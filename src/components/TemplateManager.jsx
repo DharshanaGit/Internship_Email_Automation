@@ -331,7 +331,7 @@ export default function TemplateManager({ session }) {
       {isEditorOpen && (
         <div className={styles.modalBackdrop} onClick={() => setIsEditorOpen(false)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <form onSubmit={handleSaveTemplate}>
+            <form onSubmit={handleSaveTemplate} className={styles.modalForm}>
               <div className={styles.modalHeader}>
                 <div className={styles.modalTitle}>
                   {editingTemplate ? `Edit Template: ${editingTemplate.title}` : 'Create New Email Template'}
