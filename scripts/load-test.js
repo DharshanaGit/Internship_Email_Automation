@@ -40,7 +40,7 @@ async function runLoadAndSecurityAudit() {
   });
 
   assert(!renderedXss.includes('<script>'), 'Unescaped <script> tag must NOT exist in output');
-  assert(!renderedXss.includes('onerror='), 'Unescaped onerror handler must NOT exist in output');
+  assert(!renderedXss.includes('<img src=x onerror='), 'Unescaped onerror handler must NOT exist in output');
   assert(renderedXss.includes('&lt;script&gt;'), 'Escaped &lt;script&gt; entity must be present');
   assert(renderedXss.includes('&lt;img src=x onerror=alert(1)&gt;'), 'Escaped &lt;img&gt; entity must be present');
   console.log('✓ Audit 2 Passed: XSS and HTML injection prevention verified.');
@@ -93,8 +93,8 @@ async function runLoadAndSecurityAudit() {
   const latencies = [];
 
   const insertStmt = db.prepare(`
-    INSERT INTO outreach_logs (id, college_name, email, normalized_email, department, contact_person, designation, subject, status, attempts, error_type, last_error, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ACCEPTED', 1, NULL, NULL, ?)
+    INSERT INTO outreach_logs (id, college_name, email, normalized_email, department, contact_person, designation, subject, body_html, status, attempts, failure_type, error_message, sent_by, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, '<p>load test</p>', 'ACCEPTED', 1, 'NONE', NULL, 'loadtest@shortfundly.com', ?)
   `);
 
   const now = new Date().toISOString();

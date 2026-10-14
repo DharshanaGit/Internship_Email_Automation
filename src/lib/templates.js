@@ -147,12 +147,12 @@ export function formatBodyToHtml(textOrHtml) {
  * and handles both bracket [Placeholder] and curly brace {{placeholder}} syntax.
  */
 export function renderTemplate(templateStr, variables = {}) {
-  const safeCollege = (variables.college_name || '').trim();
-  const safeDepartment = (variables.department || '').trim();
-  const safeContact = (variables.contact_person || '').trim();
-  const safeDesignation = (variables.designation || '').trim();
-  const safeSender = (variables.sender_name || 'Shortfundly Campus Outreach').trim();
-  const safeEmail = (variables.email || '').trim();
+  const safeCollege = escapeHtml((variables.college_name || '').trim());
+  const safeDepartment = escapeHtml((variables.department || '').trim());
+  const safeContact = escapeHtml((variables.contact_person || '').trim());
+  const safeDesignation = escapeHtml((variables.designation || '').trim());
+  const safeSender = escapeHtml((variables.sender_name || 'Shortfundly Campus Outreach').trim());
+  const safeEmail = escapeHtml((variables.email || '').trim());
 
   // Smart Person / Salutation Construction
   let personWithDesignation = safeContact;

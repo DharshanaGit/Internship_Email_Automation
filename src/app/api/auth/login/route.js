@@ -57,7 +57,7 @@ export async function POST(request) {
   } catch (err) {
     console.error('[API Login] Unexpected server error:', err);
     return NextResponse.json(
-      { success: false, error: 'Internal security authentication failure.' },
+      { success: false, error: err?.message ? `Authentication error: ${err.message}` : 'Internal security authentication failure.' },
       { status: 500 }
     );
   }
