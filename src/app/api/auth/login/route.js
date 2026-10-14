@@ -15,8 +15,9 @@ export async function POST(request) {
 
     const { email, password, captcha_token, captcha_answer } = parseResult.data;
 
-    // Verify cryptographic CAPTCHA challenge
-    const isCaptchaValid = verifyCaptcha(captcha_token, captcha_answer);
+    // Verify cryptographic CAPTCHA challenge (body token or cookie fallback)
+    const token = captcha_token || request.cookies.get('sf_captcha_token')?.value;
+    const isCaptchaValid = verifyCaptcha(token, captcha_answer);
     if (!isCaptchaValid) {
       return NextResponse.json(
         { success: false, error: 'Security verification failed: Incorrect or expired CAPTCHA code. Please enter the characters shown.' },

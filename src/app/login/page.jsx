@@ -17,35 +17,21 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [captchaAnswer, setCaptchaAnswer] = useState('');
-  const [captchaToken, setCaptchaToken] = useState('');
-  const [captchaSvg, setCaptchaSvg] = useState('');
-  const [loadingCaptcha, setLoadingCaptcha] = useState(false);
+  const [captchaNonce, setCaptchaNonce] = useState(1);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [capsLockActive, setCapsLockActive] = useState(false);
 
-  // Load CAPTCHA challenge
-  const fetchCaptcha = async () => {
-    try {
-      setLoadingCaptcha(true);
-      const res = await fetch('/api/auth/captcha?ts=' + Date.now());
-      if (res.ok) {
-        const data = await res.json();
-        setCaptchaSvg(data.svg);
-        setCaptchaToken(data.token);
-        setCaptchaAnswer('');
-      }
-    } catch {
-      // In case of error
-    } finally {
-      setLoadingCaptcha(false);
-    }
-  };
-
+  // Initialize nonce on mount
   useEffect(() => {
-    fetchCaptcha();
+    setCaptchaNonce(Date.now());
   }, []);
+
+  const refreshCaptcha = () => {
+    setCaptchaNonce(Date.now());
+    setCaptchaAnswer('');
+  };
 
   const checkCapsLock = (e) => {
     if (e.getModifierState) {
@@ -70,7 +56,7 @@ export default function LoginPage() {
     }
 
     if (!captchaAnswer.trim()) {
-      setError('Please enter the CAPTCHA security verification code.');
+      setError('Please enter the security verification code shown in the image.');
       return;
     }
 
@@ -93,7 +79,6 @@ export default function LoginPage() {
         body: JSON.stringify({
           email: cleanEmail.toLowerCase(),
           password,
-          captcha_token: captchaToken,
           captcha_answer: captchaAnswer.trim(),
         }),
       });
@@ -110,11 +95,11 @@ export default function LoginPage() {
         }
         setError(msg);
         // Refresh CAPTCHA challenge after each failed attempt
-        fetchCaptcha();
+        refreshCaptcha();
       }
     } catch {
       setError('Network communication failed. Please check server connection.');
-      fetchCaptcha();
+      refreshCaptcha();
     } finally {
       setLoading(false);
     }
@@ -214,24 +199,23 @@ export default function LoginPage() {
             </label>
 
             <div className={styles.captchaRow}>
-              {captchaSvg ? (
-                <div
-                  className={styles.captchaSvgWrapper}
-                  dangerouslySetInnerHTML={{ __html: captchaSvg }}
-                  title="Security Verification Code"
-                />
-              ) : (
-                <div style={{ height: '44px', width: '160px', background: '#f1f5f9', borderRadius: '4px' }} />
-              )}
+              <img
+                src={`/api/auth/captcha?format=image&v=${captchaNonce}`}
+                alt="Security Verification Code"
+                className={styles.captchaImg}
+                width={160}
+                height={44}
+                onClick={refreshCaptcha}
+                title="Click image to generate new code"
+              />
 
               <button
                 type="button"
                 className={styles.captchaRefreshBtn}
-                onClick={fetchCaptcha}
-                disabled={loadingCaptcha}
+                onClick={refreshCaptcha}
                 title="Generate a new security code"
               >
-                <RefreshCwIcon size={13} className={loadingCaptcha ? 'spin' : ''} />
+                <RefreshCwIcon size={13} />
                 <span>Refresh</span>
               </button>
             </div>

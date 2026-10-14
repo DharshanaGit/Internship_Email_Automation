@@ -123,8 +123,8 @@ export function recordSendAction(identifier) {
 export const loginSchema = z.object({
   email: z.string().email('Please enter a valid company email address.'),
   password: z.string().min(6, 'Password must be at least 6 characters.'),
-  captcha_token: z.string().min(5, 'CAPTCHA challenge expired or missing.'),
-  captcha_answer: z.string().min(2, 'Please enter the CAPTCHA security code.'),
+  captcha_token: z.string().optional().nullable(),
+  captcha_answer: z.string().min(1, 'Please enter the CAPTCHA security code.'),
 });
 
 export const outreachSendSchema = z.object({

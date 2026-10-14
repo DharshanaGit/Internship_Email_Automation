@@ -126,12 +126,15 @@
   gap: 12px;
 }
 
-.captchaSvgWrapper {
+.captchaImg {
+  width: 160px;
+  height: 44px;
   border-radius: var(--radius-sm);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--border-medium);
+  background: #f8fafc;
+  display: block;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
   flex-shrink: 0;
 }
 
@@ -147,6 +150,7 @@
   font-size: 11px;
   font-weight: 600;
   transition: all 0.15s ease;
+  cursor: pointer;
 }
 
 .captchaRefreshBtn:hover {
