@@ -4,7 +4,7 @@ export const DEFAULT_TEMPLATES = [
   {
     id: 'campus-collaboration-proposal',
     title: 'Shortfundly Campus Collaboration Proposal (Official)',
-    subjectTemplate: 'PROPOSAL FOR SHORTFUNDLY CAMPUS COLLABORATION — Empowering Student Creators at {{college_name}}',
+    subjectTemplate: 'Proposal for Shortfundly Campus Collaboration — Empowering Student Creators at {{college_name}}',
     bodyTemplate: `<p>Dear {{contact_salutation}},</p>
 
 <p>Greetings from Shortfundly!</p>
@@ -160,12 +160,15 @@ export function wrapInEmailLayout(bodyHtml) {
 
           <!-- Footer -->
           <tr>
-            <td style="background-color:#f8fafc; padding:20px 32px; border-top:1px solid #e2e8f0; text-align:center;">
-              <p style="margin:0 0 6px 0; font-size:12px; color:#64748b; font-weight:600;">
-                Shortfundly — SM Smartygen Media Networks Private Limited
+            <td style="background-color:#f8fafc; padding:24px 32px; border-top:1px solid #e2e8f0; text-align:center;">
+              <p style="margin:0 0 6px 0; font-size:12px; color:#475569; font-weight:700;">
+                Shortfundly Campus &bull; SM Smartygen Media Networks Private Limited
               </p>
-              <p style="margin:0; font-size:11px; color:#94a3b8;">
-                Chennai, Tamil Nadu, India | <a href="https://www.shortfundly.com" style="color:#e11d48; text-decoration:none;">www.shortfundly.com</a> | <a href="https://campus.shortfundly.com" style="color:#e11d48; text-decoration:none;">campus.shortfundly.com</a>
+              <p style="margin:0 0 8px 0; font-size:11px; color:#64748b;">
+                Chennai, Tamil Nadu, India | <a href="https://www.shortfundly.com" target="_blank" style="color:#e11d48; text-decoration:none;">www.shortfundly.com</a> | <a href="https://campus.shortfundly.com" target="_blank" style="color:#e11d48; text-decoration:none;">campus.shortfundly.com</a>
+              </p>
+              <p style="margin:10px 0 0 0; font-size:11px; color:#94a3b8; line-height:1.5;">
+                This institutional outreach was sent to your university/college department to discuss creator initiatives and academic collaboration. If you prefer not to receive future communications, simply reply with &ldquo;Unsubscribe&rdquo; or email <a href="mailto:campus@shortfundly.com" style="color:#64748b; text-decoration:underline;">campus@shortfundly.com</a>.
               </p>
             </td>
           </tr>

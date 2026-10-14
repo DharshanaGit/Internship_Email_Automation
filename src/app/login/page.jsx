@@ -10,12 +10,15 @@ import {
   ShieldCheckIcon,
   RefreshCwIcon,
   LockIcon,
+  EyeIcon,
+  EyeOffIcon,
 } from '@/components/Icons.jsx';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [captchaNonce, setCaptchaNonce] = useState(1);
 
@@ -50,7 +53,9 @@ export default function LoginPage() {
       return;
     }
 
-    if (!password) {
+    const cleanPassword = password.trim();
+
+    if (!cleanPassword) {
       setError('Please provide your account password.');
       return;
     }
@@ -78,7 +83,7 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: cleanEmail.toLowerCase(),
-          password,
+          password: cleanPassword,
           captcha_answer: captchaAnswer.trim(),
         }),
       });
@@ -169,16 +174,33 @@ export default function LoginPage() {
 
           {/* Password */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label} htmlFor="password">
-              Password
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className={styles.label} htmlFor="password">
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--accent-primary)',
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  padding: '0 0 4px 0',
+                }}
+              >
+                {showPassword ? 'Hide Password' : 'Show Password'}
+              </button>
+            </div>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><UserIcon size={16} /></span>
               <input
                 id="password"
-                type="password"
-                className={styles.input}
-                placeholder="••••••••••••"
+                type={showPassword ? 'text' : 'password'}
+                className={`${styles.input} ${styles.inputWithToggle}`}
+                placeholder="Enter password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -189,6 +211,15 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 required
               />
+              <button
+                type="button"
+                className={styles.togglePasswordBtn}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+              </button>
             </div>
           </div>
 

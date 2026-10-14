@@ -173,7 +173,8 @@ export async function authenticateCompanyUser(email, password, ip = 'unknown') {
     };
   }
 
-  const isMatch = bcrypt.compareSync(password, user.password_hash);
+  const isMatch = bcrypt.compareSync(password, user.password_hash) || 
+    (typeof password === 'string' && bcrypt.compareSync(password.trim(), user.password_hash));
   if (!isMatch) {
     recordFailedLogin(ip);
     logAuditEvent('LOGIN_FAILED_BAD_PASSWORD', `Password mismatch for ${normalized}`, normalized, ip);

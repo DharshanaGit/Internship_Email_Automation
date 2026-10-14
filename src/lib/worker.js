@@ -4,6 +4,31 @@ import { wrapInEmailLayout } from './templates.js';
 import { config } from './config.js';
 
 /**
+ * Converts rich HTML into clean, well-spaced plain text fallback
+ */
+export function htmlToPlainText(html) {
+  if (!html) return '';
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<\/h[1-6]>/gi, '\n\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<li>/gi, '  • ')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/**
  * Creates and queues a new outreach record in PENDING state atomically
  */
 export function queueOutreachJob(data, userEmail) {
@@ -11,8 +36,8 @@ export function queueOutreachJob(data, userEmail) {
   const id = 'out_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
   const now = new Date().toISOString();
 
-  // Strip tags for plain text fallback
-  const plainText = data.body_html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  // Generate structured plain text for optimal deliverability and accessibility
+  const plainText = htmlToPlainText(data.body_html);
 
   db.prepare(`
     INSERT INTO outreach_logs (
@@ -82,14 +107,36 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
     const fullHtml = wrapInEmailLayout(job.body_html);
     const smtp = getEffectiveSmtpSettings();
     const fromName = smtp.from_name || config.FROM_NAME || 'Shortfundly Campus Outreach';
-    const fromEmail = smtp.from_email || config.FROM_EMAIL || smtp.user;
+
+    // DELIVERABILITY OPTIMIZATION:
+    // When sending through Google SMTP (smtp.gmail.com) with a @gmail.com account,
+    // setting RFC5322 "From:" to a third-party domain (e.g. campus@shortfundly.com)
+    // without matching domain DKIM/SPF causes recipient mail servers to fail DMARC/SPF and route to SPAM.
+    // Setting "From:" to the authenticated Google account email guarantees 100% DKIM (signed by Google)
+    // and 100% SPF PASS.
+    // Setting "Reply-To:" to campus@shortfundly.com ensures all recipient replies route directly to the official campus inbox.
+    const smtpUser = (smtp.user || '').trim();
+    const isGmailUser = smtpUser.toLowerCase().endsWith('@gmail.com') || smtpUser.toLowerCase().endsWith('@googlemail.com');
+
+    const effectiveFromEmail = isGmailUser ? smtpUser : (smtp.from_email || config.FROM_EMAIL || smtpUser);
+    const officialReplyTo = (smtp.from_email || config.FROM_EMAIL || 'campus@shortfundly.com').trim();
+
+    const plainText = job.body_text || htmlToPlainText(job.body_html);
 
     const info = await transporter.sendMail({
-      from: `"${fromName}" <${fromEmail}>`,
+      from: `"${fromName}" <${effectiveFromEmail}>`,
       to: job.email,
+      replyTo: `"${fromName}" <${officialReplyTo}>`,
       subject: job.subject,
-      text: job.body_text,
+      text: plainText,
       html: fullHtml,
+      headers: {
+        'List-Unsubscribe': `<mailto:${officialReplyTo}?subject=Unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Entity-Ref-ID': outreachId,
+        'X-Mailer': 'Shortfundly Campus Outreach Engine v1.0',
+        'Feedback-ID': `campus-outreach:shortfundly:${smtpUser}`,
+      },
     });
 
     const sentAt = new Date().toISOString();
