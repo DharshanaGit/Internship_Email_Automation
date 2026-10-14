@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth.js';
-import { getDb } from '@/lib/db.js';
-import { applySecurityHeaders } from '@/lib/security.js';
+import { getDb, logAuditEvent } from '@/lib/db.js';
+import { applySecurityHeaders, validateCsrfOrigin } from '@/lib/security.js';
 
 export async function GET(request) {
   const session = await getSession(request);
@@ -57,5 +57,59 @@ export async function GET(request) {
   } catch (err) {
     console.error('[API Logs] Query error:', err);
     return NextResponse.json({ error: 'Failed to retrieve outreach logs.' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  const session = await getSession(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Only authorized users can delete outreach records
+  if (!session.can_send && session.role !== 'admin' && session.role !== 'team_lead') {
+    return NextResponse.json(
+      { error: 'Access denied: You do not have permission to delete outreach records.' },
+      { status: 403 }
+    );
+  }
+
+  if (!validateCsrfOrigin(request)) {
+    return NextResponse.json({ error: 'CSRF security validation failed.' }, { status: 403 });
+  }
+
+  try {
+    const body = await request.json().catch(() => ({}));
+    const recordId = body.id || new URL(request.url).searchParams.get('id');
+
+    if (!recordId) {
+      return NextResponse.json({ error: 'Record ID is required for deletion.' }, { status: 400 });
+    }
+
+    const db = getDb();
+    const existing = db.prepare('SELECT id, college_name, email, status FROM outreach_logs WHERE id = ?').get(recordId);
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Outreach record not found.' }, { status: 404 });
+    }
+
+    db.prepare('DELETE FROM outreach_logs WHERE id = ?').run(recordId);
+
+    logAuditEvent(
+      'OUTREACH_RECORD_DELETED',
+      { id: recordId, email: existing.email, college: existing.college_name, previous_status: existing.status },
+      session.email
+    );
+
+    const response = NextResponse.json({
+      success: true,
+      message: `Outreach record for ${existing.college_name} (${existing.email}) deleted successfully.`,
+    });
+
+    applySecurityHeaders(response.headers);
+    return response;
+  } catch (err) {
+    console.error('[API Logs DELETE] Error:', err);
+    return NextResponse.json({ error: 'Failed to delete outreach record.' }, { status: 500 });
   }
 }

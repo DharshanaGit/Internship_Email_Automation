@@ -11,7 +11,8 @@ import {
   HelpCircleIcon,
   EyeIcon,
   MailIcon,
-  CloseIcon
+  CloseIcon,
+  TrashIcon,
 } from './Icons.jsx';
 
 export default function EmailRecordsTable({
@@ -24,6 +25,8 @@ export default function EmailRecordsTable({
   onRefresh,
   onRetryRecord,
   isRetryingId = null,
+  onDeleteRecord,
+  isDeletingId = null,
 }) {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
@@ -243,6 +246,28 @@ export default function EmailRecordsTable({
                           <span>{isRetryingId === rec.id ? 'Retrying...' : 'Retry'}</span>
                         </button>
                       )}
+
+                      <button
+                        type="button"
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        onClick={() => {
+                          const targetDesc = rec.contact_person
+                            ? `${rec.contact_person} (${rec.email}) at ${rec.college_name}`
+                            : `${rec.email} at ${rec.college_name}`;
+                          if (window.confirm(`Are you sure you want to delete the outreach mail record for ${targetDesc}?`)) {
+                            onDeleteRecord && onDeleteRecord(rec.id);
+                          }
+                        }}
+                        disabled={isDeletingId === rec.id}
+                        title="Delete outreach mail record for this person"
+                      >
+                        {isDeletingId === rec.id ? (
+                          <RefreshCwIcon size={12} className="spin" />
+                        ) : (
+                          <TrashIcon size={12} />
+                        )}
+                        <span>{isDeletingId === rec.id ? 'Deleting...' : 'Delete'}</span>
+                      </button>
                     </div>
                   </td>
                 </tr>

@@ -277,6 +277,23 @@
   cursor: not-allowed;
 }
 
+.deleteBtn {
+  color: #b91c1c;
+  background: #ffffff;
+  border-color: #fca5a5;
+}
+
+.deleteBtn:hover:not(:disabled) {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #ef4444;
+}
+
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .emptyState {
   padding: 48px 24px;
   text-align: center;

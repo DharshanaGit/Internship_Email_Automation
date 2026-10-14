@@ -44,6 +44,7 @@ export default function DashboardPage() {
   const [activeFormData, setActiveFormData] = useState(null);
   const [smtpModalOpen, setSmtpModalOpen] = useState(false);
   const [retryingId, setRetryingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   // 1. Authenticate user
   useEffect(() => {
@@ -154,6 +155,28 @@ export default function DashboardPage() {
     }
   };
 
+  const handleDeleteRecord = async (recordId) => {
+    setDeletingId(recordId);
+    try {
+      const res = await fetch('/api/outreach/logs', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: recordId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || 'Failed to delete outreach record.');
+      } else {
+        fetchStats();
+        fetchLogs();
+      }
+    } catch {
+      alert('Network error while deleting outreach record.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
@@ -251,6 +274,8 @@ export default function DashboardPage() {
                 }}
                 onRetryRecord={handleRetryRecord}
                 isRetryingId={retryingId}
+                onDeleteRecord={handleDeleteRecord}
+                isDeletingId={deletingId}
               />
             </>
           )}
