@@ -85,6 +85,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
   const [filterType, setFilterType] = useState('all'); // all, eligible, duplicate, invalid, cooldown
 
   // Template & Personalization
+  const [availableTemplates, setAvailableTemplates] = useState(templates);
   const [selectedTemplateId, setSelectedTemplateId] = useState(templates[0]?.id || 'campus-collaboration-proposal');
   const [subjectTemplate, setSubjectTemplate] = useState('Collaboration with Shortfundly Campus - [College Name]');
   const [bodyTemplate, setBodyTemplate] = useState('');
@@ -96,21 +97,46 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
   const [campaignProgress, setCampaignProgress] = useState(null); // { total, current, sent, failed, skipped }
   const [campaignSummary, setCampaignSummary] = useState(null);
 
+  // Sync available templates when props change
+  useEffect(() => {
+    if (templates && templates.length > 0) {
+      setAvailableTemplates(templates);
+    }
+  }, [templates]);
+
+  // Always fetch fresh templates directly from API on mount
+  useEffect(() => {
+    async function loadFreshTemplates() {
+      try {
+        const res = await fetch('/api/outreach/templates');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.templates && data.templates.length > 0) {
+            setAvailableTemplates(data.templates);
+          }
+        }
+      } catch {
+        // Fallback to props
+      }
+    }
+    loadFreshTemplates();
+  }, []);
+
   // Sync default template
   useEffect(() => {
-    if (templates.length > 0) {
-      const active = templates.find((t) => t.id === selectedTemplateId) || templates[0];
+    if (availableTemplates.length > 0) {
+      const active = availableTemplates.find((t) => t.id === selectedTemplateId) || availableTemplates[0];
       if (active) {
         setSubjectTemplate(active.subject_template || active.subjectTemplate || '');
         setBodyTemplate(active.body_template || active.bodyTemplate || '');
       }
     }
-  }, [templates, selectedTemplateId]);
+  }, [availableTemplates, selectedTemplateId]);
 
   const handleTemplateChange = (e) => {
     const id = e.target.value;
     setSelectedTemplateId(id);
-    const chosen = templates.find((t) => t.id === id);
+    const chosen = availableTemplates.find((t) => t.id === id);
     if (chosen) {
       setSubjectTemplate(chosen.subject_template || chosen.subjectTemplate || '');
       setBodyTemplate(chosen.body_template || chosen.bodyTemplate || '');
@@ -761,7 +787,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
                   value={selectedTemplateId}
                   onChange={handleTemplateChange}
                 >
-                  {templates.map((t) => (
+                  {availableTemplates.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.title}
                     </option>

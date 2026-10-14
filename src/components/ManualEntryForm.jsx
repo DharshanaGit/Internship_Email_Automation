@@ -14,6 +14,7 @@ import {
 
 export default function ManualEntryForm({ templates = [], onOpenReview, duplicateNotice = null, user = null }) {
   const canSend = user ? (user.role === 'admin' || user.role === 'team_lead' || Boolean(user.can_send)) : true;
+  const [availableTemplates, setAvailableTemplates] = useState(templates);
   const [formData, setFormData] = useState({
     college_name: '',
     email: '',
@@ -27,12 +28,38 @@ export default function ManualEntryForm({ templates = [], onOpenReview, duplicat
   const [checkingDuplicate, setCheckingDuplicate] = useState(false);
   const [duplicateWarning, setDuplicateWarning] = useState(null);
 
-  // Synchronize default template if templates load asynchronously
+  // Synchronize available templates when props update
   useEffect(() => {
-    if (templates.length > 0 && !formData.template_id) {
-      setFormData((prev) => ({ ...prev, template_id: templates[0].id }));
+    if (templates && templates.length > 0) {
+      setAvailableTemplates(templates);
+      if (!formData.template_id) {
+        setFormData((prev) => ({ ...prev, template_id: templates[0].id }));
+      }
     }
   }, [templates]);
+
+  // Always fetch fresh templates directly from API on mount
+  useEffect(() => {
+    async function loadFreshTemplates() {
+      try {
+        const res = await fetch('/api/outreach/templates');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.templates && data.templates.length > 0) {
+            setAvailableTemplates(data.templates);
+            setFormData((prev) => {
+              // Keep previous template if valid, otherwise select first available
+              const exists = data.templates.some((t) => t.id === prev.template_id);
+              return { ...prev, template_id: exists ? prev.template_id : data.templates[0].id };
+            });
+          }
+        }
+      } catch {
+        // Fallback to props
+      }
+    }
+    loadFreshTemplates();
+  }, []);
 
   // Check duplicate when email loses focus
   const handleEmailBlur = async () => {
@@ -295,7 +322,7 @@ export default function ManualEntryForm({ templates = [], onOpenReview, duplicat
               value={formData.template_id}
               onChange={handleChange}
             >
-              {templates.map((tpl) => (
+              {availableTemplates.map((tpl) => (
                 <option key={tpl.id} value={tpl.id}>
                   {tpl.title}
                 </option>

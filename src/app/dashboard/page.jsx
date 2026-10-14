@@ -121,7 +121,7 @@ export default function DashboardPage() {
       fetchTemplates();
       fetchLogs();
     }
-  }, [user, fetchStats, fetchTemplates, fetchLogs]);
+  }, [user, activeTab, fetchStats, fetchTemplates, fetchLogs]);
 
   // Handlers
   const handleOpenReview = (formData) => {
@@ -365,7 +365,7 @@ export default function DashboardPage() {
           )}
 
           {activeTab === 'templates' && (
-            <TemplateManager session={user} />
+            <TemplateManager session={user} onTemplatesUpdated={fetchTemplates} />
           )}
 
           {activeTab === 'settings' && (

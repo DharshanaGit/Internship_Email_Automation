@@ -14,7 +14,7 @@ import {
   AlertCircleIcon,
 } from './Icons';
 
-export default function TemplateManager({ session }) {
+export default function TemplateManager({ session, onTemplatesUpdated }) {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -113,6 +113,7 @@ export default function TemplateManager({ session }) {
         setFeedback({ type: 'success', message: 'Template saved successfully.' });
         setIsEditorOpen(false);
         loadTemplates();
+        if (onTemplatesUpdated) onTemplatesUpdated();
       } else {
         setFeedback({ type: 'error', message: result.error || 'Failed to save template.' });
       }
@@ -141,6 +142,7 @@ export default function TemplateManager({ session }) {
       if (res.ok && result.success) {
         setFeedback({ type: 'success', message: 'Template deleted.' });
         loadTemplates();
+        if (onTemplatesUpdated) onTemplatesUpdated();
       } else {
         setFeedback({ type: 'error', message: result.error || 'Failed to delete template.' });
       }
