@@ -13,6 +13,7 @@ import {
   CheckCircleIcon,
   AlertCircleIcon,
 } from './Icons';
+import { renderTemplate, formatBodyToHtml } from '@/lib/templates.js';
 
 export default function TemplateManager({ session, onTemplatesUpdated }) {
   const [templates, setTemplates] = useState([]);
@@ -70,8 +71,8 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
     setEditingTemplate(null);
     setFormData({
       title: '',
-      subject_template: 'Collaboration with Shortfundly Campus - [College Name]',
-      body_template: 'Dear Sir/Madam,\n\nGreetings from Shortfundly!\n\nWe would like to propose a strategic collaboration with [College Name] for the [Department] department.\n\nBest regards,\nShortfundly Campus Team',
+      subject_template: 'Proposal for Shortfundly Campus Collaboration — Empowering Student Creators at [College Name]',
+      body_template: 'Dear [Contact Person],\n\nGreetings from Shortfundly!\n\nWe propose a strategic collaboration with [College Name] ([Department]) through Shortfundly Campus to empower student creators.\n\nWarm regards,\n[Your Name]\nProduct Manager | Shortfundly',
     });
     setIsEditorOpen(true);
   };
@@ -151,14 +152,18 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
     }
   };
 
+  const sampleVars = {
+    college_name: 'PSG College of Technology',
+    department: 'Visual Communication & Media Arts',
+    contact_person: 'Dr. K. Ramesh',
+    designation: 'Head of Department',
+    email: 'hod.viscom@psgtech.ac.in',
+    sender_name: 'Shortfundly Campus Outreach',
+  };
+
   const renderSamplePreview = (text) => {
     if (!text) return '';
-    return text
-      .replace(/\[College Name\]/gi, 'PSG College of Technology')
-      .replace(/\[Contact Person\]/gi, 'Dr. K. Ramesh')
-      .replace(/\[Department\]/gi, 'Visual Communication & Media Arts')
-      .replace(/\[Designation\]/gi, 'Head of Department')
-      .replace(/\[Recipient Email\]/gi, 'hod.viscom@psgtech.ac.in');
+    return renderTemplate(text, sampleVars);
   };
 
   const insertVariable = (varName) => {
@@ -310,9 +315,12 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
                 <div className={styles.previewHeaderItem}>
                   <strong>Sample College:</strong> PSG College of Technology (Visual Communication & Media Arts)
                 </div>
-                <div className={styles.previewBodyContent}>
-                  {renderSamplePreview(previewTemplate.body_template)}
-                </div>
+                <div
+                  className={styles.previewBodyContent}
+                  dangerouslySetInnerHTML={{
+                    __html: formatBodyToHtml(renderSamplePreview(previewTemplate.body_template)),
+                  }}
+                />
               </div>
             </div>
 
@@ -386,13 +394,6 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
                     <button
                       type="button"
                       className={styles.variableChip}
-                      onClick={() => insertVariable('[Contact Person]')}
-                    >
-                      + [Contact Person]
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.variableChip}
                       onClick={() => insertVariable('[Department]')}
                     >
                       + [Department]
@@ -400,9 +401,30 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
                     <button
                       type="button"
                       className={styles.variableChip}
+                      onClick={() => insertVariable('[Contact Person]')}
+                    >
+                      + [Contact Person]
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.variableChip}
                       onClick={() => insertVariable('[Designation]')}
                     >
                       + [Designation]
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.variableChip}
+                      onClick={() => insertVariable('[Your Name]')}
+                    >
+                      + [Your Name]
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.variableChip}
+                      onClick={() => insertVariable('[Recipient Email]')}
+                    >
+                      + [Recipient Email]
                     </button>
                   </div>
                   <textarea

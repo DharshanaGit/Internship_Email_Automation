@@ -14,7 +14,7 @@ import {
   BuildingIcon,
   MailIcon
 } from './Icons.jsx';
-import { renderTemplate } from '@/lib/templates.js';
+import { renderTemplate, formatBodyToHtml } from '@/lib/templates.js';
 
 export default function EmailReviewModal({
   isOpen,
@@ -23,6 +23,7 @@ export default function EmailReviewModal({
   onClose,
   onSuccess,
   canSend = true,
+  user,
 }) {
   const [activeTab, setActiveTab] = useState('preview'); // 'preview' | 'edit'
   const [subject, setSubject] = useState('');
@@ -31,25 +32,59 @@ export default function EmailReviewModal({
   const [sendResult, setSendResult] = useState(null);
   const [overrideReason, setOverrideReason] = useState('');
 
+  const getInterpolationVars = () => {
+    if (!initialData) return {};
+    return {
+      college_name: initialData.college_name || '',
+      department: initialData.department || '',
+      contact_person: initialData.contact_person || '',
+      designation: initialData.designation || '',
+      email: initialData.email || '',
+      sender_name: 'Shortfundly Campus Outreach',
+    };
+  };
+
   // Interpolate initial data into selected template
   useEffect(() => {
     if (!initialData) return;
 
-    const tpl = templates.find((t) => t.id === initialData.template_id) || templates[0];
-    if (tpl) {
-      const vars = {
-        college_name: initialData.college_name,
-        department: initialData.department,
-        contact_person: initialData.contact_person,
-        designation: initialData.designation,
-        sender_name: 'Shortfundly Campus Outreach',
-      };
+    let allTemplates = [...templates];
 
-      const renderedSubject = renderTemplate(tpl.subjectTemplate || tpl.subject_template || '', vars);
-      const renderedBody = renderTemplate(tpl.bodyTemplate || tpl.body_template || '', vars);
+    const applyTemplate = (tplList) => {
+      const tpl = tplList.find((t) => t.id === initialData.template_id) || tplList[0];
+      if (tpl) {
+        const vars = {
+          college_name: initialData.college_name || '',
+          department: initialData.department || '',
+          contact_person: initialData.contact_person || '',
+          designation: initialData.designation || '',
+          email: initialData.email || '',
+          sender_name: 'Shortfundly Campus Outreach',
+        };
 
-      setSubject(renderedSubject);
-      setBodyHtml(renderedBody);
+        const rawSubject = tpl.subjectTemplate || tpl.subject_template || '';
+        const rawBody = tpl.bodyTemplate || tpl.body_template || '';
+
+        const renderedSubject = renderTemplate(rawSubject, vars);
+        const renderedBody = renderTemplate(rawBody, vars);
+
+        setSubject(renderedSubject);
+        setBodyHtml(renderedBody);
+      }
+    };
+
+    if (allTemplates.length === 0) {
+      // Fetch fresh templates directly if props are empty
+      fetch('/api/outreach/templates')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.templates && data.templates.length > 0) {
+            applyTemplate(data.templates);
+          }
+        })
+        .catch(() => {});
+    } else {
+      applyTemplate(allTemplates);
     }
 
     setSendResult(null);
@@ -59,11 +94,15 @@ export default function EmailReviewModal({
 
   if (!isOpen || !initialData) return null;
 
+  const vars = getInterpolationVars();
+
   const handleSend = async () => {
     setIsSending(true);
     setSendResult(null);
 
     const hasDuplicate = Boolean(initialData.duplicateWarning?.isDuplicate);
+    const finalSubject = renderTemplate(subject, vars);
+    const finalBodyHtml = formatBodyToHtml(renderTemplate(bodyHtml, vars));
 
     try {
       const response = await fetch('/api/outreach/send', {
@@ -75,8 +114,8 @@ export default function EmailReviewModal({
           department: initialData.department,
           contact_person: initialData.contact_person || null,
           designation: initialData.designation || null,
-          subject,
-          body_html: bodyHtml,
+          subject: finalSubject,
+          body_html: finalBodyHtml,
           override_duplicate: hasDuplicate,
           override_reason: hasDuplicate ? overrideReason || 'Manual user override after review' : null,
         }),
@@ -169,11 +208,11 @@ export default function EmailReviewModal({
           {activeTab === 'preview' ? (
             <div className={styles.previewContainer}>
               <div className={styles.previewSubject}>
-                Subject: {subject}
+                Subject: {renderTemplate(subject, vars)}
               </div>
               <div
                 className={styles.previewHtml}
-                dangerouslySetInnerHTML={{ __html: bodyHtml }}
+                dangerouslySetInnerHTML={{ __html: formatBodyToHtml(renderTemplate(bodyHtml, vars)) }}
               />
             </div>
           ) : (

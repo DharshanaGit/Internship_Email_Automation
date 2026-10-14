@@ -440,10 +440,24 @@
 .previewBodyContent {
   font-size: 13px;
   color: var(--text-primary);
-  line-height: 1.7;
-  white-space: pre-wrap;
+  line-height: 1.65;
   border-top: 1px solid var(--border-subtle);
   padding-top: 14px;
+}
+
+.previewBodyContent p {
+  margin: 0 0 14px 0;
+  line-height: 1.65;
+}
+
+.previewBodyContent strong {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.previewBodyContent a {
+  color: #2563eb;
+  text-decoration: underline;
 }
 
 .emptyState {

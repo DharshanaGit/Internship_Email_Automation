@@ -14,6 +14,7 @@ import {
   CloseIcon,
   TrashIcon,
 } from './Icons.jsx';
+import { formatBodyToHtml } from '@/lib/templates.js';
 
 export default function EmailRecordsTable({
   records = [],
@@ -356,7 +357,7 @@ export default function EmailRecordsTable({
                 >
                   Subject: {selectedRecord.subject}
                 </div>
-                <div dangerouslySetInnerHTML={{ __html: selectedRecord.body_html }} />
+                <div dangerouslySetInnerHTML={{ __html: formatBodyToHtml(selectedRecord.body_html) }} />
               </div>
 
               {selectedRecord.error_message && (

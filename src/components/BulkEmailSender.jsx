@@ -11,6 +11,7 @@ import {
   CloseIcon,
   SendIcon,
 } from './Icons.jsx';
+import { renderTemplate, formatBodyToHtml } from '@/lib/templates.js';
 
 // RFC-compliant CSV parser handling quoted strings and commas
 function parseCsv(text) {
@@ -288,12 +289,15 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
 
   const mergePlaceholders = (text, item) => {
     if (!text || !item) return text || '';
-    return text
-      .replace(/\[College Name\]/gi, item.college_name || '[College Name]')
-      .replace(/\[Contact Person\]/gi, item.contact_person || 'Sir/Madam')
-      .replace(/\[Department\]/gi, item.department || '[Department]')
-      .replace(/\[Designation\]/gi, item.designation || '[Designation]')
-      .replace(/\[Recipient Email\]/gi, item.email || '[Recipient Email]');
+    const vars = {
+      college_name: item.college_name || '',
+      department: item.department || '',
+      contact_person: item.contact_person || '',
+      designation: item.designation || '',
+      email: item.email || '',
+      sender_name: 'Shortfundly Campus Outreach',
+    };
+    return renderTemplate(text, vars);
   };
 
   const insertVariable = (varName) => {
@@ -352,12 +356,8 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
       const personalizedSubject = mergePlaceholders(subjectTemplate, target);
       const personalizedBody = mergePlaceholders(bodyTemplate, target);
 
-      // Convert body to simple clean HTML
-      const bodyHtml = `
-        <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #1e293b;">
-          ${personalizedBody.replace(/\n/g, '<br/>')}
-        </div>
-      `;
+      // Convert body to well-aligned HTML preserving paragraphs and links
+      const bodyHtml = formatBodyToHtml(personalizedBody);
 
       try {
         const res = await fetch('/api/outreach/send', {
@@ -847,9 +847,12 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
                 Subject: {mergePlaceholders(subjectTemplate, activeRecipient)}
               </div>
 
-              <div className={styles.previewBody}>
-                {mergePlaceholders(bodyTemplate, activeRecipient)}
-              </div>
+              <div
+                className={styles.previewBody}
+                dangerouslySetInnerHTML={{
+                  __html: formatBodyToHtml(mergePlaceholders(bodyTemplate, activeRecipient)),
+                }}
+              />
             </div>
           </div>
 

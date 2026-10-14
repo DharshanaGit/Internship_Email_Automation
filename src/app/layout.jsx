@@ -1,4 +1,5 @@
 import './globals.css';
+import ProductionDebugBlocker from '@/components/ProductionDebugBlocker.jsx';
 
 export const metadata = {
   title: 'Shortfundly Campus Outreach Portal',
@@ -16,7 +17,10 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <ProductionDebugBlocker />
+        {children}
+      </body>
     </html>
   );
 }

@@ -96,39 +96,192 @@ SM Smartygen Media Networks Private Limited</p>`,
 ];
 
 /**
- * Safely renders a template string with escaped variable values
+ * Ensures text line breaks, paragraphs, and indentation are formatted into standard HTML
+ * preserving exact visual alignment across all email clients (Gmail, Outlook, Yahoo) and web preview panes.
+ * Converts markdown links and bold emphasis to genuine HTML elements.
+ */
+export function formatBodyToHtml(textOrHtml) {
+  if (!textOrHtml) return '';
+
+  // Check if string already contains structural HTML tags (<p>, <div>, <table>, <ul>, <ol>, <h1-6>)
+  const hasStructuralTags = /<(p|div|table|ul|ol|h[1-6]|blockquote)\b[^>]*>/i.test(textOrHtml);
+
+  if (hasStructuralTags) {
+    return textOrHtml;
+  }
+
+  let processed = textOrHtml;
+
+  // Convert markdown links: [text](url) -> <a href="url">text</a>
+  processed = processed.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    '<a href="$2" target="_blank" style="color: #2563eb; text-decoration: underline;">$1</a>'
+  );
+
+  // Convert standalone http/https URLs not already wrapped in tags
+  processed = processed.replace(
+    /(^|[\s(])(https?:\/\/[^\s<)]+)/g,
+    '$1<a href="$2" target="_blank" style="color: #2563eb; text-decoration: underline;">$2</a>'
+  );
+
+  // Convert markdown bold: **text** or *text* -> <strong>text</strong>
+  processed = processed.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+  processed = processed.replace(/(^|[\s(])\*([^*\n]+)\*([\s.,!?)]|$)/gm, '$1<strong>$2</strong>$3');
+
+  // Convert plain text with double newlines into semantic paragraphs and single newlines to <br />
+  const paragraphs = processed.split(/\r?\n\s*\r?\n/);
+  return paragraphs
+    .map((para) => {
+      const trimmed = para.trim();
+      if (!trimmed) return '';
+      const withLineBreaks = trimmed.replace(/\r?\n/g, '<br />\n');
+      return `<p style="margin: 0 0 16px 0; line-height: 1.65; color: #111827;">${withLineBreaks}</p>`;
+    })
+    .filter(Boolean)
+    .join('\n');
+}
+
+/**
+ * Safely renders a template string with escaped variable values.
+ * Intelligently personalizes greetings, college & department clauses, contact person & designation,
+ * and handles both bracket [Placeholder] and curly brace {{placeholder}} syntax.
  */
 export function renderTemplate(templateStr, variables = {}) {
-  const safeCollege = escapeHtml(variables.college_name || '');
-  const safeDepartment = variables.department ? escapeHtml(variables.department) : '';
-  const safeContact = variables.contact_person ? escapeHtml(variables.contact_person) : '';
-  const safeSender = variables.sender_name ? escapeHtml(variables.sender_name) : 'Shortfundly Campus Team';
+  const safeCollege = (variables.college_name || '').trim();
+  const safeDepartment = (variables.department || '').trim();
+  const safeContact = (variables.contact_person || '').trim();
+  const safeDesignation = (variables.designation || '').trim();
+  const safeSender = (variables.sender_name || 'Shortfundly Campus Outreach').trim();
+  const safeEmail = (variables.email || '').trim();
 
-  const salutation = safeContact ? safeContact : 'Sir/Madam';
+  // Smart Person / Salutation Construction
+  let personWithDesignation = safeContact;
+  if (safeContact && safeDesignation) {
+    personWithDesignation = `${safeContact} (${safeDesignation})`;
+  } else if (!safeContact && safeDesignation) {
+    personWithDesignation = safeDesignation;
+  }
+  const salutation = personWithDesignation || 'Sir/Madam';
+
+  // Smart College & Department Construction
+  let collegeWithDepartment = safeCollege;
+  if (safeCollege && safeDepartment) {
+    collegeWithDepartment = `${safeCollege} (${safeDepartment})`;
+  } else if (!safeCollege && safeDepartment) {
+    collegeWithDepartment = safeDepartment;
+  }
   const departmentClause = safeDepartment ? ` (${safeDepartment})` : '';
 
-  return (templateStr || '')
-    .replace(/\{\{college_name\}\}/g, safeCollege)
-    .replace(/\{\{department\}\}/g, safeDepartment)
-    .replace(/\{\{department_clause\}\}/g, departmentClause)
-    .replace(/\{\{contact_person\}\}/g, safeContact)
-    .replace(/\{\{contact_salutation\}\}/g, salutation)
-    .replace(/\{\{sender_name\}\}/g, safeSender);
+  let output = templateStr || '';
+
+  // 1. First replace combined placeholders if used
+  output = output
+    .replace(/\[\s*(?:Contact\s*Person|Contact)\s*(?:&|and)\s*Designation\s*\]/gi, salutation)
+    .replace(/\[\s*(?:College\s*Name|College)\s*(?:&|and)\s*Department\s*\]/gi, collegeWithDepartment);
+
+  // 2. Intelligently personalize greeting if generic "Dear Sir/Madam" is used and contact person is provided
+  if (safeContact) {
+    output = output
+      .replace(/Dear\s+(?:Sir\s*\/\s*Madam|Sir|Madam|Faculty\s+Coordinator|Coordinator)\s*,/gi, `Dear ${salutation},`)
+      .replace(/Respected\s+(?:Sir\s*\/\s*Madam|Sir|Madam)\s*,/gi, `Respected ${salutation},`);
+  }
+
+  // 3. College Name replacements
+  output = output
+    .replace(/\[\s*College\s*Name\s*\]/gi, safeCollege)
+    .replace(/\[\s*college_name\s*\]/gi, safeCollege)
+    .replace(/\[\s*College\s*\]/gi, safeCollege)
+    .replace(/\[\s*collegename\s*\]/gi, safeCollege)
+    .replace(/\[\s*Institution\s*\]/gi, safeCollege)
+    .replace(/\[\s*University\s*\]/gi, safeCollege)
+    .replace(/\{\{\s*college_name\s*\}\}/gi, safeCollege)
+    .replace(/\{\s*college_name\s*\}/gi, safeCollege)
+    .replace(/\{\{\s*college\s*\}\}/gi, safeCollege)
+    .replace(/\{\s*college\s*\}/gi, safeCollege);
+
+  // 4. Contact Person / Salutation replacements
+  output = output
+    .replace(/\[\s*Contact\s*Person\s*\]/gi, salutation)
+    .replace(/\[\s*contact_person\s*\]/gi, salutation)
+    .replace(/\[\s*contactperson\s*\]/gi, salutation)
+    .replace(/\[\s*Faculty\s*Name\s*\]/gi, salutation)
+    .replace(/\[\s*Faculty\s*\]/gi, salutation)
+    .replace(/\[\s*Contact\s*\]/gi, salutation)
+    .replace(/\[\s*Person\s*Name\s*\]/gi, salutation)
+    .replace(/\[\s*Name\s*\]/gi, salutation)
+    .replace(/\[\s*Salutation\s*\]/gi, salutation)
+    .replace(/\{\{\s*contact_person\s*\}\}/gi, salutation)
+    .replace(/\{\s*contact_person\s*\}/gi, salutation)
+    .replace(/\{\{\s*contact_salutation\s*\}\}/gi, salutation)
+    .replace(/\{\s*contact_salutation\s*\}/gi, salutation)
+    .replace(/\{\{\s*name\s*\}\}/gi, salutation);
+
+  // 5. Department replacements
+  const hasDepartmentPlaceholder = /\[\s*(?:Department|dept|division)\s*\]|\{\{\s*department\s*\}\}/i.test(templateStr);
+  output = output
+    .replace(/\[\s*Department\s*\]/gi, safeDepartment)
+    .replace(/\[\s*department\s*\]/gi, safeDepartment)
+    .replace(/\[\s*Dept\s*\]/gi, safeDepartment)
+    .replace(/\[\s*dept\s*\]/gi, safeDepartment)
+    .replace(/\[\s*Division\s*\]/gi, safeDepartment)
+    .replace(/\{\{\s*department\s*\}\}/gi, safeDepartment)
+    .replace(/\{\s*department\s*\}/gi, safeDepartment)
+    .replace(/\{\{\s*department_clause\s*\}\}/gi, departmentClause);
+
+  // If the template had NO department placeholder at all, but the user supplied a Department:
+  // ensure the department is included alongside the college name in phrases like "collaboration with [College Name]"
+  if (!hasDepartmentPlaceholder && safeDepartment && safeCollege) {
+    const escapedCollege = safeCollege.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(collaboration\\s+with\\s+${escapedCollege})(?!\\s*\\()`, 'gi');
+    output = output.replace(regex, `$1 (${safeDepartment})`);
+  }
+
+  // 6. Designation replacements
+  output = output
+    .replace(/\[\s*Designation\s*\]/gi, safeDesignation)
+    .replace(/\[\s*designation\s*\]/gi, safeDesignation)
+    .replace(/\[\s*Role\s*\]/gi, safeDesignation)
+    .replace(/\[\s*Title\s*\]/gi, safeDesignation)
+    .replace(/\{\{\s*designation\s*\}\}/gi, safeDesignation)
+    .replace(/\{\s*designation\s*\}/gi, safeDesignation);
+
+  // 7. Sender Name replacements
+  output = output
+    .replace(/\[\s*Your\s*Name\s*\]/gi, safeSender)
+    .replace(/\[\s*your_name\s*\]/gi, safeSender)
+    .replace(/\[\s*Sender\s*Name\s*\]/gi, safeSender)
+    .replace(/\[\s*sender_name\s*\]/gi, safeSender)
+    .replace(/\[\s*Sender\s*\]/gi, safeSender)
+    .replace(/\{\{\s*sender_name\s*\}\}/gi, safeSender)
+    .replace(/\{\s*sender_name\s*\}/gi, safeSender);
+
+  // 8. Recipient Email replacements
+  output = output
+    .replace(/\[\s*Recipient\s*Email\s*\]/gi, safeEmail)
+    .replace(/\[\s*recipient_email\s*\]/gi, safeEmail)
+    .replace(/\[\s*Email\s*\]/gi, safeEmail)
+    .replace(/\{\{\s*email\s*\}\}/gi, safeEmail)
+    .replace(/\{\s*email\s*\}/gi, safeEmail);
+
+  return output;
 }
 
 /**
  * Wraps body in a clean, natural plain-email layout without promotional banners, cards, or photo flyers
+ * Ensures paragraph structure and line breaks are fully preserved across all email clients.
  */
 export function wrapInEmailLayout(bodyHtml) {
+  const content = formatBodyToHtml(bodyHtml);
+
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 20px; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #111827;">
-  <div style="max-width: 680px; margin: 0; color: #111827;">
-    ${bodyHtml}
+<body style="margin: 0; padding: 20px; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.65; color: #111827;">
+  <div style="max-width: 680px; margin: 0; color: #111827; line-height: 1.65;">
+    ${content}
     
     <div style="margin-top: 36px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; line-height: 1.5;">
       Shortfundly Campus &bull; SM Smartygen Media Networks Private Limited<br />

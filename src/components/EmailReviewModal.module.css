@@ -201,8 +201,34 @@
 
 .previewHtml {
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--text-primary);
+}
+
+.previewHtml p {
+  margin: 0 0 16px 0;
+  line-height: 1.65;
+}
+
+.previewHtml strong {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.previewHtml a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.previewHtml ul,
+.previewHtml ol {
+  margin: 0 0 16px 0;
+  padding-left: 24px;
+  line-height: 1.65;
+}
+
+.previewHtml li {
+  margin-bottom: 6px;
 }
 
 .duplicateAlertBox {
