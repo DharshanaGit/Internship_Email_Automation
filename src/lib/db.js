@@ -263,10 +263,16 @@ class MemorySqlStore {
         }
       };
     }
-    if (s.includes('INSERT INTO system_settings')) {
+    if (s.includes('INSERT INTO system_settings') || s.includes('INSERT OR IGNORE INTO system_settings')) {
       return {
         run: (key, value) => {
-          self.settings.set(key, value);
+          if (s.includes('INSERT OR IGNORE')) {
+            if (!self.settings.has(key)) {
+              self.settings.set(key, value);
+            }
+          } else {
+            self.settings.set(key, value);
+          }
           return { changes: 1 };
         }
       };
@@ -449,6 +455,23 @@ export function getDb() {
       }
       console.log('[Database] Pre-seeded default Shortfundly email templates.');
     }
+
+    // Pre-seed default system_settings
+    const nowIso = new Date().toISOString();
+    const seedSetting = db.prepare(`
+      INSERT OR IGNORE INTO system_settings (key, value, updated_at, updated_by)
+      VALUES (?, ?, ?, 'system')
+    `);
+    seedSetting.run('smtp_host', config.SMTP_HOST || 'smtp.gmail.com', nowIso);
+    seedSetting.run('smtp_port', String(config.SMTP_PORT || 465), nowIso);
+    seedSetting.run('smtp_secure', config.SMTP_SECURE ? '1' : '0', nowIso);
+    seedSetting.run('smtp_user', config.SMTP_USER || 'dharshana.shortfundly@gmail.com', nowIso);
+    if (config.SMTP_PASS) {
+      seedSetting.run('smtp_pass', config.SMTP_PASS, nowIso);
+    }
+    seedSetting.run('from_email', config.FROM_EMAIL || 'campus@shortfundly.com', nowIso);
+    seedSetting.run('from_name', config.FROM_NAME || 'Shortfundly Campus Outreach', nowIso);
+    seedSetting.run('smtp_auth_method', 'app_password', nowIso);
 
     dbInstance = db;
     return dbInstance;

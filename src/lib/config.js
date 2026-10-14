@@ -13,7 +13,7 @@ const envSchema = z.object({
   SMTP_HOST: z.string().default('smtp.gmail.com'),
   SMTP_PORT: z.coerce.number().default(465),
   SMTP_SECURE: z.coerce.boolean().default(true),
-  SMTP_USER: z.string().optional().default(''),
+  SMTP_USER: z.string().optional().default('dharshana.shortfundly@gmail.com'),
   SMTP_PASS: z.string().optional().default(''),
   FROM_EMAIL: z.string().default('campus@shortfundly.com'),
   FROM_NAME: z.string().default('Shortfundly Campus Outreach'),
