@@ -1,0 +1,327 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import styles from './ManualEntryForm.module.css';
+import {
+  BuildingIcon,
+  MailIcon,
+  UserIcon,
+  EyeIcon,
+  ShieldAlertIcon,
+  AlertCircleIcon,
+  RefreshCwIcon
+} from './Icons.jsx';
+
+export default function ManualEntryForm({ templates = [], onOpenReview, duplicateNotice = null, user = null }) {
+  const canSend = user ? (user.role === 'admin' || user.role === 'team_lead' || Boolean(user.can_send)) : true;
+  const [formData, setFormData] = useState({
+    college_name: '',
+    email: '',
+    department: '',
+    contact_person: '',
+    designation: '',
+    template_id: templates[0]?.id || 'campus-collaboration-proposal',
+  });
+
+  const [errors, setErrors] = useState({});
+  const [checkingDuplicate, setCheckingDuplicate] = useState(false);
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
+
+  // Synchronize default template if templates load asynchronously
+  useEffect(() => {
+    if (templates.length > 0 && !formData.template_id) {
+      setFormData((prev) => ({ ...prev, template_id: templates[0].id }));
+    }
+  }, [templates]);
+
+  // Check duplicate when email loses focus
+  const handleEmailBlur = async () => {
+    const email = formData.email.trim();
+    if (!email || !email.includes('@')) {
+      setDuplicateWarning(null);
+      return;
+    }
+
+    setCheckingDuplicate(true);
+    try {
+      const res = await fetch('/api/outreach/check-duplicate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (data.isDuplicate) {
+        setDuplicateWarning(data);
+      } else {
+        setDuplicateWarning(null);
+      }
+    } catch {
+      // Ignore network hiccup
+    } finally {
+      setCheckingDuplicate(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+    if (name === 'email') {
+      setDuplicateWarning(null);
+    }
+  };
+
+  const handleReset = () => {
+    setFormData({
+      college_name: '',
+      email: '',
+      department: '',
+      contact_person: '',
+      designation: '',
+      template_id: templates[0]?.id || 'campus-collaboration-proposal',
+    });
+    setErrors({});
+    setDuplicateWarning(null);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Client-side validation
+    const newErrors = {};
+    if (!formData.college_name.trim()) {
+      newErrors.college_name = 'College name is required';
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = 'Recipient college email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      newErrors.email = 'Please provide a valid email format';
+    }
+    if (!formData.department.trim()) {
+      newErrors.department = 'Department / faculty name is required';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Launch email review & edit modal with populated template
+    onOpenReview({
+      ...formData,
+      duplicateWarning,
+    });
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <div className={styles.titleArea}>
+          <div className={styles.iconBadge}>
+            <BuildingIcon size={18} />
+          </div>
+          <div>
+            <h2 className={styles.title}>College Outreach Dispatcher</h2>
+            <p className={styles.subtitle}>Enter campus credentials to generate customized partnership proposal</p>
+          </div>
+        </div>
+        <div className={styles.stepIndicator}>Target Institution Dispatch</div>
+      </div>
+
+      {!canSend && (
+        <div style={{
+          marginBottom: '20px',
+          padding: '12px 16px',
+          background: 'rgba(245, 158, 11, 0.08)',
+          border: '1px solid rgba(245, 158, 11, 0.3)',
+          borderRadius: 'var(--radius-sm)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          color: '#fbbf24',
+          fontSize: '12px',
+        }}>
+          <AlertCircleIcon size={16} />
+          <span>
+            <strong>Read-Only Access:</strong> Your account is configured as Manager with view-only permissions. You can review template previews, but email dispatch requires Administrator authorization.
+          </span>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div className={styles.formGrid}>
+          {/* College Name */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label} htmlFor="college_name">
+              <span>College / University Name <span className={styles.required}>*</span></span>
+            </label>
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputIcon}><BuildingIcon size={16} /></span>
+              <input
+                id="college_name"
+                name="college_name"
+                type="text"
+                className={styles.input}
+                placeholder="e.g. PSG College of Technology"
+                value={formData.college_name}
+                onChange={handleChange}
+              />
+            </div>
+            {errors.college_name && (
+              <div className={styles.errorText}>
+                <AlertCircleIcon size={12} />
+                <span>{errors.college_name}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Recipient Email */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label} htmlFor="email">
+              <span>Recipient Email Address <span className={styles.required}>*</span></span>
+              {checkingDuplicate && (
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                  Checking duplicate...
+                </span>
+              )}
+            </label>
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputIcon}><MailIcon size={16} /></span>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                className={styles.input}
+                placeholder="e.g. placement@psgtech.edu / hod.media@college.edu"
+                value={formData.email}
+                onChange={handleChange}
+                onBlur={handleEmailBlur}
+              />
+            </div>
+            {errors.email && (
+              <div className={styles.errorText}>
+                <AlertCircleIcon size={12} />
+                <span>{errors.email}</span>
+              </div>
+            )}
+
+            {duplicateWarning && (
+              <div className={styles.duplicateBanner}>
+                <ShieldAlertIcon size={16} />
+                <span>
+                  <strong>Duplicate Safeguard:</strong> Outreach was already initiated for this email{' '}
+                  {duplicateWarning.daysAgo === 0 ? 'today' : `${duplicateWarning.daysAgo} day(s) ago`}{' '}
+                  (Status: {duplicateWarning.lastRecord?.status}). You can review before sending with an override reason.
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Department / Division */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label} htmlFor="department">
+              <span>Department / Student Club <span className={styles.required}>*</span></span>
+            </label>
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputIcon}><BuildingIcon size={16} /></span>
+              <input
+                id="department"
+                name="department"
+                type="text"
+                className={styles.input}
+                placeholder="e.g. Media & Visual Communication / Student Film Society"
+                value={formData.department}
+                onChange={handleChange}
+              />
+            </div>
+            {errors.department && (
+              <div className={styles.errorText}>
+                <AlertCircleIcon size={12} />
+                <span>{errors.department}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Contact Person */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label} htmlFor="contact_person">
+              <span>Contact Person / Faculty Name</span>
+            </label>
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputIcon}><UserIcon size={16} /></span>
+              <input
+                id="contact_person"
+                name="contact_person"
+                type="text"
+                className={styles.input}
+                placeholder="e.g. Dr. R. Sundaram (Leave blank for Sir/Madam)"
+                value={formData.contact_person}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          {/* Designation */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label} htmlFor="designation">
+              <span>Designation</span>
+            </label>
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputIcon}><UserIcon size={16} /></span>
+              <input
+                id="designation"
+                name="designation"
+                type="text"
+                className={styles.input}
+                placeholder="e.g. Faculty Coordinator / Placement Officer"
+                value={formData.designation}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          {/* Template Selection */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label} htmlFor="template_id">
+              <span>Outreach Template</span>
+            </label>
+            <select
+              id="template_id"
+              name="template_id"
+              className={styles.select}
+              value={formData.template_id}
+              onChange={handleChange}
+            >
+              {templates.map((tpl) => (
+                <option key={tpl.id} value={tpl.id}>
+                  {tpl.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className={styles.buttonRow}>
+          <button
+            type="button"
+            className={styles.resetBtn}
+            onClick={handleReset}
+          >
+            Clear Fields
+          </button>
+
+          <button
+            type="submit"
+            className={styles.reviewBtn}
+          >
+            <EyeIcon size={16} />
+            <span>Review &amp; Edit Content Before Dispatch</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
