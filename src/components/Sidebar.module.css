@@ -21,8 +21,9 @@
 }
 
 .logoImg {
-  height: 38px;
+  height: 42px;
   width: auto;
+  max-width: 190px;
   object-fit: contain;
   display: block;
 }

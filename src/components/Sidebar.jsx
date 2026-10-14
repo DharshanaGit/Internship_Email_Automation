@@ -56,9 +56,13 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
       {/* Brand Header */}
       <div className={styles.brandArea}>
         <img
-          src="/sf_logo.png"
+          src="/sf_logo.svg"
           alt="Shortfundly"
           className={styles.logoImg}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = '/sf_logo.png';
+          }}
         />
         <div className={styles.brandText}>
           <div className={styles.portalTitle}>Shortfundly Campus Outreach Portal</div>

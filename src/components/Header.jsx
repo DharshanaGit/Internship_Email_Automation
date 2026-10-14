@@ -13,9 +13,13 @@ export default function Header({ user, onOpenSmtpDiagnostics, onLogout }) {
           <div className={styles.logoWrapper}>
             {/* Shortfundly Official Logo */}
             <img
-              src="/sf_logo.png"
+              src="/sf_logo.svg"
               alt="Shortfundly"
               className={styles.logoImg}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = '/sf_logo.png';
+              }}
             />
           </div>
           <div className={styles.divider} />

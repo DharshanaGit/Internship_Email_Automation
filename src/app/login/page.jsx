@@ -115,9 +115,13 @@ export default function LoginPage() {
       <div className={styles.card}>
         <div className={styles.header}>
           <img
-            src="/sf_logo.png"
+            src="/sf_logo.svg"
             alt="Shortfundly"
             className={styles.logo}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = '/sf_logo.png';
+            }}
           />
           <div className={styles.titleArea}>
             <h1 className={styles.title}>Shortfundly Campus Outreach Portal</h1>
