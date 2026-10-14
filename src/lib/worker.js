@@ -1,5 +1,5 @@
 import { getDb, logAuditEvent, getEffectiveSmtpSettings } from './db.js';
-import { getMailerTransporter, classifySmtpError } from './mailer.js';
+import { getMailerTransporter, classifySmtpError, formatSmtpErrorMessage } from './mailer.js';
 import { wrapInEmailLayout } from './templates.js';
 import { config } from './config.js';
 
@@ -169,6 +169,7 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
   } catch (error) {
     const classification = classifySmtpError(error);
     const finalStatus = classification.type === 'UNKNOWN' ? 'UNKNOWN' : 'FAILED';
+    const cleanErrorMessage = formatSmtpErrorMessage(error);
 
     db.prepare(`
       UPDATE outreach_logs
@@ -180,7 +181,7 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
     `).run(
       finalStatus,
       classification.type,
-      error.message || 'Unknown SMTP error',
+      cleanErrorMessage,
       error.response || null,
       outreachId
     );
@@ -189,14 +190,14 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
       id: outreachId,
       email: job.email,
       classification,
-      error: error.message
+      error: cleanErrorMessage
     }, userEmail);
 
     return {
       success: false,
       status: finalStatus,
       classification,
-      error: error.message,
+      error: cleanErrorMessage,
     };
   }
 }

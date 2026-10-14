@@ -110,7 +110,7 @@ export async function verifySmtpConnection(customConfig = null) {
       host: smtp.host,
       port: smtp.port,
       user: smtp.user,
-      message: err.message || 'Failed to authenticate with Google SMTP server.',
+      message: formatSmtpErrorMessage(err),
     };
   } finally {
     if (testTransport && typeof testTransport.close === 'function') {
@@ -119,6 +119,21 @@ export async function verifySmtpConnection(customConfig = null) {
       } catch {}
     }
   }
+}
+
+/**
+ * Formats and sanitizes raw SMTP errors so sensitive trace or raw socket dumps aren't exposed in UI
+ */
+export function formatSmtpErrorMessage(error) {
+  const msg = error?.message || 'SMTP delivery attempt failed.';
+  if (msg.includes('535') || msg.includes('BadCredentials') || msg.includes('Username and Password not accepted')) {
+    return 'Google SMTP authentication failed. Please verify your Google Account email and 16-character Google App Password in Settings.';
+  }
+  if (msg.includes('ETIMEDOUT') || msg.includes('ECONNREFUSED') || msg.includes('ENOTFOUND')) {
+    return 'Could not connect to Google SMTP server (smtp.gmail.com:465). Please check network connectivity.';
+  }
+  // Remove Google tracking tokens / hex socket IDs
+  return msg.split('\n')[0].replace(/[a-z0-9]{15,}\.[0-9]+/gi, '').trim();
 }
 
 /**
