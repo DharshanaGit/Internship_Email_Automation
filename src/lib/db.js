@@ -52,6 +52,16 @@ class MemorySqlStore {
         created_at: new Date().toISOString(),
       });
     }
+
+    // Default Google SMTP settings from environment
+    this.settings.set('smtp_host', config.SMTP_HOST || 'smtp.gmail.com');
+    this.settings.set('smtp_port', String(config.SMTP_PORT || 465));
+    this.settings.set('smtp_secure', config.SMTP_SECURE ? '1' : '0');
+    if (config.SMTP_USER) this.settings.set('smtp_user', config.SMTP_USER);
+    if (config.SMTP_PASS) this.settings.set('smtp_pass', config.SMTP_PASS);
+    this.settings.set('from_email', config.FROM_EMAIL || 'campus@shortfundly.com');
+    this.settings.set('from_name', config.FROM_NAME || 'Shortfundly Campus Outreach');
+    this.settings.set('smtp_auth_method', 'app_password');
   }
 
   exec() {

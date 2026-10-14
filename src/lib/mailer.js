@@ -22,9 +22,12 @@ export function getMailerTransporter(forceRefresh = false) {
 
   const smtp = getEffectiveSmtpSettings();
 
-  if (!smtp.user || !smtp.pass) {
+  const authUser = smtp.user ? smtp.user.trim() : '';
+  const authPass = smtp.pass ? smtp.pass.trim() : '';
+
+  if (!authUser || !authPass) {
     throw new Error(
-      'Production Google SMTP credentials are missing. Configure your Google Account and 16-character App Password in Settings or .env.local.'
+      'Production Google SMTP credentials are missing. Configure your Google Account and 16-character App Password in Settings or environment variables.'
     );
   }
 
@@ -36,8 +39,8 @@ export function getMailerTransporter(forceRefresh = false) {
     maxConnections: 5,
     maxMessages: 100,
     auth: {
-      user: smtp.user,
-      pass: smtp.pass,
+      user: authUser,
+      pass: authPass,
     },
     tls: {
       rejectUnauthorized: true,
@@ -58,7 +61,10 @@ export function getMailerTransporter(forceRefresh = false) {
 export async function verifySmtpConnection(customConfig = null) {
   const smtp = customConfig || getEffectiveSmtpSettings();
 
-  if (!smtp.user || !smtp.pass) {
+  const authUser = smtp.user ? smtp.user.trim() : '';
+  const authPass = smtp.pass ? smtp.pass.trim() : '';
+
+  if (!authUser || !authPass) {
     return {
       success: false,
       configured: false,
@@ -76,8 +82,8 @@ export async function verifySmtpConnection(customConfig = null) {
       port: Number(smtp.port) || 465,
       secure: Boolean(smtp.secure),
       auth: {
-        user: smtp.user,
-        pass: smtp.pass,
+        user: authUser,
+        pass: authPass,
       },
       tls: {
         rejectUnauthorized: true,
