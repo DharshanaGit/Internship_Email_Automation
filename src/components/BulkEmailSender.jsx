@@ -13,10 +13,39 @@ import {
 } from './Icons.jsx';
 import { renderTemplate, formatBodyToHtml } from '@/lib/templates.js';
 
-// RFC-compliant CSV parser handling quoted strings and commas
-function parseCsv(text) {
+import * as XLSX from 'xlsx';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EXTRACT_EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+
+function cleanString(val) {
+  if (val === null || val === undefined) return '';
+  return String(val).trim();
+}
+
+function extractEmail(val) {
+  if (!val) return '';
+  const s = String(val).trim();
+  const match = s.match(EXTRACT_EMAIL_REGEX);
+  return match ? match[0].toLowerCase() : s.toLowerCase();
+}
+
+// Resilient Text CSV parser fallback for edge cases
+function parseCsvTextTo2D(text) {
   const lines = text.split(/\r\n|\n|\r/).filter((line) => line.trim().length > 0);
-  if (lines.length < 2) return [];
+  if (lines.length === 0) return [];
+
+  const firstLine = lines[0];
+  const delimiters = [',', ';', '\t', '|'];
+  let bestDelim = ',';
+  let maxCount = -1;
+  for (const d of delimiters) {
+    const count = (firstLine.match(new RegExp('\\' + d, 'g')) || []).length;
+    if (count > maxCount) {
+      maxCount = count;
+      bestDelim = d;
+    }
+  }
 
   const parseLine = (line) => {
     const row = [];
@@ -32,7 +61,7 @@ function parseCsv(text) {
         } else {
           insideQuote = !insideQuote;
         }
-      } else if (char === ',' && !insideQuote) {
+      } else if (char === bestDelim && !insideQuote) {
         row.push(entry.trim());
         entry = '';
       } else {
@@ -43,35 +72,146 @@ function parseCsv(text) {
     return row;
   };
 
-  const headers = parseLine(lines[0]).map((h) => h.toLowerCase().replace(/[\s_-]+/g, ''));
-  const rows = [];
+  return lines.map(parseLine);
+}
 
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseLine(lines[i]);
-    if (values.length === 0 || values.every((v) => !v)) continue;
+// Universal spreadsheet parser supporting Excel (.xlsx, .xls), CSV, TSV with smart header detection
+function parseSpreadsheetBuffer(buffer, fileName = '') {
+  let raw2d = [];
 
-    const rowObj = {};
-    headers.forEach((h, idx) => {
-      rowObj[h] = values[idx] || '';
+  // 1. Attempt SheetJS binary parsing (supports .xlsx, .xls, .ods, .csv)
+  try {
+    const wb = XLSX.read(buffer, { type: 'array', cellDates: true });
+    let maxRows = 0;
+    let bestSheet = null;
+
+    for (const sheetName of wb.SheetNames) {
+      const sheet = wb.Sheets[sheetName];
+      const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+      if (data && data.length > maxRows) {
+        maxRows = data.length;
+        bestSheet = data;
+      }
+    }
+    if (bestSheet && bestSheet.length > 0) {
+      raw2d = bestSheet;
+    }
+  } catch (err) {
+    console.warn('[SpreadsheetParser] SheetJS parse notice, attempting text decode fallback:', err?.message);
+    try {
+      const decoder = new TextDecoder('utf-8');
+      const text = decoder.decode(buffer);
+      raw2d = parseCsvTextTo2D(text);
+    } catch {}
+  }
+
+  if (!raw2d || raw2d.length === 0) {
+    return [];
+  }
+
+  const cleanRows = raw2d.filter((row) => Array.isArray(row) && row.some((cell) => cleanString(cell).length > 0));
+  if (cleanRows.length === 0) return [];
+
+  // 2. Identify header row index by scanning rows 0 to 10
+  let headerRowIdx = 0;
+  let highestHeaderScore = 0;
+
+  for (let r = 0; r < Math.min(10, cleanRows.length); r++) {
+    const row = cleanRows[r];
+    let score = 0;
+    for (const cell of row) {
+      const norm = cleanString(cell).toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (norm.includes('email') || norm.includes('mailid') || norm === 'mail' || norm.includes('emailaddress')) score += 5;
+      if (norm.includes('college') || norm.includes('institution') || norm.includes('institute') || norm.includes('university') || norm.includes('campus') || norm.includes('school')) score += 4;
+      if (norm.includes('contact') || norm.includes('coordinator') || norm.includes('principal') || norm.includes('hod') || norm.includes('faculty') || norm === 'name') score += 2;
+      if (norm.includes('dept') || norm.includes('department') || norm.includes('branch') || norm.includes('stream')) score += 2;
+      if (norm.includes('designation') || norm.includes('role') || norm.includes('title')) score += 2;
+    }
+    if (score > highestHeaderScore) {
+      highestHeaderScore = score;
+      headerRowIdx = r;
+    }
+  }
+
+  const rawHeaders = cleanRows[headerRowIdx];
+  const normalizedHeaders = rawHeaders.map((h) => cleanString(h).toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+  let collegeCol = -1;
+  let emailCol = -1;
+  let departmentCol = -1;
+  let contactCol = -1;
+  let designationCol = -1;
+
+  normalizedHeaders.forEach((h, idx) => {
+    if (emailCol === -1 && (h.includes('email') || h.includes('mailid') || h === 'mail' || h.includes('emailaddress') || h.includes('contactemail') || h.includes('officialemail'))) {
+      emailCol = idx;
+    } else if (collegeCol === -1 && (h.includes('college') || h.includes('institution') || h.includes('institute') || h.includes('university') || h.includes('campus') || h.includes('school') || h.includes('academy') || h.includes('collegename'))) {
+      collegeCol = idx;
+    } else if (departmentCol === -1 && (h.includes('dept') || h.includes('department') || h.includes('branch') || h.includes('stream') || h.includes('course') || h.includes('division') || h.includes('discipline'))) {
+      departmentCol = idx;
+    } else if (contactCol === -1 && (h.includes('contactperson') || h.includes('contactname') || h.includes('faculty') || h.includes('coordinator') || h.includes('principal') || h.includes('hod') || h.includes('dean') || h.includes('personname') || h === 'name' || h === 'contact')) {
+      contactCol = idx;
+    } else if (designationCol === -1 && (h.includes('designation') || h.includes('role') || h.includes('title') || h.includes('position') || h.includes('post'))) {
+      designationCol = idx;
+    }
+  });
+
+  const dataRows = (highestHeaderScore > 0) ? cleanRows.slice(headerRowIdx + 1) : cleanRows;
+
+  // Content-based fallback if header names did not identify email
+  if (emailCol === -1 && dataRows.length > 0) {
+    const maxCols = Math.max(...dataRows.slice(0, 50).map((r) => r.length), 1);
+    const emailCounts = new Array(maxCols).fill(0);
+    dataRows.slice(0, 50).forEach((row) => {
+      row.forEach((cell, idx) => {
+        if (EXTRACT_EMAIL_REGEX.test(cleanString(cell))) {
+          emailCounts[idx]++;
+        }
+      });
     });
+    const bestEmailCol = emailCounts.indexOf(Math.max(...emailCounts));
+    if (emailCounts[bestEmailCol] > 0) {
+      emailCol = bestEmailCol;
+    }
+  }
 
-    const college_name = rowObj['collegename'] || rowObj['college'] || rowObj['institution'] || values[0] || '';
-    const email = rowObj['email'] || rowObj['emailaddress'] || rowObj['recipientemail'] || values[1] || '';
-    const department = rowObj['department'] || rowObj['dept'] || rowObj['division'] || values[2] || '';
-    const contact_person = rowObj['contactperson'] || rowObj['contact'] || rowObj['name'] || values[3] || '';
-    const designation = rowObj['designation'] || rowObj['role'] || rowObj['title'] || values[4] || '';
+  // Content-based fallback for college name
+  if (collegeCol === -1 && dataRows.length > 0) {
+    const maxCols = Math.max(...dataRows.slice(0, 50).map((r) => r.length), 1);
+    for (let c = 0; c < maxCols; c++) {
+      if (c !== emailCol && c !== departmentCol && c !== contactCol && c !== designationCol) {
+        collegeCol = c;
+        break;
+      }
+    }
+    if (collegeCol === -1) collegeCol = 0;
+  }
 
-    rows.push({
-      id: 'row_' + i + '_' + Date.now(),
-      college_name: college_name.trim(),
-      email: email.trim(),
-      department: department.trim(),
-      contact_person: contact_person.trim(),
-      designation: designation.trim(),
+  const results = [];
+  for (let i = 0; i < dataRows.length; i++) {
+    const row = dataRows[i];
+    if (!row || row.length === 0) continue;
+
+    const rawEmail = emailCol !== -1 ? row[emailCol] : '';
+    const email = extractEmail(rawEmail);
+    const collegeName = collegeCol !== -1 ? cleanString(row[collegeCol]) : '';
+    const department = departmentCol !== -1 ? cleanString(row[departmentCol]) : '';
+    const contactPerson = contactCol !== -1 ? cleanString(row[contactCol]) : '';
+    const designation = designationCol !== -1 ? cleanString(row[designationCol]) : '';
+
+    if (!email && !collegeName) continue;
+
+    results.push({
+      id: 'row_' + i + '_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      college_name: collegeName,
+      email: email,
+      department: department,
+      contact_person: contactPerson,
+      designation: designation,
     });
   }
 
-  return rows;
+  return results;
 }
 
 export default function BulkEmailSender({ templates = [], session, onCampaignFinished }) {
@@ -84,6 +224,8 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const [filterType, setFilterType] = useState('all'); // all, eligible, duplicate, invalid, cooldown
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
 
   // Template & Personalization
   const [availableTemplates, setAvailableTemplates] = useState(templates);
@@ -149,29 +291,29 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
     setFileName(file.name);
     setAnalyzing(true);
     setCampaignSummary(null);
+    setCurrentPage(1);
 
     const reader = new FileReader();
     reader.onload = async (e) => {
-      const text = e.target.result;
-      const rawRows = parseCsv(text);
+      const buffer = e.target.result;
+      const rawRows = parseSpreadsheetBuffer(buffer, file.name);
 
       if (rawRows.length === 0) {
-        alert('The uploaded CSV file is empty or missing headers. Please verify and retry.');
+        alert('The uploaded spreadsheet/CSV file is empty or missing valid data rows. Please verify your file and retry.');
         setAnalyzing(false);
         return;
       }
 
       // 1. Analyze format and file-level duplicates
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const seenEmails = new Set();
       const validEmailsToQuery = [];
 
       const initialAnalyzed = rawRows.map((row) => {
-        const normEmail = row.email.toLowerCase();
+        const normEmail = (row.email || '').toLowerCase().trim();
         let status = 'eligible';
         let statusReason = '';
 
-        if (!row.email || !emailRegex.test(normEmail)) {
+        if (!normEmail || !EMAIL_REGEX.test(normEmail)) {
           status = 'invalid';
           statusReason = 'Invalid email address format';
         } else if (!row.college_name) {
@@ -179,7 +321,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
           statusReason = 'College name is required';
         } else if (seenEmails.has(normEmail)) {
           status = 'duplicate';
-          statusReason = 'Duplicate entry in CSV file';
+          statusReason = 'Duplicate entry in spreadsheet';
         } else {
           seenEmails.add(normEmail);
           validEmailsToQuery.push(normEmail);
@@ -195,14 +337,14 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
         };
       });
 
-      // 2. Query database for previous outreach cooldowns in batch
+      // 2. Query database for previous outreach cooldowns in batch (up to 10,000)
       let cooldownMap = {};
       if (validEmailsToQuery.length > 0) {
         try {
           const res = await fetch('/api/outreach/check-batch-duplicates', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emails: validEmailsToQuery }),
+            body: JSON.stringify({ emails: validEmailsToQuery.slice(0, 10000) }),
           });
           if (res.ok) {
             const data = await res.json();
@@ -234,10 +376,11 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
       );
       setSelectedIds(eligibleIds);
       setActivePreviewIndex(0);
+      setCurrentPage(1);
       setAnalyzing(false);
     };
 
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
   };
 
   // Metrics
@@ -256,6 +399,17 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
     if (filterType === 'invalid') return r.status === 'invalid';
     return true;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredRecipients.length / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (safeCurrentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, filteredRecipients.length);
+  const paginatedRecipients = filteredRecipients.slice(startIndex, endIndex);
+
+  const handleFilterChange = (type) => {
+    setFilterType(type);
+    setCurrentPage(1);
+  };
 
   // Selection handlers
   const handleToggleSelect = (id) => {
@@ -461,7 +615,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
         <input
           type="file"
           ref={fileInputRef}
-          accept=".csv,text/csv"
+          accept=".csv,.xlsx,.xls,.tsv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
           style={{ display: 'none' }}
           onChange={(e) => {
             if (e.target.files?.[0]) {
@@ -483,10 +637,10 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
         >
           <MailIcon size={32} className={styles.dropzoneIcon} />
           <div className={styles.dropzoneMainText}>
-            Click or drag &amp; drop your college contacts CSV here
+            Click or drag &amp; drop your college contacts Excel (.xlsx, .xls) or CSV file here
           </div>
           <div className={styles.dropzoneSubText}>
-            Supported columns: college_name, email, department, contact_person, designation
+            Supported: Excel (.xlsx, .xls), CSV &bull; Auto-detects: College Name, Email, Department, Contact Person, Designation
           </div>
         </div>
 
@@ -629,37 +783,37 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
               <button
                 type="button"
                 className={`${styles.chipBtn} ${filterType === 'all' ? styles.chipBtnActive : ''}`}
-                onClick={() => setFilterType('all')}
+                onClick={() => handleFilterChange('all')}
               >
-                All ({totalRows})
+                All ({totalRows.toLocaleString()})
               </button>
               <button
                 type="button"
                 className={`${styles.chipBtn} ${filterType === 'eligible' ? styles.chipBtnActive : ''}`}
-                onClick={() => setFilterType('eligible')}
+                onClick={() => handleFilterChange('eligible')}
               >
-                Eligible ({eligibleCount})
+                Eligible ({eligibleCount.toLocaleString()})
               </button>
               <button
                 type="button"
                 className={`${styles.chipBtn} ${filterType === 'cooldown' ? styles.chipBtnActive : ''}`}
-                onClick={() => setFilterType('cooldown')}
+                onClick={() => handleFilterChange('cooldown')}
               >
-                Cooldown ({cooldownCount})
+                Cooldown ({cooldownCount.toLocaleString()})
               </button>
               <button
                 type="button"
                 className={`${styles.chipBtn} ${filterType === 'duplicate' ? styles.chipBtnActive : ''}`}
-                onClick={() => setFilterType('duplicate')}
+                onClick={() => handleFilterChange('duplicate')}
               >
-                Duplicates ({fileDuplicateCount})
+                Duplicates ({fileDuplicateCount.toLocaleString()})
               </button>
               <button
                 type="button"
                 className={`${styles.chipBtn} ${filterType === 'invalid' ? styles.chipBtnActive : ''}`}
-                onClick={() => setFilterType('invalid')}
+                onClick={() => handleFilterChange('invalid')}
               >
-                Invalid ({invalidCount})
+                Invalid ({invalidCount.toLocaleString()})
               </button>
             </div>
           </div>
@@ -691,7 +845,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
                 </tr>
               </thead>
               <tbody>
-                {filteredRecipients.map((r, idx) => {
+                {paginatedRecipients.map((r) => {
                   const isSelected = selectedIds.has(r.id);
                   const isPreviewed = activeRecipient?.id === r.id;
 
@@ -707,7 +861,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
                       );
                     }
                     if (r.status === 'duplicate') {
-                      return <span className={`${styles.statusBadge} ${styles.badgeDuplicate}`}>CSV Duplicate</span>;
+                      return <span className={`${styles.statusBadge} ${styles.badgeDuplicate}`}>Duplicate</span>;
                     }
                     return <span className={`${styles.statusBadge} ${styles.badgeInvalid}`}>Invalid Format</span>;
                   };
@@ -766,6 +920,38 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
               </tbody>
             </table>
           </div>
+
+          {filteredRecipients.length > 0 && (
+            <div className={styles.paginationBar}>
+              <div className={styles.paginationInfo}>
+                Showing <strong>{startIndex + 1}</strong> to <strong>{endIndex}</strong> of{' '}
+                <strong>{filteredRecipients.length.toLocaleString()}</strong> contacts
+                {filteredRecipients.length < totalRows && ` (filtered from ${totalRows.toLocaleString()} total)`}
+              </div>
+
+              <div className={styles.paginationButtons}>
+                <button
+                  type="button"
+                  className={styles.paginationBtn}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={safeCurrentPage <= 1}
+                >
+                  &larr; Previous
+                </button>
+                <span className={styles.paginationPageIndicator}>
+                  Page {safeCurrentPage} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className={styles.paginationBtn}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={safeCurrentPage >= totalPages}
+                >
+                  Next &rarr;
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

@@ -23,7 +23,7 @@ export async function POST(request) {
     }
 
     const results = {};
-    for (const rawEmail of emails.slice(0, 500)) {
+    for (const rawEmail of emails.slice(0, 10000)) {
       if (!rawEmail || typeof rawEmail !== 'string') continue;
       const normalized = normalizeEmail(rawEmail);
       if (!normalized) continue;
