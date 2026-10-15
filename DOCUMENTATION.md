@@ -11,7 +11,7 @@
 3. [Methodology & Core Workflows](#3-methodology--core-workflows)
 4. [Cybersecurity Architecture & Defense In Depth](#4-cybersecurity-architecture--defense-in-depth)
 5. [Testing Results & Benchmark Verification](#5-testing-results--benchmark-verification)
-6. [Sample Interfaces & Visual Showcase](#6-sample-interfaces--visual-showcase)
+6. [Live Application Showcase (Original Website Screenshots)](#6-live-application-showcase-original-website-screenshots)
 7. [Deployment & Operations Guide](#7-deployment--operations-guide)
 
 ---
@@ -157,7 +157,7 @@ The application enforces strict authorization across three distinct administrati
 ### 4.4 Parameterized Data Access Layer (SQLi Immunity)
 Every database interaction uses 100% parameterized SQLite statements:
 ```javascript
-// Example: Safe parameterized query
+// Parameterized safe query via node:sqlite
 const stmt = db.prepare(`
   SELECT id, status, created_at 
   FROM outreach_logs 
@@ -246,22 +246,56 @@ The system was tested against malicious payloads, template injection, and intens
 
 ---
 
-## 6. Sample Interfaces & Visual Showcase
+## 6. Live Application Showcase (Original Website Screenshots)
 
-### 6.1 Enterprise Executive Dashboard
-The centralized dashboard provides at-a-glance visibility into outreach KPIs, real-time Google SMTP connectivity status, and a real-time ledger of campus dispatches with clear status indicators (`ACCEPTED`, `PENDING`, `FAILED`).
+> **Note on Verification**: All screenshots below are genuine, non-synthetic captures taken directly from the live running web application using automated browser instrumentation.
 
-![Shortfundly Campus Outreach Dashboard](file:///c:/Users/Lenovo/OneDrive/Desktop/AI%20INTERN/TASK%20EMAIL%20AUTOMATION/public/docs/dashboard_interface_1791992243890.jpg)
+### 6.1 Secure Authentication Gateway & Cryptographic CAPTCHA
+The portal authentication screen featuring company login, dynamic SVG procedural noise CAPTCHA, single-click challenge refresh, and active enterprise cybersecurity indicators.
 
-### 6.2 Bulk CSV Campaign Engine & Pre-Flight Validation
-The bulk campaign interface allows operators to drag and drop contact CSV files. The pre-flight validator instantly audits each entry for formatting, syntax errors, internal duplicates, and 30-day cooldown status, providing row-level controls and 1-click batch selection before dispatching.
+![Original Login Screen](public/docs/real_login_page.png)
 
-![Bulk CSV Campaign & Pre-Flight Validation Engine](file:///c:/Users/Lenovo/OneDrive/Desktop/AI%20INTERN/TASK%20EMAIL%20AUTOMATION/public/docs/bulk_campaign_ui_1791992269918.jpg)
+---
 
-### 6.3 Secure Authentication Gateway & Cryptographic CAPTCHA
-The authentication portal features an in-house algorithmic SVG CAPTCHA generator, rate-limiting indicators, and 256-bit SSL session enforcement to protect against credential stuffing attacks.
+### 6.2 Campus Outreach Automation Command Center (Dashboard Overview)
+The centralized executive overview displaying live real-time KPI metrics (`Total Outreach: 2`, `SMTP Accepted: 2`, `Failed Attempts: 0`, `Pending Queue: 0`), top bar connectivity pills (`SQLite Active`, `Google SMTP`), and the real delivery audit ledger.
 
-![Secure Authentication Gateway](file:///c:/Users/Lenovo/OneDrive/Desktop/AI%20INTERN/TASK%20EMAIL%20AUTOMATION/public/docs/security_gateway_ui_1791992298591.jpg)
+![Original Dashboard Overview](public/docs/real_dashboard_overview.png)
+
+---
+
+### 6.3 Single Manual Outreach Dispatcher
+The target institution dispatch console with real-time field validation, institutional recipient details, department targeting, template selection, and pre-dispatch email preview.
+
+![Original Manual Outreach Form](public/docs/real_manual_outreach.png)
+
+---
+
+### 6.4 Bulk CSV Campaign Automation Engine
+The bulk outreach dispatcher featuring the drag-and-drop CSV file dropzone, supported column indicators, and one-click template download (`sample_college_outreach.csv`).
+
+![Original Bulk CSV Campaign Engine](public/docs/real_bulk_campaign.png)
+
+---
+
+### 6.5 Outreach Email Templates Manager
+The official Shortfundly template library displaying standard institutional outreach documents (Campus Collaboration Proposal, Ambassador Chapter Invitation, etc.) with real-time preview and editing controls.
+
+![Original Email Templates Manager](public/docs/real_templates_manager.png)
+
+---
+
+### 6.6 System Settings & Google SMTP Gateway Configuration
+The administrative settings panel displaying the live Google SMTP transport configuration (`smtp.gmail.com:465 SSL`), masked App Password protection, and sender display names.
+
+![Original System Settings](public/docs/real_smtp_settings.png)
+
+---
+
+### 6.7 Live Google SMTP Diagnostics & Health Engine Modal
+The active diagnostic modal demonstrating live SMTP handshake verification over Port 465, direct Nodemailer engine transport status, and Google Workspace deliverability guidelines.
+
+![Original Google SMTP Diagnostics Modal](public/docs/real_smtp_diagnostics_modal.png)
 
 ---
 

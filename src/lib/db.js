@@ -57,7 +57,7 @@ class MemorySqlStore {
     this.settings.set('smtp_host', config.SMTP_HOST || 'smtp.gmail.com');
     this.settings.set('smtp_port', String(config.SMTP_PORT || 465));
     this.settings.set('smtp_secure', config.SMTP_SECURE ? '1' : '0');
-    if (config.SMTP_USER) this.settings.set('smtp_user', config.SMTP_USER);
+    this.settings.set('smtp_user', 'dharshana.shortfundly@gmail.com');
     if (config.SMTP_PASS) this.settings.set('smtp_pass', config.SMTP_PASS);
     this.settings.set('from_email', config.FROM_EMAIL || 'campus@shortfundly.com');
     this.settings.set('from_name', config.FROM_NAME || 'Shortfundly Campus Outreach');
@@ -258,7 +258,11 @@ class MemorySqlStore {
     if (s.includes('SELECT value FROM system_settings WHERE key = ?')) {
       return {
         get: (key) => {
-          const val = self.settings.get(key);
+          let val = self.settings.get(key);
+          if (key === 'smtp_user' && (!val || val.toLowerCase().includes('campus@shortfundly'))) {
+            val = 'dharshana.shortfundly@gmail.com';
+            self.settings.set('smtp_user', val);
+          }
           return val ? { value: val } : undefined;
         }
       };
@@ -266,12 +270,16 @@ class MemorySqlStore {
     if (s.includes('INSERT INTO system_settings') || s.includes('INSERT OR IGNORE INTO system_settings')) {
       return {
         run: (key, value) => {
+          let val = value;
+          if (key === 'smtp_user' && (!val || String(val).toLowerCase().includes('campus@shortfundly'))) {
+            val = 'dharshana.shortfundly@gmail.com';
+          }
           if (s.includes('INSERT OR IGNORE')) {
             if (!self.settings.has(key)) {
-              self.settings.set(key, value);
+              self.settings.set(key, val);
             }
           } else {
-            self.settings.set(key, value);
+            self.settings.set(key, val);
           }
           return { changes: 1 };
         }
@@ -458,6 +466,14 @@ export function getDb() {
 
     // Pre-seed default system_settings
     const nowIso = new Date().toISOString();
+    try {
+      db.prepare(`
+        UPDATE system_settings
+        SET value = 'dharshana.shortfundly@gmail.com'
+        WHERE key = 'smtp_user' AND (value = 'campus@shortfundly.com' OR value LIKE '%campus@shortfundly%')
+      `).run();
+    } catch {}
+
     const seedSetting = db.prepare(`
       INSERT OR IGNORE INTO system_settings (key, value, updated_at, updated_by)
       VALUES (?, ?, ?, 'system')
@@ -465,7 +481,7 @@ export function getDb() {
     seedSetting.run('smtp_host', config.SMTP_HOST || 'smtp.gmail.com', nowIso);
     seedSetting.run('smtp_port', String(config.SMTP_PORT || 465), nowIso);
     seedSetting.run('smtp_secure', config.SMTP_SECURE ? '1' : '0', nowIso);
-    seedSetting.run('smtp_user', config.SMTP_USER || 'dharshana.shortfundly@gmail.com', nowIso);
+    seedSetting.run('smtp_user', 'dharshana.shortfundly@gmail.com', nowIso);
     if (config.SMTP_PASS) {
       seedSetting.run('smtp_pass', config.SMTP_PASS, nowIso);
     }
@@ -540,6 +556,43 @@ export function logAuditEvent(action, details, userEmail = null, ipAddress = 'un
   }
 }
 
+function getSettingsCachePath() {
+  const isServerless = Boolean(
+    process.env.VERCEL ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    process.env.LAMBDA_TASK_ROOT
+  );
+  const dir = isServerless
+    ? path.join(os.tmpdir(), 'shortfundly_campus_data')
+    : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../data');
+  return path.join(dir, 'settings_cache.json');
+}
+
+function persistSettingFile(key, value) {
+  try {
+    const filePath = getSettingsCachePath();
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    let data = {};
+    if (fs.existsSync(filePath)) {
+      try { data = JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch {}
+    }
+    data[key] = value;
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+  } catch {}
+}
+
+function readSettingFile(key) {
+  try {
+    const filePath = getSettingsCachePath();
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      if (data && data[key] !== undefined && data[key] !== null) return data[key];
+    }
+  } catch {}
+  return null;
+}
+
 /**
  * System Settings Helpers (Database-backed with environment fallback)
  */
@@ -547,23 +600,49 @@ export function getSystemSetting(key, fallback = null) {
   try {
     const db = getDb();
     const row = db.prepare('SELECT value FROM system_settings WHERE key = ?').get(key);
-    return row ? row.value : fallback;
-  } catch {
-    return fallback;
+    if (row && row.value !== undefined && row.value !== null && row.value !== '') {
+      if (key === 'smtp_user' && String(row.value).toLowerCase().includes('campus@shortfundly')) {
+        return 'dharshana.shortfundly@gmail.com';
+      }
+      return row.value;
+    }
+  } catch {}
+
+  const fileVal = readSettingFile(key);
+  if (fileVal !== null && fileVal !== undefined && fileVal !== '') {
+    if (key === 'smtp_user' && String(fileVal).toLowerCase().includes('campus@shortfundly')) {
+      return 'dharshana.shortfundly@gmail.com';
+    }
+    return fileVal;
   }
+
+  if (key === 'smtp_user' && (!fallback || String(fallback).toLowerCase().includes('campus@shortfundly'))) {
+    return 'dharshana.shortfundly@gmail.com';
+  }
+  return fallback;
 }
 
 export function setSystemSetting(key, value, updatedBy = 'system') {
-  const db = getDb();
-  const now = new Date().toISOString();
-  db.prepare(`
-    INSERT INTO system_settings (key, value, updated_at, updated_by)
-    VALUES (?, ?, ?, ?)
-    ON CONFLICT(key) DO UPDATE SET
-      value = excluded.value,
-      updated_at = excluded.updated_at,
-      updated_by = excluded.updated_by
-  `).run(key, String(value), now, updatedBy);
+  let val = String(value);
+  if (key === 'smtp_user' && (!val || val.toLowerCase().includes('campus@shortfundly'))) {
+    val = 'dharshana.shortfundly@gmail.com';
+  }
+  persistSettingFile(key, val);
+
+  try {
+    const db = getDb();
+    const now = new Date().toISOString();
+    db.prepare(`
+      INSERT INTO system_settings (key, value, updated_at, updated_by)
+      VALUES (?, ?, ?, ?)
+      ON CONFLICT(key) DO UPDATE SET
+        value = excluded.value,
+        updated_at = excluded.updated_at,
+        updated_by = excluded.updated_by
+    `).run(key, val, now, updatedBy);
+  } catch (err) {
+    console.warn('[Database] setSystemSetting warning:', err?.message);
+  }
 }
 
 /**
@@ -573,9 +652,12 @@ export function getEffectiveSmtpSettings() {
   const host = getSystemSetting('smtp_host', config.SMTP_HOST || 'smtp.gmail.com');
   const port = Number(getSystemSetting('smtp_port', config.SMTP_PORT || 465));
   const secure = getSystemSetting('smtp_secure', config.SMTP_SECURE ? '1' : '0') === '1';
-  const user = getSystemSetting('smtp_user', config.SMTP_USER || '');
+  let user = getSystemSetting('smtp_user', config.SMTP_USER || 'dharshana.shortfundly@gmail.com');
+  if (!user || user.trim().toLowerCase().includes('campus@shortfundly')) {
+    user = 'dharshana.shortfundly@gmail.com';
+  }
   const pass = getSystemSetting('smtp_pass', config.SMTP_PASS || '');
-  const from_email = getSystemSetting('from_email', config.FROM_EMAIL || user || 'campus@shortfundly.com');
+  const from_email = getSystemSetting('from_email', config.FROM_EMAIL || 'campus@shortfundly.com');
   const from_name = getSystemSetting('from_name', config.FROM_NAME || 'Shortfundly Campus Outreach');
   const auth_method = getSystemSetting('smtp_auth_method', 'app_password');
 

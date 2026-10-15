@@ -30,11 +30,16 @@ export async function POST(request) {
         pass = current.pass;
       }
 
+      let testUser = (body.user || '').trim();
+      if (!testUser || testUser.toLowerCase().includes('campus@shortfundly')) {
+        testUser = 'dharshana.shortfundly@gmail.com';
+      }
+
       candidate = {
         host: (body.host || 'smtp.gmail.com').trim(),
         port: Number(body.port) || 465,
         secure: Boolean(body.secure),
-        user: body.user.trim(),
+        user: testUser,
         pass: pass ? pass.trim() : '',
       };
     }

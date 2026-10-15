@@ -23,10 +23,10 @@ export default function SettingsView({ session }) {
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
-    user: '',
+    user: 'dharshana.shortfundly@gmail.com',
     pass: '',
     from_name: 'Shortfundly Campus Outreach',
-    from_email: '',
+    from_email: 'campus@shortfundly.com',
     auth_method: 'app_password',
   });
   const [loadingSmtp, setLoadingSmtp] = useState(false);
@@ -51,24 +51,71 @@ export default function SettingsView({ session }) {
   const [newPasswordVal, setNewPasswordVal] = useState('');
   const [resettingPw, setResettingPw] = useState(false);
 
-  // Load SMTP config
+  // Load SMTP config (with client-side localStorage fallback for resilience across serverless cold starts)
   const fetchSmtpConfig = async () => {
     if (!isAdmin) return;
+
+    let localSaved = null;
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('shortfundly_google_smtp_config') : null;
+      if (raw) localSaved = JSON.parse(raw);
+    } catch {}
+
+    // Immediately seed with client-stored config to avoid UI flicker
+    if (localSaved?.user) {
+      setSmtpForm((prev) => ({
+        ...prev,
+        user: (!localSaved.user || localSaved.user.toLowerCase().includes('campus@shortfundly'))
+          ? 'dharshana.shortfundly@gmail.com'
+          : localSaved.user,
+        pass: localSaved.pass || prev.pass,
+        from_email: localSaved.from_email || 'campus@shortfundly.com',
+      }));
+    }
+
     try {
       setLoadingSmtp(true);
       const res = await fetch('/api/admin/smtp');
       if (res.ok) {
         const data = await res.json();
+        let effectiveUser = data.user;
+        if (!effectiveUser || effectiveUser.toLowerCase().includes('campus@shortfundly')) {
+          effectiveUser = 'dharshana.shortfundly@gmail.com';
+        }
+
+        let effectivePass = data.pass_masked || '';
+        if (localSaved?.pass && !localSaved.pass.includes('•')) {
+          effectivePass = localSaved.pass;
+        }
+
         setSmtpForm({
           host: data.host || 'smtp.gmail.com',
           port: data.port || 465,
           secure: Boolean(data.secure),
-          user: data.user || '',
-          pass: data.pass_masked || '',
+          user: effectiveUser,
+          pass: effectivePass,
           from_name: data.from_name || 'Shortfundly Campus Outreach',
-          from_email: data.from_email || '',
+          from_email: data.from_email || 'campus@shortfundly.com',
           auth_method: data.auth_method || 'app_password',
         });
+
+        // Re-hydrate serverless backend if backend lost credentials on cold restart
+        if (!data.is_configured && localSaved?.pass && !localSaved.pass.includes('•')) {
+          fetch('/api/admin/smtp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              host: data.host || 'smtp.gmail.com',
+              port: data.port || 465,
+              secure: Boolean(data.secure),
+              user: effectiveUser,
+              pass: localSaved.pass,
+              from_email: data.from_email || 'campus@shortfundly.com',
+              from_name: data.from_name || 'Shortfundly Campus Outreach',
+              auth_method: data.auth_method || 'app_password',
+            }),
+          }).catch(() => {});
+        }
       }
     } catch {
       setFeedback({ type: 'error', message: 'Failed to load SMTP configuration.' });
@@ -107,13 +154,36 @@ export default function SettingsView({ session }) {
 
     try {
       setSavingSmtp(true);
+      const targetUser = (!smtpForm.user || smtpForm.user.toLowerCase().includes('campus@shortfundly'))
+        ? 'dharshana.shortfundly@gmail.com'
+        : smtpForm.user.trim();
+
+      const payload = {
+        ...smtpForm,
+        user: targetUser,
+        from_email: (smtpForm.from_email || 'campus@shortfundly.com').trim(),
+      };
+
       const res = await fetch('/api/admin/smtp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(smtpForm),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        // Persist to browser localStorage permanently
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(
+              'shortfundly_google_smtp_config',
+              JSON.stringify({
+                ...payload,
+                pass: smtpForm.pass && !smtpForm.pass.includes('•') ? smtpForm.pass.trim() : undefined,
+              })
+            );
+          }
+        } catch {}
+
         setFeedback({ type: 'success', message: 'Google SMTP credentials and settings updated securely.' });
         fetchSmtpConfig();
       } else {
@@ -369,12 +439,15 @@ export default function SettingsView({ session }) {
             </div>
           )}
 
-          <form onSubmit={handleSaveSmtp}>
+          <form onSubmit={handleSaveSmtp} autoComplete="off">
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>SMTP Host</label>
                 <input
                   type="text"
+                  name="sf_smtp_host_server"
+                  id="sf_smtp_host_server"
+                  autoComplete="off"
                   className={styles.input}
                   value={smtpForm.host}
                   onChange={(e) => setSmtpForm({ ...smtpForm, host: e.target.value })}
@@ -387,6 +460,8 @@ export default function SettingsView({ session }) {
               <div className={styles.formGroup}>
                 <label className={styles.label}>SMTP Port & Security</label>
                 <select
+                  name="sf_smtp_port_selection"
+                  id="sf_smtp_port_selection"
                   className={styles.select}
                   value={smtpForm.port}
                   onChange={(e) => {
@@ -407,26 +482,42 @@ export default function SettingsView({ session }) {
               <div className={styles.formGroup}>
                 <label className={styles.label}>Google Account / SMTP Username</label>
                 <input
-                  type="email"
+                  type="text"
+                  inputMode="email"
+                  name="sf_smtp_auth_user_identity"
+                  id="sf_smtp_auth_user_identity"
+                  autoComplete="off"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   className={styles.input}
                   value={smtpForm.user}
                   onChange={(e) => setSmtpForm({ ...smtpForm, user: e.target.value })}
-                  placeholder="e.g. dharshana.shortfundly@gmail.com"
+                  placeholder="dharshana.shortfundly@gmail.com"
                   required
                 />
+                <span className={styles.inputHint}>
+                  Fixed Google authentication account: <strong>dharshana.shortfundly@gmail.com</strong>
+                </span>
               </div>
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>Google App Password (16 Characters)</label>
                 <input
                   type="password"
+                  name="sf_smtp_auth_user_token"
+                  id="sf_smtp_auth_user_token"
+                  autoComplete="new-password"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   className={styles.input}
                   value={smtpForm.pass}
                   onChange={(e) => setSmtpForm({ ...smtpForm, pass: e.target.value })}
                   placeholder="Enter 16-character Google App Password"
                 />
                 <span className={styles.inputHint}>
-                  Masked for security. Leave as bullets to keep existing stored credentials.
+                  Masked for security. Stored permanently for delivery. Leave bullets to keep saved password.
                 </span>
               </div>
 
@@ -434,10 +525,13 @@ export default function SettingsView({ session }) {
                 <label className={styles.label}>Sender Display Name</label>
                 <input
                   type="text"
+                  name="sf_sender_display_name"
+                  id="sf_sender_display_name"
+                  autoComplete="off"
                   className={styles.input}
                   value={smtpForm.from_name}
                   onChange={(e) => setSmtpForm({ ...smtpForm, from_name: e.target.value })}
-                  placeholder="Shortfundly Campus Relations"
+                  placeholder="Shortfundly Campus Outreach"
                 />
               </div>
 
@@ -445,11 +539,17 @@ export default function SettingsView({ session }) {
                 <label className={styles.label}>Sender / Reply-To Email</label>
                 <input
                   type="email"
+                  name="sf_sender_reply_to_email"
+                  id="sf_sender_reply_to_email"
+                  autoComplete="off"
                   className={styles.input}
                   value={smtpForm.from_email}
                   onChange={(e) => setSmtpForm({ ...smtpForm, from_email: e.target.value })}
-                  placeholder="dharshana.shortfundly@gmail.com"
+                  placeholder="campus@shortfundly.com"
                 />
+                <span className={styles.inputHint}>
+                  Replies route to official campus inbox: <strong>campus@shortfundly.com</strong>
+                </span>
               </div>
             </div>
 

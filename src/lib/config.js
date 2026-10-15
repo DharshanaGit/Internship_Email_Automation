@@ -36,6 +36,11 @@ try {
 
 let parsedConfig;
 
+const rawSmtpUser = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
+const sanitizedSmtpUser = (!rawSmtpUser || rawSmtpUser.toLowerCase().includes('campus@shortfundly'))
+  ? 'dharshana.shortfundly@gmail.com'
+  : rawSmtpUser;
+
 try {
   parsedConfig = envSchema.parse({
     NODE_ENV: process.env.NODE_ENV,
@@ -46,7 +51,7 @@ try {
     SMTP_HOST: process.env.SMTP_HOST,
     SMTP_PORT: process.env.SMTP_PORT,
     SMTP_SECURE: process.env.SMTP_SECURE,
-    SMTP_USER: process.env.SMTP_USER,
+    SMTP_USER: sanitizedSmtpUser,
     SMTP_PASS: process.env.SMTP_PASS,
     FROM_EMAIL: process.env.FROM_EMAIL,
     FROM_NAME: process.env.FROM_NAME,
@@ -58,7 +63,9 @@ try {
   });
 } catch (error) {
   console.warn('[Config] Falling back to safe defaults:', error?.message);
-  parsedConfig = envSchema.parse({});
+  parsedConfig = envSchema.parse({
+    SMTP_USER: 'dharshana.shortfundly@gmail.com',
+  });
 }
 
 export const config = parsedConfig;

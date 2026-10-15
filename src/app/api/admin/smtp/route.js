@@ -16,17 +16,21 @@ export async function GET(request) {
   }
 
   const smtp = getEffectiveSmtpSettings();
+  let user = smtp.user;
+  if (!user || user.toLowerCase().includes('campus@shortfundly')) {
+    user = 'dharshana.shortfundly@gmail.com';
+  }
 
   // Return masked representation — NEVER expose the secret password!
   const safeData = {
-    host: smtp.host,
-    port: smtp.port,
-    secure: smtp.secure,
-    user: smtp.user,
-    from_email: smtp.from_email,
-    from_name: smtp.from_name,
-    auth_method: smtp.auth_method,
-    is_configured: smtp.is_configured,
+    host: smtp.host || 'smtp.gmail.com',
+    port: smtp.port || 465,
+    secure: smtp.secure !== false,
+    user: user,
+    from_email: smtp.from_email || 'campus@shortfundly.com',
+    from_name: smtp.from_name || 'Shortfundly Campus Outreach',
+    auth_method: smtp.auth_method || 'app_password',
+    is_configured: Boolean(user && smtp.pass),
     pass_masked: smtp.pass ? '••••••••••••••••' : '',
   };
 
@@ -54,8 +58,9 @@ export async function POST(request) {
     const body = await request.json().catch(() => ({}));
     const { host, port, secure, user, pass, from_email, from_name, auth_method } = body;
 
-    if (!user?.trim()) {
-      return NextResponse.json({ error: 'Google Account / SMTP Username is required.' }, { status: 400 });
+    let targetUser = (user || '').trim();
+    if (!targetUser || targetUser.toLowerCase().includes('campus@shortfundly')) {
+      targetUser = 'dharshana.shortfundly@gmail.com';
     }
 
     const currentSmtp = getEffectiveSmtpSettings();
@@ -69,11 +74,11 @@ export async function POST(request) {
     setSystemSetting('smtp_host', (host || 'smtp.gmail.com').trim(), session.email);
     setSystemSetting('smtp_port', String(port || 465).trim(), session.email);
     setSystemSetting('smtp_secure', secure ? '1' : '0', session.email);
-    setSystemSetting('smtp_user', user.trim(), session.email);
+    setSystemSetting('smtp_user', targetUser, session.email);
     if (finalPass) {
       setSystemSetting('smtp_pass', finalPass, session.email);
     }
-    setSystemSetting('from_email', (from_email || user).trim(), session.email);
+    setSystemSetting('from_email', (from_email || 'campus@shortfundly.com').trim(), session.email);
     setSystemSetting('from_name', (from_name || 'Shortfundly Campus Outreach').trim(), session.email);
     setSystemSetting('smtp_auth_method', (auth_method || 'app_password').trim(), session.email);
 
@@ -81,7 +86,7 @@ export async function POST(request) {
     resetMailerTransporter();
 
     logAuditEvent('SMTP_CONFIG_UPDATED', {
-      user: user.trim(),
+      user: targetUser,
       host: host || 'smtp.gmail.com',
       port: port || 465,
     }, session.email);
