@@ -263,6 +263,39 @@ export function renderTemplate(templateStr, variables = {}) {
     .replace(/\{\{\s*email\s*\}\}/gi, safeEmail)
     .replace(/\{\s*email\s*\}/gi, safeEmail);
 
+  // 9. Location & Campus Metadata replacements
+  const safeCityDistrict = escapeHtml((variables.city_district || '').trim());
+  const safeCategory = escapeHtml((variables.category || '').trim());
+  const safeWebsite = escapeHtml((variables.website_url || '').trim());
+  const safePhone = escapeHtml((variables.phone || '').trim());
+  const safeState = escapeHtml((variables.state || '').trim());
+  const safeRemarks = escapeHtml((variables.remarks || '').trim());
+
+  output = output
+    .replace(/\[\s*City\s*\/\s*District\s*\]/gi, safeCityDistrict)
+    .replace(/\[\s*District\s*\]/gi, safeCityDistrict)
+    .replace(/\[\s*City\s*\]/gi, safeCityDistrict)
+    .replace(/\{\{\s*city_district\s*\}\}/gi, safeCityDistrict)
+    .replace(/\{\s*city_district\s*\}/gi, safeCityDistrict)
+    .replace(/\[\s*Category\s*\]/gi, safeCategory)
+    .replace(/\[\s*Stream\s*\]/gi, safeCategory)
+    .replace(/\{\{\s*category\s*\}\}/gi, safeCategory)
+    .replace(/\{\s*category\s*\}/gi, safeCategory)
+    .replace(/\[\s*Official\s*Website\s*URL\s*\]/gi, safeWebsite)
+    .replace(/\[\s*Website\s*\]/gi, safeWebsite)
+    .replace(/\{\{\s*website_url\s*\}\}/gi, safeWebsite)
+    .replace(/\{\s*website_url\s*\}/gi, safeWebsite)
+    .replace(/\[\s*Phone\s*\]/gi, safePhone)
+    .replace(/\[\s*Contact\s*Number\s*\]/gi, safePhone)
+    .replace(/\{\{\s*phone\s*\}\}/gi, safePhone)
+    .replace(/\{\s*phone\s*\}/gi, safePhone)
+    .replace(/\[\s*State\s*\]/gi, safeState)
+    .replace(/\{\{\s*state\s*\}\}/gi, safeState)
+    .replace(/\{\s*state\s*\}/gi, safeState)
+    .replace(/\[\s*Remarks\s*\]/gi, safeRemarks)
+    .replace(/\{\{\s*remarks\s*\}\}/gi, safeRemarks)
+    .replace(/\{\s*remarks\s*\}/gi, safeRemarks);
+
   return output;
 }
 

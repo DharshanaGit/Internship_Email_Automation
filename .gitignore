@@ -34,3 +34,15 @@ yarn-error.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Root investigation & scratch scripts (Production scripts reside in /scripts)
+/*.py
+cap_homepage.png
+test_eapcet.xls
+final dataset/
+
