@@ -244,6 +244,8 @@ def main():
         ("Session & Auth", "JWT (jose) + bcryptjs", "Stateless signed HS256 tokens in HTTP-only SameSite=lax cookies; 12-round bcrypt salt."),
         ("Bot Defense", "Cryptographic SVG CAPTCHA", "In-house procedural SVG character distortion with HMAC-SHA256 timestamp signature."),
         ("Email Gateway", "Nodemailer + Google SMTP", "Transport connection pool over smtp.gmail.com:465 Direct SSL/TLS with latency diagnostics."),
+        ("Safe Batch Engine", "Client-Side Safe Partitioning & Pacing", "Auto-segments large datasets into safe batches (25/50/100/200) with anti-spam cooling intervals."),
+        ("Statewide Data Pipeline", "Python (Playwright & BeautifulSoup)", "Headless browser data extraction across state educational portals with multi-sheet Excel generation."),
         ("Validation Layer", "Zod Runtime Schemas", "Strict input coercion, schema enforcement, and boundary validation on all API endpoints.")
     ]
 
@@ -266,14 +268,14 @@ def main():
     add_heading_with_spacing(doc, "2.1 High-Performance Queue & Background Worker Pipeline", level=2)
     p = doc.add_paragraph("Outreach jobs transition through a strict finite state machine: PENDING -> PROCESSING -> ACCEPTED / FAILED / UNKNOWN. Jobs are queued atomically in SQLite, ensuring that dispatches are resilient against application restarts and server interruptions. Transient errors (network timeouts, DNS blips) trigger exponential retry backoff, while permanent 5xx mailbox errors are flagged and isolated.")
 
-    # ================= 3. METHODOLOGY & CORE WORKFLOWS =================
-    add_heading_with_spacing(doc, "3. Methodology & Core Workflows", level=1)
+    # ================= 3. METHODOLOGY, SAFE BATCHING & AP DIRECTORY PIPELINE =================
+    add_heading_with_spacing(doc, "3. Methodology, Safe Batching & AP Directory Pipeline", level=1)
 
     add_heading_with_spacing(doc, "3.1 Single Manual Outreach Flow", level=2)
     p = doc.add_paragraph("Designed for high-value targets (Principals, Deans, HODs):")
     steps_manual = [
         ("Real-Time Verification: ", "As the operator types the institution email, an asynchronous debounced check queries /api/outreach/check-duplicate to ensure no active 30-day cooldown exists."),
-        ("Intelligent Template Personalization: ", "Selects from official Shortfundly templates. Placeholders such as {{college_name}}, {{contact_salutation}}, and {{department}} are parsed and formatted dynamically."),
+        ("Intelligent Template Personalization: ", "Selects from official Shortfundly templates. Placeholders such as {{college_name}}, {{contact_salutation}}, {{city_district}}, and {{department}} are parsed and formatted dynamically."),
         ("Visual Review Modal: ", "Operators preview the exact rendered HTML email before releasing it to the mail queue, guaranteeing professional polish.")
     ]
     for s_title, s_desc in steps_manual:
@@ -282,19 +284,49 @@ def main():
         bp.add_run(s_title).bold = True
         bp.add_run(s_desc)
 
-    add_heading_with_spacing(doc, "3.2 Bulk CSV Campaign Automation Engine", level=2)
-    p = doc.add_paragraph("Engineered for large-scale institutional campaigns with strict pre-flight audit safeguards:")
+    add_heading_with_spacing(doc, "3.2 Unstress Bulk Outreach Panel & Auto-Separate Batch Engine", level=2)
+    p = doc.add_paragraph("The bulk outreach dispatcher was comprehensively upgraded into an unstressful, high-throughput campaign system:")
     steps_bulk = [
-        ("Drag-and-Drop Ingestion: ", "Accepts college contact CSVs (sample template provided with college_name, email, department, contact_person, designation)."),
-        ("Pre-Flight Breakdown Audit: ", "Instant parsing splits contacts into 4 categories: Valid Eligible, CSV Duplicates, In 30-Day Cooldown, and Invalid Addresses."),
-        ("Granular Selection Controls: ", "Provides 'Select Eligible Only', row-level toggles, and live contact filtering before dispatch."),
-        ("Rate-Limited Sequential Worker: ", "Sends 1-by-1 isolated SMTP emails with a 500ms safety jitter to protect domain reputation and avoid Google SMTP throttling.")
+        ("1-Click Built-in AP Dataset Loader: ", "Direct in-app button loading 1,832 officially verified colleges across Andhra Pradesh in sub-10ms via pre-cached JSON API without manual file uploads."),
+        ("Multi-Sheet Category Navigator: ", "Tabbed switching across 6 directory sheets: All Colleges (1,832), Principals (1,291), HODs (528), Deans (186), TPOs (172), and Faculty (1,250)."),
+        ("Smart Applied Filters: ", "Real-time pre-flight filtering by District (13 standardized AP districts — 0 numeric codes), Target Stakeholder Role, Website Availability, and live search query."),
+        ("Auto-Separate Safe Batch Engine: ", "Automatically partitions filtered records into safe batches (25, 50, 100, 200 per batch) with horizontal status pills (Ready / Sending / Completed)."),
+        ("Anti-Spam Cooling Interval & Calming Pacing: ", "Configurable inter-batch delay (5s, 10s Safe, 15s, 30s) with live countdown timer and Pause/Resume controls to protect domain reputation."),
+        ("Flexible Execution Modes: ", "Supports 'Send Active Batch Only' for targeted chunk testing, as well as 'Auto-Play All Batches (Unstressed)' for automated sequential execution with 300ms socket jitter.")
     ]
     for s_title, s_desc in steps_bulk:
         bp = doc.add_paragraph(style='List Bullet')
         bp.paragraph_format.space_after = Pt(2)
         bp.add_run(s_title).bold = True
         bp.add_run(s_desc)
+
+    add_heading_with_spacing(doc, "3.3 Dynamic Template Personalization Rules", level=2)
+    p = doc.add_paragraph("Templates support multiple syntax conventions ([College Name], {{college_name}}, [Contact Person], [City / District], [Official Website URL], etc.) and automatically resolve contextual nuances:")
+    tpl_rules = [
+        ("Intelligent Salutation: ", "Formats salutations dynamically (e.g., 'Dear Dr. Miller (Dean of Arts),' vs fallback 'Dear Sir/Madam,')."),
+        ("Department Clause Insertion: ", "Automatically integrates department context cleanly into proposal narratives without awkward grammar."),
+        ("Campus Pass Value Terms: ", "Standardized commercial details outlining the Campus Pass (Rs 1,500 + GST/year) and all 6 platform product offerings.")
+    ]
+    for t_title, t_desc in tpl_rules:
+        bp = doc.add_paragraph(style='List Bullet')
+        bp.paragraph_format.space_after = Pt(2)
+        bp.add_run(t_title).bold = True
+        bp.add_run(t_desc)
+
+    add_heading_with_spacing(doc, "3.4 Andhra Pradesh Statewide Higher Education Directory & Scraping Pipeline", level=2)
+    p = doc.add_paragraph("A state-level higher education institutional intelligence pipeline was developed to empower the outreach portal with officially verified contacts:")
+    ap_items = [
+        ("Official Portals Scraped: ", "Sourced directly from APSCHE, AP EAPCET / APTOnline College Master, AP Comprehensive Admission Portal (CAP / APCFSS), and Department of Collegiate Education (AP CCE)."),
+        ("1,832 Verified Colleges (0 Duplicates): ", "Statewide institutional directory covering all 10 academic streams: Engineering, Pharmacy, MBA, MCA, Medical, Law, Architecture, Polytechnic, and PG colleges."),
+        ("District Cleanup & Standardization: ", "Eliminated all raw numeric district codes, normalizing every institution into its verified 13 official districts (Guntur: 271, Prakasam: 191, Chittoor: 173, Krishna: 161, East Godavari: 153, Visakhapatnam: 152, Anantapur: 146, Kurnool: 138, West Godavari: 128, Nellore: 124, Kadapa: 116, Srikakulam: 55, Vizianagaram: 52)."),
+        ("National & Premier Institutes: ", "Integrated premier institutions including IIT Tirupati, NIT Andhra Pradesh, IIIT Sri City, IIITDM Kurnool, IIM Visakhapatnam, IISER Tirupati, AIIMS Mangalagiri, KL University, GITAM, VFSTR, and Government Medical Colleges."),
+        ("Multi-Sheet Master Excel Architecture: ", "Consolidated into Andhra_Pradesh_Master_College_Directory_2026.xlsx across 6 purpose-built sheets, and exported as pre-cached JSON for instant sub-10ms UI loading.")
+    ]
+    for a_title, a_desc in ap_items:
+        bp = doc.add_paragraph(style='List Bullet')
+        bp.paragraph_format.space_after = Pt(2)
+        bp.add_run(a_title).bold = True
+        bp.add_run(a_desc)
 
     # ================= 4. CYBERSECURITY ARCHITECTURE =================
     add_heading_with_spacing(doc, "4. Cybersecurity Architecture & Defense In Depth", level=1)
@@ -430,9 +462,19 @@ def main():
             "Figure 3: Target Institution Single Outreach Form with real-time field validation, recipient contact targeting, template selection, and pre-dispatch email review trigger."
         ),
         (
-            "6.4 Bulk CSV Campaign Automation Engine",
+            "6.4.1 Unstress Bulk Campaign Panel & 1-Click AP Master Directory Loader",
+            "real_unstress_bulk_campaign_panel.png",
+            "Figure 4a: Upgraded Unstress Bulk Outreach Panel displaying 1-click built-in Andhra Pradesh Master Directory loader (1,832 colleges), categorized sheet tabs, and smart multi-attribute campaign filters."
+        ),
+        (
+            "6.4.2 Auto-Separated Safe Batches & Institutional Recipients Audit Table",
+            "real_unstress_batches_and_table.png",
+            "Figure 4b: Auto-Separated Safe Batch Engine displaying horizontal batch selector pills, anti-spam cooling timer controls, and verified institutional recipients audit table."
+        ),
+        (
+            "6.4.3 Custom Spreadsheet & CSV Dropzone Importer",
             "real_bulk_campaign.png",
-            "Figure 4: Bulk CSV Campaign Dispatcher featuring the drag-and-drop file dropzone, supported column indicators, and downloadable sample outreach CSV template."
+            "Figure 4c: Custom Spreadsheet Importer supporting external CSV/Excel ingestion with instant deduplication and schema normalization."
         ),
         (
             "6.5 Outreach Email Templates Manager",
@@ -541,9 +583,29 @@ def main():
         r_c.font.color.rgb = RGBColor(0x0F, 0x17, 0x2A)
         bp.add_run(f" — {desc}")
 
-    # Save document
-    doc.save(output_docx)
-    print(f"Document successfully created at: {output_docx}")
+    # Save document with resilient lock handling
+    public_docx = os.path.join(base_dir, 'public', 'Shortfundly_Campus_Outreach_Documentation.docx')
+    doc.save(public_docx)
+    print(f"Document successfully created at: {public_docx}")
+
+    updated_docx = os.path.join(base_dir, 'Shortfundly_Campus_Outreach_Documentation_Updated.docx')
+    doc.save(updated_docx)
+    print(f"Document successfully created at: {updated_docx}")
+
+    # Copy to user downloads folder if accessible
+    user_downloads = os.path.join(os.path.expanduser('~'), 'Downloads', 'Shortfundly_Campus_Outreach_Documentation.docx')
+    try:
+        import shutil
+        shutil.copyfile(public_docx, user_downloads)
+        print(f"Document successfully mirrored to Downloads: {user_downloads}")
+    except Exception as e:
+        print(f"Downloads note: {e}")
+
+    try:
+        doc.save(output_docx)
+        print(f"Document successfully created at: {output_docx}")
+    except Exception as e:
+        print(f"Note: {output_docx} is currently open in Word. Saved to {updated_docx} and {public_docx}.")
 
 if __name__ == '__main__':
     main()

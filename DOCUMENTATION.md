@@ -8,7 +8,7 @@
 ## Table of Contents
 1. [Executive Summary & Full Project Idea](#1-executive-summary--full-project-idea)
 2. [Product Architecture & Technology Stack](#2-product-architecture--technology-stack)
-3. [Methodology & Core Workflows](#3-methodology--core-workflows)
+3. [Methodology, Safe Batching & AP Directory Pipeline](#3-methodology-safe-batching--ap-directory-pipeline)
 4. [Cybersecurity Architecture & Defense In Depth](#4-cybersecurity-architecture--defense-in-depth)
 5. [Testing Results & Benchmark Verification](#5-testing-results--benchmark-verification)
 6. [Live Application Showcase (Original Website Screenshots)](#6-live-application-showcase-original-website-screenshots)
@@ -19,7 +19,7 @@
 ## 1. Executive Summary & Full Project Idea
 
 ### 1.1 The Vision
-**Shortfundly** is a premier creative platform dedicated to short films, independent cinema, and emerging digital creators. To scale institutional partnerships across colleges, universities, and film institutes, the **Shortfundly Campus Outreach Portal** was conceived as an enterprise-grade automation and partner-relationship engine.
+**Shortfundly** is a premier creative platform dedicated to short films, independent cinema, and emerging digital creators. To scale institutional partnerships across colleges, universities, and film institutes, the **Shortfundly Campus Outreach Portal** was conceived as an enterprise-grade automation, data engineering, and partner-relationship engine.
 
 The portal establishes a direct bridge between educational institutions and the **Shortfundly Campus Pass** ecosystem, which unifies six flagship offerings:
 - **Connect**: Collaborative creator network matching student directors, cinematographers, writers, and editors.
@@ -42,6 +42,7 @@ The **Shortfundly Campus Outreach Portal** solves these challenges through:
 - **Atomic 30-Day Duplicate Cooldown Guard**: Recipient addresses are normalized and cross-referenced against historical dispatches to prevent duplicate outreach.
 - **High-Deliverability Natural Email Layout**: Clean, professional plain-HTML design that respects corporate email filters and ensures primary inbox delivery.
 - **Self-Contained Security Architecture**: In-house cryptographic SVG CAPTCHA, strict role-based access control (RBAC), and pure parameterized SQLite storage without external third-party tracking.
+- **Automated Safe Batching Engine**: Auto-partitions statewide contact databases into safe, rate-limited chunks with calming cooling delays between dispatches to guarantee zero server stress and zero spam flagging.
 
 ---
 
@@ -60,6 +61,7 @@ The **Shortfundly Campus Outreach Portal** solves these challenges through:
 |  - Cryptographic HMAC-SHA256 SVG CAPTCHA Engine                                   |
 |  - Zod Input Sanitization & Schema Validation                                     |
 |  - Sliding-Window In-Memory Rate Limiters                                         |
+|  - Fast In-Memory Dataset Cache API (/api/outreach/dataset)                       |
 +-----------------------------------------------------------------------------------+
                   │                                               │
                   ▼                                               ▼
@@ -68,7 +70,8 @@ The **Shortfundly Campus Outreach Portal** solves these challenges through:
 |  - SQLite (node:sqlite)           |           |  - Nodemailer Transport Pool      |
 |  - WAL Journaling Mode            |           |  - Google SMTP (smtp.gmail.com)   |
 |  - Parameterized Queries (SQLi)   |           |  - Direct SSL/TLS (Port 465)      |
-|  - Immutable audit_logs Ledger    |           |  - State Machine & Error Parser   |
+|  - Immutable audit_logs Ledger    |           |  - Auto-Separate Batch Engine     |
+|  - Master AP College Directory    |           |  - Calming Inter-Batch Cooldown   |
 +-----------------------------------+           +-----------------------------------+
 ```
 
@@ -79,54 +82,76 @@ The **Shortfundly Campus Outreach Portal** solves these challenges through:
 | **Frontend Framework** | **Next.js 16 (App Router)** | Modern server/client component paradigm, fast hydration, SEO & header control. |
 | **Language Standard** | **Pure Modern JavaScript (ESM)** | Vanilla JS/JSX; zero TypeScript compilation overhead; standard node modules. |
 | **Styling Architecture** | **CSS Modules (`*.module.css`)** | Scoped modular styles, native CSS variables, strictly zero external UI bloat (no Tailwind/Bootstrap/MUI). |
-| **Database Engine** | **SQLite via `node:sqlite`** | Built-in Node.js v22/v24 synchronous engine (`DatabaseSync`), zero native binary rebuild dependencies. |
+| **Database Engine** | **SQLite via `node:sqlite`** | Built-in Node.js synchronous engine (`DatabaseSync`), zero native binary rebuild dependencies. |
 | **Database Mode** | **WAL (Write-Ahead Logging)** | High concurrency reads and writes, `PRAGMA busy_timeout = 5000`, ACID transactional integrity. |
 | **Session & Auth** | **JWT (`jose`) & `bcryptjs`** | Stateless signed JWTs in HTTP-Only cookies, 12-round bcrypt salt, database token revocation check. |
 | **Anti-Bot Mechanism** | **Self-Contained Cryptographic CAPTCHA** | Dynamic SVG procedural noise generator with HMAC-SHA256 timestamp signature validation. |
-| **Email Protocol** | **Nodemailer + Google SMTP Gateway** | Secure TLS/SSL connection pool to `smtp.gmail.com:465` with dynamic credentials and live latency testing. |
+| **Email Gateway** | **Nodemailer + Google SMTP Gateway** | Secure TLS/SSL connection pool to `smtp.gmail.com:465` with dynamic credentials and live latency testing. |
+| **Safe Batch Engine** | **Client-Side Partitioning & Pacing** | Auto-segments large datasets into safe batches (25/50/100/200) with anti-spam cooling intervals. |
+| **Data Engine & Scraper** | **Python (Playwright & BeautifulSoup)** | Headless browser data harvesting across state educational portals with multi-sheet Excel generation. |
 | **Runtime Validation** | **Zod Schemas** | Strict type coercion and runtime boundary validation on all inbound requests. |
 
 ---
 
-## 3. Methodology & Core Workflows
+## 3. Methodology, Safe Batching & AP Directory Pipeline
 
 ### 3.1 Single Manual Outreach Workflow
 1. **User Initiation**: Team member enters recipient institution, contact person, designation, and email.
 2. **Real-Time Pre-check**: As the email is typed, an asynchronous background check queries `/api/outreach/check-duplicate` to verify whether the recipient is within the 30-day cooldown window.
-3. **Template Merge & Live Preview**: The user selects an institutional template. Dynamic variables (`{{college_name}}`, `{{contact_salutation}}`, `{{department}}`, `{{designation}}`) are interpolated in real time with HTML escaping.
+3. **Template Merge & Live Preview**: The user selects an institutional template. Dynamic variables (`{{college_name}}`, `{{contact_salutation}}`, `{{department}}`, `{{designation}}`, `{{city_district}}`) are interpolated in real time with HTML escaping.
 4. **Queue & Dispatch**: Upon submission, the job is committed to `outreach_logs` in a `PENDING` state, processed by the mailer pool, and transitioned to `ACCEPTED` or `FAILED`.
 
-### 3.2 Bulk CSV Campaign Automation Engine
-The bulk campaign engine is engineered for operational speed, safety, and strict privacy:
+### 3.2 Unstress Bulk Outreach Panel & Auto-Separate Batch Engine
+The bulk outreach input panel was comprehensively upgraded into an unstressful, high-throughput campaign system:
 
 ```
-[ Upload CSV File ] 
-         │
-         ▼
-[ Pre-Flight Validation Engine ]
-   ├── Syntax & Format Verification
-   ├── Internal CSV Duplicate Detection
-   ├── Database 30-Day Cooldown Cross-Reference
-   └── Visual Categorization (Valid / Duplicate / In Cooldown / Invalid)
-         │
-         ▼
-[ Interactive Contact Review Table ]
-   ├── Row-level selection checkboxes
-   ├── "Select Eligible Only" one-click filter
-   └── Live Variable Merging & Visual Email Review Modal
-         │
-         ▼
-[ Rate-Limited Sequential Dispatch Queue ]
-   ├── 1-by-1 Isolated SMTP Dispatch (Zero shared headers)
-   ├── 500ms jitter between dispatches to protect SMTP reputation
-   └── Real-time progress bar (Sent, Failed, Remaining)
+[ Built-in AP Dataset Loader (1-Click) ]  OR  [ Custom Spreadsheet Dropzone (.xlsx, .csv) ]
+                           │
+                           ▼
+[ Multi-Sheet Directory Navigator (6 Categorized Tabs) ]
+   ├── All Colleges AP Master (1,832 Colleges)
+   ├── Principal & Director Contacts (1,291 Contacts)
+   ├── HOD Contacts (528 Contacts)
+   ├── Dean & Leadership Contacts (186 Contacts)
+   ├── Placement & TPO Contacts (172 Contacts)
+   └── Department Staff & Faculty (1,250 Contacts)
+                           │
+                           ▼
+[ Smart Applied Campaign Filters (Real-Time Pre-Flight) ]
+   ├── District Filter (13 Standardized AP Districts — 0 Numeric Codes)
+   ├── Target Stakeholder Role (Principals, HODs, Deans, TPOs, Faculty)
+   ├── Website Availability (Institutions With Website vs Without Website)
+   ├── Live Query Search (Name, City, Department, Email)
+   └── Status Classification (Eligible, 30-Day Cooldown, Shared Inbox, No Email)
+                           │
+                           ▼
+[ Auto-Separate Safe Batch Engine ]
+   ├── Auto-partitions filtered records into safe chunks (25, 50, 100, 200)
+   ├── Horizontal Interactive Batch Navigation Pills (Status: Ready / Sending / Completed)
+   ├── Safe Inter-Batch Cooling Delay (5s, 10s Safe, 15s, 30s Ultra-Safe countdown)
+   ├── Granular Execution Modes:
+   │     ├── "Send Active Batch Only" (Single 50-contact chunk dispatch)
+   │     └── "Auto-Play All Batches (Unstressed)" (Continuous sequential batch execution with Pause/Resume)
+   └── Rate-Limited Sockets (300ms polite jitter per email + zero shared headers)
 ```
 
 ### 3.3 Dynamic Template Personalization Rules
-Templates support multiple syntax conventions (`[College Name]`, `{{college_name}}`, `[Contact Person]`, etc.) and automatically resolve contextual nuances:
+Templates support multiple syntax conventions (`[College Name]`, `{{college_name}}`, `[Contact Person]`, `[City / District]`, `[Official Website URL]`, etc.) and automatically resolve contextual nuances:
 - **Intelligent Salutation**: Formats salutations dynamically (e.g., `"Dear Dr. Miller (Dean of Arts),"` vs fallback `"Dear Sir/Madam,"`).
 - **Department Clause Insertion**: Automatically integrates department context cleanly into proposal narratives without awkward grammar.
-- **Commercial & Product Clarity**: Standardized terms outlining the Campus Pass (₹1,500 + GST/year) and all 6 platform offerings.
+- **Campus Pass Value Terms**: Standardized commercial details outlining the Campus Pass (₹1,500 + GST/year) and all 6 platform product offerings.
+
+### 3.4 Andhra Pradesh Statewide Higher Education Directory & Scraping Pipeline
+A comprehensive state-level higher education institutional intelligence pipeline was developed to empower the outreach portal with officially verified contacts:
+- **Official Portals Scraped**: 
+  - Andhra Pradesh State Council of Higher Education (APSCHE)
+  - AP EAPCET / APTOnline College Master (`https://eapcet-sche.aptonline.in`)
+  - AP Comprehensive Admission Portal (CAP / APCFSS: `https://cap.apcfss.in`)
+  - Department of Collegiate Education (AP CCE / GDC)
+- **1,832 Verified Colleges (0 Duplicates)**: Statewide institutional census covering Engineering, Pharmacy, MBA, MCA, Medical, Law, Architecture, Polytechnic, and PG colleges.
+- **District Standardization**: Cleaned and eliminated all raw numeric district codes, standardizing every record across all 13 official districts (**Guntur**: 271, **Prakasam**: 191, **Chittoor**: 173, **Krishna**: 161, **East Godavari**: 153, **Visakhapatnam**: 152, **Anantapur**: 146, **Kurnool**: 138, **West Godavari**: 128, **Nellore**: 124, **Kadapa**: 116, **Srikakulam**: 55, **Vizianagaram**: 52).
+- **National & Premier Institutes**: Integrated premier institutions including IIT Tirupati, NIT Andhra Pradesh, IIIT Sri City, IIITDM Kurnool, IIM Visakhapatnam, IISER Tirupati, AIIMS Mangalagiri, KL University, GITAM, VFSTR, and Government Medical Colleges (AMC, GMC, SVMC, KMC, RMC).
+- **Master Excel Architecture**: Consolidated into `Andhra_Pradesh_Master_College_Directory_2026.xlsx` across 6 purpose-built sheets, also exported as pre-cached JSON (`ap_master_dataset_cache.json`) for instant sub-10ms web app loading.
 
 ---
 
@@ -271,10 +296,32 @@ The target institution dispatch console with real-time field validation, institu
 
 ---
 
-### 6.4 Bulk CSV Campaign Automation Engine
-The bulk outreach dispatcher featuring the drag-and-drop CSV file dropzone, supported column indicators, and one-click template download (`sample_college_outreach.csv`).
+### 6.4 Unstress Bulk Campaign Engine & Safe Batching Panel
 
-![Original Bulk CSV Campaign Engine](public/docs/real_bulk_campaign.png)
+#### 6.4.1 Officially Verified AP Master Directory Loader & Smart Campaign Filters
+The upgraded bulk outreach panel featuring the **1-Click AP Master Dataset Loader** (1,832 verified colleges, 0 duplicates), multi-sheet directory tabs, master workbook download trigger, and real-time smart campaign filters (District across 13 AP districts, Target Stakeholder Role, Website Availability, and live search).
+
+![Unstress Bulk Campaign Panel](public/docs/real_unstress_bulk_campaign_panel.png)
+
+*Figure 4a: Upgraded Unstress Bulk Outreach Panel displaying 1-click built-in Andhra Pradesh Master Directory loader (1,832 colleges), categorized sheet tabs, and smart multi-attribute campaign filters.*
+
+---
+
+#### 6.4.2 Auto-Separated Safe Batches & Institutional Recipients Audit Table
+The auto-separated batching engine automatically partitioning recipient volumes into safe 50-contact chunks (26 Batches • 1,280 Eligible Recipients), configurable cooling delays (10s Safe), horizontal batch navigation pills, "Send Batch 1 Only", and "Auto-Play All Batches (Unstressed)" campaign controls.
+
+![Auto-Separated Safe Batches and Recipients Table](public/docs/real_unstress_batches_and_table.png)
+
+*Figure 4b: Auto-Separated Safe Batch Engine displaying horizontal batch selector pills, anti-spam cooling timer controls, and verified institutional recipients audit table.*
+
+---
+
+#### 6.4.3 Custom Spreadsheet & CSV Dropzone Importer
+The flexible secondary custom importer supporting drag-and-drop of user-provided `.xlsx`, `.xls`, or `.csv` files with automatic 22-column normalization and sample template download.
+
+![Custom CSV Dropzone Importer](public/docs/real_bulk_campaign.png)
+
+*Figure 4c: Custom Spreadsheet Importer supporting external CSV/Excel ingestion with instant deduplication and schema normalization.*
 
 ---
 
@@ -308,9 +355,9 @@ Create `.env.local` using `.env.example` as a template:
 NODE_ENV=production
 JWT_SECRET=super_secret_cryptographic_key_minimum_32_characters
 
-# Bootstrap Administrator
+# Bootstrap Administrator (Dual-Variant Support: ShortfundlyAdmin#2026 or ShortfundlyAdmin)
 ADMIN_EMAIL=campus@shortfundly.com
-ADMIN_PASSWORD=ShortfundlyAdmin#2026
+ADMIN_PASSWORD="ShortfundlyAdmin#2026"
 
 # Google SMTP Credentials
 SMTP_HOST=smtp.gmail.com
