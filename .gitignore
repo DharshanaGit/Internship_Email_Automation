@@ -46,3 +46,9 @@ cap_homepage.png
 test_eapcet.xls
 final dataset/
 
+# Documentation files (kept locally, excluded from git)
+DOCUMENTATION.md
+*.docx
+Shortfundly_Campus_Outreach_Documentation*
+
+
