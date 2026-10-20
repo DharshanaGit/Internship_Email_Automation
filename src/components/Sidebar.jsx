@@ -9,6 +9,7 @@ import {
   SettingsIcon,
   LogOutIcon,
   UserIcon,
+  ShortfundlyLogoSymbol,
 } from './Icons';
 
 export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) {
@@ -55,18 +56,10 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
     <aside className={styles.sidebar}>
       {/* Brand Header */}
       <div className={styles.brandArea}>
-        <img
-          src="/sf_logo.svg"
-          alt="Shortfundly"
-          className={styles.logoImg}
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            e.currentTarget.src = '/sf_logo.png';
-          }}
-        />
+        <ShortfundlyLogoSymbol size={40} className={styles.logoImg} />
         <div className={styles.brandText}>
-          <div className={styles.portalTitle}>Shortfundly Campus Outreach Portal</div>
-          <div className={styles.tagline}>Connecting Campuses. Empowering Creators.</div>
+          <div className={styles.portalTitle}>Shortfundly</div>
+          <div className={styles.tagline} style={{ color: 'var(--accent-primary)', fontWeight: '700' }}>Campus Outreach</div>
         </div>
       </div>
 

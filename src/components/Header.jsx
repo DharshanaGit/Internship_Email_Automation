@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import styles from './Header.module.css';
-import { ServerIcon, UserIcon, LogOutIcon } from './Icons.jsx';
+import { ServerIcon, UserIcon, LogOutIcon, ShortfundlyLogoSymbol } from './Icons.jsx';
 
 export default function Header({ user, onOpenSmtpDiagnostics, onLogout }) {
   return (
@@ -11,21 +11,11 @@ export default function Header({ user, onOpenSmtpDiagnostics, onLogout }) {
       <div className={styles.inner}>
         <div className={styles.brandGroup}>
           <div className={styles.logoWrapper}>
-            {/* Shortfundly Official Logo */}
-            <img
-              src="/sf_logo.svg"
-              alt="Shortfundly"
-              className={styles.logoImg}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = '/sf_logo.png';
-              }}
-            />
+            <ShortfundlyLogoSymbol size={38} />
           </div>
-          <div className={styles.divider} />
           <div className={styles.titleArea}>
             <div className={styles.portalTitle}>
-              Shortfundly Campus Outreach Portal
+              Shortfundly <span style={{ color: 'var(--accent-primary)', fontWeight: '700' }}>Campus Outreach</span>
             </div>
             <div className={styles.tagline}>
               Connecting Campuses. Empowering Creators.

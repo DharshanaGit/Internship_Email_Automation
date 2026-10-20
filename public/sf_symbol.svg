@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 10 94 94" width="94" height="94" fill="none">
+  <!-- Red Brand Circle -->
+  <circle cx="57" cy="57" r="45.5" fill="#FE3030" />
+
+  <!-- Inside Circle: Left Dot -->
+  <circle cx="37.5" cy="57" r="6.2" fill="#FFFFFF" />
+
+  <!-- Inside Circle: Forward Chevron Play Symbol -->
+  <g stroke="#FFFFFF" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="46" y1="82" x2="70" y2="57" opacity="0.9" />
+    <line x1="46" y1="32" x2="70" y2="57" opacity="0.9" />
+  </g>
+
+  <!-- Center Cap Overlay -->
+  <circle cx="70" cy="57" r="7.5" fill="#FFFFFF" />
+</svg>

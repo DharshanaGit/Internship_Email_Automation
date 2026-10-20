@@ -13,6 +13,7 @@ import {
   LockIcon,
   EyeIcon,
   EyeOffIcon,
+  ShortfundlyLogoSymbol,
 } from '@/components/Icons.jsx';
 
 export default function LoginPage() {
@@ -118,17 +119,14 @@ export default function LoginPage() {
           ← Back to Overview
         </Link>
         <div className={styles.header}>
-          <img
-            src="/sf_logo.svg"
-            alt="Shortfundly"
-            className={styles.logo}
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = '/sf_logo.png';
-            }}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
+            <ShortfundlyLogoSymbol size={46} />
+            <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+              <span style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)', lineHeight: 1.15 }}>Shortfundly</span>
+              <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Campus Outreach</span>
+            </div>
+          </div>
           <div className={styles.titleArea}>
-            <h1 className={styles.title}>Shortfundly Campus Outreach Portal</h1>
             <div className={styles.taglineLead}>
               Connecting Campuses. Empowering Creators.
             </div>

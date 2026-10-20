@@ -284,3 +284,25 @@ export function SparklesIcon({ className, size = 18 }) {
   );
 }
 
+export function ShortfundlyLogoSymbol({ size = 36, className }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="10 10 94 94"
+      width={size}
+      height={size}
+      fill="none"
+      className={className}
+      style={{ flexShrink: 0, display: 'inline-block' }}
+    >
+      <circle cx="57" cy="57" r="45.5" fill="#FE3030" />
+      <circle cx="37.5" cy="57" r="6.2" fill="#FFFFFF" />
+      <g stroke="#FFFFFF" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="46" y1="82" x2="70" y2="57" opacity="0.95" />
+        <line x1="46" y1="32" x2="70" y2="57" opacity="0.95" />
+      </g>
+      <circle cx="70" cy="57" r="7.5" fill="#FFFFFF" />
+    </svg>
+  );
+}
+
