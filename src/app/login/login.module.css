@@ -32,6 +32,23 @@
   background: linear-gradient(90deg, #e11d48, #be123c, #9f1239);
 }
 
+.backHomeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  align-self: flex-start;
+  margin-bottom: -10px;
+  transition: color 0.15s ease;
+}
+
+.backHomeBtn:hover {
+  color: var(--accent-primary);
+}
+
 .header {
   display: flex;
   flex-direction: column;

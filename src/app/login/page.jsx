@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './login.module.css';
 import {
@@ -113,6 +114,9 @@ export default function LoginPage() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
+        <Link href="/" className={styles.backHomeBtn}>
+          ← Back to Overview
+        </Link>
         <div className={styles.header}>
           <img
             src="/sf_logo.svg"

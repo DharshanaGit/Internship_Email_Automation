@@ -181,7 +181,7 @@ export default function DashboardPage() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
     } finally {
-      router.push('/login');
+      router.push('/');
     }
   };
 
