@@ -46,10 +46,6 @@ export default function SettingsView({ session }) {
   });
   const [addingUser, setAddingUser] = useState(false);
 
-  // Reset Password State
-  const [resetTarget, setResetTarget] = useState(null);
-  const [newPasswordVal, setNewPasswordVal] = useState('');
-  const [resettingPw, setResettingPw] = useState(false);
 
   // Load SMTP config (with client-side localStorage fallback for resilience across serverless cold starts)
   const fetchSmtpConfig = async () => {
@@ -269,34 +265,6 @@ export default function SettingsView({ session }) {
     }
   };
 
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    if (!resetTarget || !newPasswordVal || newPasswordVal.length < 8) {
-      alert('Password must be at least 8 characters long.');
-      return;
-    }
-
-    try {
-      setResettingPw(true);
-      const res = await fetch('/api/admin/users', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: resetTarget.id, password: newPasswordVal }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setFeedback({ type: 'success', message: `Password reset successfully for ${resetTarget.email}.` });
-        setResetTarget(null);
-        setNewPasswordVal('');
-      } else {
-        setFeedback({ type: 'error', message: data.error || 'Failed to reset password.' });
-      }
-    } catch {
-      setFeedback({ type: 'error', message: 'Network error resetting password.' });
-    } finally {
-      setResettingPw(false);
-    }
-  };
 
   if (!isAdmin) {
     return (
@@ -580,7 +548,7 @@ export default function SettingsView({ session }) {
             <div>
               <div className={styles.cardTitle}>Company User Directory & RBAC Roles</div>
               <div className={styles.cardSubtitle}>
-                Manage team member credentials, assign roles (Admin, Team Lead, Manager), and regulate outreach sending rights.
+                Manage team directory, assign RBAC roles (Admin, Team Lead, Manager), and regulate outreach sending rights. In-app password alteration is disabled under cybersecurity policy.
               </div>
             </div>
             <button
@@ -602,7 +570,6 @@ export default function SettingsView({ session }) {
                   <th>Outreach Send Right</th>
                   <th>Account Status</th>
                   <th>Created</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -665,20 +632,6 @@ export default function SettingsView({ session }) {
 
                       <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                         {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}
-                      </td>
-
-                      <td>
-                        <button
-                          type="button"
-                          className={styles.btnSecondary}
-                          style={{ padding: '4px 10px', fontSize: '11px' }}
-                          onClick={() => {
-                            setResetTarget(u);
-                            setNewPasswordVal('');
-                          }}
-                        >
-                          Reset Password
-                        </button>
                       </td>
                     </tr>
                   );
@@ -779,58 +732,7 @@ export default function SettingsView({ session }) {
         </div>
       )}
 
-      {/* Reset Password Modal */}
-      {resetTarget && (
-        <div className={styles.modalBackdrop} onClick={() => setResetTarget(null)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <form onSubmit={handleResetPassword}>
-              <div className={styles.modalHeader}>
-                <div className={styles.modalTitle}>Reset Password: {resetTarget.email}</div>
-                <button
-                  type="button"
-                  className={styles.modalCloseBtn}
-                  onClick={() => setResetTarget(null)}
-                >
-                  <CloseIcon size={18} />
-                </button>
-              </div>
 
-              <div className={styles.modalBody}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>New Password (min 8 chars)</label>
-                  <input
-                    type="password"
-                    className={styles.input}
-                    placeholder="Enter new secure password"
-                    value={newPasswordVal}
-                    onChange={(e) => setNewPasswordVal(e.target.value)}
-                    required
-                    minLength={8}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.modalFooter}>
-                <button
-                  type="button"
-                  className={styles.btnSecondary}
-                  onClick={() => setResetTarget(null)}
-                  disabled={resettingPw}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className={styles.btnPrimary}
-                  disabled={resettingPw}
-                >
-                  {resettingPw ? 'Saving...' : 'Set New Password'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

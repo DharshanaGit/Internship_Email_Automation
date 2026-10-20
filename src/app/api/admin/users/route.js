@@ -121,6 +121,14 @@ export async function PATCH(request) {
     const body = await request.json().catch(() => ({}));
     const { id, role, is_active, can_send, password } = body;
 
+    // Strict Cybersecurity Defense: In-app password mutations are prohibited
+    if (password !== undefined) {
+      return NextResponse.json(
+        { error: 'Security Policy: In-app password modifications are strictly disabled under cybersecurity policy.' },
+        { status: 403 }
+      );
+    }
+
     if (!id) {
       return NextResponse.json({ error: 'User ID is required.' }, { status: 400 });
     }
@@ -153,20 +161,11 @@ export async function PATCH(request) {
     const newActive = typeof is_active === 'boolean' ? (is_active ? 1 : 0) : (typeof is_active === 'number' ? is_active : targetUser.is_active);
     const newCanSend = typeof can_send === 'boolean' ? (can_send ? 1 : 0) : (typeof can_send === 'number' ? can_send : targetUser.can_send);
 
-    if (password && password.length >= 8) {
-      const newHash = bcrypt.hashSync(password, 12);
-      db.prepare(`
-        UPDATE users
-        SET role = ?, is_active = ?, can_send = ?, password_hash = ?
-        WHERE id = ?
-      `).run(newRole, newActive, newCanSend, newHash, id);
-    } else {
-      db.prepare(`
-        UPDATE users
-        SET role = ?, is_active = ?, can_send = ?
-        WHERE id = ?
-      `).run(newRole, newActive, newCanSend, id);
-    }
+    db.prepare(`
+      UPDATE users
+      SET role = ?, is_active = ?, can_send = ?
+      WHERE id = ?
+    `).run(newRole, newActive, newCanSend, id);
 
     logAuditEvent('USER_UPDATED', {
       user_id: id,
@@ -174,7 +173,6 @@ export async function PATCH(request) {
       new_role: newRole,
       new_active: newActive,
       new_can_send: newCanSend,
-      password_reset: Boolean(password),
     }, session.email);
 
     const response = NextResponse.json({
