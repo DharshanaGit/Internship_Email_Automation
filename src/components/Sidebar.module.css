@@ -1,7 +1,7 @@
-/* Executive Sidebar Shell */
+/* Warm Ivory Floating Sidebar Shell */
 .sidebar {
-  width: 260px;
-  background: #ffffff;
+  width: 250px;
+  background: #FBF7F1;
   border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
@@ -14,9 +14,8 @@
 
 /* Brand Header */
 .brandArea {
-  padding: 22px 20px;
+  padding: 22px 18px 18px 18px;
   border-bottom: 1px solid var(--border-subtle);
-  background: #ffffff;
 }
 
 .brandRow {
@@ -25,8 +24,10 @@
   gap: 12px;
 }
 
-.logoImg {
-  display: block;
+.logoCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
@@ -37,27 +38,120 @@
 
 .brandTitle {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 850;
   color: var(--text-primary);
   line-height: 1.15;
   letter-spacing: -0.2px;
 }
 
 .brandSubtitle {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--accent-primary);
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
 
-/* Nav Section */
-.navSection {
-  flex: 1;
-  padding: 24px 14px;
+/* User Mini Profile Inset (Inspired by Reference) */
+.profileInset {
+  margin: 16px 14px 4px 14px;
+  background: #FFFFFF;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-xs);
+}
+
+.avatarWrap {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profileMeta {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 3px;
+  min-width: 0;
+}
+
+.profileEmail {
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+}
+
+.profileBadges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.rolePill {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+}
+
+.roleAdmin {
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-tint);
+}
+
+.roleTeamLead {
+  background: #F1F6FD;
+  color: #1E5BB8;
+  border: 1px solid #C8DCFA;
+}
+
+.roleManager {
+  background: #FEF7EA;
+  color: #966108;
+  border: 1px solid #FBE5B7;
+}
+
+.sendPill {
+  font-size: 8px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: var(--radius-full);
+}
+
+.sendActive {
+  background: #ECF7F1;
+  color: #217346;
+}
+
+.sendDisabled {
+  background: #FDF2F1;
+  color: #B92D23;
+}
+
+/* Navigation Section */
+.navSection {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   overflow-y: auto;
 }
 
@@ -67,7 +161,7 @@
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: var(--text-muted);
-  padding: 0 12px 6px 12px;
+  padding: 0 10px 4px 10px;
 }
 
 .navList {
@@ -81,7 +175,7 @@
   align-items: center;
   gap: 12px;
   padding: 9px 12px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 600;
@@ -92,25 +186,27 @@
 }
 
 .navItem:hover {
-  background: #f8fafc;
+  background: #F2ECE3;
   color: var(--text-primary);
 }
 
 .navItemActive {
-  background: var(--accent-subtle);
+  background: #FFFFFF;
   color: var(--accent-primary);
-  font-weight: 700;
+  font-weight: 750;
+  box-shadow: 0 1px 4px rgba(35, 31, 32, 0.05);
 }
 
 .navItemActive::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 6px;
-  bottom: 6px;
-  width: 3px;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 18px;
   background: var(--accent-primary);
-  border-radius: 0 2px 2px 0;
+  border-radius: var(--radius-full);
 }
 
 .itemIcon {
@@ -119,6 +215,7 @@
   justify-content: center;
   color: inherit;
   flex-shrink: 0;
+  margin-left: 4px;
 }
 
 .itemLabel {
@@ -135,109 +232,14 @@
   letter-spacing: 0.5px;
   padding: 2px 6px;
   border-radius: var(--radius-full);
-  background: #f1f5f9;
+  background: var(--bg-subtle);
   color: var(--text-muted);
 }
 
-/* User Profile Footer */
+/* Footer */
 .footerSection {
-  padding: 16px 14px;
+  padding: 14px 14px;
   border-top: 1px solid var(--border-subtle);
-  background: #f8fafc;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.userProfileCard {
-  background: #ffffff;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-}
-
-.userEmailRow {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.userAvatar {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-full);
-  background: #f1f5f9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.userInfoCol {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.userEmailText {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-}
-
-.roleBadgesRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.rolePill {
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
-}
-
-.roleAdmin {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
-}
-
-.roleTeamLead {
-  background: #eff6ff;
-  color: #1d4ed8;
-}
-
-.roleManager {
-  background: #fffbeb;
-  color: #b45309;
-}
-
-.sendPill {
-  font-size: 9px;
-  font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 4px;
-}
-
-.sendActive {
-  background: #ecfdf5;
-  color: #047857;
-}
-
-.sendDisabled {
-  background: #fef2f2;
-  color: #b91c1c;
 }
 
 .logoutBtn {
@@ -246,10 +248,10 @@
   justify-content: center;
   gap: 8px;
   padding: 8px 12px;
-  background: #ffffff;
+  background: #FFFFFF;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  color: #dc2626;
+  border-radius: var(--radius-full);
+  color: var(--status-failed-text);
   font-size: 12px;
   font-weight: 600;
   transition: all 0.15s ease;
@@ -257,12 +259,12 @@
 }
 
 .logoutBtn:hover {
-  background: #fef2f2;
-  border-color: #fecaca;
+  background: var(--status-failed-bg);
+  border-color: var(--status-failed-border);
 }
 
 @media (max-width: 900px) {
   .sidebar {
-    width: 230px;
+    width: 220px;
   }
 }

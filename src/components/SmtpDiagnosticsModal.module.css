@@ -1,7 +1,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(35, 31, 32, 0.45);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 100;
@@ -12,15 +12,15 @@
 }
 
 .modal {
-  background: #ffffff;
+  background: #FFFFFF;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   width: 100%;
   max-width: 650px;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   animation: modalEnter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -42,12 +42,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f8fafc;
+  background: #FBF7F1;
 }
 
 .headerTitle {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 850;
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -57,30 +57,31 @@
 .closeBtn {
   color: var(--text-secondary);
   padding: 6px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .closeBtn:hover {
-  background: #e2e8f0;
+  background: #E8DFD5;
   color: var(--text-primary);
 }
 
 .modalBody {
-  padding: 20px 24px;
+  padding: 22px 24px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  background: #FAF7F2;
 }
 
 .configCard {
-  background: #f8fafc;
+  background: #FFFFFF;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 16px;
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -99,76 +100,40 @@
 .configVal {
   font-family: var(--font-mono);
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 650;
 }
 
-.testBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: var(--radius-sm);
-  background: var(--accent-primary);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.25);
-}
-
-.testBtn:hover:not(:disabled) {
-  background: var(--accent-hover);
-  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
-}
-
-.testBtn:disabled {
-  opacity: 0.6;
-}
-
-.resultBox {
-  padding: 14px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
+.statusCard {
+  background: #FFFFFF;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-.resultBoxSuccess {
-  background: var(--status-accepted-bg);
-  border: 1px solid var(--status-accepted-border);
-  color: var(--status-accepted-text);
+.modalFooter {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-subtle);
+  background: #FFFFFF;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
-.resultBoxError {
-  background: var(--status-failed-bg);
-  border: 1px solid var(--status-failed-border);
-  color: var(--status-failed-text);
-}
-
-.docSection {
-  background: #f8fafc;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  font-size: 12px;
-  line-height: 1.6;
+.closePillBtn {
+  padding: 8px 18px;
+  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-full);
   color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
 }
 
-.docTitle {
-  font-size: 13px;
-  font-weight: 700;
+.closePillBtn:hover {
+  background: var(--bg-secondary);
   color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.docSection ul {
-  padding-left: 18px;
-  margin-top: 6px;
-}
-
-.docSection li {
-  margin-bottom: 4px;
 }

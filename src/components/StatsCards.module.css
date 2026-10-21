@@ -1,37 +1,37 @@
-.statsRibbon {
+/* Warm Ivory & Linen Rounded Metric Cards */
+.statsContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
   gap: 14px;
   width: 100%;
 }
 
-.statMetricCard {
-  background: #ffffff;
+.statPanel {
+  background: #FFFFFF;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  position: relative;
+  box-shadow: var(--shadow-xs);
   transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
-.statMetricCard:hover {
+.statPanel:hover {
   border-color: var(--border-medium);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
 }
 
-.cardTopRow {
+.panelHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
-.metricLabel {
+.panelLabel {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -39,11 +39,11 @@
   color: var(--text-muted);
 }
 
-.iconChip {
+.iconCircle {
   width: 26px;
   height: 26px;
-  border-radius: var(--radius-xs);
-  background: #f1f5f9;
+  border-radius: var(--radius-full);
+  background: var(--bg-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -51,32 +51,32 @@
   flex-shrink: 0;
 }
 
-.iconChipGreen {
-  background: #ecfdf5;
-  color: #047857;
+.iconGreen {
+  background: #ECF7F1;
+  color: #217346;
 }
 
-.iconChipRed {
-  background: #fef2f2;
-  color: #b91c1c;
+.iconRed {
+  background: #FDF2F1;
+  color: #B92D23;
 }
 
-.iconChipAmber {
-  background: #fffbeb;
-  color: #b45309;
+.iconAmber {
+  background: #FEF7EA;
+  color: #966108;
 }
 
-.iconChipBlue {
-  background: #eff6ff;
-  color: #1d4ed8;
+.iconBlue {
+  background: #F1F6FD;
+  color: #1E5BB8;
 }
 
-.iconChipCrimson {
-  background: #fff1f2;
+.iconCoral {
+  background: var(--accent-subtle);
   color: var(--accent-primary);
 }
 
-.metricNumber {
+.statValue {
   font-size: 24px;
   font-weight: 850;
   font-family: var(--font-mono);
@@ -84,32 +84,68 @@
   line-height: 1.15;
 }
 
-.numberGreen {
-  color: #047857;
+.textGreen { color: #217346; }
+.textRed { color: #B92D23; }
+.textAmber { color: #966108; }
+.textBlue { color: #1E5BB8; }
+.textCoral { color: var(--accent-primary); }
+
+.progressRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
 }
 
-.numberRed {
-  color: #b91c1c;
+.barBackground {
+  height: 4px;
+  background: #F4EFE8;
+  border-radius: var(--radius-full);
+  overflow: hidden;
 }
 
-.numberAmber {
-  color: #b45309;
+.barFillNeutral {
+  height: 100%;
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
 }
 
-.numberBlue {
-  color: #1d4ed8;
+.barFillGreen {
+  height: 100%;
+  background: #2E7D5E;
+  border-radius: var(--radius-full);
 }
 
-.numberCrimson {
-  color: var(--accent-primary);
+.barFillRed {
+  height: 100%;
+  background: #B92D23;
+  border-radius: var(--radius-full);
 }
 
-.metricFootnote {
+.barFillAmber {
+  height: 100%;
+  background: #D97706;
+  border-radius: var(--radius-full);
+}
+
+.barFillBlue {
+  height: 100%;
+  background: #2563EB;
+  border-radius: var(--radius-full);
+}
+
+.barFillCoral {
+  height: 100%;
+  background: var(--accent-primary);
+  border-radius: var(--radius-full);
+}
+
+.barCaption {
   font-size: 11px;
-  color: var(--text-dim);
+  color: var(--text-muted);
 }
 
-.activeSpin {
+.spinIcon {
   animation: spin 1s linear infinite;
 }
 

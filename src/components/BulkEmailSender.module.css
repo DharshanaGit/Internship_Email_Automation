@@ -919,9 +919,9 @@
 }
 
 .rolePrincipal {
-  background: #f3e8ff;
-  color: #7e22ce;
-  border: 1px solid #d8b4fe;
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-tint);
 }
 
 .roleTpo {

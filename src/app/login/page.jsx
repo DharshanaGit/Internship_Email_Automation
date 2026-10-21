@@ -17,6 +17,7 @@ import {
   CheckCircleIcon,
   ServerIcon,
   BuildingIcon,
+  ArrowRightIcon,
 } from '@/components/Icons.jsx';
 
 export default function LoginPage() {
@@ -31,7 +32,6 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
   const [capsLockActive, setCapsLockActive] = useState(false);
 
-  // Initialize nonce on mount
   useEffect(() => {
     setCaptchaNonce(Date.now());
   }, []);
@@ -54,14 +54,14 @@ export default function LoginPage() {
     let cleanEmail = email.trim();
 
     if (!cleanEmail) {
-      setError('Please enter your company email address.');
+      setError('Please provide your company email address.');
       return;
     }
 
     const cleanPassword = password.trim();
 
     if (!cleanPassword) {
-      setError('Please enter your account password.');
+      setError('Please provide your account password.');
       return;
     }
 
@@ -70,12 +70,11 @@ export default function LoginPage() {
       return;
     }
 
-    // Auto-complete default company handle if user entered only "campus"
     if (!cleanEmail.includes('@')) {
       if (cleanEmail.toLowerCase() === 'campus') {
         cleanEmail = 'campus@shortfundly.com';
       } else {
-        setError(`Please enter a full company email address (e.g. ${cleanEmail.toLowerCase()}@shortfundly.com).`);
+        setError(`Please enter a complete company email address (e.g. ${cleanEmail.toLowerCase()}@shortfundly.com).`);
         return;
       }
     }
@@ -99,15 +98,15 @@ export default function LoginPage() {
         router.push('/dashboard');
         router.refresh();
       } else {
-        let msg = data.error || 'Authentication failed. Please verify your company credentials.';
+        let msg = data.error || 'Authentication rejected. Verify your company credentials.';
         if (capsLockActive) {
-          msg += ' (Notice: Caps Lock is active. Passwords are case-sensitive.)';
+          msg += ' (Notice: Caps Lock is ON. Passwords are case-sensitive.)';
         }
         setError(msg);
         refreshCaptcha();
       }
     } catch {
-      setError('Network communication failed. Please check your connection and retry.');
+      setError('Network communication failed. Please check server connection.');
       refreshCaptcha();
     } finally {
       setLoading(false);
@@ -115,274 +114,265 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.splitLayout}>
-      {/* LEFT EXECUTIVE DECK: Brand, Telemetry & Institutional Metrics */}
-      <div className={styles.intelDeck}>
-        <div className={styles.deckContent}>
-          {/* Brand Seal */}
-          <div className={styles.brandSeal}>
-            <ShortfundlyLogoSymbol size={44} />
-            <div className={styles.brandTextGroup}>
-              <span className={styles.brandTitle}>Shortfundly</span>
-              <span className={styles.brandBadge}>Campus Outreach Portal</span>
+    <div className={styles.loginWorkspace}>
+      {/* Floating Dual-Panel Container */}
+      <div className={styles.splitShell}>
+        {/* Left Side: Brand Story, Telemetry & Operations Panel */}
+        <div className={styles.brandPanel}>
+          <div className={styles.brandPanelInner}>
+            {/* Logo Badge */}
+            <div className={styles.logoRow}>
+              <div className={styles.symbolWrap}>
+                <ShortfundlyLogoSymbol size={42} />
+              </div>
+              <div className={styles.brandNames}>
+                <span className={styles.mainBrand}>Shortfundly</span>
+                <span className={styles.subBrand}>Campus Outreach Workspace</span>
+              </div>
+            </div>
+
+            {/* Introduction Statement */}
+            <div className={styles.statementBox}>
+              <div className={styles.pillLabel}>INTERNAL OPERATIONS</div>
+              <h1 className={styles.statementTitle}>
+                Academic Partnership &amp; Outreach Command Console
+              </h1>
+              <p className={styles.statementDesc}>
+                Connect directly with Principals, Directors, Deans, HODs, and Placement Heads across 5,189+ verified institutions statewide.
+              </p>
+            </div>
+
+            {/* Nested Status Card */}
+            <div className={styles.telemetryCard}>
+              <div className={styles.telemetryTop}>
+                <div className={styles.statusPill}>
+                  <span className={styles.statusDot} />
+                  <span>Google SMTP Engine &bull; 250 OK Protocol</span>
+                </div>
+                <span className={styles.versionTag}>v2.5 Workspace</span>
+              </div>
+
+              <div className={styles.metricsGrid}>
+                <div className={styles.metricItem}>
+                  <span className={styles.metricValue}>5,189</span>
+                  <span className={styles.metricLabel}>Active Campuses</span>
+                </div>
+                <div className={styles.metricItem}>
+                  <span className={styles.metricValue}>13,647</span>
+                  <span className={styles.metricLabel}>Verified Contacts</span>
+                </div>
+                <div className={styles.metricItem}>
+                  <span className={styles.metricValue}>30 Days</span>
+                  <span className={styles.metricLabel}>Anti-Spam Cooldown</span>
+                </div>
+                <div className={styles.metricItem}>
+                  <span className={styles.metricValue}>100%</span>
+                  <span className={styles.metricLabel}>RFC 5322 Delivery</span>
+                </div>
+              </div>
+
+              <div className={styles.rolePillsRow}>
+                <span className={styles.rolePill}><BuildingIcon size={12} /> 3,238 Principals</span>
+                <span className={styles.rolePill}><CheckCircleIcon size={12} /> 1,170 TPOs</span>
+                <span className={styles.rolePill}><UserIcon size={12} /> 3,211 Faculties &amp; HODs</span>
+              </div>
+            </div>
+
+            {/* Feature Guarantees */}
+            <div className={styles.highlightsRow}>
+              <div className={styles.highlightItem}>
+                <ServerIcon size={15} className={styles.highlightIcon} />
+                <span>SSL/TLS Encrypted Dispatch</span>
+              </div>
+              <div className={styles.highlightItem}>
+                <ShieldCheckIcon size={15} className={styles.highlightIcon} />
+                <span>Zero Recipient Harassment</span>
+              </div>
             </div>
           </div>
 
-          {/* Core Mission & Editorial Statement */}
-          <div className={styles.intelStatement}>
-            <h1 className={styles.intelHeading}>
-              Enterprise College Outreach &amp; Academic Partnership Intelligence
-            </h1>
-            <p className={styles.intelSummary}>
-              Unified communication console designed for company outreach to Principals, Directors,
-              Deans, HODs, and Training &amp; Placement Officers across higher-education institutions.
-            </p>
-          </div>
-
-          {/* Real-time System Telemetry Panel */}
-          <div className={styles.telemetryCard}>
-            <div className={styles.telemetryHeader}>
-              <div className={styles.telemetryIndicator}>
-                <span className={styles.pulseDot} />
-                <span className={styles.telemetryStatus}>Live Outreach Engine Active</span>
-              </div>
-              <span className={styles.telemetryTag}>v2.4 Enterprise</span>
-            </div>
-
-            <div className={styles.metricGrid}>
-              <div className={styles.metricItem}>
-                <span className={styles.metricValue}>5,189</span>
-                <span className={styles.metricLabel}>Indexed Campuses</span>
-              </div>
-              <div className={styles.metricItem}>
-                <span className={styles.metricValue}>13,647</span>
-                <span className={styles.metricLabel}>Verified Contacts</span>
-              </div>
-              <div className={styles.metricItem}>
-                <span className={styles.metricValue}>30 Days</span>
-                <span className={styles.metricLabel}>Anti-Spam Cooldown</span>
-              </div>
-              <div className={styles.metricItem}>
-                <span className={styles.metricValue}>100%</span>
-                <span className={styles.metricLabel}>RFC 5322 Compliant</span>
-              </div>
-            </div>
-
-            <div className={styles.targetRolesList}>
-              <div className={styles.roleChip}>
-                <BuildingIcon size={12} />
-                <span>3,238 Principals &amp; Directors</span>
-              </div>
-              <div className={styles.roleChip}>
-                <CheckCircleIcon size={12} />
-                <span>1,170 Placement Officers</span>
-              </div>
-              <div className={styles.roleChip}>
-                <UserIcon size={12} />
-                <span>3,211 Faculties &amp; HODs</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Security & Infrastructure Highlights */}
-          <div className={styles.securityPillars}>
-            <div className={styles.pillarItem}>
-              <ServerIcon size={15} className={styles.pillarIcon} />
-              <div>
-                <strong className={styles.pillarTitle}>Google Enterprise SMTP</strong>
-                <p className={styles.pillarDesc}>SSL 465 / STARTTLS 587 secure transport protocol.</p>
-              </div>
-            </div>
-            <div className={styles.pillarItem}>
-              <ShieldCheckIcon size={15} className={styles.pillarIcon} />
-              <div>
-                <strong className={styles.pillarTitle}>Cooldownguard Defense</strong>
-                <p className={styles.pillarDesc}>Prevents duplicate recipient contact within 30-day cycle.</p>
-              </div>
-            </div>
+          <div className={styles.panelFooter}>
+            <span>&copy; {new Date().getFullYear()} Shortfundly Outreach Platform &bull; Authorized Corporate Access Only</span>
           </div>
         </div>
 
-        <div className={styles.deckFooter}>
-          <span>&copy; {new Date().getFullYear()} Shortfundly Outreach Platform &bull; Authorized Personnel Only</span>
-        </div>
-      </div>
-
-      {/* RIGHT AUTH CONSOLE: Login Form & Security Verification */}
-      <div className={styles.authConsole}>
-        <div className={styles.consoleHeader}>
-          <Link href="/" className={styles.backHomeBtn}>
-            <span>&larr;</span> Back to Portal Overview
-          </Link>
-        </div>
-
-        <div className={styles.consoleCard}>
-          <div className={styles.formIntro}>
-            <span className={styles.eyebrowTag}>SECURE GATEWAY</span>
-            <h2 className={styles.consoleTitle}>Sign In to Outreach Console</h2>
-            <p className={styles.consoleSubtitle}>
-              Authenticate with your company email credentials to manage contacts and campaigns.
-            </p>
+        {/* Right Side: Authentication Console */}
+        <div className={styles.formPanel}>
+          <div className={styles.formPanelHeader}>
+            <Link href="/" className={styles.backPill}>
+              <span>&larr;</span> Return to Overview
+            </Link>
           </div>
 
-          {error && (
-            <div className={styles.errorAlert} role="alert">
-              <AlertCircleIcon size={18} className={styles.alertIcon} />
-              <div className={styles.alertText}>{error}</div>
+          <div className={styles.formCard}>
+            <div className={styles.formTitleGroup}>
+              <span className={styles.eyebrowChip}>ACCESS AUTHENTICATION</span>
+              <h2 className={styles.formTitle}>Sign In to Workspace</h2>
+              <p className={styles.formSubtitle}>
+                Enter your company credentials to manage contacts, compose proposals, and run campaigns.
+              </p>
             </div>
-          )}
 
-          {capsLockActive && (
-            <div className={styles.capsLockAlert}>
-              <LockIcon size={14} />
+            {error && (
+              <div className={styles.errorBanner} role="alert">
+                <AlertCircleIcon size={16} className={styles.bannerIcon} />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {capsLockActive && (
+              <div className={styles.capsLockBanner}>
+                <LockIcon size={14} />
+                <span>
+                  <strong>Caps Lock is Active:</strong> Passwords are case-sensitive.
+                </span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className={styles.authForm} noValidate>
+              {/* Company Email */}
+              <div className={styles.fieldContainer}>
+                <label className={styles.inputLabel} htmlFor="email">
+                  Company Email
+                </label>
+                <div className={styles.inputWrap}>
+                  <span className={styles.inputIcon}><MailIcon size={16} /></span>
+                  <input
+                    id="email"
+                    type="email"
+                    className={styles.styledInput}
+                    placeholder="name@shortfundly.com"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    onKeyDown={checkCapsLock}
+                    onKeyUp={checkCapsLock}
+                    autoComplete="email"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className={styles.fieldContainer}>
+                <div className={styles.labelWithAction}>
+                  <label className={styles.inputLabel} htmlFor="password">
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    className={styles.visibilityToggleBtn}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? 'Hide Password' : 'Show Password'}
+                  </button>
+                </div>
+                <div className={styles.inputWrap}>
+                  <span className={styles.inputIcon}><LockIcon size={16} /></span>
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    className={`${styles.styledInput} ${styles.inputWithToggle}`}
+                    placeholder="Enter account password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    onKeyDown={checkCapsLock}
+                    onKeyUp={checkCapsLock}
+                    autoComplete="current-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className={styles.eyeBtn}
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Security CAPTCHA Challenge */}
+              <div className={styles.captchaBlock}>
+                <div className={styles.labelWithAction}>
+                  <label className={styles.inputLabel} htmlFor="captcha">
+                    Security Verification
+                  </label>
+                  <span className={styles.captchaHelp}>Click image to refresh</span>
+                </div>
+
+                <div className={styles.captchaGraphicRow}>
+                  <img
+                    src={`/api/auth/captcha?format=image&v=${captchaNonce}`}
+                    alt="Security verification code"
+                    className={styles.captchaImage}
+                    width={160}
+                    height={44}
+                    onClick={refreshCaptcha}
+                    title="Click image to generate new verification challenge"
+                  />
+
+                  <button
+                    type="button"
+                    className={styles.refreshPill}
+                    onClick={refreshCaptcha}
+                    title="Generate new verification code"
+                  >
+                    <RefreshCwIcon size={13} />
+                    <span>New Code</span>
+                  </button>
+                </div>
+
+                <div className={styles.inputWrap} style={{ marginTop: '6px' }}>
+                  <span className={styles.inputIcon}><ShieldCheckIcon size={16} /></span>
+                  <input
+                    id="captcha"
+                    type="text"
+                    className={styles.styledInput}
+                    placeholder="Enter characters from image above"
+                    value={captchaAnswer}
+                    onChange={(e) => {
+                      setCaptchaAnswer(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    maxLength={8}
+                    autoComplete="off"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Submit CTA */}
+              <button
+                type="submit"
+                className={styles.submitBtn}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <RefreshCwIcon size={16} className={styles.spinner} />
+                    <span>Authenticating Workspace...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Enter Outreach Workspace</span>
+                    <ArrowRightIcon size={15} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className={styles.securityFooterNote}>
+              <ShieldCheckIcon size={14} className={styles.secIcon} />
               <span>
-                <strong>Caps Lock is ON</strong> — Passwords are case-sensitive. Check keyboard casing.
+                Protected with bcrypt credential hashing, HTTP-only JWT cookies, and rate-limited brute-force lockout defense.
               </span>
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className={styles.loginForm} noValidate>
-            {/* Company Email */}
-            <div className={styles.inputGroup}>
-              <label className={styles.fieldLabel} htmlFor="email">
-                Company Email Address
-              </label>
-              <div className={styles.fieldBox}>
-                <span className={styles.fieldIcon}><MailIcon size={16} /></span>
-                <input
-                  id="email"
-                  type="email"
-                  className={styles.textInput}
-                  placeholder="name@shortfundly.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (error) setError(null);
-                  }}
-                  onKeyDown={checkCapsLock}
-                  onKeyUp={checkCapsLock}
-                  autoComplete="email"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div className={styles.inputGroup}>
-              <div className={styles.labelRow}>
-                <label className={styles.fieldLabel} htmlFor="password">
-                  Account Password
-                </label>
-                <button
-                  type="button"
-                  className={styles.textActionBtn}
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? 'Hide Password' : 'Show Password'}
-                </button>
-              </div>
-              <div className={styles.fieldBox}>
-                <span className={styles.fieldIcon}><LockIcon size={16} /></span>
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  className={`${styles.textInput} ${styles.inputWithToggle}`}
-                  placeholder="Enter your security password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (error) setError(null);
-                  }}
-                  onKeyDown={checkCapsLock}
-                  onKeyUp={checkCapsLock}
-                  autoComplete="current-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className={styles.toggleVisibilityBtn}
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  title={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Security CAPTCHA Challenge */}
-            <div className={styles.captchaSection}>
-              <div className={styles.labelRow}>
-                <label className={styles.fieldLabel} htmlFor="captcha">
-                  Security Verification Challenge
-                </label>
-                <span className={styles.captchaHelper}>Click image or refresh if unclear</span>
-              </div>
-
-              <div className={styles.captchaControls}>
-                <img
-                  src={`/api/auth/captcha?format=image&v=${captchaNonce}`}
-                  alt="Security verification code"
-                  className={styles.captchaGraphic}
-                  width={160}
-                  height={44}
-                  onClick={refreshCaptcha}
-                  title="Click image to generate new verification challenge"
-                />
-
-                <button
-                  type="button"
-                  className={styles.refreshCaptchaBtn}
-                  onClick={refreshCaptcha}
-                  title="Generate new verification code"
-                >
-                  <RefreshCwIcon size={13} />
-                  <span>New Code</span>
-                </button>
-              </div>
-
-              <div className={styles.fieldBox} style={{ marginTop: '8px' }}>
-                <span className={styles.fieldIcon}><ShieldCheckIcon size={16} /></span>
-                <input
-                  id="captcha"
-                  type="text"
-                  className={styles.textInput}
-                  placeholder="Enter the security code shown above"
-                  value={captchaAnswer}
-                  onChange={(e) => {
-                    setCaptchaAnswer(e.target.value);
-                    if (error) setError(null);
-                  }}
-                  maxLength={8}
-                  autoComplete="off"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Submit Action */}
-            <button
-              type="submit"
-              className={styles.submitBtn}
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <RefreshCwIcon size={16} className={styles.spinningIcon} />
-                  <span>Verifying Credentials...</span>
-                </>
-              ) : (
-                <span>Sign In to Outreach Console &rarr;</span>
-              )}
-            </button>
-          </form>
-
-          {/* Enterprise Protection Notice */}
-          <div className={styles.complianceNote}>
-            <ShieldCheckIcon size={15} className={styles.complianceIcon} />
-            <p>
-              <strong>Corporate Security Policy:</strong> All access attempts are recorded in the security audit ledger. Sessions are secured with bcrypt credential hashing, HTTP-only JWT cookies, and cryptographic CAPTCHA defense.
-            </p>
           </div>
         </div>
       </div>

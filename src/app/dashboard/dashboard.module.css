@@ -1,7 +1,7 @@
 .dashboardWrapper {
   min-height: 100vh;
   display: flex;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-primary);
   width: 100%;
 }
 
@@ -12,7 +12,7 @@
   min-width: 0;
   height: 100vh;
   overflow-y: auto;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-primary);
 }
 
 .topBar {
@@ -20,7 +20,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 32px;
-  background: #ffffff;
+  background: rgba(250, 247, 242, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
@@ -50,51 +52,52 @@
 .topBarRight {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .statusPill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
+  padding: 4px 12px;
+  background: #ECF7F1;
+  border: 1px solid #C2E7D3;
   border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 700;
-  color: #047857;
+  color: #217346;
 }
 
 .statusDot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #10b981;
+  background-color: #2E7D5E;
 }
 
 .smtpBtn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  background: #ffffff;
+  padding: 6px 14px;
+  background: #FFFFFF;
   border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 600;
   transition: all 0.15s ease;
+  box-shadow: var(--shadow-xs);
 }
 
 .smtpBtn:hover {
-  background: #f8fafc;
-  border-color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border-color: var(--border-strong);
 }
 
 .pageContent {
   flex: 1;
-  max-width: 1440px;
+  max-width: 1400px;
   width: 100%;
   margin: 0 auto;
   padding: 24px 32px 56px 32px;
@@ -125,19 +128,20 @@
 .modeSwitcher {
   display: inline-flex;
   align-items: center;
-  background: #ffffff;
+  background: #FFFFFF;
   padding: 4px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   border: 1px solid var(--border-subtle);
   width: fit-content;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-xs);
+  gap: 4px;
 }
 
 .modeBtn {
-  padding: 7px 16px;
+  padding: 7px 18px;
   font-size: 12px;
   font-weight: 600;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -149,6 +153,7 @@
   background: var(--accent-subtle);
   color: var(--accent-primary);
   font-weight: 700;
+  box-shadow: 0 1px 3px rgba(226, 92, 80, 0.15);
 }
 
 .loadingOverlay {
@@ -159,7 +164,7 @@
   justify-content: center;
   gap: 16px;
   color: var(--text-secondary);
-  background: #ffffff;
+  background: var(--bg-primary);
   font-size: 14px;
   font-weight: 600;
 }
@@ -182,11 +187,9 @@
   .dashboardWrapper {
     flex-direction: column;
   }
-
   .pageContent {
     padding: 16px;
   }
-
   .topBar {
     padding: 12px 16px;
   }

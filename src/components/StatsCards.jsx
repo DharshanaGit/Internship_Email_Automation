@@ -21,91 +21,127 @@ export default function StatsCards({ stats = {} }) {
     duplicates_blocked = 0,
   } = stats;
 
+  const deliveryRate = total > 0 ? Math.round((accepted / total) * 100) : 100;
+
   return (
-    <div className={styles.statsRibbon}>
-      {/* 1. Total Outreach */}
-      <div className={styles.statMetricCard}>
-        <div className={styles.cardTopRow}>
-          <span className={styles.metricLabel}>Total Tracked Outreach</span>
-          <div className={styles.iconChip}>
+    <div className={styles.statsContainer}>
+      {/* 1. Total Outreach Module */}
+      <div className={styles.statPanel}>
+        <div className={styles.panelHeader}>
+          <span className={styles.panelLabel}>Total Outreach</span>
+          <div className={styles.iconCircle}>
             <MailIcon size={14} />
           </div>
         </div>
-        <div className={styles.metricNumber}>{total.toLocaleString()}</div>
-        <div className={styles.metricFootnote}>All campus dispatches</div>
+        <div className={styles.statValue}>{total.toLocaleString()}</div>
+        <div className={styles.progressRow}>
+          <div className={styles.barBackground}>
+            <div className={styles.barFillNeutral} style={{ width: total > 0 ? '100%' : '0%' }} />
+          </div>
+          <span className={styles.barCaption}>All campus records</span>
+        </div>
       </div>
 
       {/* 2. SMTP Accepted 250 OK */}
-      <div className={`${styles.statMetricCard} ${styles.metricAccepted}`}>
-        <div className={styles.cardTopRow}>
-          <span className={styles.metricLabel}>Delivered (250 OK)</span>
-          <div className={`${styles.iconChip} ${styles.iconChipGreen}`}>
+      <div className={`${styles.statPanel} ${styles.panelAccepted}`}>
+        <div className={styles.panelHeader}>
+          <span className={styles.panelLabel}>Delivered (250 OK)</span>
+          <div className={`${styles.iconCircle} ${styles.iconGreen}`}>
             <CheckCircleIcon size={14} />
           </div>
         </div>
-        <div className={`${styles.metricNumber} ${styles.numberGreen}`}>{accepted.toLocaleString()}</div>
-        <div className={styles.metricFootnote}>Direct inbox acknowledgment</div>
+        <div className={`${styles.statValue} ${styles.textGreen}`}>{accepted.toLocaleString()}</div>
+        <div className={styles.progressRow}>
+          <div className={styles.barBackground}>
+            <div className={styles.barFillGreen} style={{ width: `${deliveryRate}%` }} />
+          </div>
+          <span className={styles.barCaption}>
+            {deliveryRate}% Inbox Handshake
+          </span>
+        </div>
       </div>
 
       {/* 3. Failed Attempts */}
-      <div className={`${styles.statMetricCard} ${styles.metricFailed}`}>
-        <div className={styles.cardTopRow}>
-          <span className={styles.metricLabel}>Failed Dispatches</span>
-          <div className={`${styles.iconChip} ${styles.iconChipRed}`}>
+      <div className={`${styles.statPanel} ${styles.panelFailed}`}>
+        <div className={styles.panelHeader}>
+          <span className={styles.panelLabel}>Failed Dispatches</span>
+          <div className={`${styles.iconCircle} ${styles.iconRed}`}>
             <AlertCircleIcon size={14} />
           </div>
         </div>
-        <div className={`${styles.metricNumber} ${styles.numberRed}`}>{failed.toLocaleString()}</div>
-        <div className={styles.metricFootnote}>Bounce or transient errors</div>
+        <div className={`${styles.statValue} ${styles.textRed}`}>{failed.toLocaleString()}</div>
+        <div className={styles.progressRow}>
+          <div className={styles.barBackground}>
+            <div className={styles.barFillRed} style={{ width: total > 0 ? `${Math.min(100, Math.round((failed / total) * 100))}%` : '0%' }} />
+          </div>
+          <span className={styles.barCaption}>Transient / Bounced</span>
+        </div>
       </div>
 
       {/* 4. Pending Queue */}
-      <div className={`${styles.statMetricCard} ${styles.metricPending}`}>
-        <div className={styles.cardTopRow}>
-          <span className={styles.metricLabel}>Queue Pending</span>
-          <div className={`${styles.iconChip} ${styles.iconChipAmber}`}>
+      <div className={`${styles.statPanel} ${styles.panelPending}`}>
+        <div className={styles.panelHeader}>
+          <span className={styles.panelLabel}>Queue Pending</span>
+          <div className={`${styles.iconCircle} ${styles.iconAmber}`}>
             <ClockIcon size={14} />
           </div>
         </div>
-        <div className={`${styles.metricNumber} ${styles.numberAmber}`}>{pending.toLocaleString()}</div>
-        <div className={styles.metricFootnote}>Awaiting worker cycle</div>
+        <div className={`${styles.statValue} ${styles.textAmber}`}>{pending.toLocaleString()}</div>
+        <div className={styles.progressRow}>
+          <div className={styles.barBackground}>
+            <div className={styles.barFillAmber} style={{ width: pending > 0 ? '70%' : '0%' }} />
+          </div>
+          <span className={styles.barCaption}>Awaiting dispatch</span>
+        </div>
       </div>
 
-      {/* 5. Currently Processing */}
-      <div className={`${styles.statMetricCard} ${styles.metricProcessing}`}>
-        <div className={styles.cardTopRow}>
-          <span className={styles.metricLabel}>In Flight</span>
-          <div className={`${styles.iconChip} ${styles.iconChipBlue}`}>
-            <RefreshCwIcon size={14} className={processing > 0 ? styles.activeSpin : ''} />
+      {/* 5. In Flight Processing */}
+      <div className={`${styles.statPanel} ${styles.panelProcessing}`}>
+        <div className={styles.panelHeader}>
+          <span className={styles.panelLabel}>In Flight</span>
+          <div className={`${styles.iconCircle} ${styles.iconBlue}`}>
+            <RefreshCwIcon size={14} className={processing > 0 ? styles.spinIcon : ''} />
           </div>
         </div>
-        <div className={`${styles.metricNumber} ${styles.numberBlue}`}>{processing.toLocaleString()}</div>
-        <div className={styles.metricFootnote}>Active transmission</div>
+        <div className={`${styles.statValue} ${styles.textBlue}`}>{processing.toLocaleString()}</div>
+        <div className={styles.progressRow}>
+          <div className={styles.barBackground}>
+            <div className={styles.barFillBlue} style={{ width: processing > 0 ? '100%' : '0%' }} />
+          </div>
+          <span className={styles.barCaption}>Active transmission</span>
+        </div>
       </div>
 
-      {/* 6. Cooldown Collision Shield */}
-      <div className={`${styles.statMetricCard} ${styles.metricShield}`}>
-        <div className={styles.cardTopRow}>
-          <span className={styles.metricLabel}>30d Collision Shield</span>
-          <div className={`${styles.iconChip} ${styles.iconChipCrimson}`}>
+      {/* 6. Cooldown Shield */}
+      <div className={`${styles.statPanel} ${styles.panelShield}`}>
+        <div className={styles.panelHeader}>
+          <span className={styles.panelLabel}>30d Collision Guard</span>
+          <div className={`${styles.iconCircle} ${styles.iconCoral}`}>
             <ShieldAlertIcon size={14} />
           </div>
         </div>
-        <div className={`${styles.metricNumber} ${styles.numberCrimson}`}>{duplicates_blocked.toLocaleString()}</div>
-        <div className={styles.metricFootnote}>Duplicate emails protected</div>
+        <div className={`${styles.statValue} ${styles.textCoral}`}>{duplicates_blocked.toLocaleString()}</div>
+        <div className={styles.progressRow}>
+          <div className={styles.barBackground}>
+            <div className={styles.barFillCoral} style={{ width: '100%' }} />
+          </div>
+          <span className={styles.barCaption}>Zero spam collisions</span>
+        </div>
       </div>
 
-      {/* 7. Ambiguous / Unknown (conditional) */}
+      {/* 7. Uncertain Outcome (if present) */}
       {unknown > 0 && (
-        <div className={`${styles.statMetricCard} ${styles.metricUnknown}`}>
-          <div className={styles.cardTopRow}>
-            <span className={styles.metricLabel}>Uncertain Outcome</span>
-            <div className={styles.iconChip}>
+        <div className={styles.statPanel}>
+          <div className={styles.panelHeader}>
+            <span className={styles.panelLabel}>Uncertain Handshake</span>
+            <div className={styles.iconCircle}>
               <HelpCircleIcon size={14} />
             </div>
           </div>
-          <div className={styles.metricNumber}>{unknown.toLocaleString()}</div>
-          <div className={styles.metricFootnote}>Handshake timeout</div>
+          <div className={styles.statValue}>{unknown.toLocaleString()}</div>
+          <div className={styles.progressRow}>
+            <span className={styles.barCaption}>Timeout response</span>
+          </div>
         </div>
       )}
     </div>
