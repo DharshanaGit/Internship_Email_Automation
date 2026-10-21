@@ -93,9 +93,9 @@ export default function EmailRecordsTable({
       {/* Header with Search and Status Filter Tabs */}
       <div className={styles.tableHeader}>
         <div className={styles.titleArea}>
-          <h3 className={styles.title}>Outreach Audit &amp; Delivery Ledger</h3>
+          <h3 className={styles.title}>Email Delivery Ledger</h3>
           <p className={styles.subtitle}>
-            Real-time status of all dispatched and pending campus communications ({total} records)
+            Real-time delivery status for all sent, pending, and scheduled outreach emails ({total} records)
           </p>
         </div>
 
@@ -173,18 +173,18 @@ export default function EmailRecordsTable({
                 <tr key={rec.id} className={styles.row}>
                   <td>
                     <div className={styles.collegeCol}>
-                      <span className={styles.collegeName}>{rec.college_name}</span>
-                      <span className={styles.department}>{rec.department}</span>
+                      <span className={styles.collegeName}>{rec.college_name || 'Institution'}</span>
+                      {rec.department && <span className={styles.department}>{rec.department}</span>}
                     </div>
                   </td>
                   <td>
                     <div className={styles.emailCol}>
-                      <span className={styles.recipientEmail}>{rec.email}</span>
                       {rec.contact_person && (
                         <span className={styles.contactPerson}>
                           {rec.contact_person} {rec.designation ? `(${rec.designation})` : ''}
                         </span>
                       )}
+                      <span className={styles.recipientEmail}>{rec.email}</span>
                     </div>
                   </td>
                   <td>

@@ -3,134 +3,108 @@ import { escapeHtml } from './config.js';
 export const DEFAULT_TEMPLATES = [
   {
     id: 'campus-collaboration-proposal',
-    title: 'Shortfundly Campus Collaboration Proposal (Official)',
-    subjectTemplate: 'Proposal for Shortfundly Campus Collaboration — Empowering Student Creators at {{college_name}}',
+    title: 'Institutional Campus Collaboration Proposal (Official)',
+    subjectTemplate: 'Proposal for Institutional Collaboration — Academic & Skill Development at {{college_name}}',
     bodyTemplate: `<p>Dear {{contact_salutation}},</p>
 
-<p>Greetings from Shortfundly!</p>
+<p>Greetings from Campus Outreach!</p>
 
 <div style="margin: 18px 0; text-align: center;">
-  <img src="/uploads/email-images/sf_creator_pass_banner.svg" alt="Shortfundly Campus Creator Pass" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);" />
+  <img src="/uploads/email-images/sf_creator_pass_banner.svg" alt="Campus Outreach Initiative" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);" />
 </div>
 
-<p>We propose a collaboration with <strong>{{college_name}}</strong>{{department_clause}} in <strong>{{state}}, {{country}}</strong> through <strong>Shortfundly Campus</strong> to help students develop creative skills, showcase their work, and explore opportunities in filmmaking and digital content.</p>
+<p>We propose an institutional collaboration with <strong>{{college_name}}</strong>{{department_clause}} in <strong>{{state}}, {{country}}</strong> to help students develop industry-relevant skills, participate in national workshops, and explore career and innovation opportunities.</p>
 
-<p><strong>About Shortfundly Campus:</strong><br />
-Shortfundly Campus connects student creators with collaboration, film submission, promotion, and event opportunities. Its Campus Pass brings together six products: Connect, Festival, Hub, Marketing, Ticket, and Tools. Students can build creator profiles, find collaborators, and prepare their projects for wider exposure.</p>
+<p><strong>About the Initiative:</strong><br />
+Our campus program connects students with professional masterclasses, hands-on learning, skill certifications, and industry mentorship. Students can build comprehensive portfolios, collaborate with peers across institutions, and prepare for career opportunities.</p>
 
 <p><strong>Proposed Areas of Collaboration:</strong></p>
 <ul style="padding-left: 20px; line-height: 1.6;">
-  <li><strong>Student onboarding:</strong> Introduce interested students to the platform and help them activate their access.</li>
-  <li><strong>Learning sessions:</strong> Plan workshops on filmmaking, OTT distribution, film marketing, and AI.</li>
-  <li><strong>Campus activities:</strong> Organize screenings and competitions to showcase student talent.</li>
-  <li><strong>Creator development:</strong> Encourage portfolio building, collaboration, and festival participation.</li>
-  <li><strong>Student leadership:</strong> Explore a Campus Ambassador initiative to support participation and community building.</li>
+  <li><strong>Student Skill Onboarding:</strong> Introduce interested students to the platform and provide guided access to learning modules.</li>
+  <li><strong>Expert Masterclasses:</strong> Conduct interactive sessions on modern technical skills, digital tools, and industry trends.</li>
+  <li><strong>Campus Hackathons &amp; Competitions:</strong> Organize structured hackathons and competitions to showcase student talent.</li>
+  <li><strong>Student Chapters:</strong> Establish a recognized Student Chapter to drive campus innovation and community leadership.</li>
 </ul>
 
-<p><em>The activities, frequency, support, and deliverables will be finalized jointly with the institution.</em></p>
+<p><em>The schedule, topics, faculty support, and specific deliverables will be finalized jointly with your institution.</em></p>
 
 <p><strong>Objectives for {{institution}}:</strong></p>
 <ul style="padding-left: 20px; line-height: 1.6;">
-  <li>Create a structured pathway for students to develop and present creative projects.</li>
-  <li>Strengthen participation in film clubs and interdisciplinary activities.</li>
-  <li>Help students build practical experience and demonstrable portfolios.</li>
-  <li>Showcase the institution’s emerging creative talent across {{state}}.</li>
+  <li>Create structured pathways for students to develop practical and demonstrable skills.</li>
+  <li>Strengthen interdisciplinary activities and faculty-guided projects.</li>
+  <li>Showcase the institution’s emerging talent and achievements across {{state}}.</li>
 </ul>
 
-<p><strong>Commercial Terms:</strong><br />
-The Campus Pass is currently listed at ₹1,500 + GST per year. Institutional pricing and any additional activity charges will be confirmed through a separate quotation based on the agreed scope.</p>
-
 <p><strong>Next Steps:</strong><br />
-We would welcome a meeting with your team to understand your requirements and present Shortfundly Campus. Kindly share a convenient time and nominate a faculty coordinator to take the discussion forward.</p>
-
-<p>
-Contact: +91 93612 23155<br />
-Explore Campus: <a href="https://campus.shortfundly.com/" target="_blank" style="color: #2563eb; text-decoration: underline;">https://campus.shortfundly.com/</a><br />
-Schedule a Meeting: <a href="https://calendly.com/shortfundly-meeting/30min" target="_blank" style="color: #2563eb; text-decoration: underline;">https://calendly.com/shortfundly-meeting/30min</a>
-</p>
+We would welcome an introductory meeting with your leadership team to understand your requirements and present the program roadmap. Kindly share a convenient time and nominate a faculty coordinator to take the discussion forward.</p>
 
 <p style="margin-top: 24px;">Warm regards,<br />
 <strong>{{sender_name}}</strong><br />
-Product Manager | Shortfundly<br />
-SM Smartygen Media Networks Private Limited</p>`,
+Campus Outreach Coordinator<br />
+Campus Email Automation Platform</p>`,
     is_default: 1,
   },
   {
     id: 'campus-film-festival-invitation',
-    title: 'Shortfundly National Campus Film Festival 2026 (Poster & Call for Entries)',
-    subjectTemplate: 'Official Invitation: National Campus Short Film Festival 2026 — Nominate Student Filmmakers from {{college_name}}',
+    title: 'National Student Innovation & Skills Workshop 2026 (Poster & Call for Entries)',
+    subjectTemplate: 'Official Invitation: National Student Innovation & Skills Workshop 2026 — Nominate Students from {{college_name}}',
     bodyTemplate: `<p>Dear {{contact_salutation}},</p>
 
-<p>Greetings from Shortfundly Campus!</p>
+<p>Greetings from Campus Outreach Team!</p>
 
 <div style="margin: 20px 0; text-align: center;">
-  <a href="https://festival.shortfundly.com" target="_blank">
-    <img src="/uploads/email-images/sf_campus_festival_poster.svg" alt="Shortfundly National Campus Film Festival 2026" style="max-width: 100%; height: auto; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" />
-  </a>
+  <img src="/uploads/email-images/sf_campus_festival_poster.svg" alt="National Student Innovation & Skills Workshop 2026" style="max-width: 100%; height: auto; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" />
 </div>
 
-<p>We are delighted to invite <strong>{{college_name}}</strong>, {{state}}, to participate in the prestigious <strong>Shortfundly National Campus Short Film Festival 2026</strong>.</p>
+<p>We are delighted to invite <strong>{{college_name}}</strong>, {{state}}, to participate in the upcoming <strong>National Student Innovation &amp; Skills Workshop 2026</strong>.</p>
 
-<p>This annual festival celebrates visionary student storytelling across narrative fiction, documentaries, animation, and experimental media. Selected student films receive OTT distribution, festival laurels, and direct access to production house mentorship.</p>
+<p>This initiative brings together students and educators across premier institutions to foster innovation, hands-on learning, and project excellence. Selected participants receive verified certifications, mentorship from industry experts, and project showcase opportunities.</p>
 
 <p><strong>Highlights for {{institution}}:</strong></p>
 <ul style="padding-left: 20px; line-height: 1.6;">
-  <li><strong>₹2,50,000 Total Prize Pool</strong> across Best Director, Screenplay, Cinematography, and Editor categories.</li>
-  <li><strong>Exclusive Screening Rights</strong> on Shortfundly OTT for institutional showcase.</li>
-  <li><strong>Industry Jury Panel</strong> consisting of celebrated directors, festival curators, and producers.</li>
-  <li><strong>Institutional Trophy &amp; Digital Credentials</strong> for winning departments.</li>
+  <li><strong>Merit Awards &amp; Recognition:</strong> National level commendations for outstanding student projects.</li>
+  <li><strong>Industry Mentorship:</strong> Direct guidance from experienced industry practitioners and researchers.</li>
+  <li><strong>Institutional Showcase:</strong> Featured spotlight for winning institutional departments.</li>
 </ul>
 
 <p><strong>Nomination Details:</strong><br />
-Institutions may nominate up to 5 student projects without entry fees using their verified college email address.</p>
-
-<p>
-Official Festival Portal: <a href="https://festival.shortfundly.com" target="_blank" style="color: #2563eb; text-decoration: underline;">https://festival.shortfundly.com</a><br />
-Submit Nominations: <a href="https://campus.shortfundly.com/festival-entry" target="_blank" style="color: #2563eb; text-decoration: underline;">https://campus.shortfundly.com/festival-entry</a><br />
-Direct Inquiry: +91 93612 23155
-</p>
+Institutions may nominate student cohorts directly through their department or faculty coordinator.</p>
 
 <p style="margin-top: 24px;">With highest regards,<br />
 <strong>{{sender_name}}</strong><br />
-Festival Director | Shortfundly Campus<br />
-SM Smartygen Media Networks Private Limited</p>`,
+Program Director | Campus Outreach<br />
+Campus Email Automation Platform</p>`,
     is_default: 0,
   },
   {
     id: 'campus-ambassador-initiative',
-    title: 'Shortfundly Campus Ambassador Chapter Invitation',
-    subjectTemplate: 'Campus Ambassador Chapter Invitation — Partnering with {{college_name}}',
+    title: 'Campus Student Chapter & Innovation Initiative Invitation',
+    subjectTemplate: 'Campus Student Chapter Invitation — Partnering with {{college_name}}',
     bodyTemplate: `<p>Dear {{contact_salutation}},</p>
 
-<p>Greetings from Shortfundly Campus!</p>
+<p>Greetings from Campus Outreach!</p>
 
-<p>We are excited to invite <strong>{{college_name}}</strong>{{department_clause}} in <strong>{{state}}, {{country}}</strong> to establish an official <strong>Shortfundly Student Creator Chapter</strong>.</p>
+<p>We are excited to invite <strong>{{college_name}}</strong>{{department_clause}} in <strong>{{state}}, {{country}}</strong> to establish an official <strong>Student Innovation &amp; Outreach Chapter</strong>.</p>
 
 <div style="margin: 16px 0; text-align: center;">
-  <img src="/uploads/email-images/sf_creator_pass_banner.svg" alt="Shortfundly Student Creator Chapter" style="max-width: 100%; height: auto; border-radius: 8px;" />
+  <img src="/uploads/email-images/sf_creator_pass_banner.svg" alt="Student Innovation Chapter" style="max-width: 100%; height: auto; border-radius: 8px;" />
 </div>
 
-<p>Campus Ambassadors receive hands-on experience in OTT distribution, media curation, and film festival coordination, directly backed by Shortfundly's industry ecosystem.</p>
+<p>Student Chapter Leads receive direct mentorship, hands-on leadership experience, and resources to organize workshops, hackathons, and webinars on campus.</p>
 
 <p><strong>Benefits for {{college_name}}:</strong></p>
 <ul style="padding-left: 20px; line-height: 1.6;">
-  <li>Free festival submissions and creator credentials for nominated students.</li>
-  <li>Industry webinars hosted by acclaimed filmmakers and OTT curators.</li>
-  <li>Annual excellence certificates for active student leads.</li>
+  <li>Free workshops and digital certifications for nominated students.</li>
+  <li>Quarterly webinars with industry leaders and technical innovators.</li>
+  <li>Annual leadership certificates for student coordinators and faculty advisors.</li>
 </ul>
 
 <p>We look forward to connecting with your department to nominate student leads.</p>
 
-<p>
-Contact: +91 93612 23155<br />
-Explore Campus: <a href="https://campus.shortfundly.com/" target="_blank" style="color: #2563eb; text-decoration: underline;">https://campus.shortfundly.com/</a><br />
-Schedule a Call: <a href="https://calendly.com/shortfundly-meeting/30min" target="_blank" style="color: #2563eb; text-decoration: underline;">https://calendly.com/shortfundly-meeting/30min</a>
-</p>
-
 <p style="margin-top: 24px;">Warm regards,<br />
 <strong>{{sender_name}}</strong><br />
-Product Manager | Shortfundly<br />
-SM Smartygen Media Networks Private Limited</p>`,
+Campus Outreach Coordinator<br />
+Campus Email Automation Platform</p>`,
     is_default: 0,
   }
 ];
@@ -193,7 +167,7 @@ export function renderTemplate(templateStr, variables = {}) {
   const safeDepartment = escapeHtml((variables.department || '').trim());
   const safeContact = escapeHtml((variables.contact_person || '').trim());
   const safeDesignation = escapeHtml((variables.designation || '').trim());
-  const safeSender = escapeHtml((variables.sender_name || 'Shortfundly Campus Outreach').trim());
+  const safeSender = escapeHtml((variables.sender_name || 'Campus Outreach Coordinator').trim());
   const safeEmail = escapeHtml((variables.email || '').trim());
   const safeCountry = escapeHtml((variables.country || variables.country_name || 'India').trim());
   const safeState = escapeHtml((variables.state || variables.state_or_region || 'Andhra Pradesh').trim());
@@ -386,7 +360,7 @@ export function validateTemplatePlaceholders(text, variables = {}) {
  */
 export function wrapInEmailLayout(bodyHtml, options = {}) {
   const content = formatBodyToHtml(bodyHtml);
-  const unsubscribeUrl = options.unsubscribeUrl || 'mailto:campus@shortfundly.com?subject=Unsubscribe';
+  const unsubscribeUrl = options.unsubscribeUrl || 'mailto:outreach@campusoutreach.org?subject=Unsubscribe';
 
   return `<!DOCTYPE html>
 <html>
@@ -396,7 +370,7 @@ export function wrapInEmailLayout(bodyHtml, options = {}) {
   <style>
     img { max-width: 100% !important; height: auto !important; border-radius: 6px; }
     p { margin: 0 0 16px 0; }
-    a { color: #2563eb; text-decoration: underline; }
+    a { color: #0d9488; text-decoration: underline; }
   </style>
 </head>
 <body style="margin: 0; padding: 24px; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.65; color: #111827;">
@@ -410,10 +384,10 @@ export function wrapInEmailLayout(bodyHtml, options = {}) {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="left" vertical-align="middle">
-                    <span style="font-size: 17px; font-weight: 800; color: #0f172a; letter-spacing: -0.2px;">Shortfundly <span style="color: #e11d48; font-weight: 600;">Campus</span></span>
+                    <span style="font-size: 17px; font-weight: 800; color: #0f172a; letter-spacing: -0.2px;">Campus <span style="color: #0d9488; font-weight: 600;">Outreach</span></span>
                   </td>
                   <td align="right" vertical-align="middle">
-                    <span style="font-size: 11px; font-weight: 600; color: #64748b; background-color: #f1f5f9; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Institutional Outreach</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; background-color: #f1f5f9; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Institutional Communication</span>
                   </td>
                 </tr>
               </table>
@@ -433,9 +407,8 @@ export function wrapInEmailLayout(bodyHtml, options = {}) {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td>
-                    <strong>Shortfundly Campus Outreach Engine</strong> &bull; SM Smartygen Media Networks Private Limited<br />
-                    Chennai, Tamil Nadu, India &bull; <a href="https://campus.shortfundly.com" target="_blank" style="color: #64748b; text-decoration: underline;">campus.shortfundly.com</a><br />
-                    To opt out of future institutional invitations, <a href="${unsubscribeUrl}" style="color: #64748b; text-decoration: underline;">reply with &ldquo;Unsubscribe&rdquo;</a> or email <a href="mailto:campus@shortfundly.com" style="color: #64748b; text-decoration: underline;">campus@shortfundly.com</a>.
+                    <strong>Campus Email Automation Platform</strong> &bull; Institutional Partnerships<br />
+                    To manage your email preferences or opt out of institutional communications, <a href="${unsubscribeUrl}" style="color: #64748b; text-decoration: underline;">click here to unsubscribe</a>.
                   </td>
                 </tr>
               </table>

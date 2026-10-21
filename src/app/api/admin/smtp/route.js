@@ -28,7 +28,7 @@ export async function GET(request) {
     secure: smtp.secure !== false,
     user: user,
     from_email: smtp.from_email || 'campus@shortfundly.com',
-    from_name: smtp.from_name || 'Shortfundly Campus Outreach',
+    from_name: smtp.from_name || 'Campus Outreach Coordinator',
     auth_method: smtp.auth_method || 'app_password',
     is_configured: Boolean(user && smtp.pass),
     pass_masked: smtp.pass ? '••••••••••••••••' : '',
@@ -79,7 +79,7 @@ export async function POST(request) {
       setSystemSetting('smtp_pass', finalPass, session.email);
     }
     setSystemSetting('from_email', (from_email || 'campus@shortfundly.com').trim(), session.email);
-    setSystemSetting('from_name', (from_name || 'Shortfundly Campus Outreach').trim(), session.email);
+    setSystemSetting('from_name', (from_name || 'Campus Outreach Coordinator').trim(), session.email);
     setSystemSetting('smtp_auth_method', (auth_method || 'app_password').trim(), session.email);
 
     // Reset cached transporter so changes take immediate effect

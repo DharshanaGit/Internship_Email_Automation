@@ -25,7 +25,7 @@ export default function SettingsView({ session }) {
     secure: true,
     user: 'dharshana.shortfundly@gmail.com',
     pass: '',
-    from_name: 'Shortfundly Campus Outreach',
+    from_name: 'Campus Outreach Coordinator',
     from_email: 'campus@shortfundly.com',
     auth_method: 'app_password',
   });
@@ -281,7 +281,7 @@ export default function SettingsView({ session }) {
             <LockIcon size={32} />
             <div className={styles.lockTitle}>Administrator Access Required</div>
             <div className={styles.lockSub}>
-              Google SMTP Gateway settings and Company User Management are restricted to Shortfundly Administrators.
+              Google SMTP Gateway settings and Company User Management are restricted to Platform Administrators.
               Your current profile details are shown below.
             </div>
           </div>
@@ -499,7 +499,7 @@ export default function SettingsView({ session }) {
                   className={styles.input}
                   value={smtpForm.from_name}
                   onChange={(e) => setSmtpForm({ ...smtpForm, from_name: e.target.value })}
-                  placeholder="Shortfundly Campus Outreach"
+                  placeholder="Campus Outreach Coordinator"
                 />
               </div>
 
@@ -664,7 +664,7 @@ export default function SettingsView({ session }) {
                   <input
                     type="email"
                     className={styles.input}
-                    placeholder="e.g. outreach.lead@shortfundly.com"
+                    placeholder="e.g. outreach.lead@organization.com"
                     value={newUser.email}
                     onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                     required

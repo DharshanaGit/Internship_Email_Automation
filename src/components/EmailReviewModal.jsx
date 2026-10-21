@@ -40,7 +40,7 @@ export default function EmailReviewModal({
       contact_person: initialData.contact_person || '',
       designation: initialData.designation || '',
       email: initialData.email || '',
-      sender_name: 'Shortfundly Campus Outreach',
+      sender_name: 'Campus Outreach Coordinator',
     };
   };
 
@@ -59,7 +59,7 @@ export default function EmailReviewModal({
           contact_person: initialData.contact_person || '',
           designation: initialData.designation || '',
           email: initialData.email || '',
-          sender_name: 'Shortfundly Campus Outreach',
+          sender_name: 'Campus Outreach Coordinator',
         };
 
         const rawSubject = tpl.subjectTemplate || tpl.subject_template || '';

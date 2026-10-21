@@ -41,7 +41,7 @@ export default function SmtpDiagnosticsModal({ isOpen, onClose }) {
         <div className={styles.modalHeader}>
           <div className={styles.headerTitle}>
             <ServerIcon size={18} />
-            <span>Google SMTP Diagnostics &amp; Health Engine</span>
+            <span>Google SMTP Connection &amp; Settings</span>
           </div>
           <button type="button" className={styles.closeBtn} onClick={onClose}>
             <CloseIcon size={18} />

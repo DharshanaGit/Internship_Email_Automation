@@ -11,9 +11,23 @@ export async function GET(request) {
 
   const db = getDb();
   try {
-    const templates = db
-      .prepare('SELECT id, title, subject_template, body_template, is_default, created_at FROM email_templates ORDER BY is_default DESC, title ASC')
+    const rawTemplates = db
+      .prepare('SELECT id, title, subject_template, body_template, is_default, attachments, created_at FROM email_templates ORDER BY is_default DESC, title ASC')
       .all();
+    const templates = rawTemplates.map((t) => {
+      let parsedAttachments = [];
+      try {
+        if (t.attachments) {
+          parsedAttachments = typeof t.attachments === 'string' ? JSON.parse(t.attachments) : t.attachments;
+        }
+      } catch {
+        parsedAttachments = [];
+      }
+      return {
+        ...t,
+        attachments: Array.isArray(parsedAttachments) ? parsedAttachments : [],
+      };
+    });
     const response = NextResponse.json({ templates });
     applySecurityHeaders(response.headers);
     return response;
@@ -43,7 +57,7 @@ export async function POST(request) {
 
   try {
     const body = await request.json().catch(() => ({}));
-    const { id, title, subject_template, body_template } = body;
+    const { id, title, subject_template, body_template, attachments = [] } = body;
 
     if (!title?.trim() || !subject_template?.trim() || !body_template?.trim()) {
       return NextResponse.json(
@@ -55,15 +69,21 @@ export async function POST(request) {
     const db = getDb();
     const templateId = id ? id.trim() : 'tpl_' + Date.now();
     const now = new Date().toISOString();
+    const serializedAttachments = Array.isArray(attachments)
+      ? JSON.stringify(attachments)
+      : typeof attachments === 'string'
+      ? attachments
+      : '[]';
 
     db.prepare(`
-      INSERT INTO email_templates (id, title, subject_template, body_template, is_default, created_at)
-      VALUES (?, ?, ?, ?, 0, ?)
+      INSERT INTO email_templates (id, title, subject_template, body_template, is_default, attachments, created_at)
+      VALUES (?, ?, ?, ?, 0, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         title = excluded.title,
         subject_template = excluded.subject_template,
-        body_template = excluded.body_template
-    `).run(templateId, title.trim(), subject_template.trim(), body_template.trim(), now);
+        body_template = excluded.body_template,
+        attachments = excluded.attachments
+    `).run(templateId, title.trim(), subject_template.trim(), body_template.trim(), serializedAttachments, now);
 
     logAuditEvent('TEMPLATE_SAVED', { id: templateId, title }, session.email);
 

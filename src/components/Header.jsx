@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import styles from './Header.module.css';
-import { ServerIcon, UserIcon, LogOutIcon, ShortfundlyLogoSymbol } from './Icons.jsx';
+import { ServerIcon, UserIcon, LogOutIcon, CampaignPulseLogoSymbol } from './Icons.jsx';
 
 export default function Header({ user, onOpenSmtpDiagnostics, onLogout }) {
   return (
@@ -11,14 +11,14 @@ export default function Header({ user, onOpenSmtpDiagnostics, onLogout }) {
       <div className={styles.inner}>
         <div className={styles.brandGroup}>
           <div className={styles.logoWrapper}>
-            <ShortfundlyLogoSymbol size={38} />
+            <CampaignPulseLogoSymbol size={38} />
           </div>
           <div className={styles.titleArea}>
             <div className={styles.portalTitle}>
-              Shortfundly <span style={{ color: 'var(--accent-primary)', fontWeight: '700' }}>Campus Outreach</span>
+              Campus <span style={{ color: 'var(--accent-primary)', fontWeight: '700' }}>Email Automation</span>
             </div>
             <div className={styles.tagline}>
-              Connecting Campuses. Empowering Creators.
+              Campus Outreach &amp; Email Platform
             </div>
           </div>
         </div>
@@ -26,14 +26,14 @@ export default function Header({ user, onOpenSmtpDiagnostics, onLogout }) {
         <div className={styles.rightGroup}>
           <div className={styles.statusPill}>
             <span className={styles.statusDot} />
-            <span>SQLite Active</span>
+            <span>Connected</span>
           </div>
 
           <button
             type="button"
             className={styles.smtpBtn}
             onClick={onOpenSmtpDiagnostics}
-            title="Inspect Google SMTP status & settings"
+            title="Check Google SMTP email settings"
           >
             <ServerIcon size={14} />
             <span>Google SMTP</span>
@@ -50,10 +50,10 @@ export default function Header({ user, onOpenSmtpDiagnostics, onLogout }) {
             type="button"
             className={styles.logoutBtn}
             onClick={onLogout}
-            title="Sign out of outreach portal"
+            title="Sign out"
           >
             <LogOutIcon size={14} />
-            <span>Logout</span>
+            <span>Log Out</span>
           </button>
         </div>
       </div>

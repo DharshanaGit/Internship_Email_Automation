@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './TemplateManager.module.css';
 import {
   TemplateIcon,
@@ -12,8 +12,17 @@ import {
   CloseIcon,
   CheckCircleIcon,
   AlertCircleIcon,
+  ImageIcon,
 } from './Icons';
+import EmailImageManagerModal from './EmailImageManagerModal.jsx';
 import { renderTemplate, formatBodyToHtml } from '@/lib/templates.js';
+
+function formatFileSize(bytes) {
+  if (!bytes) return '0 B';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
 
 export default function TemplateManager({ session, onTemplatesUpdated }) {
   const [templates, setTemplates] = useState([]);
@@ -31,8 +40,17 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
     title: '',
     subject_template: '',
     body_template: '',
+    attachments: [],
   });
   const [saving, setSaving] = useState(false);
+
+  // Image modal state
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
+  // Attachment upload state
+  const attachmentInputRef = useRef(null);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const [attachmentError, setAttachmentError] = useState('');
 
   const canManage = session?.role === 'admin' || session?.role === 'team_lead';
   const isAdmin = session?.role === 'admin';
@@ -69,22 +87,103 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
 
   const handleOpenCreate = () => {
     setEditingTemplate(null);
+    setAttachmentError('');
     setFormData({
       title: '',
-      subject_template: 'Proposal for Shortfundly Campus Collaboration — Empowering Student Creators at [College Name]',
-      body_template: 'Dear [Contact Person],\n\nGreetings from Shortfundly!\n\nWe propose a strategic collaboration with [College Name] ([Department]) through Shortfundly Campus to empower student creators.\n\nWarm regards,\n[Your Name]\nProduct Manager | Shortfundly',
+      subject_template: 'Institutional Collaboration Proposal — Academic Programs at [College Name]',
+      body_template: 'Dear [Contact Person],\n\nGreetings!\n\nWe propose an institutional collaboration with [College Name] ([Department]) to support student skill development, workshops, and academic enrichment initiatives.\n\nWarm regards,\n[Your Name]\nCampus Outreach Coordinator',
+      attachments: [],
     });
     setIsEditorOpen(true);
   };
 
   const handleOpenEdit = (tpl) => {
     setEditingTemplate(tpl);
+    setAttachmentError('');
     setFormData({
       title: tpl.title,
       subject_template: tpl.subject_template,
       body_template: tpl.body_template,
+      attachments: Array.isArray(tpl.attachments) ? tpl.attachments : [],
     });
     setIsEditorOpen(true);
+  };
+
+  // Image insertion callback
+  const handleInsertImage = (imageHtml) => {
+    setFormData((prev) => ({
+      ...prev,
+      body_template: prev.body_template + '\n' + imageHtml + '\n',
+    }));
+  };
+
+  // Attachment file selection & upload
+  const handleAttachmentUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAttachmentError('');
+
+    // Client-side validations
+    const allowedExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.csv'];
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!allowedExts.includes(ext)) {
+      setAttachmentError(`Unsupported file format (${ext}). Supported: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, CSV.`);
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setAttachmentError(`File size exceeds 10 MB limit (${(file.size / (1024 * 1024)).toFixed(2)} MB).`);
+      e.target.value = '';
+      return;
+    }
+
+    const currentAttachments = formData.attachments || [];
+    if (currentAttachments.length >= 5) {
+      setAttachmentError('Maximum of 5 attachments allowed per email template.');
+      e.target.value = '';
+      return;
+    }
+
+    const currentTotalSize = currentAttachments.reduce((acc, a) => acc + (a.size || 0), 0);
+    if (currentTotalSize + file.size > 20 * 1024 * 1024) {
+      setAttachmentError(`Combined attachment size exceeds 20 MB limit.`);
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      setUploadingAttachment(true);
+      const fd = new FormData();
+      fd.append('file', file);
+
+      const res = await fetch('/api/outreach/upload-attachment', {
+        method: 'POST',
+        body: fd,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.attachment) {
+        setFormData((prev) => ({
+          ...prev,
+          attachments: [...(prev.attachments || []), data.attachment],
+        }));
+      } else {
+        setAttachmentError(data.error || 'Failed to upload attachment.');
+      }
+    } catch {
+      setAttachmentError('Network error uploading attachment.');
+    } finally {
+      setUploadingAttachment(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveAttachment = (indexToRemove) => {
+    setFormData((prev) => ({
+      ...prev,
+      attachments: (prev.attachments || []).filter((_, idx) => idx !== indexToRemove),
+    }));
   };
 
   const handleSaveTemplate = async (e) => {
@@ -101,6 +200,7 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
         title: formData.title.trim(),
         subject_template: formData.subject_template.trim(),
         body_template: formData.body_template.trim(),
+        attachments: formData.attachments || [],
       };
 
       const res = await fetch('/api/outreach/templates', {
@@ -158,7 +258,10 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
     contact_person: 'Dr. K. Ramesh',
     designation: 'Head of Department',
     email: 'hod.viscom@psgtech.ac.in',
-    sender_name: 'Shortfundly Campus Outreach',
+    sender_name: 'Campus Outreach Coordinator',
+    state: 'Tamil Nadu',
+    country: 'India',
+    institution: 'PSG College of Technology',
   };
 
   const renderSamplePreview = (text) => {
@@ -166,11 +269,49 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
     return renderTemplate(text, sampleVars);
   };
 
+  const textareaRef = useRef(null);
+
+  const insertAtCursor = (textToInsert) => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      const start = textarea.selectionStart ?? formData.body_template.length;
+      const end = textarea.selectionEnd ?? formData.body_template.length;
+      const current = formData.body_template || '';
+      const updated = current.substring(0, start) + textToInsert + current.substring(end);
+      setFormData((prev) => ({ ...prev, body_template: updated }));
+      setTimeout(() => {
+        textarea.focus();
+        const nextPos = start + textToInsert.length;
+        textarea.setSelectionRange(nextPos, nextPos);
+      }, 10);
+    } else {
+      setFormData((prev) => ({ ...prev, body_template: (prev.body_template || '') + ' ' + textToInsert }));
+    }
+  };
+
   const insertVariable = (varName) => {
-    setFormData((prev) => ({
-      ...prev,
-      body_template: prev.body_template + ' ' + varName + ' ',
-    }));
+    insertAtCursor(` ${varName} `);
+  };
+
+  const insertFormatTag = (openTag, closeTag, defaultText = 'sample text') => {
+    const textarea = textareaRef.current;
+    if (textarea && textarea.selectionStart !== textarea.selectionEnd) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selected = (formData.body_template || '').substring(start, end);
+      insertAtCursor(`${openTag}${selected}${closeTag}`);
+    } else {
+      insertAtCursor(`${openTag}${defaultText}${closeTag}`);
+    }
+  };
+
+  const insertHyperlinkPrompt = () => {
+    const url = prompt('Enter the link destination URL:', 'https://example.com/programs');
+    if (!url) return;
+    const text = prompt('Enter clickable link text:', 'Explore Campus Programs');
+    if (!text) return;
+    const linkHtml = `<a href="${url.trim()}" target="_blank" style="color: #2563eb; text-decoration: underline;">${text.trim()}</a>`;
+    insertAtCursor(` ${linkHtml} `);
   };
 
   return (
@@ -180,8 +321,8 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
         <div className={styles.titleArea}>
           <h2 className={styles.title}>Email Templates</h2>
           <p className={styles.description}>
-            Standardized outreach letters for college collaborations and creator activations. Placeholders like{' '}
-            <code>[College Name]</code> and <code>[Contact Person]</code> are automatically merged during review.
+            Create, customize, and manage reusable email templates. Placeholders like{' '}
+            <code>[College Name]</code> and <code>[Contact Person]</code> are automatically filled when sending.
           </p>
         </div>
 
@@ -236,56 +377,66 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
         <div className={styles.emptyState}>No matching templates found.</div>
       ) : (
         <div className={styles.templateGrid}>
-          {filteredTemplates.map((tpl) => (
-            <div key={tpl.id} className={styles.templateCard}>
-              <div className={styles.cardTop}>
-                <div className={styles.cardTitle}>{tpl.title}</div>
-                {Boolean(tpl.is_default) && <span className={styles.defaultBadge}>Default</span>}
-              </div>
+          {filteredTemplates.map((tpl) => {
+            const tplAttachments = Array.isArray(tpl.attachments) ? tpl.attachments : [];
+            return (
+              <div key={tpl.id} className={styles.templateCard}>
+                <div className={styles.cardTop}>
+                  <div className={styles.cardTitle}>{tpl.title}</div>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    {tplAttachments.length > 0 && (
+                      <span className={styles.cardAttachmentsBadge} title={`${tplAttachments.length} file attachments included`}>
+                        📎 {tplAttachments.length}
+                      </span>
+                    )}
+                    {Boolean(tpl.is_default) && <span className={styles.defaultBadge}>Default</span>}
+                  </div>
+                </div>
 
-              <div className={styles.subjectPreview} title={tpl.subject_template}>
-                <strong>Subject:</strong> {tpl.subject_template}
-              </div>
+                <div className={styles.subjectPreview} title={tpl.subject_template}>
+                  <strong>Subject:</strong> {tpl.subject_template}
+                </div>
 
-              <div className={styles.bodySnippet}>{tpl.body_template}</div>
+                <div className={styles.bodySnippet}>{tpl.body_template}</div>
 
-              <div className={styles.cardFooter}>
-                <button
-                  type="button"
-                  className={styles.btnSecondary}
-                  onClick={() => setPreviewTemplate(tpl)}
-                >
-                  <EyeIcon size={14} />
-                  <span>Preview</span>
-                </button>
+                <div className={styles.cardFooter}>
+                  <button
+                    type="button"
+                    className={styles.btnSecondary}
+                    onClick={() => setPreviewTemplate(tpl)}
+                  >
+                    <EyeIcon size={14} />
+                    <span>Preview</span>
+                  </button>
 
-                <div className={styles.actionGroup}>
-                  {canManage && (
-                    <button
-                      type="button"
-                      className={styles.btnSecondary}
-                      onClick={() => handleOpenEdit(tpl)}
-                      title="Edit template content"
-                    >
-                      <EditIcon size={14} />
-                      <span>Edit</span>
-                    </button>
-                  )}
+                  <div className={styles.actionGroup}>
+                    {canManage && (
+                      <button
+                        type="button"
+                        className={styles.btnSecondary}
+                        onClick={() => handleOpenEdit(tpl)}
+                        title="Edit template content"
+                      >
+                        <EditIcon size={14} />
+                        <span>Edit</span>
+                      </button>
+                    )}
 
-                  {isAdmin && !tpl.is_default && (
-                    <button
-                      type="button"
-                      className={styles.btnDanger}
-                      onClick={() => handleDelete(tpl)}
-                      title="Delete this template"
-                    >
-                      <TrashIcon size={14} />
-                    </button>
-                  )}
+                    {isAdmin && !tpl.is_default && (
+                      <button
+                        type="button"
+                        className={styles.btnDanger}
+                        onClick={() => handleDelete(tpl)}
+                        title="Delete this template"
+                      >
+                        <TrashIcon size={14} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -315,6 +466,30 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
                 <div className={styles.previewHeaderItem}>
                   <strong>Sample College:</strong> PSG College of Technology (Visual Communication & Media Arts)
                 </div>
+
+                {/* Attached files preview */}
+                {Array.isArray(previewTemplate.attachments) && previewTemplate.attachments.length > 0 && (
+                  <div style={{ margin: '12px 0', padding: '10px 14px', background: '#f1f5f9', borderRadius: '6px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+                      📎 Attached Files ({previewTemplate.attachments.length}):
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {previewTemplate.attachments.map((att, idx) => (
+                        <a
+                          key={idx}
+                          href={att.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.attachmentChip}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          📄 {att.filename} <span style={{ opacity: 0.7, fontSize: '11px' }}>({formatFileSize(att.size)})</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div
                   className={styles.previewBodyContent}
                   dangerouslySetInnerHTML={{
@@ -373,30 +548,70 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
                   <input
                     type="text"
                     className={styles.input}
-                    placeholder="e.g. Proposal for Shortfundly Campus Collaboration - [College Name]"
+                    placeholder="e.g. Institutional Collaboration Proposal - [College Name]"
                     value={formData.subject_template}
                     onChange={(e) => setFormData({ ...formData, subject_template: e.target.value })}
                     required
                   />
                 </div>
 
+                {/* Formatted Content Editor */}
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Template Body (Plain text & formatting)</label>
+                  <label className={styles.label}>Template Body Content (HTML &amp; Text)</label>
+
+                  {/* Formatting & Insert Bar */}
+                  <div className={styles.formattingBar}>
+                    <button
+                      type="button"
+                      className={`${styles.formatBtn} ${styles.formatBtnAccent}`}
+                      onClick={() => setIsImageModalOpen(true)}
+                    >
+                      <ImageIcon size={14} />
+                      <span>Insert Image / Poster / Banner</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={styles.formatBtn}
+                      onClick={() => insertFormatTag('<strong>', '</strong>', 'Bold text')}
+                    >
+                      <strong>B</strong> Bold
+                    </button>
+
+                    <button
+                      type="button"
+                      className={styles.formatBtn}
+                      onClick={() => insertFormatTag('<em>', '</em>', 'Italic text')}
+                    >
+                      <em>I</em> Italic
+                    </button>
+
+                    <button
+                      type="button"
+                      className={styles.formatBtn}
+                      onClick={insertHyperlinkPrompt}
+                    >
+                      🔗 Insert Link
+                    </button>
+
+                    <button
+                      type="button"
+                      className={styles.formatBtn}
+                      onClick={() => insertFormatTag('<ul style="padding-left: 20px;">\n  <li>', '</li>\n  <li>Second benefit</li>\n</ul>', 'Key benefit')}
+                    >
+                      • Bullet List
+                    </button>
+                  </div>
+
+                  {/* Placeholder Variable Helper Chips */}
                   <div className={styles.variablesHelper}>
-                    <span className={styles.helperLabel}>Insert Placeholder:</span>
+                    <span className={styles.helperLabel}>Merge Tag:</span>
                     <button
                       type="button"
                       className={styles.variableChip}
                       onClick={() => insertVariable('[College Name]')}
                     >
                       + [College Name]
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.variableChip}
-                      onClick={() => insertVariable('[Department]')}
-                    >
-                      + [Department]
                     </button>
                     <button
                       type="button"
@@ -408,9 +623,30 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
                     <button
                       type="button"
                       className={styles.variableChip}
+                      onClick={() => insertVariable('[Department]')}
+                    >
+                      + [Department]
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.variableChip}
                       onClick={() => insertVariable('[Designation]')}
                     >
                       + [Designation]
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.variableChip}
+                      onClick={() => insertVariable('[State]')}
+                    >
+                      + [State]
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.variableChip}
+                      onClick={() => insertVariable('[Country]')}
+                    >
+                      + [Country]
                     </button>
                     <button
                       type="button"
@@ -419,20 +655,75 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
                     >
                       + [Your Name]
                     </button>
-                    <button
-                      type="button"
-                      className={styles.variableChip}
-                      onClick={() => insertVariable('[Recipient Email]')}
-                    >
-                      + [Recipient Email]
-                    </button>
                   </div>
+
                   <textarea
+                    ref={textareaRef}
+                    id="template_body_editor"
                     className={styles.textarea}
+                    style={{ minHeight: '260px', borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
                     value={formData.body_template}
                     onChange={(e) => setFormData({ ...formData, body_template: e.target.value })}
+                    placeholder="Type or customize your email body content here... Use the toolbar above to insert images, formatting, links, and click merge tags to insert dynamic placeholders."
+                    rows={12}
                     required
                   />
+                </div>
+
+                {/* File Attachments Section */}
+                <div className={styles.attachmentsSection}>
+                  <label className={styles.label}>
+                    Email File Attachments (Optional, max 5 files, 10 MB each, 20 MB total)
+                  </label>
+
+                  <input
+                    type="file"
+                    ref={attachmentInputRef}
+                    style={{ display: 'none' }}
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv"
+                    onChange={handleAttachmentUpload}
+                  />
+
+                  {/* Attachment chips */}
+                  {formData.attachments && formData.attachments.length > 0 && (
+                    <div className={styles.attachmentList}>
+                      {formData.attachments.map((att, idx) => (
+                        <div key={idx} className={styles.attachmentChip}>
+                          <span>📄 {att.filename}</span>
+                          <span style={{ opacity: 0.7, fontSize: '11px' }}>({formatFileSize(att.size)})</span>
+                          <button
+                            type="button"
+                            className={styles.attachmentRemoveBtn}
+                            onClick={() => handleRemoveAttachment(idx)}
+                            title="Remove attachment"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className={styles.attachmentUploadBox}>
+                    <button
+                      type="button"
+                      className={styles.attachmentUploadBtn}
+                      onClick={() => attachmentInputRef.current?.click()}
+                      disabled={uploadingAttachment || (formData.attachments?.length || 0) >= 5}
+                    >
+                      {uploadingAttachment ? 'Uploading...' : '+ Attach File (PDF, Word, Excel, PPT, CSV)'}
+                    </button>
+                    <span>
+                      {(formData.attachments?.length || 0)} / 5 files attached &bull;{' '}
+                      {formatFileSize((formData.attachments || []).reduce((acc, a) => acc + (a.size || 0), 0))} / 20 MB total
+                    </span>
+                  </div>
+
+                  {attachmentError && (
+                    <div style={{ color: '#e11d48', fontSize: '12px', fontWeight: 600 }}>
+                      ⚠️ {attachmentError}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -457,6 +748,13 @@ export default function TemplateManager({ session, onTemplatesUpdated }) {
           </div>
         </div>
       )}
+
+      {/* Image Manager Modal */}
+      <EmailImageManagerModal
+        isOpen={isImageModalOpen}
+        onClose={() => setIsImageModalOpen(false)}
+        onInsertImage={handleInsertImage}
+      />
     </div>
   );
 }

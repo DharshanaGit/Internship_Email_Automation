@@ -246,13 +246,14 @@
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 24px 20px;
   z-index: 100;
+  overflow-y: auto;
 }
 
 .modalContent {
@@ -260,12 +261,14 @@
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
   width: 100%;
-  max-width: 840px;
-  max-height: 85vh;
+  max-width: 860px;
+  max-height: calc(100vh - 48px);
+  height: auto;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35);
   overflow: hidden;
+  position: relative;
 }
 
 .modalHeader {
@@ -275,6 +278,8 @@
   align-items: center;
   justify-content: space-between;
   background: #f8fafc;
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 .modalTitle {
@@ -296,10 +301,306 @@
   color: var(--text-primary);
 }
 
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .modalBody {
   padding: 24px;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 18px;
+  flex: 1;
+  min-height: 0;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 260px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.6;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.textarea:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
+
+.variablesHelper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background: #f1f5f9;
+  border-left: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.helperLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+
+.variableChip {
+  font-size: 11px;
+  font-weight: 600;
+  color: #0f766e;
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  padding: 4px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.variableChip:hover {
+  background: #ccfbf1;
+  border-color: #99f6e4;
+  color: #0d9488;
+}
+
+.modalFooter {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #f8fafc;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.modalCloseBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalCloseBtn:hover {
+  background: #e2e8f0;
+  color: var(--text-primary);
+}
+
+.previewEmailView {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.previewHeaderItem {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.previewHeaderItem strong {
+  color: var(--text-primary);
+  margin-right: 6px;
+}
+
+.previewBodyContent {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: #ffffff;
+  padding: 16px;
+  border-radius: var(--radius-xs);
+  border: 1px solid #e2e8f0;
+  min-height: 150px;
+}
+
+/* Toolbar & Format Controls */
+.formattingBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border-subtle);
+  border-bottom: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.formatBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.formatBtn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.formatBtnAccent {
+  background: #fdf2f8;
+  border-color: #fbcfe8;
+  color: #be185d;
+}
+
+.formatBtnAccent:hover {
+  background: #fce7f3;
+  border-color: #f472b6;
+  color: #9d174d;
+}
+
+/* Attachment Area */
+.attachmentsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.attachmentList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.attachmentChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #1e293b;
+  font-weight: 550;
+}
+
+.attachmentRemoveBtn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.attachmentRemoveBtn:hover {
+  color: #e11d48;
+}
+
+.attachmentUploadBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: #64748b;
+}
+
+.attachmentUploadBtn {
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.attachmentUploadBtn:hover {
+  background: #f1f5f9;
+}
+
+.cardAttachmentsBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 2px 8px;
 }

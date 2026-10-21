@@ -2,10 +2,12 @@ import './globals.css';
 import ProductionDebugBlocker from '@/components/ProductionDebugBlocker.jsx';
 
 export const metadata = {
-  title: 'Shortfundly Campus Outreach Portal',
-  description: 'Connecting Campuses. Empowering Creators. Manage college contacts, automate outreach, and build meaningful campus partnerships.',
+  title: 'Campus Email Automation Platform',
+  description: 'Enterprise campus email outreach automation platform. Manage college contacts, personalize multi-region campaigns, and automate high-deliverability outreach.',
   icons: {
-    icon: '/sf_logo.png',
+    icon: '/campus_icon.svg',
+    shortcut: '/campus_icon.svg',
+    apple: '/campus_icon.svg',
   },
 };
 

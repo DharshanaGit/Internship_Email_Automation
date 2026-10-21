@@ -16,7 +16,7 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional().default('dharshana.shortfundly@gmail.com'),
   SMTP_PASS: z.string().optional().default(''),
   FROM_EMAIL: z.string().default('campus@shortfundly.com'),
-  FROM_NAME: z.string().default('Shortfundly Campus Outreach'),
+  FROM_NAME: z.string().default('Campus Outreach Coordinator'),
   APP_URL: z.string().default('http://localhost:3000'),
 
   // Guardrails & Duplicate Rules

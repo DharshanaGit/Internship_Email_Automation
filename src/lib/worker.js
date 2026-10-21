@@ -1,4 +1,7 @@
-import { getDb, logAuditEvent, getEffectiveSmtpSettings } from './db.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { getDb, logAuditEvent, getEffectiveSmtpSettings, getSystemSetting, updateCampaignCounters } from './db.js';
 import { getMailerTransporter, classifySmtpError, formatSmtpErrorMessage } from './mailer.js';
 import { wrapInEmailLayout } from './templates.js';
 import { config } from './config.js';
@@ -33,30 +36,36 @@ export function htmlToPlainText(html) {
  */
 export function queueOutreachJob(data, userEmail) {
   const db = getDb();
-  const id = 'out_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+  const id = data.id || 'out_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
   const now = new Date().toISOString();
+  const trackingToken = data.tracking_token || crypto.randomBytes(16).toString('hex');
+  const serializedAttachments = Array.isArray(data.attachments)
+    ? JSON.stringify(data.attachments)
+    : typeof data.attachments === 'string'
+    ? data.attachments
+    : '[]';
 
   // Generate structured plain text for optimal deliverability and accessibility
-  const plainText = htmlToPlainText(data.body_html);
+  const plainText = data.body_text || htmlToPlainText(data.body_html);
 
   db.prepare(`
     INSERT INTO outreach_logs (
       id, college_name, email, normalized_email, department,
       contact_person, designation, subject, body_html, body_text,
       status, failure_type, attempts, sent_by, created_at,
-      override_duplicate, override_reason
+      override_duplicate, override_reason, campaign_id, country, state, tracking_token, attachments
     ) VALUES (
       ?, ?, ?, ?, ?,
       ?, ?, ?, ?, ?,
       'PENDING', 'NONE', 0, ?, ?,
-      ?, ?
+      ?, ?, ?, ?, ?, ?, ?
     )
   `).run(
     id,
     data.college_name,
     data.email,
     data.email.trim().toLowerCase(),
-    data.department,
+    data.department || 'Campus Partnerships',
     data.contact_person || null,
     data.designation || null,
     data.subject,
@@ -65,12 +74,118 @@ export function queueOutreachJob(data, userEmail) {
     userEmail,
     now,
     data.override_duplicate ? 1 : 0,
-    data.override_reason || null
+    data.override_reason || null,
+    data.campaign_id || null,
+    data.country || 'India',
+    data.state || 'Andhra Pradesh',
+    trackingToken,
+    serializedAttachments
   );
 
-  logAuditEvent('OUTREACH_QUEUED', { id, email: data.email, college: data.college_name }, userEmail);
+  logAuditEvent('OUTREACH_QUEUED', { id, email: data.email, college: data.college_name, campaignId: data.campaign_id }, userEmail);
 
   return id;
+}
+
+/**
+ * Prepares HTML content with image handling (CID attachments + hosted absolute URLs)
+ * and optional tracking injection (open pixel + click redirects).
+ */
+function prepareEmailContent(job) {
+  let html = job.body_html || '';
+  const attachments = [];
+  const appUrl = (getSystemSetting('app_url', config.APP_URL) || 'http://localhost:3000').replace(/\/+$/, '');
+  const trackingToken = job.tracking_token;
+
+  // 1. Process local image tags: convert relative paths to CID attachments or absolute URLs
+  const projectRoot = process.cwd();
+  const imageRegex = /<img\s+([^>]*?)src=["'](\/[^"']+)["']([^>]*?)>/gi;
+
+  let imgIndex = 0;
+  html = html.replace(imageRegex, (match, pre, srcPath, post) => {
+    // If it's a local public file
+    const localFilePath = path.join(projectRoot, 'public', srcPath.replace(/^\//, ''));
+    if (fs.existsSync(localFilePath)) {
+      const cid = `img_cid_${imgIndex++}_${Date.now()}@campusoutreach.org`;
+      const filename = path.basename(localFilePath);
+      attachments.push({
+        filename,
+        path: localFilePath,
+        cid,
+      });
+      return `<img ${pre}src="cid:${cid}" ${post}>`;
+    } else {
+      // Convert relative URL to hosted absolute URL
+      const absoluteUrl = `${appUrl}${srcPath}`;
+      return `<img ${pre}src="${absoluteUrl}" ${post}>`;
+    }
+  });
+
+  // 2. Click tracking: rewrite links if tracking enabled
+  const trackClicks = getSystemSetting('track_clicks_default', '1') === '1';
+  if (trackClicks && trackingToken) {
+    const linkRegex = /<a\s+([^>]*?)href=["'](https?:\/\/[^"']+)["']([^>]*?)>/gi;
+    html = html.replace(linkRegex, (match, pre, targetUrl, post) => {
+      // Skip tracking links that are already tracking URLs
+      if (targetUrl.includes('/api/tracking/')) return match;
+      const redirectUrl = `${appUrl}/api/tracking/click/${trackingToken}?url=${encodeURIComponent(targetUrl)}`;
+      return `<a ${pre}href="${redirectUrl}" ${post}>`;
+    });
+  }
+
+  // 3. Wrap in consistent layout
+  let finalHtml = wrapInEmailLayout(html, {
+    unsubscribeUrl: `mailto:${config.FROM_EMAIL}?subject=Unsubscribe%20${encodeURIComponent(job.email)}`
+  });
+
+  // 4. Open tracking pixel: inject before </body>
+  const trackOpens = getSystemSetting('track_opens_default', '1') === '1';
+  if (trackOpens && trackingToken) {
+    const pixelUrl = `${appUrl}/api/tracking/open/${trackingToken}`;
+    const pixelTag = `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;width:1px;height:1px;border:none;outline:none;" />`;
+    if (finalHtml.includes('</body>')) {
+      finalHtml = finalHtml.replace('</body>', `${pixelTag}</body>`);
+    } else {
+      finalHtml += pixelTag;
+    }
+  }
+
+  // 5. Process downloadable file attachments (separate from CID inline images)
+  let fileAttachments = [];
+  try {
+    if (job.attachments) {
+      fileAttachments = typeof job.attachments === 'string' ? JSON.parse(job.attachments) : job.attachments;
+    }
+  } catch {
+    fileAttachments = [];
+  }
+
+  if (Array.isArray(fileAttachments) && fileAttachments.length > 0) {
+    const allowedItems = fileAttachments.slice(0, 5);
+    let totalSize = 0;
+    const MAX_COMBINED_SIZE = 20 * 1024 * 1024; // 20 MB
+
+    for (const item of allowedItems) {
+      if (!item) continue;
+      let filePath = item.path;
+      if (!filePath && item.url) {
+        filePath = path.join(projectRoot, 'public', item.url.replace(/^\//, ''));
+      }
+      if (filePath && fs.existsSync(/*turbopackIgnore: true*/ filePath)) {
+        const stat = fs.statSync(/*turbopackIgnore: true*/ filePath);
+        if (totalSize + stat.size <= MAX_COMBINED_SIZE) {
+          totalSize += stat.size;
+          attachments.push({
+            filename: item.filename || path.basename(filePath),
+            path: filePath,
+            contentType: item.mimeType || undefined,
+          });
+        }
+      }
+    }
+  }
+
+  return { html: finalHtml, attachments };
 }
 
 /**
@@ -92,7 +207,6 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
   const result = claimStmt.run(now, outreachId);
 
   if (result.changes === 0) {
-    // Job was already claimed or does not exist
     return { success: false, message: 'Job already in progress or completed.' };
   }
 
@@ -104,17 +218,10 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
 
   try {
     const transporter = getMailerTransporter();
-    const fullHtml = wrapInEmailLayout(job.body_html);
+    const { html: fullHtml, attachments } = prepareEmailContent(job);
     const smtp = getEffectiveSmtpSettings();
-    const fromName = smtp.from_name || config.FROM_NAME || 'Shortfundly Campus Outreach';
+    const fromName = smtp.from_name || config.FROM_NAME || 'Campus Outreach Coordinator';
 
-    // DELIVERABILITY OPTIMIZATION:
-    // When sending through Google SMTP (smtp.gmail.com) with a @gmail.com account,
-    // setting RFC5322 "From:" to a third-party domain (e.g. campus@shortfundly.com)
-    // without matching domain DKIM/SPF causes recipient mail servers to fail DMARC/SPF and route to SPAM.
-    // Setting "From:" to the authenticated Google account email guarantees 100% DKIM (signed by Google)
-    // and 100% SPF PASS.
-    // Setting "Reply-To:" to campus@shortfundly.com ensures all recipient replies route directly to the official campus inbox.
     const smtpUser = (smtp.user || '').trim();
     const isGmailUser = smtpUser.toLowerCase().endsWith('@gmail.com') || smtpUser.toLowerCase().endsWith('@googlemail.com');
 
@@ -123,7 +230,7 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
 
     const plainText = job.body_text || htmlToPlainText(job.body_html);
 
-    const info = await transporter.sendMail({
+    const mailOptions = {
       from: `"${fromName}" <${effectiveFromEmail}>`,
       to: job.email,
       replyTo: `"${fromName}" <${officialReplyTo}>`,
@@ -134,14 +241,19 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
         'List-Unsubscribe': `<mailto:${officialReplyTo}?subject=Unsubscribe>`,
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         'X-Entity-Ref-ID': outreachId,
-        'X-Mailer': 'Shortfundly Campus Outreach Engine v1.0',
-        'Feedback-ID': `campus-outreach:shortfundly:${smtpUser}`,
+        'X-Mailer': 'Campus Email Automation Platform v2.0',
+        'Feedback-ID': `campus-outreach:platform:${smtpUser}`,
       },
-    });
+    };
 
+    if (attachments && attachments.length > 0) {
+      mailOptions.attachments = attachments;
+    }
+
+    const info = await transporter.sendMail(mailOptions);
     const sentAt = new Date().toISOString();
 
-    // 3. Mark as ACCEPTED upon 250 response receipt
+    // 3. Mark as ACCEPTED upon 250 response receipt (SMTP accepted relay)
     db.prepare(`
       UPDATE outreach_logs
       SET status = 'ACCEPTED',
@@ -149,7 +261,8 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
           error_message = NULL,
           smtp_response = ?,
           smtp_message_id = ?,
-          sent_at = ?
+          sent_at = ?,
+          delivery_status = 'SMTP_ACCEPTED'
       WHERE id = ?
     `).run(info.response || '250 OK Message Accepted', info.messageId || null, sentAt, outreachId);
 
@@ -159,6 +272,10 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
       messageId: info.messageId,
       attempts: job.attempts + 1
     }, userEmail);
+
+    if (job.campaign_id) {
+      updateCampaignCounters(job.campaign_id);
+    }
 
     return {
       success: true,
@@ -176,7 +293,8 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
       SET status = ?,
           failure_type = ?,
           error_message = ?,
-          smtp_response = ?
+          smtp_response = ?,
+          delivery_status = 'FAILED'
       WHERE id = ?
     `).run(
       finalStatus,
@@ -192,6 +310,10 @@ export async function processOutreachJob(outreachId, userEmail = 'system') {
       classification,
       error: cleanErrorMessage
     }, userEmail);
+
+    if (job.campaign_id) {
+      updateCampaignCounters(job.campaign_id);
+    }
 
     return {
       success: false,

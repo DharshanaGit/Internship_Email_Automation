@@ -10,6 +10,7 @@ import {
   LogOutIcon,
   UserIcon,
   CampaignPulseLogoSymbol,
+  BarChartIcon,
 } from './Icons';
 
 export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) {
@@ -31,22 +32,27 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
   const navItems = [
     {
       id: 'dashboard',
-      label: 'Campaign Overview',
+      label: 'Dashboard',
       icon: <DashboardIcon size={17} />,
     },
     {
       id: 'sender',
-      label: 'Outreach Dispatcher',
+      label: 'Send Emails',
       icon: <SendIcon size={17} />,
     },
     {
+      id: 'campaigns',
+      label: 'Campaign Reports',
+      icon: <BarChartIcon size={17} />,
+    },
+    {
       id: 'templates',
-      label: 'Proposal Templates',
+      label: 'Email Templates',
       icon: <TemplateIcon size={17} />,
     },
     {
       id: 'settings',
-      label: 'System & Security',
+      label: 'Settings',
       icon: <SettingsIcon size={17} />,
       badge: role === 'admin' ? 'Admin' : null,
     },
@@ -57,12 +63,12 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
       {/* Brand Header */}
       <div className={styles.brandArea}>
         <div className={styles.brandRow}>
-          <div className={styles.logoWrap}>
+          <div className={styles.logoCircle}>
             <CampaignPulseLogoSymbol size={34} />
           </div>
           <div className={styles.brandMeta}>
-            <span className={styles.brandTitle}>ReachOut <span className={styles.brandTeal}>OS</span></span>
-            <span className={styles.brandSubtitle}>Campaign Operations</span>
+            <span className={styles.brandTitle}>Campus Outreach</span>
+            <span className={styles.brandSubtitle}>Email Automation</span>
           </div>
         </div>
       </div>
@@ -70,18 +76,18 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
       {/* User Mini Profile Inset */}
       <div className={styles.profileInset}>
         <div className={styles.avatarWrap}>
-          <UserIcon size={15} />
+          <UserIcon size={16} />
         </div>
         <div className={styles.profileMeta}>
           <span className={styles.profileEmail} title={session?.email || 'User'}>
-            {session?.email?.split('@')[0] || 'Campaign Ops'}
+            {session?.email?.split('@')[0] || 'Outreach Member'}
           </span>
           <div className={styles.profileBadges}>
             <span className={`${styles.rolePill} ${getRoleClass(role)}`}>
               {getRoleLabel(role)}
             </span>
             <span className={`${styles.sendPill} ${canSend ? styles.sendActive : styles.sendDisabled}`}>
-              {canSend ? 'Dispatch Ready' : 'View Only'}
+              {canSend ? 'Send Ready' : 'View Only'}
             </span>
           </div>
         </div>
@@ -89,7 +95,7 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
 
       {/* Navigation Links */}
       <div className={styles.navSection}>
-        <div className={styles.navLabel}>Operations Menu</div>
+        <div className={styles.navLabel}>Workspace Menu</div>
         <nav className={styles.navList}>
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
@@ -109,13 +115,13 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
         </nav>
       </div>
 
-      {/* Sign Out Footer */}
+      {/* Sign Out Pill Footer */}
       <div className={styles.footerSection}>
         <button
           type="button"
           className={styles.logoutBtn}
           onClick={onLogout}
-          title="Sign out of ReachOut OS"
+          title="Sign out of Campus Email Automation Platform"
         >
           <LogOutIcon size={14} />
           <span>Sign Out</span>

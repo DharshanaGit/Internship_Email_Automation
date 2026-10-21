@@ -137,6 +137,17 @@ export const outreachSendSchema = z.object({
   body_html: z.string().min(20, 'Email body content is too short.'),
   override_duplicate: z.boolean().optional().default(false),
   override_reason: z.string().max(300).optional().nullable(),
+  country: z.string().max(100).optional().nullable(),
+  state: z.string().max(100).optional().nullable(),
+  campaign_id: z.string().max(100).optional().nullable(),
+  attachments: z.array(z.object({
+    filename: z.string(),
+    savedName: z.string().optional(),
+    url: z.string().optional(),
+    path: z.string().optional(),
+    mimeType: z.string().optional(),
+    size: z.number().optional()
+  })).max(5, 'Maximum of 5 attachments allowed.').optional().default([]),
 });
 
 export const checkDuplicateSchema = z.object({

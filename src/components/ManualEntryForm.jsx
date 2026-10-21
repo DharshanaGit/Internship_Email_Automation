@@ -151,11 +151,11 @@ export default function ManualEntryForm({ templates = [], onOpenReview, duplicat
             <BuildingIcon size={18} />
           </div>
           <div>
-            <h2 className={styles.title}>College Outreach Dispatcher</h2>
-            <p className={styles.subtitle}>Enter campus credentials to generate customized partnership proposal</p>
+            <h2 className={styles.title}>Send Single Email</h2>
+            <p className={styles.subtitle}>Enter college details to compose and send a personalized email</p>
           </div>
         </div>
-        <div className={styles.stepIndicator}>Target Institution Dispatch</div>
+        <div className={styles.stepIndicator}>Single Email</div>
       </div>
 
       {!canSend && (
@@ -345,7 +345,7 @@ export default function ManualEntryForm({ templates = [], onOpenReview, duplicat
             className={styles.reviewBtn}
           >
             <EyeIcon size={16} />
-            <span>Review &amp; Edit Content Before Dispatch</span>
+            <span>Preview &amp; Send Email</span>
           </button>
         </div>
       </form>

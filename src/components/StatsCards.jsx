@@ -25,10 +25,10 @@ export default function StatsCards({ stats = {} }) {
 
   return (
     <div className={styles.analyticsGrid}>
-      {/* 1. Total Campaign Dispatches */}
+      {/* 1. Total Emails */}
       <div className={styles.metricCard}>
         <div className={styles.cardHeader}>
-          <span className={styles.metricTitle}>Total Outreach</span>
+          <span className={styles.metricTitle}>Total Emails</span>
           <div className={styles.iconCircle}>
             <MailIcon size={14} />
           </div>
@@ -38,14 +38,14 @@ export default function StatsCards({ stats = {} }) {
           <div className={styles.progressBar}>
             <div className={styles.fillSlate} style={{ width: total > 0 ? '100%' : '0%' }} />
           </div>
-          <span className={styles.metaCaption}>Tracked transmissions</span>
+          <span className={styles.metaCaption}>All logged emails</span>
         </div>
       </div>
 
-      {/* 2. SMTP Accepted (250 OK) */}
+      {/* 2. Delivered */}
       <div className={`${styles.metricCard} ${styles.cardDelivered}`}>
         <div className={styles.cardHeader}>
-          <span className={styles.metricTitle}>Delivered (250 OK)</span>
+          <span className={styles.metricTitle}>Delivered</span>
           <div className={`${styles.iconCircle} ${styles.iconTeal}`}>
             <CheckCircleIcon size={14} />
           </div>
@@ -56,15 +56,15 @@ export default function StatsCards({ stats = {} }) {
             <div className={styles.fillTeal} style={{ width: `${Math.min(100, Math.round(Number(deliverabilityRate)))}%` }} />
           </div>
           <span className={styles.metaCaption}>
-            <strong>{deliverabilityRate}%</strong> Deliverability Rate
+            <strong>{deliverabilityRate}%</strong> Delivery Rate
           </span>
         </div>
       </div>
 
-      {/* 3. Failed Attempts */}
+      {/* 3. Failed */}
       <div className={`${styles.metricCard} ${styles.cardFailed}`}>
         <div className={styles.cardHeader}>
-          <span className={styles.metricTitle}>Failed Attempts</span>
+          <span className={styles.metricTitle}>Failed</span>
           <div className={`${styles.iconCircle} ${styles.iconRose}`}>
             <AlertCircleIcon size={14} />
           </div>
@@ -74,14 +74,14 @@ export default function StatsCards({ stats = {} }) {
           <div className={styles.progressBar}>
             <div className={styles.fillRose} style={{ width: total > 0 ? `${Math.min(100, Math.round((failed / total) * 100))}%` : '0%' }} />
           </div>
-          <span className={styles.metaCaption}>Bounces &amp; transient errors</span>
+          <span className={styles.metaCaption}>Delivery errors or bounces</span>
         </div>
       </div>
 
-      {/* 4. Queue Pending */}
+      {/* 4. Pending */}
       <div className={`${styles.metricCard} ${styles.cardPending}`}>
         <div className={styles.cardHeader}>
-          <span className={styles.metricTitle}>Pending Queue</span>
+          <span className={styles.metricTitle}>Pending</span>
           <div className={`${styles.iconCircle} ${styles.iconAmber}`}>
             <ClockIcon size={14} />
           </div>
@@ -91,14 +91,14 @@ export default function StatsCards({ stats = {} }) {
           <div className={styles.progressBar}>
             <div className={styles.fillAmber} style={{ width: pending > 0 ? '60%' : '0%' }} />
           </div>
-          <span className={styles.metaCaption}>Awaiting worker cycle</span>
+          <span className={styles.metaCaption}>Queued for sending</span>
         </div>
       </div>
 
-      {/* 5. Active In Flight */}
+      {/* 5. Sending */}
       <div className={`${styles.metricCard} ${styles.cardProcessing}`}>
         <div className={styles.cardHeader}>
-          <span className={styles.metricTitle}>In Flight</span>
+          <span className={styles.metricTitle}>Sending</span>
           <div className={`${styles.iconCircle} ${styles.iconProcessing}`}>
             <RefreshCwIcon size={14} className={processing > 0 ? styles.spinAnimation : ''} />
           </div>
@@ -108,14 +108,14 @@ export default function StatsCards({ stats = {} }) {
           <div className={styles.progressBar}>
             <div className={styles.fillProcessing} style={{ width: processing > 0 ? '100%' : '0%' }} />
           </div>
-          <span className={styles.metaCaption}>Socket actively streaming</span>
+          <span className={styles.metaCaption}>Currently processing</span>
         </div>
       </div>
 
-      {/* 6. Cooldown Collision Shield */}
+      {/* 6. Duplicates Blocked */}
       <div className={`${styles.metricCard} ${styles.cardShield}`}>
         <div className={styles.cardHeader}>
-          <span className={styles.metricTitle}>Collision Guard</span>
+          <span className={styles.metricTitle}>Duplicates Blocked</span>
           <div className={`${styles.iconCircle} ${styles.iconLime}`}>
             <ShieldAlertIcon size={14} />
           </div>
@@ -125,7 +125,7 @@ export default function StatsCards({ stats = {} }) {
           <div className={styles.progressBar}>
             <div className={styles.fillLime} style={{ width: '100%' }} />
           </div>
-          <span className={styles.metaCaption}>30-day duplicates blocked</span>
+          <span className={styles.metaCaption}>Protected by 30-day rule</span>
         </div>
       </div>
 

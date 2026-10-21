@@ -7,12 +7,21 @@ import Sidebar from '@/components/Sidebar.jsx';
 import StatsCards from '@/components/StatsCards.jsx';
 import ManualEntryForm from '@/components/ManualEntryForm.jsx';
 import BulkEmailSender from '@/components/BulkEmailSender.jsx';
+import CampaignWorkflowSender from '@/components/CampaignWorkflowSender.jsx';
+import CampaignTrackingView from '@/components/CampaignTrackingView.jsx';
 import EmailReviewModal from '@/components/EmailReviewModal.jsx';
 import EmailRecordsTable from '@/components/EmailRecordsTable.jsx';
 import TemplateManager from '@/components/TemplateManager.jsx';
 import SettingsView from '@/components/SettingsView.jsx';
 import SmtpDiagnosticsModal from '@/components/SmtpDiagnosticsModal.jsx';
-import { RefreshCwIcon, ServerIcon, SendIcon, MailIcon } from '@/components/Icons.jsx';
+import {
+  RefreshCwIcon,
+  ServerIcon,
+  SendIcon,
+  MailIcon,
+  GlobeIcon,
+  BarChartIcon
+} from '@/components/Icons.jsx';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -20,7 +29,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [senderSubMode, setSenderSubMode] = useState('manual'); // 'manual' | 'bulk'
+  const [senderSubMode, setSenderSubMode] = useState('bulk'); // 'bulk' | 'manual'
 
   // Stats & Logs state
   const [stats, setStats] = useState({
@@ -188,15 +197,19 @@ export default function DashboardPage() {
   const getViewTitle = () => {
     switch (activeTab) {
       case 'dashboard':
-        return 'Campaign Overview';
+        return 'Dashboard';
+      case 'campaigns':
+        return 'Campaign Reports';
       case 'sender':
-        return senderSubMode === 'manual' ? 'Single Outreach Composer' : 'Bulk Campaign Engine';
+        return senderSubMode === 'manual'
+          ? 'Single Email'
+          : 'Bulk Campaign';
       case 'templates':
-        return 'Proposal Templates';
+        return 'Email Templates';
       case 'settings':
-        return 'System & SMTP Settings';
+        return 'Settings';
       default:
-        return 'Campaign Operations';
+        return 'Campus Email Automation Platform';
     }
   };
 
@@ -204,14 +217,14 @@ export default function DashboardPage() {
     return (
       <div className={styles.loadingOverlay}>
         <RefreshCwIcon size={32} className={styles.loadingSpinner} />
-        <div>Authenticating Campaign Session...</div>
+        <div>Loading...</div>
       </div>
     );
   }
 
   return (
     <div className={styles.dashboardWrapper}>
-      {/* Modern SaaS Sidebar */}
+      {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -219,41 +232,42 @@ export default function DashboardPage() {
         onLogout={handleLogout}
       />
 
-      {/* Main Viewport */}
+      {/* Main Dynamic Viewport */}
       <div className={styles.mainArea}>
-        {/* Sticky Top Command Bar */}
+        {/* Sticky Top Bar */}
         <header className={styles.topBar}>
           <div className={styles.breadcrumbArea}>
             <span className={styles.viewTitle}>{getViewTitle()}</span>
-            <span className={styles.viewTagline}>&bull; ReachOut OS Platform</span>
+            <span className={styles.viewTagline}>&bull; Campus Email Automation Platform</span>
           </div>
 
           <div className={styles.topBarRight}>
             <div className={styles.statusPill}>
               <span className={styles.statusDot} />
-              <span>SQLite Active</span>
+              <span>Connected</span>
             </div>
 
             <button
               type="button"
               className={styles.smtpBtn}
               onClick={() => setSmtpModalOpen(true)}
-              title="Inspect Google SMTP handshake status"
+              title="Check Google SMTP email settings"
             >
               <ServerIcon size={14} />
-              <span>Google SMTP Status</span>
+              <span>Google SMTP</span>
             </button>
           </div>
         </header>
 
         {/* Dynamic Page Content */}
         <main className={styles.pageContent}>
+          {/* TAB 1: Command Overview */}
           {activeTab === 'dashboard' && (
             <>
               <div className={styles.introSection}>
-                <h1 className={styles.headline}>Campaign Operations Command Center</h1>
+                <h1 className={styles.headline}>Email Outreach Dashboard</h1>
                 <p className={styles.subheadline}>
-                  Monitor live campaign deliverability, track genuine 250 OK inbox handshakes, and manage statewide institutional communications.
+                  Monitor email activity, view real-time delivery logs, and check campaign statistics.
                 </p>
               </div>
 
@@ -280,12 +294,18 @@ export default function DashboardPage() {
             </>
           )}
 
+          {/* TAB 2: Campaign Tracking & Reports */}
+          {activeTab === 'campaigns' && (
+            <CampaignTrackingView session={user} />
+          )}
+
+          {/* TAB 3: Campus Dispatcher */}
           {activeTab === 'sender' && (
             <>
               <div className={styles.introSection}>
-                <h1 className={styles.headline}>Campus Outreach Dispatcher</h1>
+                <h1 className={styles.headline}>Send Emails to Colleges</h1>
                 <p className={styles.subheadline}>
-                  Choose single manual entry or import CSV lists for automated bulk outreach with duplicate prevention.
+                  Select colleges from the directory or import your spreadsheet, customize your template, and send safely.
                 </p>
               </div>
 
@@ -293,43 +313,47 @@ export default function DashboardPage() {
               <div className={styles.modeSwitcher}>
                 <button
                   type="button"
-                  className={`${styles.modeBtn} ${senderSubMode === 'manual' ? styles.modeBtnActive : ''}`}
-                  onClick={() => setSenderSubMode('manual')}
-                >
-                  <SendIcon size={14} />
-                  <span>Single Outreach Entry</span>
-                </button>
-
-                <button
-                  type="button"
                   className={`${styles.modeBtn} ${senderSubMode === 'bulk' ? styles.modeBtnActive : ''}`}
                   onClick={() => setSenderSubMode('bulk')}
                 >
                   <MailIcon size={14} />
-                  <span>Bulk Directory &amp; CSV Dispatch</span>
+                  <span>Bulk Campaign</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`${styles.modeBtn} ${senderSubMode === 'manual' ? styles.modeBtnActive : ''}`}
+                  onClick={() => setSenderSubMode('manual')}
+                >
+                  <SendIcon size={14} />
+                  <span>Single Email</span>
                 </button>
               </div>
 
-              {senderSubMode === 'manual' ? (
-                <ManualEntryForm
-                  templates={templates}
-                  onOpenReview={handleOpenReview}
-                  user={user}
-                />
-              ) : (
+              {senderSubMode === 'bulk' && (
                 <BulkEmailSender
                   templates={templates}
                   session={user}
                   onCampaignFinished={handleOutreachSuccess}
                 />
               )}
+
+              {senderSubMode === 'manual' && (
+                <ManualEntryForm
+                  templates={templates}
+                  onOpenReview={handleOpenReview}
+                  user={user}
+                />
+              )}
             </>
           )}
 
+          {/* TAB 4: Proposal Templates */}
           {activeTab === 'templates' && (
             <TemplateManager session={user} onTemplatesUpdated={fetchTemplates} />
           )}
 
+          {/* TAB 5: System Settings */}
           {activeTab === 'settings' && (
             <SettingsView session={user} />
           )}

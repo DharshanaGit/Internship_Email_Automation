@@ -1411,3 +1411,303 @@
   gap: 12px;
 }
 
+
+/* Geographic Targeting Card */
+.geoCard {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.geoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.geoGrid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .geoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.countryList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  background: #f8fafc;
+}
+
+.countryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--text-primary);
+  background: #ffffff;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.countryItem:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.countryItemActive {
+  background: #f0fdfa !important;
+  border-color: #0d9488 !important;
+  color: #0f766e !important;
+}
+
+.stateSelectorArea {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stateToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stateSearchInput {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  outline: none;
+  width: 220px;
+}
+
+.stateChipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+}
+
+.stateChipLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.stateChipLabel:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+
+.stateChipLabelActive {
+  background: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  color: #1d4ed8 !important;
+  font-weight: 600;
+}
+
+.geoActionsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.btnLoadGeo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnLoadGeo:hover:not(:disabled) {
+  background: #0d9488;
+}
+
+.btnLoadGeo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Customization Collapse Toggle */
+.customizationHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapseToggleBtn {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.collapseToggleBtn:hover {
+  background: #f1f5f9;
+  color: var(--text-primary);
+}
+
+/* Formatting & Attachments for Bulk Email Customization */
+.formattingBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border-subtle);
+  border-bottom: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.formatBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.formatBtn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.formatBtnAccent {
+  background: #fdf2f8;
+  border-color: #fbcfe8;
+  color: #be185d;
+}
+
+.formatBtnAccent:hover {
+  background: #fce7f3;
+  border-color: #f472b6;
+  color: #9d174d;
+}
+
+.attachmentList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.attachmentChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #1e293b;
+  font-weight: 550;
+}
+
+.attachmentRemoveBtn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.attachmentRemoveBtn:hover {
+  color: #e11d48;
+}
+
+.attachmentUploadBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 6px;
+}
+
+.attachmentUploadBtn {
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.attachmentUploadBtn:hover {
+  background: #f1f5f9;
+}

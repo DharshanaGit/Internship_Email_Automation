@@ -11,9 +11,18 @@ import {
   CloseIcon,
   SendIcon,
   ClockIcon,
+  ImageIcon,
 } from './Icons.jsx';
+import EmailImageManagerModal from './EmailImageManagerModal.jsx';
 import { renderTemplate, formatBodyToHtml } from '@/lib/templates.js';
 import * as XLSX from 'xlsx';
+
+function formatFileSize(bytes) {
+  if (!bytes) return '0 B';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EXTRACT_EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
@@ -316,8 +325,264 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
   // Templates
   const [availableTemplates, setAvailableTemplates] = useState(templates);
   const [selectedTemplateId, setSelectedTemplateId] = useState(templates[0]?.id || 'campus-collaboration-proposal');
-  const [subjectTemplate, setSubjectTemplate] = useState('Collaboration with Shortfundly Campus - [College Name]');
+  const [subjectTemplate, setSubjectTemplate] = useState('Institutional Collaboration Proposal — [College Name]');
   const [bodyTemplate, setBodyTemplate] = useState('');
+
+  // Geographic Country & Region Targeting State
+  const [countriesList, setCountriesList] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState('IN');
+  const [regionsList, setRegionsList] = useState([]);
+  const [selectedStates, setSelectedStates] = useState(new Set(['Andhra Pradesh']));
+  const [stateSearch, setStateSearch] = useState('');
+  const [loadingGeoData, setLoadingGeoData] = useState(false);
+  const [loadingCollegesFromGeo, setLoadingCollegesFromGeo] = useState(false);
+  const [geoNotice, setGeoNotice] = useState('');
+
+  // Customization Section State
+  const [isCustomizationExpanded, setIsCustomizationExpanded] = useState(true);
+  const [campaignAttachments, setCampaignAttachments] = useState([]);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const [attachmentError, setAttachmentError] = useState('');
+  const attachmentInputRef = useRef(null);
+
+  // Load Geographic Countries
+  useEffect(() => {
+    async function fetchCountries() {
+      try {
+        const res = await fetch('/api/outreach/geo/countries');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.countries && data.countries.length > 0) {
+            setCountriesList(data.countries);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load countries:', err);
+      }
+    }
+    fetchCountries();
+  }, []);
+
+  // Load Regions when selectedCountry changes
+  useEffect(() => {
+    async function fetchRegions() {
+      if (!selectedCountry) return;
+      try {
+        setLoadingGeoData(true);
+        const res = await fetch(`/api/outreach/geo/regions?country=${selectedCountry}`);
+        if (res.ok) {
+          const data = await res.json();
+          const regions = data.regions || [];
+          setRegionsList(regions);
+          if (selectedCountry === 'IN') {
+            setSelectedStates(new Set(['Andhra Pradesh']));
+          } else if (regions.length > 0) {
+            setSelectedStates(new Set([regions[0].name]));
+          } else {
+            setSelectedStates(new Set());
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load regions:', err);
+      } finally {
+        setLoadingGeoData(false);
+      }
+    }
+    fetchRegions();
+  }, [selectedCountry]);
+
+  // Handler to toggle selection of a state/region
+  const toggleStateSelection = (stateName) => {
+    setSelectedStates((prev) => {
+      const next = new Set(prev);
+      if (next.has(stateName)) {
+        next.delete(stateName);
+      } else {
+        next.add(stateName);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectAllStates = () => {
+    setSelectedStates(new Set(regionsList.map((r) => r.name)));
+  };
+
+  const handleClearAllStates = () => {
+    setSelectedStates(new Set());
+  };
+
+  // Handler to query and load colleges for selected geographic region
+  const handleLoadGeoColleges = async () => {
+    if (selectedStates.size === 0) {
+      alert('Please select at least one state or administrative region.');
+      return;
+    }
+    setLoadingCollegesFromGeo(true);
+    setGeoNotice('');
+    setCampaignSummary(null);
+    setCurrentPage(1);
+    setSearchQuery('');
+    setFilterDistrict('all');
+
+    try {
+      const statesArr = Array.from(selectedStates);
+      const res = await fetch('/api/outreach/geo/colleges', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          countries: [selectedCountry],
+          states: statesArr,
+          limit: 3000,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to query colleges from database.');
+      }
+
+      const data = await res.json();
+      const colleges = data.colleges || [];
+
+      if (colleges.length === 0) {
+        setGeoNotice(
+          `The selected region (${statesArr.join(', ')}) currently has 0 college records in the database. You can import contacts using the Custom Spreadsheet Importer below.`
+        );
+        setRecipients([]);
+        setFileName('');
+        return;
+      }
+
+      // Convert colleges to standardized recipient rows
+      const standardized = [];
+      colleges.forEach((col, idx) => {
+        const contacts = col.contacts && col.contacts.length > 0 ? col.contacts : [
+          {
+            contact_person: 'Principal / Director',
+            designation: 'Head of Institution',
+            department: 'Academic Administration',
+            email: col.primary_email || '',
+            phone: col.phone || '',
+          }
+        ];
+
+        contacts.forEach((ct, ctIdx) => {
+          const email = cleanString(ct.email || col.primary_email || '');
+          const allMails = extractAllEmails(email);
+          standardized.push({
+            id: `geo-${col.id}-${ctIdx}-${idx}`,
+            rowNumber: standardized.length + 1,
+            college_name: col.college_name,
+            email: email,
+            raw_email: email,
+            website_url: col.website_url || '',
+            city_district: col.district || col.city || '',
+            district: col.district || '',
+            state: col.state_or_region || statesArr[0],
+            country: col.country_name || (selectedCountry === 'IN' ? 'India' : selectedCountry),
+            contact_person: ct.contact_person || 'Principal / Representative',
+            designation: ct.designation || 'Head of Institution',
+            department: ct.department || 'Academic Administration',
+            phone: ct.phone || col.phone || '',
+            category: col.category || 'Higher Education',
+            principal_emails: allMails,
+            all_available_emails: allMails,
+            primary_emails: allMails,
+          });
+        });
+      });
+
+      setFileName(`${selectedCountry === 'IN' ? 'India' : selectedCountry} [${statesArr.join(', ')}] (${standardized.length} contacts)`);
+      const distSet = new Set(standardized.map((r) => r.district).filter(Boolean));
+      if (distSet.size > 0) setAvailableDistricts(Array.from(distSet).sort());
+
+      await processRecipientsAnalysis(standardized);
+    } catch (err) {
+      console.error('Error loading geo colleges:', err);
+      alert('Error fetching colleges: ' + (err.message || 'Network error'));
+    } finally {
+      setLoadingCollegesFromGeo(false);
+    }
+  };
+
+  // Attachment upload and management handlers
+  const handleAttachmentUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAttachmentError('');
+
+    const allowedExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.csv'];
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!allowedExts.includes(ext)) {
+      setAttachmentError(`Unsupported file format (${ext}). Supported: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, CSV.`);
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setAttachmentError(`File size exceeds 10 MB limit (${(file.size / (1024 * 1024)).toFixed(2)} MB).`);
+      e.target.value = '';
+      return;
+    }
+
+    if (campaignAttachments.length >= 5) {
+      setAttachmentError('Maximum of 5 attachments allowed per campaign.');
+      e.target.value = '';
+      return;
+    }
+
+    const currentTotal = campaignAttachments.reduce((acc, a) => acc + (a.size || 0), 0);
+    if (currentTotal + file.size > 20 * 1024 * 1024) {
+      setAttachmentError('Combined attachment size exceeds 20 MB limit.');
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      setUploadingAttachment(true);
+      const fd = new FormData();
+      fd.append('file', file);
+
+      const res = await fetch('/api/outreach/upload-attachment', {
+        method: 'POST',
+        body: fd,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.attachment) {
+        setCampaignAttachments((prev) => [...prev, data.attachment]);
+      } else {
+        setAttachmentError(data.error || 'Failed to upload attachment.');
+      }
+    } catch {
+      setAttachmentError('Network error uploading attachment.');
+    } finally {
+      setUploadingAttachment(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveAttachment = (idxToRemove) => {
+    setCampaignAttachments((prev) => prev.filter((_, idx) => idx !== idxToRemove));
+  };
+
+  const handleInsertImage = (imageHtml) => {
+    setBodyTemplate((prev) => prev + '\n' + imageHtml + '\n');
+  };
+
+  const insertFormatTag = (openTag, closeTag, defaultText = 'sample text') => {
+    setBodyTemplate((prev) => `${prev} ${openTag}${defaultText}${closeTag} `);
+  };
+
+  const insertHyperlinkPrompt = () => {
+    const url = prompt('Enter link destination URL:', 'https://example.com/programs');
+    if (!url) return;
+    const text = prompt('Enter clickable link text:', 'Explore Campus Programs');
+    if (!text) return;
+    const linkHtml = `<a href="${url.trim()}" target="_blank" style="color: #2563eb; text-decoration: underline;">${text.trim()}</a>`;
+    setBodyTemplate((prev) => `${prev} ${linkHtml} `);
+  };
 
   // Dispatch & Confirmation Modal
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -569,6 +834,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
       if (active) {
         setSubjectTemplate(active.subject_template || active.subjectTemplate || '');
         setBodyTemplate(active.body_template || active.bodyTemplate || '');
+        setCampaignAttachments(Array.isArray(active.attachments) ? active.attachments : []);
       }
     }
   }, [availableTemplates, selectedTemplateId]);
@@ -701,7 +967,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
       phone: item.phone || '',
       state: item.state || 'Andhra Pradesh',
       remarks: item.remarks || '',
-      sender_name: 'Shortfundly Campus Outreach',
+      sender_name: 'Campus Outreach Coordinator',
     };
     return renderTemplate(text, vars);
   };
@@ -806,6 +1072,9 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
             designation: target.designation || 'Faculty',
             subject: personalizedSubject,
             body_html: bodyHtml,
+            country: target.country || (selectedCountry === 'IN' ? 'India' : selectedCountry),
+            state: target.state || Array.from(selectedStates)[0] || 'Andhra Pradesh',
+            attachments: campaignAttachments,
             override_duplicate: target.status === 'cooldown',
           }),
         });
@@ -867,6 +1136,156 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
 
   return (
     <div className={styles.container}>
+      {/* Geographic Country & Region Targeting Card */}
+      <div className={styles.geoCard}>
+        <div className={styles.geoHeader}>
+          <div>
+            <div className={styles.uploadTitle}>🌐 Select Country and States</div>
+            <div className={styles.uploadSub}>
+              Choose a country and one or more states to load colleges, or upload your own CSV file below.
+            </div>
+          </div>
+          {countriesList.length > 0 && (
+            <div style={{ fontSize: '12px', color: '#0f766e', background: '#f0fdfa', padding: '4px 10px', borderRadius: '4px', fontWeight: 600 }}>
+              {countriesList.length} Countries Configured
+            </div>
+          )}
+        </div>
+
+        <div className={styles.geoGrid}>
+          {/* Country Column */}
+          <div>
+            <label className={styles.label} style={{ marginBottom: '8px', display: 'block' }}>
+              1. Select Country
+            </label>
+            <div className={styles.countryList}>
+              {countriesList.map((c) => (
+                <div
+                  key={c.code}
+                  className={`${styles.countryItem} ${selectedCountry === c.code ? styles.countryItemActive : ''}`}
+                  onClick={() => setSelectedCountry(c.code)}
+                >
+                  <span>{c.name}</span>
+                  <span style={{ fontSize: '11px', opacity: 0.7 }}>
+                    {c.college_count > 0 ? `${c.college_count} colleges` : c.code}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* States / Regions Column */}
+          <div className={styles.stateSelectorArea}>
+            <div className={styles.stateToolbar}>
+              <div>
+                <label className={styles.label} style={{ display: 'inline', marginRight: '8px' }}>
+                  2. Select States / Union Territories:
+                </label>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f766e' }}>
+                  ({selectedStates.size} selected)
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="Filter states / UTs..."
+                  className={styles.stateSearchInput}
+                  value={stateSearch}
+                  onChange={(e) => setStateSearch(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className={styles.btnActionSm}
+                  onClick={handleSelectAllStates}
+                >
+                  Select All
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnActionSm}
+                  onClick={handleClearAllStates}
+                >
+                  Clear All
+                </button>
+              </div>
+            </div>
+
+            {loadingGeoData ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
+                Loading regional administrative units...
+              </div>
+            ) : regionsList.length === 0 ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
+                No administrative regions configured for this country yet.
+              </div>
+            ) : (
+              <div className={styles.stateChipsGrid}>
+                {regionsList
+                  .filter((r) => !stateSearch || r.name.toLowerCase().includes(stateSearch.toLowerCase()))
+                  .map((r) => {
+                    const isSelected = selectedStates.has(r.name);
+                    return (
+                      <label
+                        key={r.id || r.name}
+                        className={`${styles.stateChipLabel} ${isSelected ? styles.stateChipLabelActive : ''}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleStateSelection(r.name)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {r.name}
+                        </span>
+                        {r.college_count > 0 && (
+                          <span style={{ fontSize: '10px', opacity: 0.8, background: '#e2e8f0', padding: '1px 5px', borderRadius: '10px' }}>
+                            {r.college_count}
+                          </span>
+                        )}
+                      </label>
+                    );
+                  })}
+              </div>
+            )}
+
+            <div className={styles.geoActionsBar}>
+              <div style={{ fontSize: '12px', color: '#64748b' }}>
+                {selectedCountry === 'IN'
+                  ? 'All 28 States & 8 Union Territories available for pan-India outreach.'
+                  : `Targeting selected regions in ${countriesList.find(c => c.code === selectedCountry)?.name || selectedCountry}.`}
+              </div>
+
+              <button
+                type="button"
+                className={styles.btnLoadGeo}
+                onClick={handleLoadGeoColleges}
+                disabled={loadingCollegesFromGeo || selectedStates.size === 0}
+              >
+                {loadingCollegesFromGeo ? (
+                  <>
+                    <RefreshCwIcon size={14} className={styles.spinIcon} />
+                    <span>Loading Regional Colleges...</span>
+                  </>
+                ) : (
+                  <>
+                    <BuildingIcon size={14} />
+                    <span>Load Colleges for Selected States ({selectedStates.size})</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {geoNotice && (
+              <div style={{ padding: '10px 14px', background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: '6px', color: '#b45309', fontSize: '12px', fontWeight: 550 }}>
+                ℹ️ {geoNotice}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* 1-Click Loadable Unstress Dataset Card */}
       <div className={styles.loadDatasetCard}>
         <div className={styles.loadDatasetInfo}>
@@ -1527,121 +1946,290 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
         </div>
       )}
 
-      {/* Personalization & Preview Section */}
-      {filteredRecipients.length > 0 && (
-        <div className={styles.customizationCard}>
-          <div className={styles.uploadTitle}>Email Template &amp; Personalization</div>
-          <div className={styles.uploadSub}>
-            Merge placeholders automatically with institutional parameters.
-          </div>
+      {/* Personalization & Preview Section - Always Available & Expandable */}
+      {(() => {
+        const previewTarget = activeRecipient || {
+          college_name: 'PSG College of Technology',
+          email: 'principal@psgtech.ac.in',
+          contact_person: 'Dr. K. Ramesh',
+          designation: 'Principal & Head of Institution',
+          department: 'Visual Communication & Media Arts',
+          state: Array.from(selectedStates)[0] || 'Andhra Pradesh',
+          country: selectedCountry === 'IN' ? 'India' : selectedCountry,
+          city_district: 'Coimbatore',
+        };
 
-          <div className={styles.splitEditorGrid}>
-            <div className={styles.editorPane}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Select Base Template</label>
-                <select
-                  className={styles.select}
-                  value={selectedTemplateId}
-                  onChange={(e) => {
-                    const id = e.target.value;
-                    setSelectedTemplateId(id);
-                    const chosen = availableTemplates.find((t) => t.id === id);
-                    if (chosen) {
-                      setSubjectTemplate(chosen.subject_template || chosen.subjectTemplate || '');
-                      setBodyTemplate(chosen.body_template || chosen.bodyTemplate || '');
-                    }
-                  }}
-                >
-                  {availableTemplates.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        const activeTpl = availableTemplates.find((t) => t.id === selectedTemplateId) || availableTemplates[0];
 
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Subject Template</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  value={subjectTemplate}
-                  onChange={(e) => setSubjectTemplate(e.target.value)}
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Email Body</label>
-                <div className={styles.helperChips}>
-                  <button type="button" className={styles.variableChip} onClick={() => insertVariable('[College Name]')}>
-                    + [College Name]
-                  </button>
-                  <button type="button" className={styles.variableChip} onClick={() => insertVariable('[Contact Person]')}>
-                    + [Contact Person]
-                  </button>
-                  <button type="button" className={styles.variableChip} onClick={() => insertVariable('[Department]')}>
-                    + [Department]
-                  </button>
-                  <button type="button" className={styles.variableChip} onClick={() => insertVariable('[City / District]')}>
-                    + [City / District]
-                  </button>
+        return (
+          <div className={styles.customizationCard}>
+            <div className={styles.customizationHeader} onClick={() => setIsCustomizationExpanded(!isCustomizationExpanded)}>
+              <div>
+                <div className={styles.uploadTitle}>
+                  <span>✏️ Customize Email Template</span>
+                  <span style={{ marginLeft: '10px', fontSize: '11px', fontWeight: 600, color: '#0d9488', background: '#f0fdfa', padding: '2px 8px', borderRadius: '12px' }}>
+                    Active: {activeTpl?.title || 'Selected Template'}
+                  </span>
                 </div>
-                <textarea
-                  className={styles.textarea}
-                  value={bodyTemplate}
-                  onChange={(e) => setBodyTemplate(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className={styles.previewPane}>
-              <div className={styles.previewHeader}>
-                <div className={styles.previewTitle}>Live Merged Preview</div>
-                <div className={styles.previewRecipient}>
-                  {activeRecipient ? (
-                    <>
-                      Target: <strong>{activeRecipient.college_name}</strong> &lt;{activeRecipient.email}&gt;
-                    </>
-                  ) : (
-                    'No contact selected'
-                  )}
+                <div className={styles.uploadSub}>
+                  Customize the subject, body text, images, and attachments for this campaign.
                 </div>
               </div>
 
-              <div className={styles.previewSubject}>
-                Subject: {mergePlaceholders(subjectTemplate, activeRecipient)}
-              </div>
-
-              <div
-                className={styles.previewBody}
-                dangerouslySetInnerHTML={{
-                  __html: formatBodyToHtml(mergePlaceholders(bodyTemplate, activeRecipient)),
-                }}
-              />
-            </div>
-          </div>
-
-          <div className={styles.dispatchBar}>
-            <div className={styles.dispatchLeft}>
-              <span className={styles.selectedCount}>
-                Selected: {selectedIds.size} recipient(s) &bull; Eligible in Filter: {eligibleFiltered.length}
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 type="button"
-                className={styles.btnDispatch}
-                onClick={triggerSendSelected}
-                disabled={isDispatching || isAutoPlaying || selectedIds.size === 0 || !canSend}
+                className={styles.collapseToggleBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsCustomizationExpanded(!isCustomizationExpanded);
+                }}
               >
-                <SendIcon size={16} />
-                <span>Send to Selected ({selectedIds.size})</span>
+                {isCustomizationExpanded ? 'Collapse ▲' : 'Expand & Customize ▼'}
               </button>
             </div>
+
+            {isCustomizationExpanded && (
+              <div className={styles.splitEditorGrid}>
+                {/* Editor Pane */}
+                <div className={styles.editorPane}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Select Base Template</label>
+                    <select
+                      className={styles.select}
+                      value={selectedTemplateId}
+                      onChange={(e) => {
+                        const id = e.target.value;
+                        setSelectedTemplateId(id);
+                        const chosen = availableTemplates.find((t) => t.id === id);
+                        if (chosen) {
+                          setSubjectTemplate(chosen.subject_template || chosen.subjectTemplate || '');
+                          setBodyTemplate(chosen.body_template || chosen.bodyTemplate || '');
+                          setCampaignAttachments(Array.isArray(chosen.attachments) ? chosen.attachments : []);
+                        }
+                      }}
+                    >
+                      {availableTemplates.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.title} {Array.isArray(t.attachments) && t.attachments.length > 0 ? `(📎 ${t.attachments.length} files)` : ''}
+                        </option>
+                      ))}
+                    </select>
+                    <div style={{ fontSize: '11px', color: '#0d9488', fontWeight: 550, marginTop: '2px' }}>
+                      💡 Selecting a template populates the subject, body, and attachments. Changes made below apply to this campaign without altering the saved template.
+                    </div>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Subject Template</label>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      value={subjectTemplate}
+                      onChange={(e) => setSubjectTemplate(e.target.value)}
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Email Body Content (HTML &amp; Text)</label>
+
+                    {/* Formatting & Insert Toolbar */}
+                    <div className={styles.formattingBar}>
+                      <button
+                        type="button"
+                        className={`${styles.formatBtn} ${styles.formatBtnAccent}`}
+                        onClick={() => setIsImageModalOpen(true)}
+                      >
+                        <ImageIcon size={14} />
+                        <span>Insert Image / Poster / Banner</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className={styles.formatBtn}
+                        onClick={() => insertFormatTag('<strong>', '</strong>', 'Bold text')}
+                      >
+                        <strong>B</strong> Bold
+                      </button>
+
+                      <button
+                        type="button"
+                        className={styles.formatBtn}
+                        onClick={() => insertFormatTag('<em>', '</em>', 'Italic text')}
+                      >
+                        <em>I</em> Italic
+                      </button>
+
+                      <button
+                        type="button"
+                        className={styles.formatBtn}
+                        onClick={insertHyperlinkPrompt}
+                      >
+                        🔗 Insert Link
+                      </button>
+
+                      <button
+                        type="button"
+                        className={styles.formatBtn}
+                        onClick={() => insertFormatTag('<ul style="padding-left: 20px;">\n  <li>', '</li>\n  <li>Second key point</li>\n</ul>', 'Key benefit')}
+                      >
+                        • Bullet List
+                      </button>
+                    </div>
+
+                    {/* Placeholder Helper Chips */}
+                    <div className={styles.helperChips}>
+                      <button type="button" className={styles.variableChip} onClick={() => insertVariable('[College Name]')}>
+                        + [College Name]
+                      </button>
+                      <button type="button" className={styles.variableChip} onClick={() => insertVariable('[Contact Person]')}>
+                        + [Contact Person]
+                      </button>
+                      <button type="button" className={styles.variableChip} onClick={() => insertVariable('[Department]')}>
+                        + [Department]
+                      </button>
+                      <button type="button" className={styles.variableChip} onClick={() => insertVariable('[Designation]')}>
+                        + [Designation]
+                      </button>
+                      <button type="button" className={styles.variableChip} onClick={() => insertVariable('[State]')}>
+                        + [State]
+                      </button>
+                      <button type="button" className={styles.variableChip} onClick={() => insertVariable('[Country]')}>
+                        + [Country]
+                      </button>
+                      <button type="button" className={styles.variableChip} onClick={() => insertVariable('[City / District]')}>
+                        + [City / District]
+                      </button>
+                    </div>
+
+                    <textarea
+                      className={styles.textarea}
+                      style={{ minHeight: '260px', borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+                      value={bodyTemplate}
+                      onChange={(e) => setBodyTemplate(e.target.value)}
+                      placeholder="Type or customize your campaign email body content here... Format with HTML or plain text, insert images/banners, links, and click merge tags to personalize."
+                      rows={12}
+                    />
+                  </div>
+
+                  {/* File Attachments Section */}
+                  <div style={{ marginTop: '10px' }}>
+                    <label className={styles.label}>
+                      Campaign File Attachments (Optional, max 5 files, 10 MB each, 20 MB total)
+                    </label>
+
+                    <input
+                      type="file"
+                      ref={attachmentInputRef}
+                      style={{ display: 'none' }}
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv"
+                      onChange={handleAttachmentUpload}
+                    />
+
+                    {campaignAttachments.length > 0 && (
+                      <div className={styles.attachmentList}>
+                        {campaignAttachments.map((att, idx) => (
+                          <div key={idx} className={styles.attachmentChip}>
+                            <span>📄 {att.filename}</span>
+                            <span style={{ opacity: 0.7, fontSize: '11px' }}>({formatFileSize(att.size)})</span>
+                            <button
+                              type="button"
+                              className={styles.attachmentRemoveBtn}
+                              onClick={() => handleRemoveAttachment(idx)}
+                              title="Remove attachment"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className={styles.attachmentUploadBox}>
+                      <button
+                        type="button"
+                        className={styles.attachmentUploadBtn}
+                        onClick={() => attachmentInputRef.current?.click()}
+                        disabled={uploadingAttachment || campaignAttachments.length >= 5}
+                      >
+                        {uploadingAttachment ? 'Uploading...' : '+ Attach File (PDF, DOCX, XLSX, PPTX, CSV)'}
+                      </button>
+                      <span>
+                        {campaignAttachments.length} / 5 files attached &bull;{' '}
+                        {formatFileSize(campaignAttachments.reduce((acc, a) => acc + (a.size || 0), 0))} / 20 MB total
+                      </span>
+                    </div>
+
+                    {attachmentError && (
+                      <div style={{ color: '#e11d48', fontSize: '12px', fontWeight: 600, marginTop: '4px' }}>
+                        ⚠️ {attachmentError}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Live Preview Pane */}
+                <div className={styles.previewPane}>
+                  <div className={styles.previewHeader}>
+                    <div className={styles.previewTitle}>Live Merged Email Preview</div>
+                    <div className={styles.previewRecipient}>
+                      {activeRecipient ? (
+                        <>
+                          Target: <strong>{activeRecipient.college_name}</strong> &lt;{activeRecipient.email}&gt;
+                        </>
+                      ) : (
+                        <span>Sample: <strong>{previewTarget.college_name}</strong> &lt;{previewTarget.email}&gt;</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={styles.previewSubject}>
+                    Subject: {mergePlaceholders(subjectTemplate, previewTarget)}
+                  </div>
+
+                  {/* Attached Files Badge in Preview */}
+                  {campaignAttachments.length > 0 && (
+                    <div style={{ padding: '8px 12px', background: '#e0f2fe', borderRadius: '4px', fontSize: '12px', color: '#0369a1', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      <strong>📎 Attached Files ({campaignAttachments.length}):</strong>
+                      {campaignAttachments.map((att, idx) => (
+                        <span key={idx} style={{ background: '#ffffff', padding: '2px 8px', borderRadius: '10px', fontSize: '11px' }}>
+                          {att.filename} ({formatFileSize(att.size)})
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div
+                    className={styles.previewBody}
+                    dangerouslySetInnerHTML={{
+                      __html: formatBodyToHtml(mergePlaceholders(bodyTemplate, previewTarget)),
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className={styles.dispatchBar}>
+              <div className={styles.dispatchLeft}>
+                <span className={styles.selectedCount}>
+                  Selected: {selectedIds.size} recipient(s) &bull; Eligible in Filter: {eligibleFiltered.length}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  type="button"
+                  className={styles.btnDispatch}
+                  onClick={triggerSendSelected}
+                  disabled={isDispatching || isAutoPlaying || selectedIds.size === 0 || !canSend}
+                >
+                  <SendIcon size={16} />
+                  <span>Send to Selected ({selectedIds.size})</span>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Confirmation Modal */}
       {confirmModalOpen && (
@@ -1663,6 +2251,12 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
                 You are about to initiate an automated outreach campaign to{' '}
                 <strong>{dispatchTargets.length} institution(s)</strong>.
               </p>
+
+              <div style={{ margin: '12px 0', padding: '10px 14px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div><strong>Subject:</strong> {subjectTemplate}</div>
+                <div><strong>Target Region:</strong> {selectedCountry} ({Array.from(selectedStates).join(', ')})</div>
+                <div><strong>Attachments:</strong> {campaignAttachments.length > 0 ? `${campaignAttachments.length} file(s) attached` : 'None'}</div>
+              </div>
 
               <div className={styles.securityNote}>
                 <strong>Anti-Spam &amp; Privacy Shield:</strong> A separate, individually customized email will be sent to each recipient. Socket rate limiting (300ms) will safeguard delivery reputation.
@@ -1688,6 +2282,13 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
           </div>
         </div>
       )}
+
+      {/* Image Manager Modal for Bulk Email Customization */}
+      <EmailImageManagerModal
+        isOpen={isImageModalOpen}
+        onClose={() => setIsImageModalOpen(false)}
+        onInsertImage={handleInsertImage}
+      />
     </div>
   );
 }

@@ -164,37 +164,49 @@
   vertical-align: middle;
 }
 
+.collegeCol,
 .collegeCell {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .collegeName {
   font-weight: 750;
   color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 .department {
   font-size: 11px;
-  color: var(--text-muted);
+  color: #475569;
+  font-weight: 600;
+  background: #f1f5f9;
+  padding: 2px 7px;
+  border-radius: 4px;
+  width: fit-content;
 }
 
+.emailCol,
 .recipientCell {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
+}
+
+.recipientEmail,
+.emailText {
+  font-family: var(--font-mono, monospace);
+  font-size: 11.5px;
+  color: #334155;
+  font-weight: 500;
 }
 
 .contactPerson {
-  font-weight: 650;
-  color: var(--text-primary);
-}
-
-.emailText {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-muted);
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 12.5px;
 }
 
 .timestamp {
@@ -247,48 +259,58 @@
 }
 
 /* Action Buttons */
+.actionCell,
 .actionBtns {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
+.actionBtn,
 .iconBtn {
-  padding: 5px 10px;
-  border-radius: var(--radius-xs);
-  background: #ffffff;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 11.5px;
+  font-weight: 650;
+  cursor: pointer;
   transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
+.actionBtn:hover,
 .iconBtn:hover {
   background: #f8fafc;
-  color: var(--text-primary);
-  border-color: var(--border-medium);
+  border-color: #94a3b8;
+  color: #0f172a;
 }
 
 .retryBtn {
-  color: #b45309;
-  background: #fffbeb;
-  border-color: #fde68a;
+  color: #b45309 !important;
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
 }
 
 .retryBtn:hover {
-  background: #fef3c7;
-  color: #92400e;
+  background: #fef3c7 !important;
+  color: #92400e !important;
 }
 
 .deleteBtn {
-  color: #be123c;
+  color: #be123c !important;
+  background: #fff1f2 !important;
+  border-color: #fecdd3 !important;
 }
 
 .deleteBtn:hover {
-  background: #fff1f2;
-  border-color: #fecdd3;
+  background: #ffe4e6 !important;
+  border-color: #fda4af !important;
+  color: #9f1239 !important;
 }
 
 .emptyState {
