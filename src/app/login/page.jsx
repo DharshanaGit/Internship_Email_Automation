@@ -30,6 +30,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     setCaptchaNonce(Date.now());
+    // Clear any residual session on the client so the user is always asked to enter credentials
+    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
   }, []);
 
   const refreshCaptcha = () => {

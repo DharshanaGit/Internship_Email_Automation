@@ -41,10 +41,13 @@ export async function middleware(request) {
     }
   }
 
-  // If already authenticated and visiting /login, redirect to dashboard
-  if (pathname === '/login' && isAuthenticated) {
-    const dashboardUrl = new URL('/dashboard', request.url);
-    const response = NextResponse.redirect(dashboardUrl);
+  // When visiting /login, never auto-redirect to dashboard.
+  // Clear any existing session cookie so the user is always prompted to log in.
+  if (pathname === '/login') {
+    const response = NextResponse.next();
+    if (token) {
+      response.cookies.delete(COOKIE_NAME);
+    }
     applySecurityHeaders(response.headers);
     return response;
   }
