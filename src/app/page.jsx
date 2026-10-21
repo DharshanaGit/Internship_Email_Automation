@@ -12,17 +12,15 @@ import {
   ClockIcon,
   TemplateIcon,
   DashboardIcon,
-  ServerIcon,
   ArrowRightIcon,
-  CheckIcon,
-  SparklesIcon,
   ShortfundlyLogoSymbol,
+  SparklesIcon,
 } from '@/components/Icons.jsx';
 
 export const metadata = {
-  title: 'Shortfundly Campus Outreach Portal | Automated College Emailing',
+  title: 'Shortfundly Campus Outreach Portal | Simplify College Outreach with Email Automation',
   description:
-    'Internal email automation platform for the Shortfundly team to dispatch verified outreach to Principals, TPOs, HODs, Deans, and college faculty with safe batching.',
+    'Dedicated platform for company teams to manage verified college contacts, craft personalized campaign templates, and dispatch high-deliverability email outreach.',
 };
 
 export default async function HomePage() {
@@ -31,11 +29,11 @@ export default async function HomePage() {
 
   return (
     <div className={styles.landingWrapper}>
-      {/* ==================== NAVBAR ==================== */}
+      {/* ==================== 1. NAVBAR ==================== */}
       <header className={styles.navbar}>
         <div className={`${styles.container} ${styles.navContainer}`}>
           <Link href="/" className={styles.brandLink}>
-            <ShortfundlyLogoSymbol size={42} className={styles.brandSymbol} />
+            <ShortfundlyLogoSymbol size={40} className={styles.brandSymbol} />
             <div className={styles.brandDetails}>
               <span className={styles.brandName}>Shortfundly</span>
               <span className={styles.brandTagline}>Campus Outreach</span>
@@ -43,10 +41,10 @@ export default async function HomePage() {
           </Link>
 
           <nav className={styles.navLinks}>
-            <a href="#overview" className={styles.navLink}>Overview</a>
-            <a href="#stakeholders" className={styles.navLink}>Target Stakeholders</a>
+            <a href="#about" className={styles.navLink}>About</a>
+            <a href="#features" className={styles.navLink}>Key Features</a>
             <a href="#how-it-works" className={styles.navLink}>How It Works</a>
-            <a href="#why-platform" className={styles.navLink}>Why Use It</a>
+            <a href="#who-is-it-for" className={styles.navLink}>Who Is It For?</a>
           </nav>
 
           <div className={styles.navActions}>
@@ -58,361 +56,156 @@ export default async function HomePage() {
             ) : (
               <Link href="/login" className={styles.loginBtn}>
                 <UserIcon size={16} />
-                <span>Login to Portal</span>
+                <span>Login</span>
               </Link>
             )}
           </div>
         </div>
       </header>
 
-      {/* ==================== HERO SECTION ==================== */}
-      <section id="overview" className={styles.heroSection}>
+      {/* ==================== 2. HERO SECTION ==================== */}
+      <section className={styles.heroSection}>
         <div className={`${styles.container} ${styles.heroContent}`}>
           <div className={styles.heroBadge}>
             <span className={styles.heroBadgeDot}></span>
-            <span>Internal Company Tool • Automated College Emailing</span>
+            <span>Enterprise Campus Outreach Platform</span>
           </div>
 
           <h1 className={styles.heroHeadline}>
-            Automate College Outreach to <br />
-            <span className={styles.heroHighlight}>Principals, Deans &amp; HODs.</span>
+            Simplify College Outreach with <br />
+            <span className={styles.heroHighlight}>Email Automation</span>
           </h1>
 
           <p className={styles.heroSubtext}>
-            The dedicated email automation platform for Shortfundly teams. Connect with over 2,500+ colleges
-            statewide—pitching official institutional MOUs to Principals, internships to Placement Heads (TPO),
-            and departmental workshops to HODs with rate-limited safe batches and zero deliverability risk.
+            The dedicated platform for company teams to connect with colleges and universities.
+            Manage verified institutional contacts, create personalized email templates, and execute
+            safe bulk outreach with automated deliverability protection.
           </p>
 
-          <div className={styles.heroCtaRow}>
+          <div className={styles.heroCtaGroup}>
             {isAuthenticated ? (
               <Link href="/dashboard" className={styles.primaryCta}>
-                <span>Open Campaign Dashboard</span>
+                <span>Access Outreach Dashboard</span>
                 <ArrowRightIcon size={18} />
               </Link>
             ) : (
               <Link href="/login" className={styles.primaryCta}>
-                <span>Sign In to Outreach Portal</span>
+                <span>Login to Portal</span>
                 <ArrowRightIcon size={18} />
               </Link>
             )}
             <a href="#how-it-works" className={styles.secondaryCta}>
-              <span>Explore How It Works</span>
+              <span>See How It Works</span>
             </a>
           </div>
 
-          {/* Quick Stakeholder Coverage Badges */}
-          <div className={styles.stakeholderPillsTitle}>
-            Built specifically to automate communication with key college decision-makers:
-          </div>
-          <div className={styles.stakeholderPillsRow}>
-            <div className={styles.stakeholderPill}>
-              <span>🏛️ Principals &amp; Directors</span>
-              <span className={styles.pillBadge}>MOU Approvals</span>
-            </div>
-            <div className={styles.stakeholderPill}>
-              <span>💼 Placement Officers (TPO)</span>
-              <span className={styles.pillBadge}>Internships &amp; Drives</span>
-            </div>
-            <div className={styles.stakeholderPill}>
-              <span>🎓 Deans of Student Welfare</span>
-              <span className={styles.pillBadge}>Campus Events</span>
-            </div>
-            <div className={styles.stakeholderPill}>
-              <span>🔬 Heads of Department (HOD)</span>
-              <span className={styles.pillBadge}>Branch Seminars</span>
-            </div>
-            <div className={styles.stakeholderPill}>
-              <span>🤝 Faculty Coordinators &amp; Staff</span>
-              <span className={styles.pillBadge}>Event Execution</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================== LIVE DASHBOARD PREVIEW MOCKUP ==================== */}
-      <section className={styles.mockupSection}>
-        <div className={`${styles.container} ${styles.mockupContainer}`}>
-          <div className={styles.mockupCard}>
-            {/* Window Title Bar */}
-            <div className={styles.mockupWindowBar}>
-              <div className={styles.windowControls}>
-                <span className={`${styles.windowDot} ${styles.windowDotRed}`}></span>
-                <span className={`${styles.windowDot} ${styles.windowDotYellow}`}></span>
-                <span className={`${styles.windowDot} ${styles.windowDotGreen}`}></span>
-              </div>
-              <span className={styles.windowTitle}>
-                Shortfundly Campus Outreach Engine • Live Batch Dispatcher
-              </span>
-              <div className={styles.windowBadge}>
-                <span className={styles.heroBadgeDot} style={{ width: '6px', height: '6px', background: '#059669' }}></span>
-                <span>Google SMTP 465 Connected</span>
-              </div>
+          {/* Quick Metrics Bar */}
+          <div className={styles.heroStatsGrid}>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>2,500+</div>
+              <div className={styles.statLabel}>Verified Colleges</div>
+              <div className={styles.statDesc}>Clean statewide academic directory</div>
             </div>
 
-            {/* Mockup Body */}
-            <div className={styles.mockupBody}>
-              {/* Filter Toolbar */}
-              <div className={styles.mockupFilterBar}>
-                <div className={styles.mockupRoleTabs}>
-                  <span style={{ fontSize: '11px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Target Role:</span>
-                  <button type="button" className={`${styles.mockupTab} ${styles.mockupTabActive}`}>All Roles (2,501)</button>
-                  <button type="button" className={styles.mockupTab}>Principals (1,480)</button>
-                  <button type="button" className={styles.mockupTab}>TPOs (70)</button>
-                  <button type="button" className={styles.mockupTab}>HODs (120)</button>
-                  <button type="button" className={styles.mockupTab}>Deans (200)</button>
-                </div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>0</div>
+              <div className={styles.statLabel}>Duplicate Emails</div>
+              <div className={styles.statDesc}>Pre-flight deduplication engine</div>
+            </div>
 
-                <div className={styles.mockupBatchStats}>
-                  <span className={styles.batchBadge}>Safe Batch 1 of 5 (50 Colleges)</span>
-                  <span className={styles.coolingIndicator}>
-                    <ClockIcon size={13} />
-                    <span>10s Anti-Spam Cooling</span>
-                  </span>
-                </div>
-              </div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>30-Day</div>
+              <div className={styles.statLabel}>Anti-Spam Cooldown</div>
+              <div className={styles.statDesc}>Safeguards company domain reputation</div>
+            </div>
 
-              {/* Table Preview */}
-              <table className={styles.mockupTable}>
-                <thead>
-                  <tr>
-                    <th>Institution Name</th>
-                    <th>Target Stakeholder</th>
-                    <th>Verified Inbox</th>
-                    <th>Delivery Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <span className={styles.mockupCollegeName}>Andhra University College of Engineering</span>
-                      <span className={styles.mockupCollegeLoc}>Visakhapatnam • State University</span>
-                    </td>
-                    <td>
-                      <span className={`${styles.roleTag} ${styles.roleTagPrincipal}`}>Principal / Director</span>
-                    </td>
-                    <td style={{ fontFamily: 'monospace', color: '#334155' }}>principal@andhrauniversity.edu.in</td>
-                    <td>
-                      <span className={styles.statusPillReady}>
-                        <CheckCircleIcon size={14} />
-                        <span>Ready to Send</span>
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span className={styles.mockupCollegeName}>JNTU College of Engineering, Kakinada</span>
-                      <span className={styles.mockupCollegeLoc}>Kakinada • Premier Autonomous Tech</span>
-                    </td>
-                    <td>
-                      <span className={`${styles.roleTag} ${styles.roleTagTpo}`}>TPO / Placement Head</span>
-                    </td>
-                    <td style={{ fontFamily: 'monospace', color: '#334155' }}>tpo@jntuk.edu.in</td>
-                    <td>
-                      <span className={styles.statusPillReady}>
-                        <CheckCircleIcon size={14} />
-                        <span>Ready to Send</span>
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span className={styles.mockupCollegeName}>Acharya Nagarjuna University</span>
-                      <span className={styles.mockupCollegeLoc}>Guntur • Department of Computer Science</span>
-                    </td>
-                    <td>
-                      <span className={`${styles.roleTag} ${styles.roleTagHod}`}>HOD (Computer Science)</span>
-                    </td>
-                    <td style={{ fontFamily: 'monospace', color: '#334155' }}>hod.cse@anu.ac.in</td>
-                    <td>
-                      <span className={styles.statusPillReady}>
-                        <CheckCircleIcon size={14} />
-                        <span>Ready to Send</span>
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span className={styles.mockupCollegeName}>Sri Venkateswara University</span>
-                      <span className={styles.mockupCollegeLoc}>Tirupati • Student Affairs Directorate</span>
-                    </td>
-                    <td>
-                      <span className={`${styles.roleTag} ${styles.roleTagDean}`}>Dean (Student Welfare)</span>
-                    </td>
-                    <td style={{ fontFamily: 'monospace', color: '#334155' }}>dean.sw@svuniversity.edu.in</td>
-                    <td>
-                      <span className={styles.statusPillCooldown}>
-                        <ClockIcon size={14} />
-                        <span>In 30-Day Cooldown (Protected)</span>
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>100%</div>
+              <div className={styles.statLabel}>Delivery Transparency</div>
+              <div className={styles.statDesc}>Real-time Accepted &amp; Failed logs</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ==================== SECTION: TARGET STAKEHOLDERS ==================== */}
-      <section id="stakeholders" className={`${styles.section} ${styles.sectionAlt}`}>
+      {/* ==================== 3. ABOUT THE PORTAL ==================== */}
+      <section id="about" className={`${styles.section} ${styles.sectionAlt}`}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>Stakeholder Targeting Guide</span>
-            <h2 className={styles.sectionTitle}>Whom Can Company Teams Contact?</h2>
+            <span className={styles.sectionBadge}>Portal Overview</span>
+            <h2 className={styles.sectionTitle}>About the Portal</h2>
             <p className={styles.sectionSubtitle}>
-              Every college role has a distinct objective and permission authority.
-              The portal organizes verified contacts by these exact leadership tiers:
+              An internal communication system engineered to make collegiate outreach structured,
+              reliable, and completely automated.
             </p>
           </div>
 
-          <div className={styles.stakeholderGrid}>
-            {/* Stakeholder 1: Principals */}
-            <div className={styles.stakeholderCard}>
-              <div className={styles.stakeholderHeader}>
-                <div className={styles.stakeholderIconBox}><BuildingIcon size={22} /></div>
-                <div>
-                  <h3 className={styles.stakeholderRoleTitle}>Principals &amp; Directors</h3>
-                  <span className={styles.stakeholderObjective}>Official MOUs &amp; Approvals</span>
-                </div>
+          <div className={styles.aboutGrid}>
+            {/* What It Is */}
+            <div className={styles.aboutCard}>
+              <div className={styles.aboutIconBox}>
+                <BuildingIcon size={24} />
               </div>
-              <p className={styles.stakeholderDesc}>
-                The highest administrative authority for colleges. Contact them when pitching official institutional
-                partnerships, Campus Pass institutional subscriptions, and top-level executive approvals.
+              <span className={styles.aboutCardTag}>What It Is</span>
+              <h3 className={styles.aboutCardTitle}>Campus Outreach &amp; Automation Platform</h3>
+              <p className={styles.aboutCardDesc}>
+                A centralized, high-throughput email system built for Shortfundly to streamline institutional
+                communications with colleges, autonomous institutions, and state universities nationwide.
               </p>
-              <div className={styles.stakeholderDetails}>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Target For:</span>
-                  <span>Official College MOUs &amp; Approvals</span>
+              <div className={styles.aboutCardPoints}>
+                <div className={styles.aboutPointItem}>
+                  <span className={styles.aboutPointBullet}></span>
+                  <span>Consolidates 2,500+ verified academic institutions in one place.</span>
                 </div>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Email Pattern:</span>
-                  <span className={styles.detailValue}>principal@..., director@...</span>
+                <div className={styles.aboutPointItem}>
+                  <span className={styles.aboutPointBullet}></span>
+                  <span>Connects directly to company Google Workspace SMTP gateways.</span>
                 </div>
               </div>
             </div>
 
-            {/* Stakeholder 2: TPOs */}
-            <div className={styles.stakeholderCard}>
-              <div className={styles.stakeholderHeader}>
-                <div className={styles.stakeholderIconBox}><UserIcon size={22} /></div>
-                <div>
-                  <h3 className={styles.stakeholderRoleTitle}>Placement Officers (TPO)</h3>
-                  <span className={styles.stakeholderObjective}>Internships &amp; Career Pass</span>
-                </div>
+            {/* Why It Is Used */}
+            <div className={styles.aboutCard}>
+              <div className={styles.aboutIconBox}>
+                <ShieldCheckIcon size={24} />
               </div>
-              <p className={styles.stakeholderDesc}>
-                The #1 highest response rate. TPOs actively look for corporate internships, student skill projects,
-                creator opportunities, and career training. Every college has a dedicated placement officer.
+              <span className={styles.aboutCardTag}>Why It Is Used</span>
+              <h3 className={styles.aboutCardTitle}>Manage Contacts &amp; Simplify Outreach</h3>
+              <p className={styles.aboutCardDesc}>
+                Replaces scattered spreadsheets and error-prone manual emailing. Enforces a strict 30-day contact
+                cooldown, automated deduplication, and socket rate limiting so your company emails never get flagged as spam.
               </p>
-              <div className={styles.stakeholderDetails}>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Target For:</span>
-                  <span>Internships, Hiring &amp; Creator Pass</span>
+              <div className={styles.aboutCardPoints}>
+                <div className={styles.aboutPointItem}>
+                  <span className={styles.aboutPointBullet}></span>
+                  <span>Protects corporate email domain reputation with rate-limited batches.</span>
                 </div>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Email Pattern:</span>
-                  <span className={styles.detailValue}>tpo@..., placement@..., placements@...</span>
+                <div className={styles.aboutPointItem}>
+                  <span className={styles.aboutPointBullet}></span>
+                  <span>Eliminates duplicate communications across internal team members.</span>
                 </div>
               </div>
             </div>
 
-            {/* Stakeholder 3: Deans of Student Welfare */}
-            <div className={styles.stakeholderCard}>
-              <div className={styles.stakeholderHeader}>
-                <div className={styles.stakeholderIconBox}><SparklesIcon size={22} /></div>
-                <div>
-                  <h3 className={styles.stakeholderRoleTitle}>Deans of Student Affairs</h3>
-                  <span className={styles.stakeholderObjective}>Events, Posters &amp; Clubs</span>
-                </div>
+            {/* How It Helps Company Employees */}
+            <div className={styles.aboutCard}>
+              <div className={styles.aboutIconBox}>
+                <SparklesIcon size={24} />
               </div>
-              <p className={styles.stakeholderDesc}>
-                Controls all campus extracurricular activities, student clubs, auditoriums, and event sponsorship.
-                Contact them to put up campus festival posters, host filmmaking webinars, and sponsor student fests.
+              <span className={styles.aboutCardTag}>How It Helps Employees</span>
+              <h3 className={styles.aboutCardTitle}>Empower Company Teams</h3>
+              <p className={styles.aboutCardDesc}>
+                Saves outreach managers and coordinators 10+ hours every week. Employees can filter institutions by role,
+                select pre-approved partnership templates, and dispatch campaigns in seconds with zero manual copy-pasting.
               </p>
-              <div className={styles.stakeholderDetails}>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Target For:</span>
-                  <span>Seminars, Festival Tie-ups, Posters</span>
+              <div className={styles.aboutCardPoints}>
+                <div className={styles.aboutPointItem}>
+                  <span className={styles.aboutPointBullet}></span>
+                  <span>Instant variable merging with zero manual formatting mistakes.</span>
                 </div>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Email Pattern:</span>
-                  <span className={styles.detailValue}>dean.sw@..., studentwelfare@...</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Stakeholder 4: HODs */}
-            <div className={styles.stakeholderCard}>
-              <div className={styles.stakeholderHeader}>
-                <div className={styles.stakeholderIconBox}><MailIcon size={22} /></div>
-                <div>
-                  <h3 className={styles.stakeholderRoleTitle}>Heads of Department (HOD)</h3>
-                  <span className={styles.stakeholderObjective}>Department Workshops</span>
-                </div>
-              </div>
-              <p className={styles.stakeholderDesc}>
-                Directly controls students in specific departments (CSE, IT, ECE, Media, Visual Arts, MBA).
-                Target HODs directly when pitching technical workshops, hackathons, or branch-specific programs.
-              </p>
-              <div className={styles.stakeholderDetails}>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Target For:</span>
-                  <span>Department Specific Programs</span>
-                </div>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Email Pattern:</span>
-                  <span className={styles.detailValue}>hod.cse@..., hod.media@...</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Stakeholder 5: Placement Coordinators & Staff */}
-            <div className={styles.stakeholderCard}>
-              <div className={styles.stakeholderHeader}>
-                <div className={styles.stakeholderIconBox}><UserIcon size={22} /></div>
-                <div>
-                  <h3 className={styles.stakeholderRoleTitle}>Faculty Coordinators &amp; Staff</h3>
-                  <span className={styles.stakeholderObjective}>Execution &amp; Follow-up</span>
-                </div>
-              </div>
-              <p className={styles.stakeholderDesc}>
-                Works directly under TPOs and HODs to manage day-to-day student communications, classroom announcements,
-                and session scheduling. Crucial for operational follow-ups and student attendance.
-              </p>
-              <div className={styles.stakeholderDetails}>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Target For:</span>
-                  <span>Day-to-day Workshop Execution</span>
-                </div>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Email Pattern:</span>
-                  <span className={styles.detailValue}>coordinator@..., faculty.placement@...</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Stakeholder 6: University Registrars */}
-            <div className={styles.stakeholderCard}>
-              <div className={styles.stakeholderHeader}>
-                <div className={styles.stakeholderIconBox}><ServerIcon size={22} /></div>
-                <div>
-                  <h3 className={styles.stakeholderRoleTitle}>University Registrars</h3>
-                  <span className={styles.stakeholderObjective}>University-Wide Collaborations</span>
-                </div>
-              </div>
-              <p className={styles.stakeholderDesc}>
-                Heads administrative operations and official circulars for entire universities controlling 100+
-                affiliated colleges. Essential for state-level university collaborations and official circular releases.
-              </p>
-              <div className={styles.stakeholderDetails}>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Target For:</span>
-                  <span>University-Wide Collaborations</span>
-                </div>
-                <div className={detailRowClass(styles)}>
-                  <span className={styles.detailLabel}>Email Pattern:</span>
-                  <span className={styles.detailValue}>registrar@..., admin@...</span>
+                <div className={styles.aboutPointItem}>
+                  <span className={styles.aboutPointBullet}></span>
+                  <span>Real-time delivery status visibility with 1-click error retry.</span>
                 </div>
               </div>
             </div>
@@ -420,147 +213,286 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ==================== SECTION: HOW IT WORKS ==================== */}
-      <section id="how-it-works" className={styles.section}>
+      {/* ==================== 4. KEY FEATURES ==================== */}
+      <section id="features" className={styles.section}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>Simple 4-Step Process</span>
-            <h2 className={styles.sectionTitle}>How Company Teams Use the System</h2>
+            <span className={styles.sectionBadge}>Capabilities</span>
+            <h2 className={styles.sectionTitle}>Key Features</h2>
             <p className={styles.sectionSubtitle}>
-              From contact selection to automated delivery and cooldown tracking in 4 easy steps:
+              Comprehensive tools designed to manage every stage of your college communication pipeline:
             </p>
           </div>
 
-          <div className={styles.workflowGrid}>
+          <div className={styles.featuresGrid}>
+            {/* Feature 1 */}
+            <div className={styles.featureCard}>
+              <div className={styles.featureIconBox}>
+                <BuildingIcon size={22} />
+              </div>
+              <h3 className={styles.featureTitle}>Contact Management</h3>
+              <p className={styles.featureDesc}>
+                Access a structured database of over 2,500+ verified colleges or upload custom CSV/Excel spreadsheets.
+                Automatic pre-flight auditing eliminates duplicate rows and checks active 30-day cooldowns.
+              </p>
+              <div className={styles.featureTags}>
+                <span className={styles.featureTag}>Clean Institutional Census</span>
+                <span className={styles.featureTag}>District &amp; Stream Filters</span>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className={styles.featureCard}>
+              <div className={styles.featureIconBox}>
+                <TemplateIcon size={22} />
+              </div>
+              <h3 className={styles.featureTitle}>Personalized Templates</h3>
+              <p className={styles.featureDesc}>
+                Create reusable proposal and invitation templates with smart merge tokens like <code>[College Name]</code>,{' '}
+                <code>[Contact Person]</code>, and <code>[City / District]</code> that adapt automatically for each recipient.
+              </p>
+              <div className={styles.featureTags}>
+                <span className={styles.featureTag}>Dynamic Salutations</span>
+                <span className={styles.featureTag}>Live Preview Modal</span>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className={styles.featureCard}>
+              <div className={styles.featureIconBox}>
+                <SendIcon size={22} />
+              </div>
+              <h3 className={styles.featureTitle}>Bulk Email Sending</h3>
+              <p className={styles.featureDesc}>
+                Dispatch emails to dozens or hundreds of institutions safely with the Auto-Separated Safe Batch Engine.
+                Partitions recipients into 50-contact chunks with configurable cooling pauses and 300ms polite socket jitter.
+              </p>
+              <div className={styles.featureTags}>
+                <span className={styles.featureTag}>Safe Batching Engine</span>
+                <span className={styles.featureTag}>Anti-Spam Pacing</span>
+              </div>
+            </div>
+
+            {/* Feature 4 */}
+            <div className={styles.featureCard}>
+              <div className={styles.featureIconBox}>
+                <UserIcon size={22} />
+              </div>
+              <h3 className={styles.featureTitle}>Targeted Outreach</h3>
+              <p className={styles.featureDesc}>
+                Directly segment and contact key decision-makers based on your initiative: Principals for institutional MOUs,
+                Placement Heads (TPO) for internships, Deans for student events, and HODs for branch workshops.
+              </p>
+              <div className={styles.featureTags}>
+                <span className={styles.featureTag}>Principals &amp; Directors</span>
+                <span className={styles.featureTag}>TPOs, Deans &amp; HODs</span>
+              </div>
+            </div>
+
+            {/* Feature 5 */}
+            <div className={styles.featureCard}>
+              <div className={styles.featureIconBox}>
+                <CheckCircleIcon size={22} />
+              </div>
+              <h3 className={styles.featureTitle}>Email Status Tracking</h3>
+              <p className={styles.featureDesc}>
+                Track the delivery lifecycle of every outreach email in real time. Inspect Accepted and Failed states,
+                read exact SMTP server response codes, and retry failed recipients with a single click.
+              </p>
+              <div className={styles.featureTags}>
+                <span className={styles.featureTag}>Live Accepted / Failed Logs</span>
+                <span className={styles.featureTag}>1-Click Retry Function</span>
+              </div>
+            </div>
+
+            {/* Feature 6 - Deliverability Assurance */}
+            <div className={styles.featureCard}>
+              <div className={styles.featureIconBox}>
+                <ShieldCheckIcon size={22} />
+              </div>
+              <h3 className={styles.featureTitle}>Deliverability &amp; Safety</h3>
+              <p className={styles.featureDesc}>
+                Maintain enterprise-grade domain health with Google SMTP TLS/SSL encryption, cryptographic session authentication,
+                and an automatic 30-day blackout window per college to prevent recipient fatigue.
+              </p>
+              <div className={styles.featureTags}>
+                <span className={styles.featureTag}>Google SMTP 465 SSL</span>
+                <span className={styles.featureTag}>30-Day Anti-Fatigue Rules</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== 5. HOW IT WORKS ==================== */}
+      <section id="how-it-works" className={`${styles.section} ${styles.sectionAlt}`}>
+        <div className={styles.container}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionBadge}>Step-by-Step Workflow</span>
+            <h2 className={styles.sectionTitle}>How It Works</h2>
+            <p className={styles.sectionSubtitle}>
+              A clear, four-step operational process designed for speed, personalization, and deliverability safety:
+            </p>
+          </div>
+
+          <div className={styles.howGrid}>
             {/* Step 1 */}
-            <div className={styles.workflowStepCard}>
-              <div className={styles.stepHeaderRow}>
-                <span className={styles.stepBadgePill}>STEP 01</span>
-                <BuildingIcon size={20} className={styles.stepIconWrap} />
+            <div className={styles.howStepCard}>
+              <div className={styles.howStepHeader}>
+                <span className={styles.howStepBadge}>STEP 01</span>
+                <BuildingIcon size={20} className={styles.howStepIcon} />
               </div>
-              <h3 className={styles.stepCardTitle}>Filter Verified Directory</h3>
-              <p className={styles.stepCardDesc}>
-                Select from 2,500+ verified institutions across Andhra Pradesh or upload a custom CSV/Excel roster.
-                Filter by District, University Affiliation, and Target Role (Principal, TPO, HOD, Dean).
+              <h3 className={styles.howStepTitle}>Manage Contacts</h3>
+              <p className={styles.howStepDesc}>
+                Load the verified directory of 2,500+ colleges or upload custom spreadsheets. Filter by district,
+                stream, and target role while the pre-flight engine strips duplicates and identifies active cooldowns.
               </p>
-              <div className={styles.stepCardFooter}>
-                <span className={styles.stepPill}>Instant Pre-Flight Deduplication</span>
-                <span className={styles.stepPill}>Automatic Cooldown Detection</span>
+              <div className={styles.howStepFooter}>
+                <span className={styles.howPill}>Directory &amp; Custom CSV/Excel</span>
+                <span className={styles.howPill}>Automated Duplicate Removal</span>
               </div>
             </div>
 
             {/* Step 2 */}
-            <div className={styles.workflowStepCard}>
-              <div className={styles.stepHeaderRow}>
-                <span className={styles.stepBadgePill}>STEP 02</span>
-                <TemplateIcon size={20} className={styles.stepIconWrap} />
+            <div className={styles.howStepCard}>
+              <div className={styles.howStepHeader}>
+                <span className={styles.howStepBadge}>STEP 02</span>
+                <TemplateIcon size={20} className={styles.howStepIcon} />
               </div>
-              <h3 className={styles.stepCardTitle}>Pick or Craft Template</h3>
-              <p className={styles.stepCardDesc}>
-                Select an approved partnership proposal template. Dynamic tokens like <code>[College Name]</code>,{' '}
-                <code>[Contact Person]</code>, and <code>[City / District]</code> are merged automatically for every recipient.
+              <h3 className={styles.howStepTitle}>Prepare Emails</h3>
+              <p className={styles.howStepDesc}>
+                Select an approved outreach proposal template. Dynamic tokens like <code>[College Name]</code>,{' '}
+                <code>[Contact Person]</code>, and <code>[City / District]</code> populate automatically with live preview validation.
               </p>
-              <div className={styles.stepCardFooter}>
-                <span className={styles.stepPill}>Dynamic Salutations (Dear Principal, ...)</span>
-                <span className={styles.stepPill}>Live Email Merging Preview</span>
+              <div className={styles.howStepFooter}>
+                <span className={styles.howPill}>Personalized Merge Tags</span>
+                <span className={styles.howPill}>Pre-Approved Pitch Blueprints</span>
               </div>
             </div>
 
             {/* Step 3 */}
-            <div className={styles.workflowStepCard}>
-              <div className={styles.stepHeaderRow}>
-                <span className={styles.stepBadgePill}>STEP 03</span>
-                <SendIcon size={20} className={styles.stepIconWrap} />
+            <div className={styles.howStepCard}>
+              <div className={styles.howStepHeader}>
+                <span className={styles.howStepBadge}>STEP 03</span>
+                <SendIcon size={20} className={styles.howStepIcon} />
               </div>
-              <h3 className={styles.stepCardTitle}>Dispatch in Safe Batches</h3>
-              <p className={styles.stepCardDesc}>
-                Choose between single 1-by-1 manual send or the <strong>Auto-Separated Safe Batch Engine</strong>.
-                Splits lists into safe 50-contact chunks with 10s cooling pauses and 300ms polite socket jitter.
+              <h3 className={styles.howStepTitle}>Send Campaigns</h3>
+              <p className={styles.howStepDesc}>
+                Dispatch single high-priority emails or execute bulk campaigns with the Auto-Separated Safe Batch Engine.
+                Sends in 50-recipient chunks with polite socket delays and cooling intervals to protect domain reputation.
               </p>
-              <div className={styles.stepCardFooter}>
-                <span className={styles.stepPill}>50-Recipient Safe Chunking</span>
-                <span className={styles.stepPill}>Configurable Inter-Batch Cooling</span>
+              <div className={styles.howStepFooter}>
+                <span className={styles.howPill}>50-Recipient Safe Batches</span>
+                <span className={styles.howPill}>300ms Socket Rate Limiting</span>
               </div>
             </div>
 
             {/* Step 4 */}
-            <div className={styles.workflowStepCard}>
-              <div className={styles.stepHeaderRow}>
-                <span className={styles.stepBadgePill}>STEP 04</span>
-                <CheckCircleIcon size={20} className={styles.stepIconWrap} />
+            <div className={styles.howStepCard}>
+              <div className={styles.howStepHeader}>
+                <span className={styles.howStepBadge}>STEP 04</span>
+                <CheckCircleIcon size={20} className={styles.howStepIcon} />
               </div>
-              <h3 className={styles.stepCardTitle}>Track &amp; Maintain Safety</h3>
-              <p className={styles.stepCardDesc}>
-                View live Accepted / Failed delivery badges in real time. The database automatically logs the dispatch
-                and activates a <strong>30-day anti-spam cooldown</strong> to prevent team members from double-emailing.
+              <h3 className={styles.howStepTitle}>Track Status</h3>
+              <p className={styles.howStepDesc}>
+                Review live delivery outcomes in your campaign dashboard. Inspect real-time server response codes,
+                retry temporary failures with 1 click, and enforce the automatic 30-day cooldown window.
               </p>
-              <div className={styles.stepCardFooter}>
-                <span className={styles.stepPill}>Live SMTP Server Response Codes</span>
-                <span className={styles.stepPill}>Automated 30-Day Cooldown Protection</span>
+              <div className={styles.howStepFooter}>
+                <span className={styles.howPill}>Real-Time Delivery Audits</span>
+                <span className={styles.howPill}>Automated 30-Day Cooldown</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ==================== SECTION: WHY USE THIS PLATFORM ==================== */}
-      <section id="why-platform" className={`${styles.section} ${styles.sectionAlt}`}>
+      {/* ==================== 6. WHO IS IT FOR? ==================== */}
+      <section id="who-is-it-for" className={styles.section}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>Corporate Benefits</span>
-            <h2 className={styles.sectionTitle}>Why Company Teams Love This System</h2>
+            <span className={styles.sectionBadge}>Target Users</span>
+            <h2 className={styles.sectionTitle}>Who Is It For?</h2>
             <p className={styles.sectionSubtitle}>
-              Engineered to replace manual email fatigue with enterprise-grade deliverability:
+              Tailored specifically for internal Shortfundly teams managing academic outreach and institutional relationships:
             </p>
           </div>
 
-          <div className={styles.whyUseGrid}>
-            <div className={styles.whyUseCard}>
-              <div className={styles.whyUseIcon}><ShieldCheckIcon size={24} /></div>
-              <h3 className={styles.whyUseTitle}>Zero Domain Ban Risk</h3>
-              <p className={styles.whyUseDesc}>
-                Sending 500 emails at once from Gmail gets your company account blocked. Our engine sends
-                isolated emails with polite socket jitter and inter-batch cooling so Google SMTP never flags your domain.
+          <div className={styles.whoGrid}>
+            {/* Team 1: Campus Outreach */}
+            <div className={styles.whoCard}>
+              <div className={styles.whoIconBox}>
+                <BuildingIcon size={22} />
+              </div>
+              <h3 className={styles.whoRoleTitle}>Campus Outreach Teams</h3>
+              <p className={styles.whoDesc}>
+                Coordinate academic collaborations, college festival sponsorships, filmmaking workshop tie-ups,
+                and campus ambassador recruitment drives directly with college leadership.
               </p>
+              <div className={styles.whoPoints}>
+                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Campus Festival Partnerships</span>
+                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Student Ambassador Drives</span>
+              </div>
             </div>
 
-            <div className={styles.whyUseCard}>
-              <div className={styles.whyUseIcon}><ClockIcon size={24} /></div>
-              <h3 className={styles.whyUseTitle}>No Duplicate Emails</h3>
-              <p className={styles.whyUseDesc}>
-                When multiple team members work on outreach, colleges get spammed. Our central database
-                enforces a strict 30-day blackout per college across all users.
+            {/* Team 2: Partnership Teams */}
+            <div className={styles.whoCard}>
+              <div className={styles.whoIconBox}>
+                <ShieldCheckIcon size={22} />
+              </div>
+              <h3 className={styles.whoRoleTitle}>Partnership Teams</h3>
+              <p className={styles.whoDesc}>
+                Establish long-term institutional Memorandums of Understanding (MOUs), campus creator passes,
+                and multi-college alliances directly with University Registrars, Vice-Chancellors, and Principals.
               </p>
+              <div className={styles.whoPoints}>
+                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Institutional MOU Formalization</span>
+                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Executive-Level Approvals</span>
+              </div>
             </div>
 
-            <div className={styles.whyUseCard}>
-              <div className={styles.whyUseIcon}><SparklesIcon size={24} /></div>
-              <h3 className={styles.whyUseTitle}>Saves 10+ Hours Weekly</h3>
-              <p className={styles.whyUseDesc}>
-                No more manually searching for college emails, copying names, and writing individual emails.
-                Filter your target audience, pick a template, and dispatch in minutes.
+            {/* Team 3: Business Development */}
+            <div className={styles.whoCard}>
+              <div className={styles.whoIconBox}>
+                <SendIcon size={22} />
+              </div>
+              <h3 className={styles.whoRoleTitle}>Business Development Teams</h3>
+              <p className={styles.whoDesc}>
+                Expand Shortfundly&apos;s footprint across higher education networks. Target specific academic streams
+                and geographic clusters to identify and scale new institutional partnership opportunities.
               </p>
+              <div className={styles.whoPoints}>
+                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Statewide College Expansion</span>
+                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Institutional Pipeline Growth</span>
+              </div>
             </div>
 
-            <div className={styles.whyUseCard}>
-              <div className={styles.whyUseIcon}><ServerIcon size={24} /></div>
-              <h3 className={styles.whyUseTitle}>Full Delivery Transparency</h3>
-              <p className={styles.whyUseDesc}>
-                Know with 100% certainty if an email reached the institution&apos;s server. Inspect SMTP handshakes,
-                diagnose errors, and retry failed recipients with a single click.
+            {/* Team 4: Internship & Recruitment */}
+            <div className={styles.whoCard}>
+              <div className={styles.whoIconBox}>
+                <UserIcon size={22} />
+              </div>
+              <h3 className={styles.whoRoleTitle}>Internship Teams</h3>
+              <p className={styles.whoDesc}>
+                Engage directly with Training &amp; Placement Officers (TPOs) and career cells to announce creator
+                fellowships, media internships, skill-building workshops, and campus hiring initiatives.
               </p>
+              <div className={styles.whoPoints}>
+                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Direct TPO Communications</span>
+                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Internship &amp; Fellowship Drives</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ==================== CTA BANNER ==================== */}
+      {/* ==================== 7. FINAL CTA ==================== */}
       <section className={styles.ctaSection}>
         <div className={`${styles.container} ${styles.ctaCard}`}>
-          <h2 className={styles.ctaHeadline}>Ready to Launch Your Next Campus Campaign?</h2>
+          <h2 className={styles.ctaHeadline}>Ready to Simplify Your College Outreach?</h2>
           <p className={styles.ctaText}>
-            Sign in with your authorized Shortfundly company credentials to access verified college directories,
-            manage customizable outreach templates, and dispatch high-deliverability campaigns.
+            Sign in with your authorized Shortfundly company account to access verified institutional directories,
+            manage customizable outreach templates, and launch safe, automated email campaigns.
           </p>
 
           <div className={styles.ctaBtnGroup}>
@@ -577,18 +509,18 @@ export default async function HomePage() {
             )}
           </div>
 
-          <div className={styles.ctaNotice}>
+          <div className={styles.ctaSecurityNote}>
             <ShieldCheckIcon size={14} />
-            <span>Restricted to authorized Shortfundly personnel. Cryptographic CAPTCHA &amp; bcrypt security active.</span>
+            <span>Restricted to authorized Shortfundly personnel. Cryptographic CAPTCHA &amp; session security active.</span>
           </div>
         </div>
       </section>
 
-      {/* ==================== FOOTER ==================== */}
+      {/* ==================== 8. FOOTER ==================== */}
       <footer className={styles.footer}>
         <div className={`${styles.container} ${styles.footerContent}`}>
           <div className={styles.footerBrandArea}>
-            <ShortfundlyLogoSymbol size={36} className={styles.footerSymbol} />
+            <ShortfundlyLogoSymbol size={32} className={styles.footerSymbol} />
             <div className={styles.footerBrandText}>
               <span className={styles.footerTitle}>Shortfundly</span>
               <span className={styles.footerSubtitle}>Campus Outreach</span>
@@ -596,10 +528,10 @@ export default async function HomePage() {
           </div>
 
           <div className={styles.footerLinks}>
-            <a href="#overview" className={styles.footerLink}>Overview</a>
-            <a href="#stakeholders" className={styles.footerLink}>Target Stakeholders</a>
+            <a href="#about" className={styles.footerLink}>About</a>
+            <a href="#features" className={styles.footerLink}>Key Features</a>
             <a href="#how-it-works" className={styles.footerLink}>How It Works</a>
-            <a href="#why-platform" className={styles.footerLink}>Why Use It</a>
+            <a href="#who-is-it-for" className={styles.footerLink}>Who Is It For?</a>
             <Link href="/login" className={styles.footerLink}>Login to Portal</Link>
           </div>
         </div>
@@ -616,8 +548,4 @@ export default async function HomePage() {
       </footer>
     </div>
   );
-}
-
-function detailRowClass(styles) {
-  return styles.detailRow;
 }
