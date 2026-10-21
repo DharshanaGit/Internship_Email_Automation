@@ -19,7 +19,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 32px;
+  padding: 14px 32px;
   background: #ffffff;
   border-bottom: 1px solid var(--border-subtle);
   position: sticky;
@@ -27,18 +27,17 @@
   z-index: 30;
   gap: 16px;
   flex-wrap: wrap;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .breadcrumbArea {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .viewTitle {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   color: var(--text-primary);
   letter-spacing: -0.2px;
 }
@@ -63,8 +62,8 @@
   border: 1px solid #a7f3d0;
   border-radius: var(--radius-full);
   font-size: 11px;
-  font-weight: 600;
-  color: #059669;
+  font-weight: 700;
+  color: #047857;
 }
 
 .statusDot {
@@ -78,7 +77,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   background: #ffffff;
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
@@ -86,12 +85,11 @@
   font-size: 12px;
   font-weight: 600;
   transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .smtpBtn:hover {
-  background: var(--bg-secondary);
-  border-color: var(--text-muted);
+  background: #f8fafc;
+  border-color: var(--text-secondary);
 }
 
 .pageContent {
@@ -99,10 +97,10 @@
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
-  padding: 28px 32px 60px 32px;
+  padding: 24px 32px 56px 32px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .introSection {
@@ -112,15 +110,45 @@
 }
 
 .headline {
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 850;
   color: var(--text-primary);
-  letter-spacing: -0.4px;
+  letter-spacing: -0.3px;
 }
 
 .subheadline {
   font-size: 13px;
   color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.modeSwitcher {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  width: fit-content;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.modeBtn {
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+
+.modeBtnActive {
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+  font-weight: 700;
 }
 
 .loadingOverlay {
@@ -132,6 +160,8 @@
   gap: 16px;
   color: var(--text-secondary);
   background: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .loadingSpinner {
@@ -154,7 +184,7 @@
   }
 
   .pageContent {
-    padding: 20px 16px 48px 16px;
+    padding: 16px;
   }
 
   .topBar {

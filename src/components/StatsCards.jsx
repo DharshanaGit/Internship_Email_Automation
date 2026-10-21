@@ -22,109 +22,92 @@ export default function StatsCards({ stats = {} }) {
   } = stats;
 
   return (
-    <div className={styles.grid}>
-      <div className={styles.card}>
-        <div className={styles.cardHeader}>
-          <span className={styles.cardLabel}>Total Outreach</span>
-          <div className={styles.iconWrapper}>
-            <MailIcon size={16} />
+    <div className={styles.statsRibbon}>
+      {/* 1. Total Outreach */}
+      <div className={styles.statMetricCard}>
+        <div className={styles.cardTopRow}>
+          <span className={styles.metricLabel}>Total Tracked Outreach</span>
+          <div className={styles.iconChip}>
+            <MailIcon size={14} />
           </div>
         </div>
-        <div className={styles.value}>{total}</div>
-        <div className={styles.subtext}>All tracked communications</div>
+        <div className={styles.metricNumber}>{total.toLocaleString()}</div>
+        <div className={styles.metricFootnote}>All campus dispatches</div>
       </div>
 
-      <div className={`${styles.card} ${styles.cardAccepted}`}>
-        <div className={styles.cardHeader}>
-          <span className={styles.cardLabel} style={{ color: 'var(--status-accepted-text)' }}>
-            SMTP Accepted
-          </span>
-          <div className={styles.iconWrapper} style={{ color: 'var(--status-accepted-text)' }}>
-            <CheckCircleIcon size={16} />
+      {/* 2. SMTP Accepted 250 OK */}
+      <div className={`${styles.statMetricCard} ${styles.metricAccepted}`}>
+        <div className={styles.cardTopRow}>
+          <span className={styles.metricLabel}>Delivered (250 OK)</span>
+          <div className={`${styles.iconChip} ${styles.iconChipGreen}`}>
+            <CheckCircleIcon size={14} />
           </div>
         </div>
-        <div className={styles.value} style={{ color: 'var(--status-accepted-text)' }}>
-          {accepted}
-        </div>
-        <div className={styles.subtext}>250 OK acknowledgment</div>
+        <div className={`${styles.metricNumber} ${styles.numberGreen}`}>{accepted.toLocaleString()}</div>
+        <div className={styles.metricFootnote}>Direct inbox acknowledgment</div>
       </div>
 
-      <div className={`${styles.card} ${styles.cardFailed}`}>
-        <div className={styles.cardHeader}>
-          <span className={styles.cardLabel} style={{ color: 'var(--status-failed-text)' }}>
-            Failed Attempts
-          </span>
-          <div className={styles.iconWrapper} style={{ color: 'var(--status-failed-text)' }}>
-            <AlertCircleIcon size={16} />
+      {/* 3. Failed Attempts */}
+      <div className={`${styles.statMetricCard} ${styles.metricFailed}`}>
+        <div className={styles.cardTopRow}>
+          <span className={styles.metricLabel}>Failed Dispatches</span>
+          <div className={`${styles.iconChip} ${styles.iconChipRed}`}>
+            <AlertCircleIcon size={14} />
           </div>
         </div>
-        <div className={styles.value} style={{ color: 'var(--status-failed-text)' }}>
-          {failed}
-        </div>
-        <div className={styles.subtext}>Permanent or transient fails</div>
+        <div className={`${styles.metricNumber} ${styles.numberRed}`}>{failed.toLocaleString()}</div>
+        <div className={styles.metricFootnote}>Bounce or transient errors</div>
       </div>
 
-      <div className={`${styles.card} ${styles.cardPending}`}>
-        <div className={styles.cardHeader}>
-          <span className={styles.cardLabel} style={{ color: 'var(--status-pending-text)' }}>
-            Pending Queue
-          </span>
-          <div className={styles.iconWrapper} style={{ color: 'var(--status-pending-text)' }}>
-            <ClockIcon size={16} />
+      {/* 4. Pending Queue */}
+      <div className={`${styles.statMetricCard} ${styles.metricPending}`}>
+        <div className={styles.cardTopRow}>
+          <span className={styles.metricLabel}>Queue Pending</span>
+          <div className={`${styles.iconChip} ${styles.iconChipAmber}`}>
+            <ClockIcon size={14} />
           </div>
         </div>
-        <div className={styles.value} style={{ color: 'var(--status-pending-text)' }}>
-          {pending}
-        </div>
-        <div className={styles.subtext}>Awaiting worker dispatch</div>
+        <div className={`${styles.metricNumber} ${styles.numberAmber}`}>{pending.toLocaleString()}</div>
+        <div className={styles.metricFootnote}>Awaiting worker cycle</div>
       </div>
 
-      <div className={`${styles.card} ${styles.cardProcessing}`}>
-        <div className={styles.cardHeader}>
-          <span className={styles.cardLabel} style={{ color: 'var(--status-processing-text)' }}>
-            Processing
-          </span>
-          <div className={styles.iconWrapper} style={{ color: 'var(--status-processing-text)' }}>
-            <RefreshCwIcon size={16} />
+      {/* 5. Currently Processing */}
+      <div className={`${styles.statMetricCard} ${styles.metricProcessing}`}>
+        <div className={styles.cardTopRow}>
+          <span className={styles.metricLabel}>In Flight</span>
+          <div className={`${styles.iconChip} ${styles.iconChipBlue}`}>
+            <RefreshCwIcon size={14} className={processing > 0 ? styles.activeSpin : ''} />
           </div>
         </div>
-        <div className={styles.value} style={{ color: 'var(--status-processing-text)' }}>
-          {processing}
-        </div>
-        <div className={styles.subtext}>Worker currently active</div>
+        <div className={`${styles.metricNumber} ${styles.numberBlue}`}>{processing.toLocaleString()}</div>
+        <div className={styles.metricFootnote}>Active transmission</div>
       </div>
 
+      {/* 6. Cooldown Collision Shield */}
+      <div className={`${styles.statMetricCard} ${styles.metricShield}`}>
+        <div className={styles.cardTopRow}>
+          <span className={styles.metricLabel}>30d Collision Shield</span>
+          <div className={`${styles.iconChip} ${styles.iconChipCrimson}`}>
+            <ShieldAlertIcon size={14} />
+          </div>
+        </div>
+        <div className={`${styles.metricNumber} ${styles.numberCrimson}`}>{duplicates_blocked.toLocaleString()}</div>
+        <div className={styles.metricFootnote}>Duplicate emails protected</div>
+      </div>
+
+      {/* 7. Ambiguous / Unknown (conditional) */}
       {unknown > 0 && (
-        <div className={`${styles.card} ${styles.cardUnknown}`}>
-          <div className={styles.cardHeader}>
-            <span className={styles.cardLabel} style={{ color: 'var(--status-unknown-text)' }}>
-              Outcome Uncertain
-            </span>
-            <div className={styles.iconWrapper} style={{ color: 'var(--status-unknown-text)' }}>
-              <HelpCircleIcon size={16} />
+        <div className={`${styles.statMetricCard} ${styles.metricUnknown}`}>
+          <div className={styles.cardTopRow}>
+            <span className={styles.metricLabel}>Uncertain Outcome</span>
+            <div className={styles.iconChip}>
+              <HelpCircleIcon size={14} />
             </div>
           </div>
-          <div className={styles.value} style={{ color: 'var(--status-unknown-text)' }}>
-            {unknown}
-          </div>
-          <div className={styles.subtext}>Timeout / Ambiguous response</div>
+          <div className={styles.metricNumber}>{unknown.toLocaleString()}</div>
+          <div className={styles.metricFootnote}>Handshake timeout</div>
         </div>
       )}
-
-      <div className={`${styles.card} ${styles.cardDuplicates}`}>
-        <div className={styles.cardHeader}>
-          <span className={styles.cardLabel} style={{ color: 'var(--accent-primary)' }}>
-            Dupe Shield
-          </span>
-          <div className={styles.iconWrapper} style={{ color: 'var(--accent-primary)' }}>
-            <ShieldAlertIcon size={16} />
-          </div>
-        </div>
-        <div className={styles.value} style={{ color: 'var(--accent-primary)' }}>
-          {duplicates_blocked}
-        </div>
-        <div className={styles.subtext}>Cooldownguard protected</div>
-      </div>
     </div>
   );
 }

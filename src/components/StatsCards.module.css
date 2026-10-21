@@ -1,98 +1,123 @@
-.grid {
+.statsRibbon {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  width: 100%;
 }
 
-.card {
-  background: var(--bg-card);
+.statMetricCard {
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: all 0.2s ease;
+  gap: 6px;
   position: relative;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: transparent;
-  transition: background 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
+.statMetricCard:hover {
   border-color: var(--border-medium);
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
 }
 
-.cardAccepted::before {
-  background: var(--status-accepted-text);
-}
-
-.cardFailed::before {
-  background: var(--status-failed-text);
-}
-
-.cardPending::before {
-  background: var(--status-pending-text);
-}
-
-.cardProcessing::before {
-  background: var(--status-processing-text);
-}
-
-.cardUnknown::before {
-  background: var(--status-unknown-text);
-}
-
-.cardDuplicates::before {
-  background: var(--accent-primary);
-}
-
-.cardHeader {
+.cardTopRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
 
-.cardLabel {
+.metricLabel {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-secondary);
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
 }
 
-.iconWrapper {
+.iconChip {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-xs);
+  background: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  background: #f1f5f9;
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 
-.value {
-  font-size: 26px;
-  font-weight: 800;
+.iconChipGreen {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.iconChipRed {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.iconChipAmber {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.iconChipBlue {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.iconChipCrimson {
+  background: #fff1f2;
+  color: var(--accent-primary);
+}
+
+.metricNumber {
+  font-size: 24px;
+  font-weight: 850;
   font-family: var(--font-mono);
   color: var(--text-primary);
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
-.subtext {
+.numberGreen {
+  color: #047857;
+}
+
+.numberRed {
+  color: #b91c1c;
+}
+
+.numberAmber {
+  color: #b45309;
+}
+
+.numberBlue {
+  color: #1d4ed8;
+}
+
+.numberCrimson {
+  color: var(--accent-primary);
+}
+
+.metricFootnote {
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-dim);
+}
+
+.activeSpin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

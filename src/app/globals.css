@@ -2,58 +2,69 @@
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 
-  /* Shortfundly Professional White Theme Palette */
+  /* Shortfundly Professional Editorial Palette */
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
+  --bg-surface: #fcfcfd;
   --bg-card: #ffffff;
-  --bg-card-hover: #f1f5f9;
+  --bg-card-hover: #f8fafc;
   --bg-input: #ffffff;
+  --bg-subtle: #f1f5f9;
 
+  /* Architectural Borders */
   --border-subtle: #e2e8f0;
   --border-medium: #cbd5e1;
+  --border-strong: #94a3b8;
   --border-focus: #e11d48;
 
+  /* Shortfundly Crimson Brand Accents */
   --accent-primary: #e11d48;
   --accent-hover: #be123c;
   --accent-active: #9f1239;
   --accent-subtle: #fff1f2;
+  --accent-tint: #ffe4e6;
   --accent-glow: rgba(225, 29, 72, 0.12);
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
+  /* Deep High-Contrast Obsidian Text */
+  --text-primary: #090d16;
+  --text-secondary: #334155;
   --text-muted: #64748b;
   --text-dim: #94a3b8;
 
-  /* Status Colors (Light Theme Optimized) */
+  /* Semantic Status Palette (High Contrast & Clear) */
   --status-accepted-bg: #ecfdf5;
-  --status-accepted-text: #059669;
+  --status-accepted-text: #047857;
   --status-accepted-border: #a7f3d0;
 
   --status-failed-bg: #fef2f2;
-  --status-failed-text: #dc2626;
+  --status-failed-text: #b91c1c;
   --status-failed-border: #fecaca;
 
   --status-pending-bg: #fffbeb;
   --status-pending-text: #b45309;
   --status-pending-border: #fde68a;
 
-  --status-processing-bg: #f0f9ff;
-  --status-processing-text: #0284c7;
-  --status-processing-border: #bae6fd;
+  --status-processing-bg: #eff6ff;
+  --status-processing-text: #1d4ed8;
+  --status-processing-border: #bfdbfe;
 
-  --status-unknown-bg: #f5f3ff;
-  --status-unknown-text: #7c3aed;
-  --status-unknown-border: #ddd6fe;
+  --status-unknown-bg: #f8fafc;
+  --status-unknown-text: #475569;
+  --status-unknown-border: #cbd5e1;
 
-  /* Elevation */
-  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
-  --shadow-glow: 0 0 16px var(--accent-glow);
+  /* Engineered Elevations (Subtle & Crisp) */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 8px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
+  --shadow-glow: 0 0 20px rgba(225, 29, 72, 0.16);
 
+  /* Geometric Radii */
+  --radius-xs: 4px;
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 9999px;
 }
 
@@ -96,21 +107,21 @@ input, textarea, select {
   font-size: 14px;
 }
 
-/* Light Theme Scrollbar */
+/* Crisp Light Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-medium);
+  background: #cbd5e1;
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: #94a3b8;
 }

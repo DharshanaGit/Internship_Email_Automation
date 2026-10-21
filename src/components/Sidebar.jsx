@@ -10,6 +10,7 @@ import {
   LogOutIcon,
   UserIcon,
   ShortfundlyLogoSymbol,
+  ShieldCheckIcon,
 } from './Icons';
 
 export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) {
@@ -31,23 +32,23 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
   const navItems = [
     {
       id: 'dashboard',
-      label: 'Dashboard',
-      icon: <DashboardIcon size={18} />,
+      label: 'Command Overview',
+      icon: <DashboardIcon size={17} />,
     },
     {
       id: 'sender',
-      label: 'Manual Email Sender',
-      icon: <SendIcon size={18} />,
+      label: 'Campus Outreach Dispatcher',
+      icon: <SendIcon size={17} />,
     },
     {
       id: 'templates',
-      label: 'Email Templates',
-      icon: <TemplateIcon size={18} />,
+      label: 'Proposal Templates',
+      icon: <TemplateIcon size={17} />,
     },
     {
       id: 'settings',
-      label: 'Settings',
-      icon: <SettingsIcon size={18} />,
+      label: 'System & Security Settings',
+      icon: <SettingsIcon size={17} />,
       badge: role === 'admin' ? 'Admin' : null,
     },
   ];
@@ -56,47 +57,57 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
     <aside className={styles.sidebar}>
       {/* Brand Header */}
       <div className={styles.brandArea}>
-        <ShortfundlyLogoSymbol size={40} className={styles.logoImg} />
-        <div className={styles.brandText}>
-          <div className={styles.portalTitle}>Shortfundly</div>
-          <div className={styles.tagline} style={{ color: 'var(--accent-primary)', fontWeight: '700' }}>Campus Outreach</div>
+        <div className={styles.brandRow}>
+          <ShortfundlyLogoSymbol size={38} className={styles.logoImg} />
+          <div className={styles.brandMeta}>
+            <span className={styles.brandTitle}>Shortfundly</span>
+            <span className={styles.brandSubtitle}>Campus Outreach</span>
+          </div>
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <nav className={styles.navSection}>
+      {/* Main Navigation Section */}
+      <div className={styles.navSection}>
         <div className={styles.navLabel}>Outreach Management</div>
-        {navItems.map((item) => {
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-              onClick={() => setActiveTab(item.id)}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-              {item.badge && <span className={styles.roleTag}>{item.badge}</span>}
-            </button>
-          );
-        })}
-      </nav>
+        <nav className={styles.navList}>
+          {navItems.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+                onClick={() => setActiveTab(item.id)}
+              >
+                <span className={styles.itemIcon}>{item.icon}</span>
+                <span className={styles.itemLabel}>{item.label}</span>
+                {item.badge && <span className={styles.roleTag}>{item.badge}</span>}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
 
-      {/* User Status & Logout Footer */}
+      {/* User Status & Sign Out Footer */}
       <div className={styles.footerSection}>
-        <div className={styles.userCard}>
+        <div className={styles.userProfileCard}>
           <div className={styles.userEmailRow}>
-            <UserIcon size={14} />
-            <span title={session?.email || 'User'}>{session?.email || 'Authenticated User'}</span>
-          </div>
-          <div className={styles.roleRow}>
-            <span className={`${styles.rolePill} ${getRoleClass(role)}`}>
-              {getRoleLabel(role)}
-            </span>
-            <span className={`${styles.sendPill} ${canSend ? styles.sendActive : styles.sendDisabled}`}>
-              {canSend ? 'Dispatch Enabled' : 'View Only'}
-            </span>
+            <div className={styles.userAvatar}>
+              <UserIcon size={13} />
+            </div>
+            <div className={styles.userInfoCol}>
+              <span className={styles.userEmailText} title={session?.email || 'User'}>
+                {session?.email || 'Authenticated User'}
+              </span>
+              <div className={styles.roleBadgesRow}>
+                <span className={`${styles.rolePill} ${getRoleClass(role)}`}>
+                  {getRoleLabel(role)}
+                </span>
+                <span className={`${styles.sendPill} ${canSend ? styles.sendActive : styles.sendDisabled}`}>
+                  {canSend ? 'Dispatch Enabled' : 'View Only'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -106,7 +117,7 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
           onClick={onLogout}
           title="Sign out of Shortfundly Outreach Portal"
         >
-          <LogOutIcon size={15} />
+          <LogOutIcon size={14} />
           <span>Sign Out</span>
         </button>
       </div>

@@ -1,211 +1,171 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import { getSession } from '@/lib/auth.js';
 import styles from './landing.module.css';
 import {
-  MailIcon,
+  ShortfundlyLogoSymbol,
   SendIcon,
-  BuildingIcon,
-  UserIcon,
   ShieldCheckIcon,
   CheckCircleIcon,
-  ClockIcon,
+  BuildingIcon,
+  ServerIcon,
   TemplateIcon,
-  DashboardIcon,
+  UserIcon,
+  ClockIcon,
+  MailIcon,
   ArrowRightIcon,
-  ShortfundlyLogoSymbol,
-  SparklesIcon,
+  RefreshCwIcon,
 } from '@/components/Icons.jsx';
 
-export const metadata = {
-  title: 'Shortfundly Campus Outreach Portal | Simplify College Outreach with Email Automation',
-  description:
-    'Dedicated platform for company teams to manage verified college contacts, craft personalized campaign templates, and dispatch high-deliverability email outreach.',
-};
-
-export default async function HomePage() {
-  const session = await getSession();
-  const isAuthenticated = !!session;
-
+export default function LandingPage() {
   return (
-    <div className={styles.landingWrapper}>
-      {/* ==================== 1. NAVBAR ==================== */}
+    <div className={styles.landingContainer}>
+      {/* 1. Precision Top Navigation */}
       <header className={styles.navbar}>
-        <div className={`${styles.container} ${styles.navContainer}`}>
-          <Link href="/" className={styles.brandLink}>
-            <ShortfundlyLogoSymbol size={40} className={styles.brandSymbol} />
-            <div className={styles.brandDetails}>
+        <div className={styles.navInner}>
+          <div className={styles.brandGroup}>
+            <ShortfundlyLogoSymbol size={40} />
+            <div className={styles.brandText}>
               <span className={styles.brandName}>Shortfundly</span>
-              <span className={styles.brandTagline}>Campus Outreach</span>
+              <span className={styles.portalTag}>Campus Outreach Portal</span>
             </div>
-          </Link>
+          </div>
 
           <nav className={styles.navLinks}>
-            <a href="#about" className={styles.navLink}>About</a>
-            <a href="#features" className={styles.navLink}>Key Features</a>
-            <a href="#how-it-works" className={styles.navLink}>How It Works</a>
-            <a href="#who-is-it-for" className={styles.navLink}>Who Is It For?</a>
+            <a href="#about" className={styles.navLink}>About Platform</a>
+            <a href="#features" className={styles.navLink}>Core Capabilities</a>
+            <a href="#coverage" className={styles.navLink}>Institutional Directory</a>
+            <a href="#workflow" className={styles.navLink}>Operational Workflow</a>
+            <a href="#security" className={styles.navLink}>Enterprise Security</a>
           </nav>
 
           <div className={styles.navActions}>
-            {isAuthenticated ? (
-              <Link href="/dashboard" className={styles.dashboardBtn}>
-                <DashboardIcon size={16} />
-                <span>Go to Dashboard</span>
-              </Link>
-            ) : (
-              <Link href="/login" className={styles.loginBtn}>
-                <UserIcon size={16} />
-                <span>Login</span>
-              </Link>
-            )}
+            <div className={styles.livePill}>
+              <span className={styles.pulseDot} />
+              <span>5,189 Campuses Indexed</span>
+            </div>
+            <Link href="/login" className={styles.navLoginBtn}>
+              <span>Sign In</span>
+              <ArrowRightIcon size={14} />
+            </Link>
           </div>
         </div>
       </header>
 
-      {/* ==================== 2. HERO SECTION ==================== */}
+      {/* 2. Asymmetric Executive Hero Section */}
       <section className={styles.heroSection}>
-        <div className={`${styles.container} ${styles.heroContent}`}>
-          <div className={styles.heroBadge}>
-            <span className={styles.heroBadgeDot}></span>
-            <span>Enterprise Campus Outreach Platform</span>
-          </div>
+        <div className={styles.heroGrid}>
+          {/* Left Column: Editorial Value Proposition */}
+          <div className={styles.heroCopy}>
+            <div className={styles.eyebrow}>
+              <span className={styles.eyebrowDot} />
+              <span>NEXT-GENERATION ACADEMIC OUTREACH AUTOMATION</span>
+            </div>
 
-          <h1 className={styles.heroHeadline}>
-            Simplify College Outreach with <br />
-            <span className={styles.heroHighlight}>Email Automation</span>
-          </h1>
+            <h1 className={styles.heroTitle}>
+              Simplify College Outreach with Verified Contact Intelligence &amp; Email Automation
+            </h1>
 
-          <p className={styles.heroSubtext}>
-            The dedicated platform for company teams to connect with colleges and universities.
-            Manage verified institutional contacts, create personalized email templates, and execute
-            safe bulk outreach with automated deliverability protection.
-          </p>
+            <p className={styles.heroSubtitle}>
+              The dedicated enterprise outreach portal built for company teams to discover, manage, and engage Principals, HODs, Deans, and Training &amp; Placement Officers across 5,189+ higher education institutions with 100% genuine data and zero spam.
+            </p>
 
-          <div className={styles.heroCtaGroup}>
-            {isAuthenticated ? (
-              <Link href="/dashboard" className={styles.primaryCta}>
-                <span>Access Outreach Dashboard</span>
-                <ArrowRightIcon size={18} />
-              </Link>
-            ) : (
+            <div className={styles.heroCtaGroup}>
               <Link href="/login" className={styles.primaryCta}>
-                <span>Login to Portal</span>
-                <ArrowRightIcon size={18} />
+                <span>Access Outreach Console</span>
+                <ArrowRightIcon size={16} />
               </Link>
-            )}
-            <a href="#how-it-works" className={styles.secondaryCta}>
-              <span>See How It Works</span>
-            </a>
+              <a href="#coverage" className={styles.secondaryCta}>
+                <span>Explore Directory Coverage</span>
+              </a>
+            </div>
+
+            <div className={styles.heroTrustBar}>
+              <div className={styles.trustItem}>
+                <CheckCircleIcon size={14} className={styles.trustIcon} />
+                <span>Zero Dummy Data</span>
+              </div>
+              <div className={styles.trustItem}>
+                <ShieldCheckIcon size={14} className={styles.trustIcon} />
+                <span>30-Day Anti-Collision Shield</span>
+              </div>
+              <div className={styles.trustItem}>
+                <ServerIcon size={14} className={styles.trustIcon} />
+                <span>Google SMTP (250 OK)</span>
+              </div>
+            </div>
           </div>
 
-          {/* Quick Metrics Bar */}
-          <div className={styles.heroStatsGrid}>
-            <div className={styles.statCard}>
-              <div className={styles.statValue}>2,500+</div>
-              <div className={styles.statLabel}>Verified Colleges</div>
-              <div className={styles.statDesc}>Clean statewide academic directory</div>
-            </div>
-
-            <div className={styles.statCard}>
-              <div className={styles.statValue}>0</div>
-              <div className={styles.statLabel}>Duplicate Emails</div>
-              <div className={styles.statDesc}>Pre-flight deduplication engine</div>
-            </div>
-
-            <div className={styles.statCard}>
-              <div className={styles.statValue}>30-Day</div>
-              <div className={styles.statLabel}>Anti-Spam Cooldown</div>
-              <div className={styles.statDesc}>Safeguards company domain reputation</div>
-            </div>
-
-            <div className={styles.statCard}>
-              <div className={styles.statValue}>100%</div>
-              <div className={styles.statLabel}>Delivery Transparency</div>
-              <div className={styles.statDesc}>Real-time Accepted &amp; Failed logs</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================== 3. ABOUT THE PORTAL ==================== */}
-      <section id="about" className={`${styles.section} ${styles.sectionAlt}`}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>Portal Overview</span>
-            <h2 className={styles.sectionTitle}>About the Portal</h2>
-            <p className={styles.sectionSubtitle}>
-              An internal communication system engineered to make collegiate outreach structured,
-              reliable, and completely automated.
-            </p>
-          </div>
-
-          <div className={styles.aboutGrid}>
-            {/* What It Is */}
-            <div className={styles.aboutCard}>
-              <div className={styles.aboutIconBox}>
-                <BuildingIcon size={24} />
-              </div>
-              <span className={styles.aboutCardTag}>What It Is</span>
-              <h3 className={styles.aboutCardTitle}>Campus Outreach &amp; Automation Platform</h3>
-              <p className={styles.aboutCardDesc}>
-                A centralized, high-throughput email system built for Shortfundly to streamline institutional
-                communications with colleges, autonomous institutions, and state universities nationwide.
-              </p>
-              <div className={styles.aboutCardPoints}>
-                <div className={styles.aboutPointItem}>
-                  <span className={styles.aboutPointBullet}></span>
-                  <span>Consolidates 2,500+ verified academic institutions in one place.</span>
+          {/* Right Column: Live Dispatch Simulator Graphic Card */}
+          <div className={styles.heroGraphic}>
+            <div className={styles.dispatchSimulatorCard}>
+              <div className={styles.simCardHeader}>
+                <div className={styles.simHeaderLeft}>
+                  <div className={styles.simTrafficLights}>
+                    <span className={styles.lightRed} />
+                    <span className={styles.lightYellow} />
+                    <span className={styles.lightGreen} />
+                  </div>
+                  <span className={styles.simTitle}>Outreach Dispatch Monitor &bull; Live Telemetry</span>
                 </div>
-                <div className={styles.aboutPointItem}>
-                  <span className={styles.aboutPointBullet}></span>
-                  <span>Connects directly to company Google Workspace SMTP gateways.</span>
+                <span className={styles.simBadgeActive}>ENGINE ONLINE</span>
+              </div>
+
+              {/* Sample Dispatch Activity Stream */}
+              <div className={styles.simActivityFeed}>
+                <div className={styles.simLogItem}>
+                  <div className={styles.simStatusOk}>
+                    <CheckCircleIcon size={12} />
+                    <span>250 OK</span>
+                  </div>
+                  <div className={styles.simLogDetails}>
+                    <span className={styles.simCollege}>College of Engineering Pune (COEP)</span>
+                    <span className={styles.simRecipient}>principal@coep.ac.in &bull; <strong>Principal</strong></span>
+                  </div>
+                  <span className={styles.simTime}>Just now</span>
+                </div>
+
+                <div className={styles.simLogItem}>
+                  <div className={styles.simStatusShield}>
+                    <ShieldCheckIcon size={12} />
+                    <span>COOLDOWN</span>
+                  </div>
+                  <div className={styles.simLogDetails}>
+                    <span className={styles.simCollege}>Veermata Jijabai Technological Institute (VJTI)</span>
+                    <span className={styles.simRecipient}>tpo@vjti.ac.in &bull; <strong>Protected (24d remaining)</strong></span>
+                  </div>
+                  <span className={styles.simTime}>2m ago</span>
+                </div>
+
+                <div className={styles.simLogItem}>
+                  <div className={styles.simStatusOk}>
+                    <CheckCircleIcon size={12} />
+                    <span>250 OK</span>
+                  </div>
+                  <div className={styles.simLogDetails}>
+                    <span className={styles.simCollege}>Dr. D.Y. Patil Institute of Technology</span>
+                    <span className={styles.simRecipient}>hod.comp@dypvp.edu.in &bull; <strong>HOD Computer</strong></span>
+                  </div>
+                  <span className={styles.simTime}>5m ago</span>
                 </div>
               </div>
-            </div>
 
-            {/* Why It Is Used */}
-            <div className={styles.aboutCard}>
-              <div className={styles.aboutIconBox}>
-                <ShieldCheckIcon size={24} />
-              </div>
-              <span className={styles.aboutCardTag}>Why It Is Used</span>
-              <h3 className={styles.aboutCardTitle}>Manage Contacts &amp; Simplify Outreach</h3>
-              <p className={styles.aboutCardDesc}>
-                Replaces scattered spreadsheets and error-prone manual emailing. Enforces a strict 30-day contact
-                cooldown, automated deduplication, and socket rate limiting so your company emails never get flagged as spam.
-              </p>
-              <div className={styles.aboutCardPoints}>
-                <div className={styles.aboutPointItem}>
-                  <span className={styles.aboutPointBullet}></span>
-                  <span>Protects corporate email domain reputation with rate-limited batches.</span>
-                </div>
-                <div className={styles.aboutPointItem}>
-                  <span className={styles.aboutPointBullet}></span>
-                  <span>Eliminates duplicate communications across internal team members.</span>
-                </div>
-              </div>
-            </div>
-
-            {/* How It Helps Company Employees */}
-            <div className={styles.aboutCard}>
-              <div className={styles.aboutIconBox}>
-                <SparklesIcon size={24} />
-              </div>
-              <span className={styles.aboutCardTag}>How It Helps Employees</span>
-              <h3 className={styles.aboutCardTitle}>Empower Company Teams</h3>
-              <p className={styles.aboutCardDesc}>
-                Saves outreach managers and coordinators 10+ hours every week. Employees can filter institutions by role,
-                select pre-approved partnership templates, and dispatch campaigns in seconds with zero manual copy-pasting.
-              </p>
-              <div className={styles.aboutCardPoints}>
-                <div className={styles.aboutPointItem}>
-                  <span className={styles.aboutPointBullet}></span>
-                  <span>Instant variable merging with zero manual formatting mistakes.</span>
-                </div>
-                <div className={styles.aboutPointItem}>
-                  <span className={styles.aboutPointBullet}></span>
-                  <span>Real-time delivery status visibility with 1-click error retry.</span>
+              {/* Verified Contact Card Preview */}
+              <div className={styles.simContactCard}>
+                <div className={styles.simCardTag}>INSTITUTIONAL DIRECTORY RECORD</div>
+                <div className={styles.simCardBody}>
+                  <div className={styles.simOrg}>
+                    <BuildingIcon size={16} className={styles.simOrgIcon} />
+                    <div>
+                      <div className={styles.simOrgName}>MIT World Peace University</div>
+                      <div className={styles.simOrgLoc}>Pune, Maharashtra &bull; NIRF Top 100 Ranked</div>
+                    </div>
+                  </div>
+                  <div className={styles.simTokens}>
+                    <span className={styles.simToken}>[College Name] &rarr; MIT-WPU</span>
+                    <span className={styles.simToken}>[Contact Person] &rarr; Prof. Dean Student Affairs</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -213,337 +173,330 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ==================== 4. KEY FEATURES ==================== */}
-      <section id="features" className={styles.section}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>Capabilities</span>
-            <h2 className={styles.sectionTitle}>Key Features</h2>
-            <p className={styles.sectionSubtitle}>
-              Comprehensive tools designed to manage every stage of your college communication pipeline:
-            </p>
+      {/* 3. Statewide Institutional Coverage Ribbon */}
+      <section className={styles.coverageRibbon} id="coverage">
+        <div className={styles.ribbonContainer}>
+          <div className={styles.ribbonItem}>
+            <span className={styles.ribbonNumber}>5,189</span>
+            <span className={styles.ribbonLabel}>Colleges Covered (94.5% Statewide)</span>
           </div>
-
-          <div className={styles.featuresGrid}>
-            {/* Feature 1 */}
-            <div className={styles.featureCard}>
-              <div className={styles.featureIconBox}>
-                <BuildingIcon size={22} />
-              </div>
-              <h3 className={styles.featureTitle}>Contact Management</h3>
-              <p className={styles.featureDesc}>
-                Access a structured database of over 2,500+ verified colleges or upload custom CSV/Excel spreadsheets.
-                Automatic pre-flight auditing eliminates duplicate rows and checks active 30-day cooldowns.
-              </p>
-              <div className={styles.featureTags}>
-                <span className={styles.featureTag}>Clean Institutional Census</span>
-                <span className={styles.featureTag}>District &amp; Stream Filters</span>
-              </div>
-            </div>
-
-            {/* Feature 2 */}
-            <div className={styles.featureCard}>
-              <div className={styles.featureIconBox}>
-                <TemplateIcon size={22} />
-              </div>
-              <h3 className={styles.featureTitle}>Personalized Templates</h3>
-              <p className={styles.featureDesc}>
-                Create reusable proposal and invitation templates with smart merge tokens like <code>[College Name]</code>,{' '}
-                <code>[Contact Person]</code>, and <code>[City / District]</code> that adapt automatically for each recipient.
-              </p>
-              <div className={styles.featureTags}>
-                <span className={styles.featureTag}>Dynamic Salutations</span>
-                <span className={styles.featureTag}>Live Preview Modal</span>
-              </div>
-            </div>
-
-            {/* Feature 3 */}
-            <div className={styles.featureCard}>
-              <div className={styles.featureIconBox}>
-                <SendIcon size={22} />
-              </div>
-              <h3 className={styles.featureTitle}>Bulk Email Sending</h3>
-              <p className={styles.featureDesc}>
-                Dispatch emails to dozens or hundreds of institutions safely with the Auto-Separated Safe Batch Engine.
-                Partitions recipients into 50-contact chunks with configurable cooling pauses and 300ms polite socket jitter.
-              </p>
-              <div className={styles.featureTags}>
-                <span className={styles.featureTag}>Safe Batching Engine</span>
-                <span className={styles.featureTag}>Anti-Spam Pacing</span>
-              </div>
-            </div>
-
-            {/* Feature 4 */}
-            <div className={styles.featureCard}>
-              <div className={styles.featureIconBox}>
-                <UserIcon size={22} />
-              </div>
-              <h3 className={styles.featureTitle}>Targeted Outreach</h3>
-              <p className={styles.featureDesc}>
-                Directly segment and contact key decision-makers based on your initiative: Principals for institutional MOUs,
-                Placement Heads (TPO) for internships, Deans for student events, and HODs for branch workshops.
-              </p>
-              <div className={styles.featureTags}>
-                <span className={styles.featureTag}>Principals &amp; Directors</span>
-                <span className={styles.featureTag}>TPOs, Deans &amp; HODs</span>
-              </div>
-            </div>
-
-            {/* Feature 5 */}
-            <div className={styles.featureCard}>
-              <div className={styles.featureIconBox}>
-                <CheckCircleIcon size={22} />
-              </div>
-              <h3 className={styles.featureTitle}>Email Status Tracking</h3>
-              <p className={styles.featureDesc}>
-                Track the delivery lifecycle of every outreach email in real time. Inspect Accepted and Failed states,
-                read exact SMTP server response codes, and retry failed recipients with a single click.
-              </p>
-              <div className={styles.featureTags}>
-                <span className={styles.featureTag}>Live Accepted / Failed Logs</span>
-                <span className={styles.featureTag}>1-Click Retry Function</span>
-              </div>
-            </div>
-
-            {/* Feature 6 - Deliverability Assurance */}
-            <div className={styles.featureCard}>
-              <div className={styles.featureIconBox}>
-                <ShieldCheckIcon size={22} />
-              </div>
-              <h3 className={styles.featureTitle}>Deliverability &amp; Safety</h3>
-              <p className={styles.featureDesc}>
-                Maintain enterprise-grade domain health with Google SMTP TLS/SSL encryption, cryptographic session authentication,
-                and an automatic 30-day blackout window per college to prevent recipient fatigue.
-              </p>
-              <div className={styles.featureTags}>
-                <span className={styles.featureTag}>Google SMTP 465 SSL</span>
-                <span className={styles.featureTag}>30-Day Anti-Fatigue Rules</span>
-              </div>
-            </div>
+          <div className={styles.ribbonDivider} />
+          <div className={styles.ribbonItem}>
+            <span className={styles.ribbonNumber}>13,647</span>
+            <span className={styles.ribbonLabel}>100% Verified Unique Contacts</span>
+          </div>
+          <div className={styles.ribbonDivider} />
+          <div className={styles.ribbonItem}>
+            <span className={styles.ribbonNumber}>3,238</span>
+            <span className={styles.ribbonLabel}>Principals &amp; Institutional Directors</span>
+          </div>
+          <div className={styles.ribbonDivider} />
+          <div className={styles.ribbonItem}>
+            <span className={styles.ribbonNumber}>1,170</span>
+            <span className={styles.ribbonLabel}>Placement Officers &amp; TPOs</span>
+          </div>
+          <div className={styles.ribbonDivider} />
+          <div className={styles.ribbonItem}>
+            <span className={styles.ribbonNumber}>3,211</span>
+            <span className={styles.ribbonLabel}>Faculties, Deans &amp; HODs</span>
           </div>
         </div>
       </section>
 
-      {/* ==================== 5. HOW IT WORKS ==================== */}
-      <section id="how-it-works" className={`${styles.section} ${styles.sectionAlt}`}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>Step-by-Step Workflow</span>
-            <h2 className={styles.sectionTitle}>How It Works</h2>
-            <p className={styles.sectionSubtitle}>
-              A clear, four-step operational process designed for speed, personalization, and deliverability safety:
-            </p>
-          </div>
-
-          <div className={styles.howGrid}>
-            {/* Step 1 */}
-            <div className={styles.howStepCard}>
-              <div className={styles.howStepHeader}>
-                <span className={styles.howStepBadge}>STEP 01</span>
-                <BuildingIcon size={20} className={styles.howStepIcon} />
-              </div>
-              <h3 className={styles.howStepTitle}>Manage Contacts</h3>
-              <p className={styles.howStepDesc}>
-                Load the verified directory of 2,500+ colleges or upload custom spreadsheets. Filter by district,
-                stream, and target role while the pre-flight engine strips duplicates and identifies active cooldowns.
-              </p>
-              <div className={styles.howStepFooter}>
-                <span className={styles.howPill}>Directory &amp; Custom CSV/Excel</span>
-                <span className={styles.howPill}>Automated Duplicate Removal</span>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className={styles.howStepCard}>
-              <div className={styles.howStepHeader}>
-                <span className={styles.howStepBadge}>STEP 02</span>
-                <TemplateIcon size={20} className={styles.howStepIcon} />
-              </div>
-              <h3 className={styles.howStepTitle}>Prepare Emails</h3>
-              <p className={styles.howStepDesc}>
-                Select an approved outreach proposal template. Dynamic tokens like <code>[College Name]</code>,{' '}
-                <code>[Contact Person]</code>, and <code>[City / District]</code> populate automatically with live preview validation.
-              </p>
-              <div className={styles.howStepFooter}>
-                <span className={styles.howPill}>Personalized Merge Tags</span>
-                <span className={styles.howPill}>Pre-Approved Pitch Blueprints</span>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className={styles.howStepCard}>
-              <div className={styles.howStepHeader}>
-                <span className={styles.howStepBadge}>STEP 03</span>
-                <SendIcon size={20} className={styles.howStepIcon} />
-              </div>
-              <h3 className={styles.howStepTitle}>Send Campaigns</h3>
-              <p className={styles.howStepDesc}>
-                Dispatch single high-priority emails or execute bulk campaigns with the Auto-Separated Safe Batch Engine.
-                Sends in 50-recipient chunks with polite socket delays and cooling intervals to protect domain reputation.
-              </p>
-              <div className={styles.howStepFooter}>
-                <span className={styles.howPill}>50-Recipient Safe Batches</span>
-                <span className={styles.howPill}>300ms Socket Rate Limiting</span>
-              </div>
-            </div>
-
-            {/* Step 4 */}
-            <div className={styles.howStepCard}>
-              <div className={styles.howStepHeader}>
-                <span className={styles.howStepBadge}>STEP 04</span>
-                <CheckCircleIcon size={20} className={styles.howStepIcon} />
-              </div>
-              <h3 className={styles.howStepTitle}>Track Status</h3>
-              <p className={styles.howStepDesc}>
-                Review live delivery outcomes in your campaign dashboard. Inspect real-time server response codes,
-                retry temporary failures with 1 click, and enforce the automatic 30-day cooldown window.
-              </p>
-              <div className={styles.howStepFooter}>
-                <span className={styles.howPill}>Real-Time Delivery Audits</span>
-                <span className={styles.howPill}>Automated 30-Day Cooldown</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================== 6. WHO IS IT FOR? ==================== */}
-      <section id="who-is-it-for" className={styles.section}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionBadge}>Target Users</span>
-            <h2 className={styles.sectionTitle}>Who Is It For?</h2>
-            <p className={styles.sectionSubtitle}>
-              Tailored specifically for internal Shortfundly teams managing academic outreach and institutional relationships:
-            </p>
-          </div>
-
-          <div className={styles.whoGrid}>
-            {/* Team 1: Campus Outreach */}
-            <div className={styles.whoCard}>
-              <div className={styles.whoIconBox}>
-                <BuildingIcon size={22} />
-              </div>
-              <h3 className={styles.whoRoleTitle}>Campus Outreach Teams</h3>
-              <p className={styles.whoDesc}>
-                Coordinate academic collaborations, college festival sponsorships, filmmaking workshop tie-ups,
-                and campus ambassador recruitment drives directly with college leadership.
-              </p>
-              <div className={styles.whoPoints}>
-                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Campus Festival Partnerships</span>
-                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Student Ambassador Drives</span>
-              </div>
-            </div>
-
-            {/* Team 2: Partnership Teams */}
-            <div className={styles.whoCard}>
-              <div className={styles.whoIconBox}>
-                <ShieldCheckIcon size={22} />
-              </div>
-              <h3 className={styles.whoRoleTitle}>Partnership Teams</h3>
-              <p className={styles.whoDesc}>
-                Establish long-term institutional Memorandums of Understanding (MOUs), campus creator passes,
-                and multi-college alliances directly with University Registrars, Vice-Chancellors, and Principals.
-              </p>
-              <div className={styles.whoPoints}>
-                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Institutional MOU Formalization</span>
-                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Executive-Level Approvals</span>
-              </div>
-            </div>
-
-            {/* Team 3: Business Development */}
-            <div className={styles.whoCard}>
-              <div className={styles.whoIconBox}>
-                <SendIcon size={22} />
-              </div>
-              <h3 className={styles.whoRoleTitle}>Business Development Teams</h3>
-              <p className={styles.whoDesc}>
-                Expand Shortfundly&apos;s footprint across higher education networks. Target specific academic streams
-                and geographic clusters to identify and scale new institutional partnership opportunities.
-              </p>
-              <div className={styles.whoPoints}>
-                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Statewide College Expansion</span>
-                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Institutional Pipeline Growth</span>
-              </div>
-            </div>
-
-            {/* Team 4: Internship & Recruitment */}
-            <div className={styles.whoCard}>
-              <div className={styles.whoIconBox}>
-                <UserIcon size={22} />
-              </div>
-              <h3 className={styles.whoRoleTitle}>Internship Teams</h3>
-              <p className={styles.whoDesc}>
-                Engage directly with Training &amp; Placement Officers (TPOs) and career cells to announce creator
-                fellowships, media internships, skill-building workshops, and campus hiring initiatives.
-              </p>
-              <div className={styles.whoPoints}>
-                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Direct TPO Communications</span>
-                <span className={styles.whoPoint}><span className={styles.whoPointDot}></span>Internship &amp; Fellowship Drives</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================== 7. FINAL CTA ==================== */}
-      <section className={styles.ctaSection}>
-        <div className={`${styles.container} ${styles.ctaCard}`}>
-          <h2 className={styles.ctaHeadline}>Ready to Simplify Your College Outreach?</h2>
-          <p className={styles.ctaText}>
-            Sign in with your authorized Shortfundly company account to access verified institutional directories,
-            manage customizable outreach templates, and launch safe, automated email campaigns.
+      {/* 4. About Platform: What, Why & How */}
+      <section className={styles.section} id="about">
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTag}>PLATFORM ARCHITECTURE</span>
+          <h2 className={styles.sectionTitle}>What is Shortfundly Campus Outreach &amp; Why It Matters</h2>
+          <p className={styles.sectionDescription}>
+            Building high-impact educational partnerships requires reaching the exact institutional decision-makers without deliverability issues, spam flags, or manual copy-pasting.
           </p>
+        </div>
 
-          <div className={styles.ctaBtnGroup}>
-            {isAuthenticated ? (
-              <Link href="/dashboard" className={styles.primaryCta}>
-                <span>Go to Campaign Dashboard</span>
-                <ArrowRightIcon size={18} />
-              </Link>
-            ) : (
+        <div className={styles.threePillarsGrid}>
+          <div className={styles.pillarCard}>
+            <div className={styles.pillarIconWrap}>
+              <BuildingIcon size={22} />
+            </div>
+            <h3 className={styles.pillarTitle}>What It Is</h3>
+            <p className={styles.pillarText}>
+              A centralized campus outreach automation platform integrating an extensive verified directory of Indian colleges, smart template personalization, and automated rate-controlled email delivery.
+            </p>
+            <ul className={styles.pillarPoints}>
+              <li>&bull; Comprehensive statewide contact directory</li>
+              <li>&bull; Role-specific targeting (Principals, TPOs, HODs)</li>
+              <li>&bull; Clean, centralized operational ledger</li>
+            </ul>
+          </div>
+
+          <div className={styles.pillarCard}>
+            <div className={styles.pillarIconWrap}>
+              <ShieldCheckIcon size={22} />
+            </div>
+            <h3 className={styles.pillarTitle}>Why It Is Used</h3>
+            <p className={styles.pillarText}>
+              To eliminate hours of manual outreach, protect company domain reputation with strict 30-day anti-collision rules, and ensure outreach messages land cleanly in the inbox.
+            </p>
+            <ul className={styles.pillarPoints}>
+              <li>&bull; Zero duplicate outreach within 30 days</li>
+              <li>&bull; 100% genuine academic email records</li>
+              <li>&bull; Professional delivery via Google SMTP</li>
+            </ul>
+          </div>
+
+          <div className={styles.pillarCard}>
+            <div className={styles.pillarIconWrap}>
+              <SendIcon size={22} />
+            </div>
+            <h3 className={styles.pillarTitle}>How It Empowers Teams</h3>
+            <p className={styles.pillarText}>
+              Company employees can dispatch hundreds of personalized collaboration proposals, campus film screening invites, or workshop invitations with two clicks.
+            </p>
+            <ul className={styles.pillarPoints}>
+              <li>&bull; Dynamic merge token substitution</li>
+              <li>&bull; Pre-send review and inline customization</li>
+              <li>&bull; Real-time delivery status logging (250 OK)</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Key Features Grid */}
+      <section className={styles.sectionLight} id="features">
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTag}>ENTERPRISE CAPABILITIES</span>
+          <h2 className={styles.sectionTitle}>Everything You Need for Scaled Campus Engagement</h2>
+          <p className={styles.sectionDescription}>
+            Engineered specifically for business development, partnership executives, and student creator program managers.
+          </p>
+        </div>
+
+        <div className={styles.featuresGrid}>
+          <div className={styles.featureItem}>
+            <div className={styles.featureHeader}>
+              <div className={styles.featureIconBox}><BuildingIcon size={18} /></div>
+              <h3 className={styles.featureTitle}>Contact Management &amp; Directory</h3>
+            </div>
+            <p className={styles.featureDesc}>
+              Search, filter, and organize college records across regions, institutions, and roles. Access direct verified emails for Principals, TPOs, HODs, and Deans.
+            </p>
+          </div>
+
+          <div className={styles.featureItem}>
+            <div className={styles.featureHeader}>
+              <div className={styles.featureIconBox}><TemplateIcon size={18} /></div>
+              <h3 className={styles.featureTitle}>Intelligent Template Engine</h3>
+            </div>
+            <p className={styles.featureDesc}>
+              Create customized outreach templates with dynamic placeholders for <code className={styles.codePill}>[College Name]</code>, <code className={styles.codePill}>[Department]</code>, and <code className={styles.codePill}>[Contact Person]</code>.
+            </p>
+          </div>
+
+          <div className={styles.featureItem}>
+            <div className={styles.featureHeader}>
+              <div className={styles.featureIconBox}><SendIcon size={18} /></div>
+              <h3 className={styles.featureTitle}>Safe Batch Dispatching</h3>
+            </div>
+            <p className={styles.featureDesc}>
+              Send single customized proposals or execute bulk campaigns up to 500 colleges at a time with automatic 2-5 second delay throttling to guarantee inbox deliverability.
+            </p>
+          </div>
+
+          <div className={styles.featureItem}>
+            <div className={styles.featureHeader}>
+              <div className={styles.featureIconBox}><ShieldCheckIcon size={18} /></div>
+              <h3 className={styles.featureTitle}>30-Day Anti-Collision Cooldown</h3>
+            </div>
+            <p className={styles.featureDesc}>
+              Automated database shields prevent contacting the same recipient more than once every 30 days, protecting your domain from blacklists and spam reports.
+            </p>
+          </div>
+
+          <div className={styles.featureItem}>
+            <div className={styles.featureHeader}>
+              <div className={styles.featureIconBox}><CheckCircleIcon size={18} /></div>
+              <h3 className={styles.featureTitle}>Live 250 OK Delivery Ledger</h3>
+            </div>
+            <p className={styles.featureDesc}>
+              Track exact SMTP delivery responses in real-time. Review detailed audit logs with message timestamps, recipient tags, and instant one-click retry for transient issues.
+            </p>
+          </div>
+
+          <div className={styles.featureItem}>
+            <div className={styles.featureHeader}>
+              <div className={styles.featureIconBox}><ServerIcon size={18} /></div>
+              <h3 className={styles.featureTitle}>Configurable SMTP Credentials</h3>
+            </div>
+            <p className={styles.featureDesc}>
+              Seamlessly integrates with Google Workspace SMTP (SSL 465 / STARTTLS 587) with built-in diagnostic connection tests and credential encryption.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Operational 4-Phase Workflow */}
+      <section className={styles.section} id="workflow">
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTag}>OPERATIONAL PIPELINE</span>
+          <h2 className={styles.sectionTitle}>How the Platform Works in 4 Steps</h2>
+          <p className={styles.sectionDescription}>
+            From institutional discovery to delivered inbox acknowledgment in minutes.
+          </p>
+        </div>
+
+        <div className={styles.workflowGrid}>
+          <div className={styles.stepCard}>
+            <div className={styles.stepBadge}>01</div>
+            <h3 className={styles.stepTitle}>Select Target Campuses</h3>
+            <p className={styles.stepDesc}>
+              Select colleges from the verified statewide dataset or upload your custom CSV list with role and department filters.
+            </p>
+          </div>
+
+          <div className={styles.stepCard}>
+            <div className={styles.stepBadge}>02</div>
+            <h3 className={styles.stepTitle}>Personalize Template</h3>
+            <p className={styles.stepDesc}>
+              Choose from pre-approved campus partnership templates or customize merge fields with instant live HTML preview.
+            </p>
+          </div>
+
+          <div className={styles.stepCard}>
+            <div className={styles.stepBadge}>03</div>
+            <h3 className={styles.stepTitle}>Execute Safe Dispatch</h3>
+            <p className={styles.stepDesc}>
+              Launch single outreach or run safe batch campaigns with automatic anti-duplicate scanning and rate-limiting.
+            </p>
+          </div>
+
+          <div className={styles.stepCard}>
+            <div className={styles.stepBadge}>04</div>
+            <h3 className={styles.stepTitle}>Audit &amp; Track Responses</h3>
+            <p className={styles.stepDesc}>
+              Monitor real-time delivery status (Accepted 250 OK, Failed, Pending) with full audit trails and retry tools.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Target Audience: Who is this for? */}
+      <section className={styles.sectionLight}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTag}>DESIGNED FOR TEAMS</span>
+          <h2 className={styles.sectionTitle}>Built for High-Growth Company Outreach Teams</h2>
+          <p className={styles.sectionDescription}>
+            Empowering various company departments to drive meaningful campus initiatives.
+          </p>
+        </div>
+
+        <div className={styles.personasGrid}>
+          <div className={styles.personaCard}>
+            <div className={styles.personaHeader}>
+              <UserIcon size={16} className={styles.personaIcon} />
+              <h3 className={styles.personaTitle}>Campus Outreach &amp; Partnerships</h3>
+            </div>
+            <p className={styles.personaText}>
+              Establish formal MoUs, institutional festival collaborations, and campus creator societies directly with Principals and Directors.
+            </p>
+          </div>
+
+          <div className={styles.personaCard}>
+            <div className={styles.personaHeader}>
+              <UserIcon size={16} className={styles.personaIcon} />
+              <h3 className={styles.personaTitle}>Business Development &amp; Alliances</h3>
+            </div>
+            <p className={styles.personaText}>
+              Pitch corporate sponsorships, creative workshops, screening licenses, and student membership drives to Deans and Department Heads.
+            </p>
+          </div>
+
+          <div className={styles.personaCard}>
+            <div className={styles.personaHeader}>
+              <UserIcon size={16} className={styles.personaIcon} />
+              <h3 className={styles.personaTitle}>Talent Acquisition &amp; Internships</h3>
+            </div>
+            <p className={styles.personaText}>
+              Coordinate campus recruitment drives, summer internship programs, and design challenges directly with verified Training &amp; Placement Officers (TPOs).
+            </p>
+          </div>
+
+          <div className={styles.personaCard}>
+            <div className={styles.personaHeader}>
+              <UserIcon size={16} className={styles.personaIcon} />
+              <h3 className={styles.personaTitle}>Student Creator Program Managers</h3>
+            </div>
+            <p className={styles.personaText}>
+              Invite college film clubs, media faculties, and student directors to Shortfundly screening festivals and creator competitions.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. Security & Compliance Guarantee */}
+      <section className={styles.securitySection} id="security">
+        <div className={styles.securityBox}>
+          <div className={styles.securityIconBox}>
+            <ShieldCheckIcon size={28} />
+          </div>
+          <div className={styles.securityInfo}>
+            <h3 className={styles.securityTitle}>Enterprise Security, Deliverability &amp; Data Ethics</h3>
+            <p className={styles.securityText}>
+              Shortfundly Campus Outreach complies with RFC 5322 email transmission standards. All communications pass through TLS 1.3 encrypted Google SMTP channels with full SPF, DKIM, and DMARC alignment. The 30-day anti-collision safeguard ensures zero institutional inbox harassment.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. Final High-Impact Access Banner */}
+      <section className={styles.finalCtaSection}>
+        <div className={styles.finalCtaCard}>
+          <div className={styles.finalCtaContent}>
+            <h2 className={styles.finalCtaHeading}>Ready to Accelerate Your College Outreach?</h2>
+            <p className={styles.finalCtaSub}>
+              Sign in with your Shortfundly company account to access the Maharashtra College Master Directory and dispatch your next campaign.
+            </p>
+            <div className={styles.finalBtnWrap}>
               <Link href="/login" className={styles.primaryCta}>
                 <span>Sign In to Outreach Portal</span>
-                <ArrowRightIcon size={18} />
+                <ArrowRightIcon size={16} />
               </Link>
-            )}
-          </div>
-
-          <div className={styles.ctaSecurityNote}>
-            <ShieldCheckIcon size={14} />
-            <span>Restricted to authorized Shortfundly personnel. Cryptographic CAPTCHA &amp; session security active.</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ==================== 8. FOOTER ==================== */}
+      {/* 10. Platform Footer */}
       <footer className={styles.footer}>
-        <div className={`${styles.container} ${styles.footerContent}`}>
-          <div className={styles.footerBrandArea}>
-            <ShortfundlyLogoSymbol size={32} className={styles.footerSymbol} />
-            <div className={styles.footerBrandText}>
-              <span className={styles.footerTitle}>Shortfundly</span>
-              <span className={styles.footerSubtitle}>Campus Outreach</span>
+        <div className={styles.footerInner}>
+          <div className={styles.footerBrand}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <ShortfundlyLogoSymbol size={32} />
+              <span className={styles.footerBrandName}>Shortfundly Campus Outreach</span>
             </div>
+            <p className={styles.footerTagline}>
+              Empowering campuses, students, and creative communities across India.
+            </p>
           </div>
 
           <div className={styles.footerLinks}>
-            <a href="#about" className={styles.footerLink}>About</a>
-            <a href="#features" className={styles.footerLink}>Key Features</a>
-            <a href="#how-it-works" className={styles.footerLink}>How It Works</a>
-            <a href="#who-is-it-for" className={styles.footerLink}>Who Is It For?</a>
-            <Link href="/login" className={styles.footerLink}>Login to Portal</Link>
+            <div className={styles.footerCol}>
+              <span className={styles.footerColTitle}>Quick Access</span>
+              <Link href="/login" className={styles.footerLink}>Console Login</Link>
+              <a href="#about" className={styles.footerLink}>Platform Overview</a>
+              <a href="#coverage" className={styles.footerLink}>Statewide Directory</a>
+            </div>
+            <div className={styles.footerCol}>
+              <span className={styles.footerColTitle}>Capabilities</span>
+              <a href="#features" className={styles.footerLink}>Safe-Send Engine</a>
+              <a href="#workflow" className={styles.footerLink}>Workflow Guide</a>
+              <a href="#security" className={styles.footerLink}>Security &amp; SMTP</a>
+            </div>
           </div>
         </div>
 
-        <div className={`${styles.container} ${styles.footerBottom}`}>
-          <div>
-            &copy; {new Date().getFullYear()} Shortfundly Inc. Internal Campus Outreach Automation Platform.
-          </div>
-          <div className={styles.statusIndicator}>
-            <span className={styles.statusDotGreen}></span>
-            <span>All Outreach Engine Sockets Operational</span>
-          </div>
+        <div className={styles.footerBottom}>
+          <div>&copy; {new Date().getFullYear()} Shortfundly Outreach Platform. All rights reserved.</div>
+          <div className={styles.footerLegal}>Internal Enterprise Portal &bull; Authorized Personnel Only</div>
         </div>
       </footer>
     </div>

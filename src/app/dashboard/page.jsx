@@ -190,9 +190,9 @@ export default function DashboardPage() {
       case 'dashboard':
         return 'Campus Outreach Overview';
       case 'sender':
-        return senderSubMode === 'manual' ? 'Manual Email Sender' : 'Bulk CSV Outreach Campaign';
+        return senderSubMode === 'manual' ? 'Manual Email Sender' : 'Bulk Directory & CSV Outreach';
       case 'templates':
-        return 'Outreach Templates';
+        return 'Proposal Templates';
       case 'settings':
         return 'System & SMTP Settings';
       default:
@@ -241,7 +241,7 @@ export default function DashboardPage() {
               title="Inspect Google SMTP handshake status"
             >
               <ServerIcon size={14} />
-              <span>Google SMTP</span>
+              <span>Google SMTP Status</span>
             </button>
           </div>
         </header>
@@ -290,61 +290,23 @@ export default function DashboardPage() {
               </div>
 
               {/* Sender Mode Switcher */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: '#ffffff',
-                  padding: '6px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border-subtle)',
-                  width: 'fit-content',
-                  boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
-                }}
-              >
+              <div className={styles.modeSwitcher}>
                 <button
                   type="button"
-                  style={{
-                    padding: '8px 18px',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    borderRadius: '4px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: senderSubMode === 'manual' ? 'var(--accent-subtle)' : 'transparent',
-                    color: senderSubMode === 'manual' ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                    transition: 'all 0.15s ease',
-                  }}
+                  className={`${styles.modeBtn} ${senderSubMode === 'manual' ? styles.modeBtnActive : ''}`}
                   onClick={() => setSenderSubMode('manual')}
                 >
-                  <SendIcon size={15} />
+                  <SendIcon size={14} />
                   <span>Single Outreach Entry</span>
                 </button>
 
                 <button
                   type="button"
-                  style={{
-                    padding: '8px 18px',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    borderRadius: '4px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: senderSubMode === 'bulk' ? 'var(--accent-subtle)' : 'transparent',
-                    color: senderSubMode === 'bulk' ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                    transition: 'all 0.15s ease',
-                  }}
+                  className={`${styles.modeBtn} ${senderSubMode === 'bulk' ? styles.modeBtnActive : ''}`}
                   onClick={() => setSenderSubMode('bulk')}
                 >
-                  <MailIcon size={15} />
-                  <span>Bulk CSV Upload &amp; Campaign</span>
+                  <MailIcon size={14} />
+                  <span>Bulk Directory &amp; CSV Dispatch</span>
                 </button>
               </div>
 
