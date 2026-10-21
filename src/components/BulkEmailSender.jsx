@@ -14,8 +14,60 @@ import {
   ImageIcon,
 } from './Icons.jsx';
 import EmailImageManagerModal from './EmailImageManagerModal.jsx';
-import { renderTemplate, formatBodyToHtml } from '@/lib/templates.js';
+import { renderTemplate, formatBodyToHtml, DEFAULT_TEMPLATES } from '@/lib/templates.js';
 import * as XLSX from 'xlsx';
+
+const DEFAULT_COUNTRIES = [
+  { code: 'IN', name: 'India', college_count: 1832 },
+  { code: 'US', name: 'United States', college_count: 0 },
+  { code: 'GB', name: 'United Kingdom', college_count: 0 },
+  { code: 'CA', name: 'Canada', college_count: 0 },
+  { code: 'AU', name: 'Australia', college_count: 0 },
+  { code: 'AE', name: 'United Arab Emirates', college_count: 0 },
+  { code: 'SG', name: 'Singapore', college_count: 0 },
+  { code: 'DE', name: 'Germany', college_count: 0 },
+  { code: 'MY', name: 'Malaysia', college_count: 0 },
+  { code: 'NZ', name: 'New Zealand', college_count: 0 },
+];
+
+const DEFAULT_INDIA_REGIONS = [
+  { id: 'IN-AP', name: 'Andhra Pradesh', type: 'state', college_count: 1832, contact_count: 1663 },
+  { id: 'IN-TG', name: 'Telangana', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-TN', name: 'Tamil Nadu', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-KA', name: 'Karnataka', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-KL', name: 'Kerala', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-MH', name: 'Maharashtra', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-DL', name: 'Delhi', type: 'union_territory', college_count: 0, contact_count: 0 },
+  { id: 'IN-GJ', name: 'Gujarat', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-UP', name: 'Uttar Pradesh', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-WB', name: 'West Bengal', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-RJ', name: 'Rajasthan', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-MP', name: 'Madhya Pradesh', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-HR', name: 'Haryana', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-PB', name: 'Punjab', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-OR', name: 'Odisha', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-BR', name: 'Bihar', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-AS', name: 'Assam', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-JH', name: 'Jharkhand', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-UT', name: 'Uttarakhand', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-HP', name: 'Himachal Pradesh', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-CT', name: 'Chhattisgarh', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-GA', name: 'Goa', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-JK', name: 'Jammu and Kashmir', type: 'union_territory', college_count: 0, contact_count: 0 },
+  { id: 'IN-CH', name: 'Chandigarh', type: 'union_territory', college_count: 0, contact_count: 0 },
+  { id: 'IN-PY', name: 'Puducherry', type: 'union_territory', college_count: 0, contact_count: 0 },
+  { id: 'IN-TR', name: 'Tripura', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-ML', name: 'Meghalaya', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-MN', name: 'Manipur', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-NL', name: 'Nagaland', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-MZ', name: 'Mizoram', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-SK', name: 'Sikkim', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-AR', name: 'Arunachal Pradesh', type: 'state', college_count: 0, contact_count: 0 },
+  { id: 'IN-LA', name: 'Ladakh', type: 'union_territory', college_count: 0, contact_count: 0 },
+  { id: 'IN-AN', name: 'Andaman and Nicobar Islands', type: 'union_territory', college_count: 0, contact_count: 0 },
+  { id: 'IN-DN', name: 'Dadra and Nagar Haveli and Daman and Diu', type: 'union_territory', college_count: 0, contact_count: 0 },
+  { id: 'IN-LD', name: 'Lakshadweep', type: 'union_territory', college_count: 0, contact_count: 0 },
+];
 
 function formatFileSize(bytes) {
   if (!bytes) return '0 B';
@@ -323,15 +375,23 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
   const [pageSize, setPageSize] = useState(50);
 
   // Templates
-  const [availableTemplates, setAvailableTemplates] = useState(templates);
-  const [selectedTemplateId, setSelectedTemplateId] = useState(templates[0]?.id || 'campus-collaboration-proposal');
-  const [subjectTemplate, setSubjectTemplate] = useState('Institutional Collaboration Proposal — [College Name]');
-  const [bodyTemplate, setBodyTemplate] = useState('');
+  const initialTemplates = templates && templates.length > 0 ? templates : DEFAULT_TEMPLATES;
+  const [availableTemplates, setAvailableTemplates] = useState(initialTemplates);
+  const [selectedTemplateId, setSelectedTemplateId] = useState(initialTemplates[0]?.id || 'campus-collaboration-proposal');
+  const [subjectTemplate, setSubjectTemplate] = useState(
+    initialTemplates[0]?.subject_template || initialTemplates[0]?.subjectTemplate || 'Proposal for Institutional Collaboration — Academic & Skill Development at {{college_name}}'
+  );
+  const [bodyTemplate, setBodyTemplate] = useState(
+    initialTemplates[0]?.body_template || initialTemplates[0]?.bodyTemplate || ''
+  );
+  const [campaignAttachments, setCampaignAttachments] = useState(
+    Array.isArray(initialTemplates[0]?.attachments) ? initialTemplates[0]?.attachments : []
+  );
 
   // Geographic Country & Region Targeting State
-  const [countriesList, setCountriesList] = useState([]);
+  const [countriesList, setCountriesList] = useState(DEFAULT_COUNTRIES);
   const [selectedCountry, setSelectedCountry] = useState('IN');
-  const [regionsList, setRegionsList] = useState([]);
+  const [regionsList, setRegionsList] = useState(DEFAULT_INDIA_REGIONS);
   const [selectedStates, setSelectedStates] = useState(new Set(['Andhra Pradesh']));
   const [stateSearch, setStateSearch] = useState('');
   const [loadingGeoData, setLoadingGeoData] = useState(false);
@@ -340,11 +400,47 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
 
   // Customization Section State
   const [isCustomizationExpanded, setIsCustomizationExpanded] = useState(true);
-  const [campaignAttachments, setCampaignAttachments] = useState([]);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [uploadingAttachment, setUploadingAttachment] = useState(false);
   const [attachmentError, setAttachmentError] = useState('');
   const attachmentInputRef = useRef(null);
+
+  // Unified Template Selection Handler
+  const handleTemplateChange = (templateId) => {
+    setSelectedTemplateId(templateId);
+    const chosen = availableTemplates.find((t) => t.id === templateId);
+    if (chosen) {
+      setSubjectTemplate(chosen.subject_template || chosen.subjectTemplate || '');
+      setBodyTemplate(chosen.body_template || chosen.bodyTemplate || '');
+      setCampaignAttachments(Array.isArray(chosen.attachments) ? chosen.attachments : []);
+    }
+  };
+
+  // Fetch updated templates from database on mount
+  useEffect(() => {
+    async function fetchTemplates() {
+      try {
+        const res = await fetch('/api/outreach/templates');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.templates && data.templates.length > 0) {
+            setAvailableTemplates(data.templates);
+            // If bodyTemplate was empty or not set, populate from first template
+            if (!bodyTemplate) {
+              const firstTpl = data.templates[0];
+              setSelectedTemplateId(firstTpl.id);
+              setSubjectTemplate(firstTpl.subject_template || firstTpl.subjectTemplate || '');
+              setBodyTemplate(firstTpl.body_template || firstTpl.bodyTemplate || '');
+              setCampaignAttachments(Array.isArray(firstTpl.attachments) ? firstTpl.attachments : []);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[BulkSender] Template fetch note:', err?.message);
+      }
+    }
+    fetchTemplates();
+  }, []);
 
   // Load Geographic Countries
   useEffect(() => {
@@ -374,17 +470,30 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
         if (res.ok) {
           const data = await res.json();
           const regions = data.regions || [];
-          setRegionsList(regions);
-          if (selectedCountry === 'IN') {
+          if (regions.length > 0) {
+            setRegionsList(regions);
+            if (selectedCountry === 'IN') {
+              setSelectedStates(new Set(['Andhra Pradesh']));
+            } else {
+              setSelectedStates(new Set([regions[0].name]));
+            }
+          } else if (selectedCountry === 'IN') {
+            setRegionsList(DEFAULT_INDIA_REGIONS);
             setSelectedStates(new Set(['Andhra Pradesh']));
-          } else if (regions.length > 0) {
-            setSelectedStates(new Set([regions[0].name]));
           } else {
+            setRegionsList([]);
             setSelectedStates(new Set());
           }
+        } else if (selectedCountry === 'IN') {
+          setRegionsList(DEFAULT_INDIA_REGIONS);
+          setSelectedStates(new Set(['Andhra Pradesh']));
         }
       } catch (err) {
         console.error('Failed to load regions:', err);
+        if (selectedCountry === 'IN') {
+          setRegionsList(DEFAULT_INDIA_REGIONS);
+          setSelectedStates(new Set(['Andhra Pradesh']));
+        }
       } finally {
         setLoadingGeoData(false);
       }
@@ -1158,6 +1267,28 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
             <label className={styles.label} style={{ marginBottom: '8px', display: 'block' }}>
               1. Select Country
             </label>
+            <select
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                borderRadius: '6px',
+                border: '1px solid #cbd5e1',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#0f172a',
+                marginBottom: '10px',
+                background: '#ffffff',
+                cursor: 'pointer'
+              }}
+            >
+              {countriesList.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.name} {c.college_count > 0 ? `(${c.college_count} colleges)` : ''}
+                </option>
+              ))}
+            </select>
             <div className={styles.countryList}>
               {countriesList.map((c) => (
                 <div
@@ -1165,8 +1296,8 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
                   className={`${styles.countryItem} ${selectedCountry === c.code ? styles.countryItemActive : ''}`}
                   onClick={() => setSelectedCountry(c.code)}
                 >
-                  <span>{c.name}</span>
-                  <span style={{ fontSize: '11px', opacity: 0.7 }}>
+                  <span style={{ fontWeight: 600 }}>{c.name}</span>
+                  <span style={{ fontSize: '11px', opacity: 0.8 }}>
                     {c.college_count > 0 ? `${c.college_count} colleges` : c.code}
                   </span>
                 </div>
@@ -1406,6 +1537,78 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
             </button>
           </div>
         )}
+      </div>
+
+      {/* Top-Level Template Selection Card - Step 2 */}
+      <div className={styles.templateSelectionCard}>
+        <div className={styles.templateCardHeader}>
+          <div>
+            <div className={styles.templateCardTitle}>
+              <span>✉️ Step 2: Choose Email Template</span>
+            </div>
+            <div className={styles.templateCardSub}>
+              Select an email template for this campaign. Subject, message body, and attachments will automatically populate.
+            </div>
+          </div>
+          <span className={styles.activeTemplateBadge}>
+            Active Template: {availableTemplates.find((t) => t.id === selectedTemplateId)?.title || 'Selected Template'}
+          </span>
+        </div>
+
+        <div className={styles.templateSelectorRow}>
+          <div className={styles.templateDropdownGroup}>
+            <label className={styles.templateSelectLabel}>Select Saved Template:</label>
+            <select
+              className={styles.templateSelectInput}
+              value={selectedTemplateId}
+              onChange={(e) => handleTemplateChange(e.target.value)}
+            >
+              {availableTemplates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.title} {Array.isArray(t.attachments) && t.attachments.length > 0 ? `(📎 ${t.attachments.length} attachments)` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.quickTemplatePills}>
+            <span style={{ fontSize: '11.5px', color: '#64748b', fontWeight: 600, marginRight: '4px' }}>Quick Switch:</span>
+            {availableTemplates.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className={`${styles.templatePillBtn} ${selectedTemplateId === t.id ? styles.templatePillActive : ''}`}
+                onClick={() => handleTemplateChange(t.id)}
+              >
+                {t.title}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.templatePreviewStrip}>
+          <div className={styles.previewStripRow}>
+            <span className={styles.previewStripLabel}>Subject Preview:</span>
+            <span className={styles.previewStripSubject}>{subjectTemplate || 'No subject set'}</span>
+          </div>
+          <div className={styles.previewStripRow}>
+            <span className={styles.previewStripLabel}>Body Excerpt:</span>
+            <span className={styles.previewStripBody}>
+              {(bodyTemplate || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 140)}...
+            </span>
+            <button
+              type="button"
+              className={styles.jumpToCustomizeBtn}
+              onClick={() => {
+                setIsCustomizationExpanded(true);
+                const el = document.getElementById('campaign-customization-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              ✏️ Customize Subject, Body &amp; Images &darr;
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Applied Filters Panel */}
@@ -1962,7 +2165,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
         const activeTpl = availableTemplates.find((t) => t.id === selectedTemplateId) || availableTemplates[0];
 
         return (
-          <div className={styles.customizationCard}>
+          <div className={styles.customizationCard} id="campaign-customization-section">
             <div className={styles.customizationHeader} onClick={() => setIsCustomizationExpanded(!isCustomizationExpanded)}>
               <div>
                 <div className={styles.uploadTitle}>
@@ -1997,16 +2200,7 @@ export default function BulkEmailSender({ templates = [], session, onCampaignFin
                     <select
                       className={styles.select}
                       value={selectedTemplateId}
-                      onChange={(e) => {
-                        const id = e.target.value;
-                        setSelectedTemplateId(id);
-                        const chosen = availableTemplates.find((t) => t.id === id);
-                        if (chosen) {
-                          setSubjectTemplate(chosen.subject_template || chosen.subjectTemplate || '');
-                          setBodyTemplate(chosen.body_template || chosen.bodyTemplate || '');
-                          setCampaignAttachments(Array.isArray(chosen.attachments) ? chosen.attachments : []);
-                        }
-                      }}
+                      onChange={(e) => handleTemplateChange(e.target.value)}
                     >
                       {availableTemplates.map((t) => (
                         <option key={t.id} value={t.id}>

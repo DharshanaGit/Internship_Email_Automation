@@ -119,20 +119,50 @@ export async function verifySessionToken(token) {
 export async function getSession(request = null) {
   let token = null;
 
-  // 1. Try cookie store
-  try {
-    const nextHeaders = await import('next/headers');
-    if (nextHeaders && typeof nextHeaders.cookies === 'function') {
-      const cookieStore = await nextHeaders.cookies();
-      token = cookieStore.get(COOKIE_NAME)?.value;
+  // 1. Try request cookies directly if NextRequest object provided
+  if (request && request.cookies) {
+    try {
+      if (typeof request.cookies.get === 'function') {
+        token = request.cookies.get(COOKIE_NAME)?.value || request.cookies.get(COOKIE_NAME);
+      } else if (typeof request.cookies === 'object') {
+        token = request.cookies[COOKIE_NAME];
+      }
+    } catch {
+      // Continue to next extraction method
     }
-  } catch {
-    // If outside Next.js request context
   }
 
-  // 2. Try Authorization header if request passed
-  if (!token && request) {
-    const authHeader = request.headers.get('Authorization');
+  // 2. Try cookie header directly from request headers
+  if (!token && request && request.headers) {
+    try {
+      const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie');
+      if (cookieHeader) {
+        const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`));
+        if (match) {
+          token = decodeURIComponent(match[1]);
+        }
+      }
+    } catch {
+      // Continue
+    }
+  }
+
+  // 3. Try Next.js dynamic header cookies store
+  if (!token) {
+    try {
+      const nextHeaders = await import('next/headers');
+      if (nextHeaders && typeof nextHeaders.cookies === 'function') {
+        const cookieStore = await nextHeaders.cookies();
+        token = cookieStore.get(COOKIE_NAME)?.value;
+      }
+    } catch {
+      // Outside Next.js async storage context
+    }
+  }
+
+  // 4. Try Authorization Bearer header
+  if (!token && request && request.headers) {
+    const authHeader = request.headers.get('Authorization') || request.headers.get('authorization');
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.substring(7);
     }

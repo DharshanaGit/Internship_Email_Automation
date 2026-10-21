@@ -136,6 +136,12 @@ export default function SmtpDiagnosticsModal({ isOpen, onClose }) {
             </ul>
           </div>
         </div>
+
+        <div className={styles.modalFooter}>
+          <button type="button" className={styles.closePillBtn} onClick={onClose}>
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );
