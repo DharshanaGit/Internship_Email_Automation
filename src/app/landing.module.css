@@ -1,5 +1,5 @@
-/* Warm Ivory Operations Workspace Landing Style */
-.landingWorkspace {
+/* Modern SaaS Platform Shell */
+.platformShell {
   min-height: 100vh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
@@ -8,19 +8,19 @@
 }
 
 /* ----------------------------------------------------
-   1. Precision Floating Navigation
+   1. Modern Top Navbar
 ------------------------------------------------------- */
-.navbar {
+.topNavbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(250, 247, 242, 0.94);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.navInner {
+.navbarInner {
   max-width: 1280px;
   margin: 0 auto;
   padding: 14px 28px;
@@ -36,37 +36,35 @@
   gap: 12px;
 }
 
-.brandIconWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.brandText {
+.brandTitleWrap {
   display: flex;
   flex-direction: column;
 }
 
-.brandName {
+.brandTitle {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 850;
   color: var(--text-primary);
   letter-spacing: -0.3px;
   line-height: 1.15;
 }
 
-.portalTag {
-  font-size: 11px;
-  font-weight: 700;
+.brandTeal {
   color: var(--accent-primary);
+}
+
+.brandTag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
 
-.navLinks {
+.mainNav {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 24px;
 }
 
 .navLink {
@@ -80,61 +78,61 @@
   color: var(--accent-primary);
 }
 
-.navActions {
+.navCtaGroup {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.liveBadge {
+.telemetryBadge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   padding: 5px 12px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
   border-radius: var(--radius-full);
   font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-weight: 700;
+  color: #0f766e;
 }
 
 .pulseDot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #2E7D5E;
-  box-shadow: 0 0 0 3px rgba(46, 125, 94, 0.2);
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
   display: inline-block;
 }
 
-.navLoginPill {
+.loginPillBtn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 18px;
-  background: var(--accent-primary);
-  color: #FFFFFF;
+  background: #0f172a;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 700;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   transition: all 0.15s ease;
-  box-shadow: 0 3px 8px rgba(226, 92, 80, 0.25);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
 }
 
-.navLoginPill:hover {
-  background: var(--accent-hover);
-  color: #FFFFFF;
+.loginPillBtn:hover {
+  background: #0d9488;
+  color: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 5px 14px rgba(226, 92, 80, 0.35);
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3);
 }
 
 /* ----------------------------------------------------
-   2. Hero Section with Operations Console Preview
+   2. Hero Section: Editorial Copy & Live Cockpit
 ------------------------------------------------------- */
 .heroSection {
-  padding: 64px 28px 72px 28px;
-  background-color: var(--bg-primary);
+  padding: 68px 28px 76px 28px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -156,30 +154,23 @@
   gap: 20px;
 }
 
-.eyebrowChip {
+.limeChip {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 700;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 750;
   letter-spacing: 0.9px;
   text-transform: uppercase;
-  color: var(--accent-primary);
-  background: var(--accent-subtle);
-  border: 1px solid var(--accent-tint);
+  color: #4d7c0f;
+  background: #f7fee7;
+  border: 1px solid #d9f99d;
   padding: 4px 12px;
   border-radius: var(--radius-full);
   width: fit-content;
 }
 
-.chipDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--accent-primary);
-}
-
-.heroTitle {
+.heroHeading {
   font-size: 42px;
   font-weight: 850;
   line-height: 1.18;
@@ -187,14 +178,14 @@
   color: var(--text-primary);
 }
 
-.heroSubtitle {
-  font-size: 16px;
-  line-height: 1.6;
+.heroSubhead {
+  font-size: 15px;
+  line-height: 1.65;
   color: var(--text-secondary);
   max-width: 620px;
 }
 
-.heroCtaGroup {
+.heroActions {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -202,176 +193,166 @@
   flex-wrap: wrap;
 }
 
-.primaryCta {
+.primaryLimeBtn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 13px 26px;
-  background: var(--accent-primary);
-  color: #FFFFFF;
+  background: #0f172a;
+  color: #ffffff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 750;
   border-radius: var(--radius-sm);
   transition: all 0.15s ease;
-  box-shadow: 0 4px 12px rgba(226, 92, 80, 0.28);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+  border: 1px solid #1e293b;
 }
 
-.primaryCta:hover {
-  background: var(--accent-hover);
-  color: #FFFFFF;
+.primaryLimeBtn:hover {
+  background: #0d9488;
+  border-color: #0f766e;
+  color: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(226, 92, 80, 0.38);
+  box-shadow: 0 6px 18px rgba(13, 148, 136, 0.35);
 }
 
-.secondaryCta {
+.secondarySlateBtn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 13px 22px;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-medium);
   color: var(--text-primary);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 650;
   border-radius: var(--radius-sm);
   transition: all 0.15s ease;
 }
 
-.secondaryCta:hover {
-  background: var(--bg-secondary);
+.secondarySlateBtn:hover {
+  background: #f8fafc;
   border-color: var(--border-strong);
   color: var(--text-primary);
 }
 
-.heroTrustPills {
+.trustBar {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding-top: 14px;
+  gap: 20px;
+  padding-top: 16px;
   border-top: 1px solid var(--border-subtle);
   flex-wrap: wrap;
 }
 
-.trustPill {
+.trustItem {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--text-secondary);
 }
 
-.trustIcon {
+.trustTeal {
   color: var(--accent-primary);
 }
 
-/* Operations Console Preview (Inspired by Reference) */
-.heroConsoleWrapper {
+/* Cockpit Card (Modern SaaS Simulation) */
+.heroGraphicWrap {
   display: flex;
   justify-content: center;
 }
 
-.operationsConsole {
+.cockpitCard {
   width: 100%;
   max-width: 500px;
-  background: #FFFFFF;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-workspace);
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.consoleHeader {
+.cockpitHeader {
   padding: 14px 18px;
-  background: #FBF7F1;
-  border-bottom: 1px solid var(--border-subtle);
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.consoleTitleGroup {
+.cockpitStatusGroup {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.trafficDots {
+.trafficLights {
   display: flex;
   gap: 6px;
 }
 
-.dotCoral {
+.lightRed, .lightYellow, .lightGreen {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #E25C50;
 }
+.lightRed { background: #ef4444; }
+.lightYellow { background: #f59e0b; }
+.lightGreen { background: #10b981; }
 
-.dotSand {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #DCCFBF;
-}
-
-.dotSage {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #2E7D5E;
-}
-
-.consoleTitle {
+.cockpitTitle {
   font-size: 12px;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: #cbd5e1;
 }
 
-.onlineBadge {
+.badgeOnline {
   font-size: 10px;
   font-family: var(--font-mono);
   font-weight: 700;
-  color: #217346;
-  background: #ECF7F1;
-  border: 1px solid #C2E7D3;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
   padding: 2px 8px;
   border-radius: var(--radius-full);
 }
 
-.consoleBodyGrid {
+.cockpitBody {
   padding: 16px;
   display: grid;
   grid-template-columns: 1.35fr 0.95fr;
   gap: 14px;
-  background: #FAF7F2;
+  background: #0f172a;
 }
 
-.activityColumn {
+.streamCol {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.miniSectionTitle {
-  font-size: 11px;
+.colHeader {
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
+  letter-spacing: 0.8px;
+  color: #64748b;
 }
 
-.activityFeed {
+.streamList {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.activityCard {
-  background: #FFFFFF;
-  border: 1px solid var(--border-subtle);
+.streamCard {
+  background: #1e293b;
+  border: 1px solid #334155;
   border-radius: var(--radius-sm);
   padding: 8px 10px;
   display: flex;
@@ -379,166 +360,165 @@
   gap: 3px;
 }
 
-.activityStatusAccepted {
+.tagAccepted {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 2px 6px;
   border-radius: var(--radius-xs);
-  background: #ECF7F1;
-  color: #217346;
-  font-size: 10px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  font-size: 9px;
   font-weight: 700;
   font-family: var(--font-mono);
   width: fit-content;
 }
 
-.activityStatusCooldown {
+.tagCooldown {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 2px 6px;
   border-radius: var(--radius-xs);
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
-  font-size: 10px;
+  background: rgba(20, 184, 166, 0.15);
+  color: #2dd4bf;
+  font-size: 9px;
   font-weight: 700;
   font-family: var(--font-mono);
   width: fit-content;
 }
 
-.activityDetails {
+.streamInfo {
   display: flex;
   flex-direction: column;
 }
 
-.activityCollege {
-  font-size: 12px;
+.streamCollege {
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.activityMeta {
-  font-size: 11px;
-  color: var(--text-muted);
+.streamMeta {
+  font-size: 10px;
+  color: #94a3b8;
 }
 
-.activityTime {
-  font-size: 10px;
-  color: var(--text-dim);
+.streamTime {
+  font-size: 9px;
+  color: #64748b;
   font-family: var(--font-mono);
 }
 
-/* Side Column: Dials & Telemetry */
-.dialColumn {
+.gaugesCol {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.dialCard {
-  background: #FFFFFF;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+.gaugeBox {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.dialMetricLabel {
+.gaugeLabel {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: var(--text-muted);
+  color: #94a3b8;
 }
 
-.dialValueRow {
+.gaugeNumberRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.dialNumber {
-  font-size: 20px;
+.gaugeNum {
+  font-size: 18px;
   font-weight: 850;
   font-family: var(--font-mono);
-  color: var(--text-primary);
+  color: #ffffff;
   line-height: 1.1;
 }
 
-.dialTag {
-  font-size: 10px;
+.tagSuccess {
+  font-size: 9px;
   font-weight: 700;
-  color: #217346;
-  background: #ECF7F1;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
   padding: 2px 6px;
   border-radius: var(--radius-full);
 }
 
-.dialTagProtected {
-  font-size: 10px;
+.tagLime {
+  font-size: 9px;
   font-weight: 700;
-  color: var(--accent-primary);
-  background: var(--accent-subtle);
+  color: #a3e635;
+  background: rgba(132, 204, 22, 0.15);
   padding: 2px 6px;
   border-radius: var(--radius-full);
 }
 
-.dialBarBg {
-  height: 6px;
-  background: #F4EFE8;
+.gaugeTrack {
+  height: 5px;
+  background: #334155;
   border-radius: var(--radius-full);
   overflow: hidden;
 }
 
-.dialBarFill {
+.gaugeFillTeal {
   height: 100%;
-  background: #2E7D5E;
+  background: #14b8a6;
   border-radius: var(--radius-full);
 }
 
-.dialBarFillCoral {
+.gaugeFillLime {
   height: 100%;
-  background: var(--accent-primary);
+  background: #84cc16;
   border-radius: var(--radius-full);
 }
 
-.dialSubtext {
-  font-size: 10px;
-  color: var(--text-muted);
+.gaugeSub {
+  font-size: 9px;
+  color: #64748b;
   line-height: 1.3;
 }
 
-.consoleFooterStrip {
+.cockpitFooter {
   padding: 12px 16px;
-  background: #FBF7F1;
-  border-top: 1px solid var(--border-subtle);
+  background: #1e293b;
+  border-top: 1px solid #334155;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.tokenPill {
+.tokenTag {
   font-family: var(--font-mono);
   font-size: 11px;
-  background: #FFFFFF;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+  color: #94a3b8;
+}
+
+.tokenTag code {
+  color: #14b8a6;
 }
 
 /* ----------------------------------------------------
    3. Statewide Institutional Coverage Ribbon
 ------------------------------------------------------- */
 .coverageSection {
-  padding: 20px 28px;
-  background: #231F20;
+  padding: 24px 28px;
+  background: #0f172a;
 }
 
 .coverageRibbon {
@@ -551,23 +531,23 @@
   gap: 20px;
 }
 
-.ribbonItem {
+.ribbonCell {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.ribbonNumber {
+.ribbonFigure {
   font-size: 26px;
   font-weight: 850;
   font-family: var(--font-mono);
-  color: #FFFFFF;
+  color: #ffffff;
   line-height: 1.1;
 }
 
-.ribbonLabel {
+.ribbonCaption {
   font-size: 11px;
-  color: #A89F99;
+  color: #94a3b8;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -576,25 +556,25 @@
 .ribbonDivider {
   width: 1px;
   height: 34px;
-  background: #443E3E;
+  background: #334155;
 }
 
 /* ----------------------------------------------------
    4. Sections & Pillars Grid
 ------------------------------------------------------- */
-.sectionWarm {
+.sectionPadded {
   padding: 80px 28px;
-  background-color: var(--bg-primary);
+  background-color: #ffffff;
 }
 
-.sectionLinen {
+.sectionMist {
   padding: 80px 28px;
-  background-color: #F6F1EA;
+  background-color: #f8fafc;
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.sectionHeader {
+.sectionHeadingWrap {
   max-width: 720px;
   margin: 0 auto 52px auto;
   text-align: center;
@@ -603,23 +583,23 @@
   gap: 12px;
 }
 
-.sectionTag {
+.sectionChip {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 750;
   text-transform: uppercase;
   letter-spacing: 0.9px;
   color: var(--accent-primary);
 }
 
-.sectionTitle {
+.sectionMainTitle {
   font-size: 32px;
-  font-weight: 800;
+  font-weight: 850;
   letter-spacing: -0.6px;
   color: var(--text-primary);
   line-height: 1.25;
 }
 
-.sectionDescription {
+.sectionLeadText {
   font-size: 15px;
   color: var(--text-secondary);
   line-height: 1.6;
@@ -635,9 +615,9 @@
 }
 
 .pillarCard {
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 32px 26px;
   display: flex;
   flex-direction: column;
@@ -648,15 +628,15 @@
 
 .pillarCard:hover {
   transform: translateY(-3px);
-  border-color: var(--border-medium);
+  border-color: var(--accent-primary);
   box-shadow: var(--shadow-md);
 }
 
-.pillarIconWrap {
+.pillarIconBox {
   width: 44px;
   height: 44px;
-  border-radius: var(--radius-md);
-  background: var(--accent-subtle);
+  border-radius: var(--radius-sm);
+  background: #f0fdfa;
   color: var(--accent-primary);
   display: flex;
   align-items: center;
@@ -665,17 +645,17 @@
 
 .pillarTitle {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 750;
   color: var(--text-primary);
 }
 
-.pillarText {
+.pillarBody {
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.6;
 }
 
-.pillarTagList {
+.pillBadgesList {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -684,19 +664,19 @@
   border-top: 1px solid var(--border-subtle);
 }
 
-.pillarTag {
+.miniPill {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-secondary);
-  background: #F4EFE8;
+  background: #f1f5f9;
   padding: 3px 10px;
   border-radius: var(--radius-full);
 }
 
 /* ----------------------------------------------------
-   5. Features Grid
+   5. Capabilities Grid
 ------------------------------------------------------- */
-.featuresGrid {
+.capabilitiesGrid {
   max-width: 1280px;
   margin: 0 auto;
   display: grid;
@@ -704,8 +684,8 @@
   gap: 22px;
 }
 
-.featureItem {
-  background: #FFFFFF;
+.capItem {
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 24px;
@@ -715,22 +695,22 @@
   transition: all 0.2s ease;
 }
 
-.featureItem:hover {
+.capItem:hover {
   border-color: var(--border-medium);
   box-shadow: var(--shadow-sm);
 }
 
-.featureHeader {
+.capHeader {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.featureIconBox {
+.capIconBox {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-sm);
-  background: #F4EFE8;
+  background: #f0fdfa;
   color: var(--accent-primary);
   display: flex;
   align-items: center;
@@ -738,31 +718,31 @@
   flex-shrink: 0;
 }
 
-.featureTitle {
+.capTitle {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 750;
   color: var(--text-primary);
 }
 
-.featureDesc {
+.capDesc {
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.55;
 }
 
-.codePill {
+.codeTag {
   font-family: var(--font-mono);
   font-size: 11px;
-  background: #F4EFE8;
+  background: #f1f5f9;
   padding: 2px 6px;
   border-radius: 4px;
   color: var(--accent-primary);
 }
 
 /* ----------------------------------------------------
-   6. Operational Workflow Grid
+   6. Pipeline Grid
 ------------------------------------------------------- */
-.workflowGrid {
+.pipelineGrid {
   max-width: 1280px;
   margin: 0 auto;
   display: grid;
@@ -771,9 +751,9 @@
 }
 
 .stepCard {
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 26px 20px;
   display: flex;
   flex-direction: column;
@@ -786,15 +766,15 @@
   box-shadow: var(--shadow-sm);
 }
 
-.stepBadge {
+.stepIndex {
   font-size: 18px;
   font-family: var(--font-mono);
   font-weight: 850;
   color: var(--accent-primary);
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-full);
-  background: var(--accent-subtle);
+  border-radius: var(--radius-sm);
+  background: #f0fdfa;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -802,7 +782,7 @@
 
 .stepTitle {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 750;
   color: var(--text-primary);
 }
 
@@ -824,9 +804,9 @@
 }
 
 .personaCard {
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -839,13 +819,13 @@
   gap: 10px;
 }
 
-.personaIcon {
+.personaIconTeal {
   color: var(--accent-primary);
 }
 
 .personaTitle {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 750;
   color: var(--text-primary);
 }
 
@@ -856,19 +836,19 @@
 }
 
 /* ----------------------------------------------------
-   8. Security & Compliance Guarantee
+   8. Security & Deliverability
 ------------------------------------------------------- */
 .securitySection {
   padding: 36px 28px;
-  background: var(--bg-primary);
+  background: #ffffff;
 }
 
-.securityBox {
+.securityCard {
   max-width: 1280px;
   margin: 0 auto;
-  background: #FFFFFF;
+  background: #f8fafc;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-md);
   padding: 28px 32px;
   display: flex;
   align-items: flex-start;
@@ -878,9 +858,9 @@
 
 .securityIconBox {
   color: var(--accent-primary);
-  background: var(--accent-subtle);
+  background: #f0fdfa;
   padding: 12px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
 
@@ -892,7 +872,7 @@
 
 .securityTitle {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 750;
   color: var(--text-primary);
 }
 
@@ -903,18 +883,18 @@
 }
 
 /* ----------------------------------------------------
-   9. Final Access Banner
+   9. Final CTA
 ------------------------------------------------------- */
 .finalCtaSection {
   padding: 60px 28px 80px 28px;
-  background: var(--bg-primary);
+  background: #ffffff;
 }
 
 .finalCtaCard {
   max-width: 1280px;
   margin: 0 auto;
-  background: #231F20;
-  border-radius: var(--radius-xl);
+  background: #0f172a;
+  border-radius: var(--radius-lg);
   padding: 56px 40px;
   text-align: center;
 }
@@ -928,28 +908,28 @@
   gap: 16px;
 }
 
-.finalCtaHeading {
+.finalHeading {
   font-size: 32px;
   font-weight: 850;
-  color: #FFFFFF;
+  color: #ffffff;
   letter-spacing: -0.6px;
 }
 
-.finalCtaSub {
+.finalSubText {
   font-size: 15px;
-  color: #A89F99;
+  color: #94a3b8;
   line-height: 1.6;
 }
 
-.finalBtnWrap {
+.finalActions {
   margin-top: 10px;
 }
 
 /* ----------------------------------------------------
-   10. Platform Footer
+   10. Footer
 ------------------------------------------------------- */
 .footer {
-  background: #F5EFEB;
+  background: #f8fafc;
   border-top: 1px solid var(--border-subtle);
   padding: 48px 28px 32px 28px;
   font-size: 13px;
@@ -1038,8 +1018,8 @@
     gap: 40px;
   }
   .threePillarsGrid,
-  .featuresGrid,
-  .workflowGrid {
+  .capabilitiesGrid,
+  .pipelineGrid {
     grid-template-columns: 1fr;
   }
   .coverageRibbon {
@@ -1049,7 +1029,7 @@
   .ribbonDivider {
     display: none;
   }
-  .navLinks {
+  .mainNav {
     display: none;
   }
   .personasGrid {

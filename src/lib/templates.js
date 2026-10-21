@@ -9,7 +9,11 @@ export const DEFAULT_TEMPLATES = [
 
 <p>Greetings from Shortfundly!</p>
 
-<p>We propose a collaboration with <strong>{{college_name}}</strong>{{department_clause}} through <strong>Shortfundly Campus</strong> to help students develop creative skills, showcase their work, and explore opportunities in filmmaking and digital content.</p>
+<div style="margin: 18px 0; text-align: center;">
+  <img src="/uploads/email-images/sf_creator_pass_banner.svg" alt="Shortfundly Campus Creator Pass" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);" />
+</div>
+
+<p>We propose a collaboration with <strong>{{college_name}}</strong>{{department_clause}} in <strong>{{state}}, {{country}}</strong> through <strong>Shortfundly Campus</strong> to help students develop creative skills, showcase their work, and explore opportunities in filmmaking and digital content.</p>
 
 <p><strong>About Shortfundly Campus:</strong><br />
 Shortfundly Campus connects student creators with collaboration, film submission, promotion, and event opportunities. Its Campus Pass brings together six products: Connect, Festival, Hub, Marketing, Ticket, and Tools. Students can build creator profiles, find collaborators, and prepare their projects for wider exposure.</p>
@@ -25,22 +29,13 @@ Shortfundly Campus connects student creators with collaboration, film submission
 
 <p><em>The activities, frequency, support, and deliverables will be finalized jointly with the institution.</em></p>
 
-<p><strong>Objectives for the Institution:</strong></p>
+<p><strong>Objectives for {{institution}}:</strong></p>
 <ul style="padding-left: 20px; line-height: 1.6;">
   <li>Create a structured pathway for students to develop and present creative projects.</li>
   <li>Strengthen participation in film clubs and interdisciplinary activities.</li>
   <li>Help students build practical experience and demonstrable portfolios.</li>
-  <li>Showcase the institution’s emerging creative talent.</li>
+  <li>Showcase the institution’s emerging creative talent across {{state}}.</li>
 </ul>
-
-<p><strong>Proposed Implementation:</strong></p>
-<ol style="padding-left: 20px; line-height: 1.6;">
-  <li>Conduct a product demonstration for faculty and student coordinators.</li>
-  <li>Confirm participating departments, student numbers, and priorities.</li>
-  <li>Finalize the scope, commercial terms, and activity schedule.</li>
-  <li>Conduct an orientation and begin student onboarding.</li>
-  <li>Review participation and project progress with the designated faculty coordinator.</li>
-</ol>
 
 <p><strong>Commercial Terms:</strong><br />
 The Campus Pass is currently listed at ₹1,500 + GST per year. Institutional pricing and any additional activity charges will be confirmed through a separate quotation based on the agreed scope.</p>
@@ -61,6 +56,47 @@ SM Smartygen Media Networks Private Limited</p>`,
     is_default: 1,
   },
   {
+    id: 'campus-film-festival-invitation',
+    title: 'Shortfundly National Campus Film Festival 2026 (Poster & Call for Entries)',
+    subjectTemplate: 'Official Invitation: National Campus Short Film Festival 2026 — Nominate Student Filmmakers from {{college_name}}',
+    bodyTemplate: `<p>Dear {{contact_salutation}},</p>
+
+<p>Greetings from Shortfundly Campus!</p>
+
+<div style="margin: 20px 0; text-align: center;">
+  <a href="https://festival.shortfundly.com" target="_blank">
+    <img src="/uploads/email-images/sf_campus_festival_poster.svg" alt="Shortfundly National Campus Film Festival 2026" style="max-width: 100%; height: auto; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" />
+  </a>
+</div>
+
+<p>We are delighted to invite <strong>{{college_name}}</strong>, {{state}}, to participate in the prestigious <strong>Shortfundly National Campus Short Film Festival 2026</strong>.</p>
+
+<p>This annual festival celebrates visionary student storytelling across narrative fiction, documentaries, animation, and experimental media. Selected student films receive OTT distribution, festival laurels, and direct access to production house mentorship.</p>
+
+<p><strong>Highlights for {{institution}}:</strong></p>
+<ul style="padding-left: 20px; line-height: 1.6;">
+  <li><strong>₹2,50,000 Total Prize Pool</strong> across Best Director, Screenplay, Cinematography, and Editor categories.</li>
+  <li><strong>Exclusive Screening Rights</strong> on Shortfundly OTT for institutional showcase.</li>
+  <li><strong>Industry Jury Panel</strong> consisting of celebrated directors, festival curators, and producers.</li>
+  <li><strong>Institutional Trophy &amp; Digital Credentials</strong> for winning departments.</li>
+</ul>
+
+<p><strong>Nomination Details:</strong><br />
+Institutions may nominate up to 5 student projects without entry fees using their verified college email address.</p>
+
+<p>
+Official Festival Portal: <a href="https://festival.shortfundly.com" target="_blank" style="color: #2563eb; text-decoration: underline;">https://festival.shortfundly.com</a><br />
+Submit Nominations: <a href="https://campus.shortfundly.com/festival-entry" target="_blank" style="color: #2563eb; text-decoration: underline;">https://campus.shortfundly.com/festival-entry</a><br />
+Direct Inquiry: +91 93612 23155
+</p>
+
+<p style="margin-top: 24px;">With highest regards,<br />
+<strong>{{sender_name}}</strong><br />
+Festival Director | Shortfundly Campus<br />
+SM Smartygen Media Networks Private Limited</p>`,
+    is_default: 0,
+  },
+  {
     id: 'campus-ambassador-initiative',
     title: 'Shortfundly Campus Ambassador Chapter Invitation',
     subjectTemplate: 'Campus Ambassador Chapter Invitation — Partnering with {{college_name}}',
@@ -68,7 +104,11 @@ SM Smartygen Media Networks Private Limited</p>`,
 
 <p>Greetings from Shortfundly Campus!</p>
 
-<p>We are excited to invite <strong>{{college_name}}</strong>{{department_clause}} to establish an official <strong>Shortfundly Student Creator Chapter</strong>.</p>
+<p>We are excited to invite <strong>{{college_name}}</strong>{{department_clause}} in <strong>{{state}}, {{country}}</strong> to establish an official <strong>Shortfundly Student Creator Chapter</strong>.</p>
+
+<div style="margin: 16px 0; text-align: center;">
+  <img src="/uploads/email-images/sf_creator_pass_banner.svg" alt="Shortfundly Student Creator Chapter" style="max-width: 100%; height: auto; border-radius: 8px;" />
+</div>
 
 <p>Campus Ambassadors receive hands-on experience in OTT distribution, media curation, and film festival coordination, directly backed by Shortfundly's industry ecosystem.</p>
 
@@ -103,8 +143,8 @@ SM Smartygen Media Networks Private Limited</p>`,
 export function formatBodyToHtml(textOrHtml) {
   if (!textOrHtml) return '';
 
-  // Check if string already contains structural HTML tags (<p>, <div>, <table>, <ul>, <ol>, <h1-6>)
-  const hasStructuralTags = /<(p|div|table|ul|ol|h[1-6]|blockquote)\b[^>]*>/i.test(textOrHtml);
+  // Check if string already contains structural HTML tags (<p>, <div>, <table>, <ul>, <ol>, <h1-6>, <img>)
+  const hasStructuralTags = /<(p|div|table|ul|ol|h[1-6]|blockquote|img)\b[^>]*>/i.test(textOrHtml);
 
   if (hasStructuralTags) {
     return textOrHtml;
@@ -144,15 +184,19 @@ export function formatBodyToHtml(textOrHtml) {
 /**
  * Safely renders a template string with escaped variable values.
  * Intelligently personalizes greetings, college & department clauses, contact person & designation,
+ * geographic location (country, state, city/district), institution name,
  * and handles both bracket [Placeholder] and curly brace {{placeholder}} syntax.
  */
 export function renderTemplate(templateStr, variables = {}) {
-  const safeCollege = escapeHtml((variables.college_name || '').trim());
+  const safeCollege = escapeHtml((variables.college_name || variables.institution || '').trim());
+  const safeInstitution = safeCollege;
   const safeDepartment = escapeHtml((variables.department || '').trim());
   const safeContact = escapeHtml((variables.contact_person || '').trim());
   const safeDesignation = escapeHtml((variables.designation || '').trim());
   const safeSender = escapeHtml((variables.sender_name || 'Shortfundly Campus Outreach').trim());
   const safeEmail = escapeHtml((variables.email || '').trim());
+  const safeCountry = escapeHtml((variables.country || variables.country_name || 'India').trim());
+  const safeState = escapeHtml((variables.state || variables.state_or_region || 'Andhra Pradesh').trim());
 
   // Smart Person / Salutation Construction
   let personWithDesignation = safeContact;
@@ -186,18 +230,21 @@ export function renderTemplate(templateStr, variables = {}) {
       .replace(/Respected\s+(?:Sir\s*\/\s*Madam|Sir|Madam)\s*,/gi, `Respected ${salutation},`);
   }
 
-  // 3. College Name replacements
+  // 3. College Name & Institution replacements
   output = output
     .replace(/\[\s*College\s*Name\s*\]/gi, safeCollege)
     .replace(/\[\s*college_name\s*\]/gi, safeCollege)
     .replace(/\[\s*College\s*\]/gi, safeCollege)
     .replace(/\[\s*collegename\s*\]/gi, safeCollege)
-    .replace(/\[\s*Institution\s*\]/gi, safeCollege)
+    .replace(/\[\s*Institution\s*\]/gi, safeInstitution)
+    .replace(/\[\s*institution\s*\]/gi, safeInstitution)
     .replace(/\[\s*University\s*\]/gi, safeCollege)
     .replace(/\{\{\s*college_name\s*\}\}/gi, safeCollege)
     .replace(/\{\s*college_name\s*\}/gi, safeCollege)
     .replace(/\{\{\s*college\s*\}\}/gi, safeCollege)
-    .replace(/\{\s*college\s*\}/gi, safeCollege);
+    .replace(/\{\s*college\s*\}/gi, safeCollege)
+    .replace(/\{\{\s*institution\s*\}\}/gi, safeInstitution)
+    .replace(/\{\s*institution\s*\}/gi, safeInstitution);
 
   // 4. Contact Person / Salutation replacements
   output = output
@@ -228,8 +275,6 @@ export function renderTemplate(templateStr, variables = {}) {
     .replace(/\{\s*department\s*\}/gi, safeDepartment)
     .replace(/\{\{\s*department_clause\s*\}\}/gi, departmentClause);
 
-  // If the template had NO department placeholder at all, but the user supplied a Department:
-  // ensure the department is included alongside the college name in phrases like "collaboration with [College Name]"
   if (!hasDepartmentPlaceholder && safeDepartment && safeCollege) {
     const escapedCollege = safeCollege.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(`(collaboration\\s+with\\s+${escapedCollege})(?!\\s*\\()`, 'gi');
@@ -263,15 +308,23 @@ export function renderTemplate(templateStr, variables = {}) {
     .replace(/\{\{\s*email\s*\}\}/gi, safeEmail)
     .replace(/\{\s*email\s*\}/gi, safeEmail);
 
-  // 9. Location & Campus Metadata replacements
-  const safeCityDistrict = escapeHtml((variables.city_district || '').trim());
+  // 9. Location & Geographic Metadata replacements
+  const safeCityDistrict = escapeHtml((variables.city_district || variables.city || variables.district || '').trim());
   const safeCategory = escapeHtml((variables.category || '').trim());
   const safeWebsite = escapeHtml((variables.website_url || '').trim());
   const safePhone = escapeHtml((variables.phone || '').trim());
-  const safeState = escapeHtml((variables.state || '').trim());
   const safeRemarks = escapeHtml((variables.remarks || '').trim());
 
   output = output
+    .replace(/\[\s*Country\s*\]/gi, safeCountry)
+    .replace(/\[\s*country\s*\]/gi, safeCountry)
+    .replace(/\{\{\s*country\s*\}\}/gi, safeCountry)
+    .replace(/\{\{\s*country_name\s*\}\}/gi, safeCountry)
+    .replace(/\{\s*country\s*\}/gi, safeCountry)
+    .replace(/\[\s*State\s*\]/gi, safeState)
+    .replace(/\[\s*state\s*\]/gi, safeState)
+    .replace(/\{\{\s*state\s*\}\}/gi, safeState)
+    .replace(/\{\s*state\s*\}/gi, safeState)
     .replace(/\[\s*City\s*\/\s*District\s*\]/gi, safeCityDistrict)
     .replace(/\[\s*District\s*\]/gi, safeCityDistrict)
     .replace(/\[\s*City\s*\]/gi, safeCityDistrict)
@@ -289,9 +342,6 @@ export function renderTemplate(templateStr, variables = {}) {
     .replace(/\[\s*Contact\s*Number\s*\]/gi, safePhone)
     .replace(/\{\{\s*phone\s*\}\}/gi, safePhone)
     .replace(/\{\s*phone\s*\}/gi, safePhone)
-    .replace(/\[\s*State\s*\]/gi, safeState)
-    .replace(/\{\{\s*state\s*\}\}/gi, safeState)
-    .replace(/\{\s*state\s*\}/gi, safeState)
     .replace(/\[\s*Remarks\s*\]/gi, safeRemarks)
     .replace(/\{\{\s*remarks\s*\}\}/gi, safeRemarks)
     .replace(/\{\s*remarks\s*\}/gi, safeRemarks);
@@ -300,28 +350,101 @@ export function renderTemplate(templateStr, variables = {}) {
 }
 
 /**
- * Wraps body in a clean, natural plain-email layout without promotional banners, cards, or photo flyers
- * Ensures paragraph structure and line breaks are fully preserved across all email clients.
+ * Validates whether all placeholders in subject and body are resolved.
+ * Returns array of remaining unresolved tokens (e.g. ['{{custom_token}}', '[Unknown Tag]']).
  */
-export function wrapInEmailLayout(bodyHtml) {
+export function validateTemplatePlaceholders(text, variables = {}) {
+  const rendered = renderTemplate(text, variables);
+  const remainingTokens = [];
+
+  // Match curly braces {{...}}
+  const curlyMatches = rendered.match(/\{\{([^{}]+)\}\}/g) || [];
+  for (const match of curlyMatches) {
+    if (!remainingTokens.includes(match)) {
+      remainingTokens.push(match);
+    }
+  }
+
+  // Match square brackets that look like tokens [Placeholder Name] (not links or HTML)
+  const bracketMatches = rendered.match(/\[([A-Za-z0-9_\s&/-]{3,30})\](?!\()/g) || [];
+  for (const match of bracketMatches) {
+    if (!remainingTokens.includes(match) && !match.includes('http')) {
+      remainingTokens.push(match);
+    }
+  }
+
+  return {
+    isValid: remainingTokens.length === 0,
+    unresolvedTokens: remainingTokens,
+    renderedPreview: rendered,
+  };
+}
+
+/**
+ * Wraps body in a clean, modern HTML email layout with responsive image handling
+ * and email client compatibility (Gmail, Outlook, Yahoo, Apple Mail).
+ */
+export function wrapInEmailLayout(bodyHtml, options = {}) {
   const content = formatBodyToHtml(bodyHtml);
+  const unsubscribeUrl = options.unsubscribeUrl || 'mailto:campus@shortfundly.com?subject=Unsubscribe';
 
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    img { max-width: 100% !important; height: auto !important; border-radius: 6px; }
+    p { margin: 0 0 16px 0; }
+    a { color: #2563eb; text-decoration: underline; }
+  </style>
 </head>
-<body style="margin: 0; padding: 20px; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.65; color: #111827;">
-  <div style="max-width: 680px; margin: 0; color: #111827; line-height: 1.65;">
-    ${content}
-    
-    <div style="margin-top: 36px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; line-height: 1.5;">
-      Shortfundly Campus &bull; SM Smartygen Media Networks Private Limited<br />
-      Chennai, Tamil Nadu, India | <a href="https://campus.shortfundly.com" target="_blank" style="color: #6b7280; text-decoration: underline;">campus.shortfundly.com</a><br />
-      To opt out of future collaboration outreach, reply with &ldquo;Unsubscribe&rdquo; or email <a href="mailto:campus@shortfundly.com" style="color: #6b7280; text-decoration: underline;">campus@shortfundly.com</a>.
-    </div>
-  </div>
+<body style="margin: 0; padding: 24px; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.65; color: #111827;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; width: 100%;">
+    <tr>
+      <td align="center" style="padding: 12px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 680px; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+          <!-- Email Header Bar -->
+          <tr>
+            <td style="padding: 20px 28px; border-bottom: 1px solid #f1f5f9; background-color: #ffffff;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="left" vertical-align="middle">
+                    <span style="font-size: 17px; font-weight: 800; color: #0f172a; letter-spacing: -0.2px;">Shortfundly <span style="color: #e11d48; font-weight: 600;">Campus</span></span>
+                  </td>
+                  <td align="right" vertical-align="middle">
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; background-color: #f1f5f9; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Institutional Outreach</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Email Content Body -->
+          <tr>
+            <td style="padding: 32px 28px; color: #111827; font-size: 14px; line-height: 1.68;">
+              ${content}
+            </td>
+          </tr>
+
+          <!-- Email Footer -->
+          <tr>
+            <td style="padding: 20px 28px; border-top: 1px solid #f1f5f9; background-color: #f8fafc; font-size: 11px; color: #64748b; line-height: 1.6;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td>
+                    <strong>Shortfundly Campus Outreach Engine</strong> &bull; SM Smartygen Media Networks Private Limited<br />
+                    Chennai, Tamil Nadu, India &bull; <a href="https://campus.shortfundly.com" target="_blank" style="color: #64748b; text-decoration: underline;">campus.shortfundly.com</a><br />
+                    To opt out of future institutional invitations, <a href="${unsubscribeUrl}" style="color: #64748b; text-decoration: underline;">reply with &ldquo;Unsubscribe&rdquo;</a> or email <a href="mailto:campus@shortfundly.com" style="color: #64748b; text-decoration: underline;">campus@shortfundly.com</a>.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`;
 }

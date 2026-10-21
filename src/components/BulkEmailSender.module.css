@@ -115,12 +115,12 @@
 
 .dropzone:hover {
   border-color: var(--accent-primary);
-  background: #fff1f2;
+  background: #f0fdfa;
 }
 
 .dropzoneActive {
   border-color: var(--accent-primary);
-  background: #fff1f2;
+  background: #f0fdfa;
 }
 
 .dropzoneIcon {
@@ -310,7 +310,7 @@
 }
 
 .rowSelected td {
-  background: #fff1f2;
+  background: #f0fdfa;
 }
 
 .rowPreviewSelected td {

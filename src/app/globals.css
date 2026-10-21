@@ -2,69 +2,78 @@
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 
-  /* Warm Ivory & Linen Operations Palette */
-  --bg-primary: #FAF7F2;        /* Warm ivory canvas */
-  --bg-secondary: #F4EFE8;      /* Soft sand linen */
-  --bg-surface: #FFFFFF;        /* Crisp surface inside panels */
-  --bg-card: #FFFFFF;           /* Card background */
-  --bg-card-hover: #F8F4EE;     /* Card hover */
-  --bg-input: #FFFFFF;
-  --bg-subtle: #F3ECE2;         /* Pill & badge subtle surface */
+  /* Modern SaaS Campaign Operations Palette */
+  /* Canvas & Surfaces: Warm White & Soft Mist Blue */
+  --bg-primary: #f8fafc;        /* Soft mist canvas */
+  --bg-secondary: #f1f5f9;      /* Mist blue surface */
+  --bg-surface: #ffffff;        /* Pure card white */
+  --bg-card: #ffffff;           /* Elevated surface */
+  --bg-card-hover: #f8fafc;
+  --bg-input: #ffffff;
+  --bg-subtle: #f0fdfa;         /* Soft teal tint */
+  --bg-dark: #0f172a;           /* Deep obsidian slate */
 
-  /* Architectural Soft Sand Borders */
-  --border-subtle: #E8DFD5;
-  --border-medium: #DCCFBF;
-  --border-strong: #C4B5A2;
-  --border-focus: #E25C50;      /* Soft coral focus */
+  /* Architectural Fine Borders */
+  --border-subtle: #e2e8f0;      /* Mist border */
+  --border-medium: #cbd5e1;      /* Slate border */
+  --border-strong: #94a3b8;
+  --border-focus: #0d9488;       /* Muted teal focus */
 
-  /* Soft Coral & Peach Brand Accents */
-  --accent-primary: #E25C50;    /* Soft coral-red */
-  --accent-hover: #CC4A3E;
-  --accent-active: #B53A2F;
-  --accent-subtle: #FDF1EC;     /* Soft peach wash */
-  --accent-tint: #FBE4DB;       /* Deeper peach border tint */
-  --accent-glow: rgba(226, 92, 80, 0.14);
+  /* Primary Accent: Muted Teal */
+  --accent-primary: #0d9488;     /* Muted teal */
+  --accent-hover: #0f766e;
+  --accent-active: #115e59;
+  --accent-subtle: #f0fdfa;      /* Soft teal wash */
+  --accent-tint: #ccfbf1;        /* Teal border tint */
+  --accent-glow: rgba(13, 148, 136, 0.16);
 
-  /* Deep Warm Charcoal Text Hierarchy */
-  --text-primary: #231F20;      /* Warm obsidian charcoal */
-  --text-secondary: #57504D;    /* Medium warm slate */
-  --text-muted: #827873;        /* Soft sand muted */
-  --text-dim: #A89F99;          /* Subdued label text */
+  /* Highlight Accent: Subtle Electric Lime */
+  --lime-accent: #84cc16;        /* Subtle lime accent */
+  --lime-hover: #65a30d;
+  --lime-subtle: #f7fee7;        /* Lime tint wash */
+  --lime-border: #d9f99d;        /* Lime border */
+  --lime-glow: rgba(132, 204, 22, 0.22);
 
-  /* Semantic Statuses (Warm & Calibrated) */
-  --status-accepted-bg: #ECF7F1;
-  --status-accepted-text: #217346;
-  --status-accepted-border: #C2E7D3;
+  /* Deep Slate Text Hierarchy */
+  --text-primary: #0f172a;       /* Deep slate heading */
+  --text-secondary: #334155;     /* Medium slate body */
+  --text-muted: #64748b;         /* Muted meta */
+  --text-dim: #94a3b8;           /* Subdued label text */
 
-  --status-failed-bg: #FDF2F1;
-  --status-failed-text: #B92D23;
-  --status-failed-border: #F8CBC6;
+  /* Semantic Statuses (High-Precision Deliverability) */
+  --status-accepted-bg: #f0fdf4;
+  --status-accepted-text: #15803d;
+  --status-accepted-border: #bbf7d0;
 
-  --status-pending-bg: #FEF7EA;
-  --status-pending-text: #966108;
-  --status-pending-border: #FBE5B7;
+  --status-failed-bg: #fff1f2;
+  --status-failed-text: #be123c;
+  --status-failed-border: #fecdd3;
 
-  --status-processing-bg: #F1F6FD;
-  --status-processing-text: #1E5BB8;
-  --status-processing-border: #C8DCFA;
+  --status-pending-bg: #fffbeb;
+  --status-pending-text: #b45309;
+  --status-pending-border: #fde68a;
 
-  --status-unknown-bg: #F5EFEB;
-  --status-unknown-text: #615651;
-  --status-unknown-border: #DCD0C3;
+  --status-processing-bg: #f0fdfa;
+  --status-processing-text: #0f766e;
+  --status-processing-border: #99f6e4;
 
-  /* Engineered Soft Shadow Elevation */
-  --shadow-xs: 0 1px 3px rgba(35, 31, 32, 0.04);
-  --shadow-sm: 0 2px 6px rgba(35, 31, 32, 0.05), 0 1px 2px rgba(35, 31, 32, 0.03);
-  --shadow-md: 0 8px 18px -2px rgba(35, 31, 32, 0.06), 0 3px 6px -2px rgba(35, 31, 32, 0.03);
-  --shadow-lg: 0 16px 32px -4px rgba(35, 31, 32, 0.08), 0 6px 12px -3px rgba(35, 31, 32, 0.03);
-  --shadow-workspace: 0 12px 40px rgba(35, 31, 32, 0.07);
+  --status-unknown-bg: #f8fafc;
+  --status-unknown-text: #475569;
+  --status-unknown-border: #cbd5e1;
 
-  /* Curved Geometry & Soft Surfaces */
-  --radius-xs: 6px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
+  /* Engineered Elevations */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.1), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
+  --shadow-workspace: 0 10px 30px rgba(15, 23, 42, 0.06);
+
+  /* Modern SaaS Geometry */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-pill: 9999px;
   --radius-full: 9999px;
 }
@@ -108,10 +117,10 @@ input, textarea, select {
   font-size: 14px;
 }
 
-/* Warm Tone Scrollbar */
+/* Modern Slate Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {

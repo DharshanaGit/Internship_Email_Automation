@@ -17,6 +17,7 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional().default(''),
   FROM_EMAIL: z.string().default('campus@shortfundly.com'),
   FROM_NAME: z.string().default('Shortfundly Campus Outreach'),
+  APP_URL: z.string().default('http://localhost:3000'),
 
   // Guardrails & Duplicate Rules
   DUPLICATE_COOLDOWN_DAYS: z.coerce.number().default(30),
@@ -55,6 +56,7 @@ try {
     SMTP_PASS: process.env.SMTP_PASS,
     FROM_EMAIL: process.env.FROM_EMAIL,
     FROM_NAME: process.env.FROM_NAME,
+    APP_URL: process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
     DUPLICATE_COOLDOWN_DAYS: process.env.DUPLICATE_COOLDOWN_DAYS,
     RATE_LIMIT_LOGIN_MAX: process.env.RATE_LIMIT_LOGIN_MAX,
     RATE_LIMIT_LOGIN_WINDOW_SEC: process.env.RATE_LIMIT_LOGIN_WINDOW_SEC,

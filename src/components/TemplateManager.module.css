@@ -38,18 +38,20 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: var(--accent-primary);
-  color: #FFFFFF;
+  background: #0f172a;
+  color: #ffffff;
   font-size: 13px;
-  font-weight: 700;
-  border-radius: var(--radius-full);
+  font-weight: 750;
+  border-radius: var(--radius-sm);
   transition: all 0.15s ease;
-  box-shadow: 0 3px 8px rgba(226, 92, 80, 0.28);
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.2);
+  border: 1px solid #1e293b;
 }
 
 .createBtn:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 6px 16px rgba(226, 92, 80, 0.38);
+  background: #0d9488;
+  border-color: #0f766e;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35);
 }
 
 .toolbar {
@@ -57,10 +59,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
   box-shadow: var(--shadow-xs);
 }
 
@@ -84,7 +86,7 @@
   padding: 8px 14px 8px 36px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-size: 13px;
   outline: none;
@@ -108,9 +110,9 @@
 }
 
 .templateCard {
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 22px;
   display: flex;
   flex-direction: column;
@@ -146,19 +148,19 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 3px 9px;
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
-  border: 1px solid var(--accent-tint);
-  border-radius: var(--radius-full);
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #ccfbf1;
+  border-radius: var(--radius-xs);
   white-space: nowrap;
 }
 
 .subjectPreview {
   font-size: 12px;
   color: var(--text-secondary);
-  background: #FBF7F1;
+  background: #f8fafc;
   padding: 8px 12px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   border: 1px solid var(--border-subtle);
   white-space: nowrap;
   overflow: hidden;
@@ -180,10 +182,10 @@
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
-  background: #FBF7F1;
+  background: #f8fafc;
   padding: 10px;
-  border-radius: var(--radius-sm);
-  border-left: 3px solid var(--accent-primary);
+  border-radius: var(--radius-xs);
+  border-left: 3px solid #0d9488;
 }
 
 .cardFooter {
@@ -207,12 +209,12 @@
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 600;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
   transition: all 0.15s ease;
 }
 
@@ -232,19 +234,19 @@
   color: var(--status-failed-text);
   font-size: 12px;
   font-weight: 600;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
   transition: all 0.15s ease;
 }
 
 .btnDanger:hover {
-  background: #FACDCD;
+  background: #fecdd3;
 }
 
 /* Modal Styling */
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(35, 31, 32, 0.45);
+  background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -254,8 +256,8 @@
 }
 
 .modalContent {
-  background: #FFFFFF;
-  border-radius: var(--radius-xl);
+  background: #ffffff;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
   width: 100%;
   max-width: 840px;
@@ -272,7 +274,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #FBF7F1;
+  background: #f8fafc;
 }
 
 .modalTitle {
@@ -284,13 +286,13 @@
 .closeModalBtn {
   color: var(--text-muted);
   padding: 4px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
   display: flex;
   align-items: center;
 }
 
 .closeModalBtn:hover {
-  background: #E8DFD5;
+  background: #e2e8f0;
   color: var(--text-primary);
 }
 

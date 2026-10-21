@@ -20,9 +20,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 32px;
-  background: rgba(250, 247, 242, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: #ffffff;
   border-bottom: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
@@ -39,7 +37,7 @@
 
 .viewTitle {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 850;
   color: var(--text-primary);
   letter-spacing: -0.2px;
 }
@@ -59,20 +57,20 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 12px;
-  background: #ECF7F1;
-  border: 1px solid #C2E7D3;
-  border-radius: var(--radius-full);
+  padding: 4px 10px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 700;
-  color: #217346;
+  color: #15803d;
 }
 
 .statusDot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #2E7D5E;
+  background-color: #10b981;
 }
 
 .smtpBtn {
@@ -80,9 +78,9 @@
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-medium);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 600;
@@ -91,13 +89,13 @@
 }
 
 .smtpBtn:hover {
-  background: var(--bg-secondary);
+  background: #f8fafc;
   border-color: var(--border-strong);
 }
 
 .pageContent {
   flex: 1;
-  max-width: 1400px;
+  max-width: 1440px;
   width: 100%;
   margin: 0 auto;
   padding: 24px 32px 56px 32px;
@@ -128,9 +126,9 @@
 .modeSwitcher {
   display: inline-flex;
   align-items: center;
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 4px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
   width: fit-content;
   box-shadow: var(--shadow-xs);
@@ -141,7 +139,7 @@
   padding: 7px 18px;
   font-size: 12px;
   font-weight: 600;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -150,10 +148,10 @@
 }
 
 .modeBtnActive {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
-  font-weight: 700;
-  box-shadow: 0 1px 3px rgba(226, 92, 80, 0.15);
+  background: #f0fdfa;
+  color: #0f766e;
+  font-weight: 750;
+  border: 1px solid #ccfbf1;
 }
 
 .loadingOverlay {

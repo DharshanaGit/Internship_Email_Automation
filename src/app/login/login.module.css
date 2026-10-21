@@ -1,162 +1,158 @@
-/* Warm Ivory Workspace Login Layout */
-.loginWorkspace {
+/* Modern SaaS Campaign Operations Login Style */
+.authViewport {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 24px;
   background-color: var(--bg-primary);
-  background-image: radial-gradient(#E8DFD5 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-/* Floating Dual-Panel Container */
-.splitShell {
   width: 100%;
-  max-width: 1140px;
-  min-height: 640px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  display: flex;
-  box-shadow: var(--shadow-workspace);
-  overflow: hidden;
 }
 
 /* ----------------------------------------------------
-   LEFT SIDE: Brand Story, Telemetry & Operations Panel
+   LEFT DECK: Deep Slate Campaign Telemetry Hub
 ------------------------------------------------------- */
-.brandPanel {
+.telemetryDeck {
   flex: 1.15;
-  background: #FBF6F0;
-  border-right: 1px solid var(--border-subtle);
+  background-color: #0f172a;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(20, 184, 166, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(132, 204, 22, 0.08) 0%, transparent 40%),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+  border-right: 1px solid #1e293b;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 48px;
+  padding: 52px;
   position: relative;
+  overflow: hidden;
 }
 
-.brandPanelInner {
+.deckContent {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 36px;
+  max-width: 560px;
+  position: relative;
+  z-index: 2;
 }
 
-/* Logo Badge */
-.logoRow {
+/* Brand Row */
+.brandRow {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.symbolWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.brandNames {
+.brandMeta {
   display: flex;
   flex-direction: column;
 }
 
-.mainBrand {
+.brandTitle {
   font-size: 20px;
-  font-weight: 800;
-  color: var(--text-primary);
+  font-weight: 850;
+  color: #ffffff;
   letter-spacing: -0.3px;
   line-height: 1.15;
 }
 
-.subBrand {
+.brandTeal {
+  color: #14b8a6;
+}
+
+.brandSub {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--accent-primary);
+  letter-spacing: 0.9px;
+  color: #94a3b8;
 }
 
-/* Statement Box */
-.statementBox {
+/* Statement */
+.statementGroup {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 
-.pillLabel {
+.limeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.9px;
   text-transform: uppercase;
-  color: var(--accent-primary);
-  background: var(--accent-subtle);
-  padding: 3px 10px;
+  color: #a3e635;
+  background: rgba(132, 204, 22, 0.12);
+  border: 1px solid rgba(132, 204, 22, 0.3);
+  padding: 4px 12px;
   border-radius: var(--radius-full);
   width: fit-content;
-  border: 1px solid var(--accent-tint);
 }
 
-.statementTitle {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.25;
-  color: var(--text-primary);
-  letter-spacing: -0.4px;
+.statementHeading {
+  font-size: 30px;
+  font-weight: 850;
+  line-height: 1.22;
+  color: #ffffff;
+  letter-spacing: -0.5px;
 }
 
-.statementDesc {
+.statementText {
   font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.6;
+  color: #94a3b8;
+  line-height: 1.65;
 }
 
-/* Telemetry Card */
-.telemetryCard {
-  background: #FFFFFF;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 20px;
+/* Ops Card */
+.opsCard {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: var(--shadow-sm);
+  gap: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
-.telemetryTop {
+.opsCardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.statusPill {
-  display: inline-flex;
+.statusIndicator {
+  display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
+}
+
+.pulseDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+.statusText {
   font-size: 11px;
   font-weight: 700;
-  color: #217346;
-  background: #ECF7F1;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  border: 1px solid #C2E7D3;
+  color: #34d399;
 }
 
-.statusDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #2E7D5E;
-}
-
-.versionTag {
+.badgeVersion {
   font-size: 10px;
   font-family: var(--font-mono);
   font-weight: 600;
-  color: var(--text-muted);
-  background: var(--bg-subtle);
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.06);
   padding: 2px 8px;
   border-radius: var(--radius-xs);
 }
@@ -167,113 +163,124 @@
   gap: 12px;
 }
 
-.metricItem {
-  background: #FAF7F2;
-  border: 1px solid var(--border-subtle);
+.metricCell {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-sm);
-  padding: 10px 12px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.metricValue {
-  font-size: 18px;
-  font-weight: 800;
+.metricVal {
+  font-size: 20px;
+  font-weight: 850;
   font-family: var(--font-mono);
-  color: var(--text-primary);
-  line-height: 1.2;
+  color: #ffffff;
+  line-height: 1.15;
 }
 
-.metricLabel {
+.metricValLime {
+  font-size: 20px;
+  font-weight: 850;
+  font-family: var(--font-mono);
+  color: #a3e635;
+  line-height: 1.15;
+}
+
+.metricValTeal {
+  font-size: 20px;
+  font-weight: 850;
+  font-family: var(--font-mono);
+  color: #2dd4bf;
+  line-height: 1.15;
+}
+
+.metricLbl {
   font-size: 11px;
-  color: var(--text-muted);
+  color: #94a3b8;
   font-weight: 600;
 }
 
-.rolePillsRow {
+.roleChipsRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
-.rolePill {
+.roleChip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-secondary);
-  background: #F4EFE8;
-  padding: 4px 9px;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 4px 10px;
   border-radius: var(--radius-full);
 }
 
-/* Feature Guarantees */
-.highlightsRow {
+.infraList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.infraItem {
   display: flex;
   align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.highlightItem {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: #cbd5e1;
 }
 
-.highlightIcon {
-  color: var(--accent-primary);
+.infraIcon {
+  color: #14b8a6;
 }
 
-.panelFooter {
+.deckFooter {
   font-size: 11px;
-  color: var(--text-muted);
+  color: #64748b;
   padding-top: 24px;
+  position: relative;
+  z-index: 2;
 }
 
 /* ----------------------------------------------------
-   RIGHT SIDE: Authentication Console
+   RIGHT DECK: Clean Modern SaaS Authentication Terminal
 ------------------------------------------------------- */
-.formPanel {
+.authTerminal {
   flex: 0.95;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 48px;
-  background: var(--bg-surface);
+  padding: 52px;
+  background-color: #ffffff;
 }
 
-.formPanelHeader {
+.terminalTopBar {
   display: flex;
   justify-content: flex-end;
 }
 
-.backPill {
+.returnLink {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-subtle);
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-subtle);
-  transition: all 0.15s ease;
+  color: var(--text-muted);
+  transition: color 0.15s ease;
 }
 
-.backPill:hover {
-  background: #EBE3D8;
-  color: var(--text-primary);
+.returnLink:hover {
+  color: var(--accent-primary);
 }
 
-.formCard {
-  max-width: 400px;
+.terminalFormWrap {
+  max-width: 410px;
   width: 100%;
   margin: 0 auto;
   display: flex;
@@ -281,13 +288,13 @@
   gap: 22px;
 }
 
-.formTitleGroup {
+.formHeader {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.eyebrowChip {
+.eyebrowTag {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.9px;
@@ -295,21 +302,21 @@
   color: var(--accent-primary);
 }
 
-.formTitle {
+.terminalTitle {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 850;
   color: var(--text-primary);
   letter-spacing: -0.4px;
 }
 
-.formSubtitle {
+.terminalSubtitle {
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.5;
 }
 
 /* Alerts */
-.errorBanner {
+.errorAlert {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -322,12 +329,12 @@
   line-height: 1.4;
 }
 
-.bannerIcon {
+.alertIcon {
   flex-shrink: 0;
   margin-top: 1px;
 }
 
-.capsLockBanner {
+.capsLockAlert {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -339,32 +346,32 @@
   font-size: 11px;
 }
 
-/* Form Fields */
-.authForm {
+/* Fields */
+.formElement {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.fieldContainer {
+.fieldUnit {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.labelWithAction {
+.labelBar {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.inputLabel {
+.fieldLabel {
   font-size: 12px;
   font-weight: 700;
   color: var(--text-secondary);
 }
 
-.visibilityToggleBtn {
+.toggleTextBtn {
   font-size: 11px;
   font-weight: 600;
   color: var(--accent-primary);
@@ -374,17 +381,17 @@
   padding: 0;
 }
 
-.visibilityToggleBtn:hover {
+.toggleTextBtn:hover {
   color: var(--accent-hover);
 }
 
-.inputWrap {
+.inputShell {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.inputIcon {
+.inputPrefix {
   position: absolute;
   left: 12px;
   color: var(--text-muted);
@@ -393,10 +400,10 @@
   align-items: center;
 }
 
-.styledInput {
+.textInput {
   width: 100%;
   padding: 10px 14px 10px 38px;
-  background: var(--bg-surface);
+  background: #ffffff;
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   font-size: 13px;
@@ -405,16 +412,16 @@
   transition: all 0.15s ease;
 }
 
-.styledInput:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px var(--accent-subtle);
+.textInput:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-tint);
 }
 
 .inputWithToggle {
   padding-right: 40px !important;
 }
 
-.eyeBtn {
+.eyeToggleBtn {
   position: absolute;
   right: 8px;
   padding: 6px;
@@ -426,27 +433,27 @@
   transition: color 0.15s ease;
 }
 
-.eyeBtn:hover {
+.eyeToggleBtn:hover {
   color: var(--text-primary);
 }
 
-/* CAPTCHA Block */
-.captchaBlock {
+/* CAPTCHA Panel */
+.captchaPanel {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background: #FBF7F1;
+  background: #f8fafc;
   padding: 14px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
 }
 
-.captchaHelp {
+.captchaMeta {
   font-size: 11px;
   color: var(--text-muted);
 }
 
-.captchaGraphicRow {
+.captchaRow {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -457,19 +464,19 @@
   height: 44px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-medium);
-  background: #FFFFFF;
+  background: #ffffff;
   cursor: pointer;
   box-shadow: var(--shadow-xs);
 }
 
-.refreshPill {
+.refreshBtn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 11px;
   font-weight: 600;
@@ -477,20 +484,20 @@
   cursor: pointer;
 }
 
-.refreshPill:hover {
+.refreshBtn:hover {
   background: var(--bg-secondary);
   border-color: var(--border-medium);
   color: var(--text-primary);
 }
 
 /* Submit Action Button */
-.submitBtn {
+.submitAction {
   margin-top: 6px;
   padding: 12px 18px;
-  background: var(--accent-primary);
-  color: #FFFFFF;
+  background: #0f172a;
+  color: #ffffff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 750;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -498,21 +505,23 @@
   gap: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
-  box-shadow: 0 3px 8px rgba(226, 92, 80, 0.28);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+  border: 1px solid #1e293b;
 }
 
-.submitBtn:hover:not(:disabled) {
-  background: var(--accent-hover);
-  box-shadow: 0 6px 16px rgba(226, 92, 80, 0.38);
+.submitAction:hover:not(:disabled) {
+  background: #0d9488;
+  border-color: #0f766e;
+  box-shadow: 0 4px 18px rgba(13, 148, 136, 0.35);
   transform: translateY(-1px);
 }
 
-.submitBtn:disabled {
+.submitAction:disabled {
   opacity: 0.65;
   cursor: not-allowed;
 }
 
-.spinner {
+.iconSpinner {
   animation: spin 1s linear infinite;
 }
 
@@ -525,7 +534,7 @@
   }
 }
 
-.securityFooterNote {
+.terminalSecurityNote {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -535,23 +544,23 @@
   padding-top: 4px;
 }
 
-.secIcon {
-  color: var(--text-muted);
+.noteIcon {
+  color: var(--accent-primary);
   margin-top: 1px;
   flex-shrink: 0;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .splitShell {
+  .authViewport {
     flex-direction: column;
   }
-  .brandPanel {
+  .telemetryDeck {
     border-right: none;
-    border-bottom: 1px solid var(--border-subtle);
-    padding: 32px 24px;
+    border-bottom: 1px solid #1e293b;
+    padding: 36px 24px;
   }
-  .formPanel {
+  .authTerminal {
     padding: 36px 24px;
   }
 }

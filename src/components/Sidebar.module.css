@@ -1,7 +1,7 @@
-/* Warm Ivory Floating Sidebar Shell */
+/* Modern SaaS Campaign Operations Sidebar */
 .sidebar {
   width: 250px;
-  background: #FBF7F1;
+  background: #ffffff;
   border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
@@ -12,9 +12,9 @@
   z-index: 40;
 }
 
-/* Brand Header */
+/* Brand Area */
 .brandArea {
-  padding: 22px 18px 18px 18px;
+  padding: 20px 18px 18px 18px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -24,7 +24,7 @@
   gap: 12px;
 }
 
-.logoCircle {
+.logoWrap {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,33 +44,36 @@
   letter-spacing: -0.2px;
 }
 
+.brandTeal {
+  color: var(--accent-primary);
+}
+
 .brandSubtitle {
   font-size: 10px;
   font-weight: 700;
-  color: var(--accent-primary);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
 
-/* User Mini Profile Inset (Inspired by Reference) */
+/* User Mini Profile Inset */
 .profileInset {
   margin: 16px 14px 4px 14px;
-  background: #FFFFFF;
+  background: #f8fafc;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   padding: 10px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: var(--shadow-xs);
 }
 
 .avatarWrap {
   width: 32px;
   height: 32px;
   border-radius: var(--radius-full);
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
+  background: #0f172a;
+  color: #a3e635;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -107,42 +110,40 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 1px 6px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
 }
 
 .roleAdmin {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
-  border: 1px solid var(--accent-tint);
+  background: #0f172a;
+  color: #a3e635;
 }
 
 .roleTeamLead {
-  background: #F1F6FD;
-  color: #1E5BB8;
-  border: 1px solid #C8DCFA;
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #ccfbf1;
 }
 
 .roleManager {
-  background: #FEF7EA;
-  color: #966108;
-  border: 1px solid #FBE5B7;
+  background: #f1f5f9;
+  color: #475569;
 }
 
 .sendPill {
   font-size: 8px;
   font-weight: 600;
   padding: 1px 5px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
 }
 
 .sendActive {
-  background: #ECF7F1;
-  color: #217346;
+  background: #f0fdf4;
+  color: #15803d;
 }
 
 .sendDisabled {
-  background: #FDF2F1;
-  color: #B92D23;
+  background: #fff1f2;
+  color: #be123c;
 }
 
 /* Navigation Section */
@@ -157,7 +158,7 @@
 
 .navLabel {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 750;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: var(--text-muted);
@@ -175,7 +176,7 @@
   align-items: center;
   gap: 12px;
   padding: 9px 12px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 600;
@@ -186,27 +187,26 @@
 }
 
 .navItem:hover {
-  background: #F2ECE3;
+  background: #f8fafc;
   color: var(--text-primary);
 }
 
 .navItemActive {
-  background: #FFFFFF;
-  color: var(--accent-primary);
+  background: #f0fdfa;
+  color: #0f766e;
   font-weight: 750;
-  box-shadow: 0 1px 4px rgba(35, 31, 32, 0.05);
+  border: 1px solid #ccfbf1;
 }
 
 .navItemActive::before {
   content: '';
   position: absolute;
-  left: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 18px;
-  background: var(--accent-primary);
-  border-radius: var(--radius-full);
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: #0d9488;
+  border-radius: 0 2px 2px 0;
 }
 
 .itemIcon {
@@ -215,7 +215,6 @@
   justify-content: center;
   color: inherit;
   flex-shrink: 0;
-  margin-left: 4px;
 }
 
 .itemLabel {
@@ -232,13 +231,13 @@
   letter-spacing: 0.5px;
   padding: 2px 6px;
   border-radius: var(--radius-full);
-  background: var(--bg-subtle);
+  background: #f1f5f9;
   color: var(--text-muted);
 }
 
 /* Footer */
 .footerSection {
-  padding: 14px 14px;
+  padding: 14px;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -248,10 +247,10 @@
   justify-content: center;
   gap: 8px;
   padding: 8px 12px;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  color: var(--status-failed-text);
+  border-radius: var(--radius-sm);
+  color: #be123c;
   font-size: 12px;
   font-weight: 600;
   transition: all 0.15s ease;
@@ -259,8 +258,8 @@
 }
 
 .logoutBtn:hover {
-  background: var(--status-failed-bg);
-  border-color: var(--status-failed-border);
+  background: #fff1f2;
+  border-color: #fecdd3;
 }
 
 @media (max-width: 900px) {

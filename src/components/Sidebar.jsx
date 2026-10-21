@@ -9,7 +9,7 @@ import {
   SettingsIcon,
   LogOutIcon,
   UserIcon,
-  ShortfundlyLogoSymbol,
+  CampaignPulseLogoSymbol,
 } from './Icons';
 
 export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) {
@@ -31,12 +31,12 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
   const navItems = [
     {
       id: 'dashboard',
-      label: 'Command Overview',
+      label: 'Campaign Overview',
       icon: <DashboardIcon size={17} />,
     },
     {
       id: 'sender',
-      label: 'Campus Dispatcher',
+      label: 'Outreach Dispatcher',
       icon: <SendIcon size={17} />,
     },
     {
@@ -57,24 +57,24 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
       {/* Brand Header */}
       <div className={styles.brandArea}>
         <div className={styles.brandRow}>
-          <div className={styles.logoCircle}>
-            <ShortfundlyLogoSymbol size={34} />
+          <div className={styles.logoWrap}>
+            <CampaignPulseLogoSymbol size={34} />
           </div>
           <div className={styles.brandMeta}>
-            <span className={styles.brandTitle}>Shortfundly</span>
-            <span className={styles.brandSubtitle}>Campus Outreach</span>
+            <span className={styles.brandTitle}>ReachOut <span className={styles.brandTeal}>OS</span></span>
+            <span className={styles.brandSubtitle}>Campaign Operations</span>
           </div>
         </div>
       </div>
 
-      {/* User Mini Profile Inset (Inspired by Reference) */}
+      {/* User Mini Profile Inset */}
       <div className={styles.profileInset}>
         <div className={styles.avatarWrap}>
-          <UserIcon size={16} />
+          <UserIcon size={15} />
         </div>
         <div className={styles.profileMeta}>
           <span className={styles.profileEmail} title={session?.email || 'User'}>
-            {session?.email?.split('@')[0] || 'Outreach Member'}
+            {session?.email?.split('@')[0] || 'Campaign Ops'}
           </span>
           <div className={styles.profileBadges}>
             <span className={`${styles.rolePill} ${getRoleClass(role)}`}>
@@ -89,7 +89,7 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
 
       {/* Navigation Links */}
       <div className={styles.navSection}>
-        <div className={styles.navLabel}>Workspace Menu</div>
+        <div className={styles.navLabel}>Operations Menu</div>
         <nav className={styles.navList}>
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
@@ -109,13 +109,13 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
         </nav>
       </div>
 
-      {/* Sign Out Pill Footer */}
+      {/* Sign Out Footer */}
       <div className={styles.footerSection}>
         <button
           type="button"
           className={styles.logoutBtn}
           onClick={onLogout}
-          title="Sign out of Shortfundly Outreach Portal"
+          title="Sign out of ReachOut OS"
         >
           <LogOutIcon size={14} />
           <span>Sign Out</span>

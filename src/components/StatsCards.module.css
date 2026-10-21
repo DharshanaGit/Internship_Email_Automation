@@ -1,13 +1,13 @@
-/* Warm Ivory & Linen Rounded Metric Cards */
-.statsContainer {
+/* Modern SaaS Campaign Metrics Grid */
+.analyticsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
   width: 100%;
 }
 
-.statPanel {
-  background: #FFFFFF;
+.metricCard {
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 16px 18px;
@@ -18,22 +18,22 @@
   transition: all 0.15s ease;
 }
 
-.statPanel:hover {
+.metricCard:hover {
   border-color: var(--border-medium);
   box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
-.panelHeader {
+.cardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
-.panelLabel {
+.metricTitle {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 750;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--text-muted);
@@ -42,8 +42,8 @@
 .iconCircle {
   width: 26px;
   height: 26px;
-  border-radius: var(--radius-full);
-  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  background: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -51,32 +51,32 @@
   flex-shrink: 0;
 }
 
-.iconGreen {
-  background: #ECF7F1;
-  color: #217346;
+.iconTeal {
+  background: #f0fdfa;
+  color: #0d9488;
 }
 
-.iconRed {
-  background: #FDF2F1;
-  color: #B92D23;
+.iconRose {
+  background: #fff1f2;
+  color: #be123c;
 }
 
 .iconAmber {
-  background: #FEF7EA;
-  color: #966108;
+  background: #fffbeb;
+  color: #b45309;
 }
 
-.iconBlue {
-  background: #F1F6FD;
-  color: #1E5BB8;
+.iconProcessing {
+  background: #f0fdfa;
+  color: #0f766e;
 }
 
-.iconCoral {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
+.iconLime {
+  background: #f7fee7;
+  color: #65a30d;
 }
 
-.statValue {
+.metricValue {
   font-size: 24px;
   font-weight: 850;
   font-family: var(--font-mono);
@@ -84,68 +84,72 @@
   line-height: 1.15;
 }
 
-.textGreen { color: #217346; }
-.textRed { color: #B92D23; }
-.textAmber { color: #966108; }
-.textBlue { color: #1E5BB8; }
-.textCoral { color: var(--accent-primary); }
+.valTeal { color: #0d9488; }
+.valRose { color: #be123c; }
+.valAmber { color: #b45309; }
+.valProcessing { color: #0f766e; }
+.valLime { color: #4d7c0f; }
 
-.progressRow {
+.metaRow {
   display: flex;
   flex-direction: column;
   gap: 4px;
   margin-top: 2px;
 }
 
-.barBackground {
+.progressBar {
   height: 4px;
-  background: #F4EFE8;
+  background: #f1f5f9;
   border-radius: var(--radius-full);
   overflow: hidden;
 }
 
-.barFillNeutral {
+.fillSlate {
   height: 100%;
   background: var(--border-strong);
   border-radius: var(--radius-full);
 }
 
-.barFillGreen {
+.fillTeal {
   height: 100%;
-  background: #2E7D5E;
+  background: #0d9488;
   border-radius: var(--radius-full);
 }
 
-.barFillRed {
+.fillRose {
   height: 100%;
-  background: #B92D23;
+  background: #be123c;
   border-radius: var(--radius-full);
 }
 
-.barFillAmber {
+.fillAmber {
   height: 100%;
-  background: #D97706;
+  background: #d97706;
   border-radius: var(--radius-full);
 }
 
-.barFillBlue {
+.fillProcessing {
   height: 100%;
-  background: #2563EB;
+  background: #0f766e;
   border-radius: var(--radius-full);
 }
 
-.barFillCoral {
+.fillLime {
   height: 100%;
-  background: var(--accent-primary);
+  background: #84cc16;
   border-radius: var(--radius-full);
 }
 
-.barCaption {
+.metaCaption {
   font-size: 11px;
   color: var(--text-muted);
 }
 
-.spinIcon {
+.metaCaption strong {
+  color: var(--text-primary);
+}
+
+.spinAnimation {
   animation: spin 1s linear infinite;
 }
 

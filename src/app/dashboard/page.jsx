@@ -188,15 +188,15 @@ export default function DashboardPage() {
   const getViewTitle = () => {
     switch (activeTab) {
       case 'dashboard':
-        return 'Campus Outreach Overview';
+        return 'Campaign Overview';
       case 'sender':
-        return senderSubMode === 'manual' ? 'Manual Email Sender' : 'Bulk Directory & CSV Outreach';
+        return senderSubMode === 'manual' ? 'Single Outreach Composer' : 'Bulk Campaign Engine';
       case 'templates':
         return 'Proposal Templates';
       case 'settings':
         return 'System & SMTP Settings';
       default:
-        return 'Campus Outreach Portal';
+        return 'Campaign Operations';
     }
   };
 
@@ -204,14 +204,14 @@ export default function DashboardPage() {
     return (
       <div className={styles.loadingOverlay}>
         <RefreshCwIcon size={32} className={styles.loadingSpinner} />
-        <div>Authenticating Company Session...</div>
+        <div>Authenticating Campaign Session...</div>
       </div>
     );
   }
 
   return (
     <div className={styles.dashboardWrapper}>
-      {/* Sidebar Navigation */}
+      {/* Modern SaaS Sidebar */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -219,13 +219,13 @@ export default function DashboardPage() {
         onLogout={handleLogout}
       />
 
-      {/* Main Dynamic Viewport */}
+      {/* Main Viewport */}
       <div className={styles.mainArea}>
-        {/* Sticky Top Bar */}
+        {/* Sticky Top Command Bar */}
         <header className={styles.topBar}>
           <div className={styles.breadcrumbArea}>
             <span className={styles.viewTitle}>{getViewTitle()}</span>
-            <span className={styles.viewTagline}>&bull; Shortfundly Campus Outreach Portal</span>
+            <span className={styles.viewTagline}>&bull; ReachOut OS Platform</span>
           </div>
 
           <div className={styles.topBarRight}>
@@ -251,9 +251,9 @@ export default function DashboardPage() {
           {activeTab === 'dashboard' && (
             <>
               <div className={styles.introSection}>
-                <h1 className={styles.headline}>Campus Outreach Automation Command Center</h1>
+                <h1 className={styles.headline}>Campaign Operations Command Center</h1>
                 <p className={styles.subheadline}>
-                  Empower colleges and student creators with official Shortfundly Campus partnerships, screening festivals, and creator tools.
+                  Monitor live campaign deliverability, track genuine 250 OK inbox handshakes, and manage statewide institutional communications.
                 </p>
               </div>
 

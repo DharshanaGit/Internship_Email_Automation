@@ -285,23 +285,30 @@ export function SparklesIcon({ className, size = 18 }) {
 }
 
 export function ShortfundlyLogoSymbol({ size = 36, className }) {
+  return <CampaignPulseLogoSymbol size={size} className={className} />;
+}
+
+export function CampaignPulseLogoSymbol({ size = 36, className }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="10 10 94 94"
+      viewBox="0 0 40 40"
       width={size}
       height={size}
       fill="none"
       className={className}
       style={{ flexShrink: 0, display: 'inline-block' }}
     >
-      <circle cx="57" cy="57" r="45.5" fill="#FE3030" />
-      <circle cx="37.5" cy="57" r="6.2" fill="#FFFFFF" />
-      <g stroke="#FFFFFF" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="46" y1="82" x2="70" y2="57" opacity="0.95" />
-        <line x1="46" y1="32" x2="70" y2="57" opacity="0.95" />
-      </g>
-      <circle cx="70" cy="57" r="7.5" fill="#FFFFFF" />
+      <rect width="40" height="40" rx="10" fill="#0f172a" />
+      <path
+        d="M10 27L16 13L24 23L30 11"
+        stroke="#14b8a6"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="30" cy="11" r="3.2" fill="#84cc16" />
+      <circle cx="16" cy="13" r="2.2" fill="#38bdf8" />
     </svg>
   );
 }
