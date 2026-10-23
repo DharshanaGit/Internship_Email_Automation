@@ -9,7 +9,7 @@ import { Mail, Lock, Shield, RotateCw, ArrowRight, AlertCircle, UserCheck } from
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('admin@shortfundly.com');
-  const [password, setPassword] = useState('admin123');
+  const [password, setPassword] = useState('Shortfundly@Pass2026!');
   const [role, setRole] = useState('ADMIN');
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [captchaData, setCaptchaData] = useState({ token: '', svg: '' });
@@ -80,7 +80,7 @@ export default function LoginPage() {
 
   const handleQuickFillRole = (selectedRole, selectedEmail) => {
     setEmail(selectedEmail || 'admin@shortfundly.com');
-    setPassword('admin123');
+    setPassword('Shortfundly@Pass2026!');
     setRole(selectedRole);
     setErrorMessage('');
   };
@@ -202,7 +202,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => handleQuickFillRole('ADMIN', 'admin@shortfundly.com')}
               className={styles.quickFillButton}
-              title="admin@shortfundly.com / admin123"
+              title="admin@shortfundly.com / Shortfundly@Pass2026!"
             >
               Admin
             </button>
@@ -210,7 +210,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => handleQuickFillRole('HR', 'hr@shortfundly.com')}
               className={styles.quickFillButton}
-              title="hr@shortfundly.com / admin123"
+              title="hr@shortfundly.com / Shortfundly@Pass2026!"
             >
               HR Director
             </button>
@@ -218,13 +218,13 @@ export default function LoginPage() {
               type="button"
               onClick={() => handleQuickFillRole('CEO', 'ceo@shortfundly.com')}
               className={styles.quickFillButton}
-              title="ceo@shortfundly.com / admin123"
+              title="ceo@shortfundly.com / Shortfundly@Pass2026!"
             >
               CEO
             </button>
           </div>
           <div style={{ fontSize: '11px', color: '#64748b', textAlign: 'center', marginTop: '6px' }}>
-            Credentials configured in .env (admin@shortfundly.com / admin123)
+            Credentials configured in .env (admin@shortfundly.com / Shortfundly@Pass2026!)
           </div>
         </div>
 
