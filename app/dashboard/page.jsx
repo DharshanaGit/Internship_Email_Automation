@@ -32,6 +32,7 @@ import {
   Filter,
   ArrowRight,
   Sliders,
+  FileText,
 } from 'lucide-react';
 import { generateGemmaTask, generateGemmaFeedback } from '@/lib/gemmaEngine';
 import { formatToDdMmYy, getRandomIstTime, getExplanationSchedule } from '@/lib/dateUtils';
