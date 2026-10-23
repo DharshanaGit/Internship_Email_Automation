@@ -133,12 +133,13 @@ export async function POST(request) {
     // SCENARIO B: REVIEW 1 DISPATCH (Only Review Date, Time, Google Meet link - NO FEEDBACK for Review 1)
     if (action === 'review_1' || action === 'send_next_review') {
       const schedule = getReviewOneSchedule(task.explanationDate || new Date());
+      const persistentMeetLink = candidate.googleMeetUrl || task.meetLink || (await getOrCreateCandidateMeetLink(candidate, schedule.callDateStr));
 
       const icsInvite = createIcsCalendarInvite({
         uid: `sf-task-rev1-${task.id}@shortfundly.com`,
         title: `[Shortfundly] Review 1 Call - ${candidate.role} (${candidate.fullName})`,
-        description: `Review 1 for task: ${task.title}.\n\nSame Google Meet Link: ${task.meetLink}`,
-        meetLink: task.meetLink,
+        description: `Review 1 for task: ${task.title}.\n\nSame Google Meet Link: ${persistentMeetLink}`,
+        meetLink: persistentMeetLink,
         startDateStr: new Date().toISOString().split('T')[0],
         startTimeStr: '14:00',
         durationMinutes: 45,
@@ -160,7 +161,7 @@ export async function POST(request) {
               <p style="margin: 4px 0;"><strong>Task:</strong> ${task.title}</p>
               <p style="margin: 4px 0;"><strong>Review Date:</strong> ${schedule.callDateStr}</p>
               <p style="margin: 4px 0;"><strong>Time:</strong> ${schedule.timeStr}</p>
-              <p style="margin: 8px 0 0 0;"><strong>Google Meet Link (Same Link):</strong> <a href="${task.meetLink}" style="color: #2563eb; font-weight: bold; text-decoration: underline;">${task.meetLink}</a></p>
+              <p style="margin: 8px 0 0 0;"><strong>Google Meet Link (Same Link):</strong> <a href="${persistentMeetLink}" style="color: #2563eb; font-weight: bold; text-decoration: underline;">${persistentMeetLink}</a></p>
             </div>
 
             <p>Please prepare your progress demo and deliverables for evaluation on this call.</p>
@@ -173,11 +174,12 @@ export async function POST(request) {
         candidateId: candidate.id,
         to: candidate.email,
         recipientName: candidate.fullName,
+        cc: body.cc || undefined,
         subject: `Review 1 Call Scheduled - ${candidate.fullName} | Shortfundly`,
         html: emailHtml,
-        text: `Review 1 call scheduled for ${schedule.callDateStr} at ${schedule.timeStr}. Meet: ${task.meetLink}`,
+        text: `Review 1 call scheduled for ${schedule.callDateStr} at ${schedule.timeStr}. Meet: ${persistentMeetLink}`,
         emailType: 'TASK_REVIEW_1',
-        meetLink: task.meetLink,
+        meetLink: persistentMeetLink,
         attachments: [
           {
             filename: 'review1_invite.ics',
@@ -211,12 +213,13 @@ export async function POST(request) {
     if (action === 'review_2') {
       const manualFeedback = feedback?.trim() || 'Sprint deliverables evaluated by mentor. Review agenda items recorded.';
       const schedule = getReviewTwoSchedule(task.firstReviewDate || task.reviewDate || new Date());
+      const persistentMeetLink = candidate.googleMeetUrl || task.meetLink || (await getOrCreateCandidateMeetLink(candidate, schedule.callDateStr));
 
       const icsInvite = createIcsCalendarInvite({
         uid: `sf-task-rev2-${task.id}@shortfundly.com`,
         title: `[Shortfundly] Review 2 Call with Feedback - ${candidate.role} (${candidate.fullName})`,
-        description: `Review 2 for task: ${task.title}.\n\nMentor Feedback:\n${manualFeedback}\n\nSame Google Meet Link: ${task.meetLink}`,
-        meetLink: task.meetLink,
+        description: `Review 2 for task: ${task.title}.\n\nMentor Feedback:\n${manualFeedback}\n\nSame Google Meet Link: ${persistentMeetLink}`,
+        meetLink: persistentMeetLink,
         startDateStr: new Date().toISOString().split('T')[0],
         startTimeStr: '15:00',
         durationMinutes: 45,
@@ -243,7 +246,7 @@ export async function POST(request) {
               <h4 style="margin: 0 0 6px 0; color: #1d4ed8;">Second Review Call Schedule:</h4>
               <p style="margin: 4px 0;"><strong>Second Review Date:</strong> ${schedule.callDateStr}</p>
               <p style="margin: 4px 0;"><strong>Time:</strong> ${schedule.timeStr}</p>
-              <p style="margin: 8px 0 0 0;"><strong>Google Meet Link (Same Link):</strong> <a href="${task.meetLink}" style="color: #2563eb; font-weight: bold; text-decoration: underline;">${task.meetLink}</a></p>
+              <p style="margin: 8px 0 0 0;"><strong>Google Meet Link (Same Link):</strong> <a href="${persistentMeetLink}" style="color: #2563eb; font-weight: bold; text-decoration: underline;">${persistentMeetLink}</a></p>
             </div>
 
             <p style="margin-top: 24px;">Best regards,<br><strong>Technical Mentorship & HR Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.</p>
@@ -255,11 +258,12 @@ export async function POST(request) {
         candidateId: candidate.id,
         to: candidate.email,
         recipientName: candidate.fullName,
+        cc: body.cc || undefined,
         subject: `Review 2 Call & Feedback - ${candidate.fullName} | Shortfundly`,
         html: emailHtml,
-        text: `Review 2 scheduled for ${schedule.callDateStr} at ${schedule.timeStr}. Feedback: ${manualFeedback}. Meet: ${task.meetLink}`,
+        text: `Review 2 scheduled for ${schedule.callDateStr} at ${schedule.timeStr}. Feedback: ${manualFeedback}. Meet: ${persistentMeetLink}`,
         emailType: 'TASK_REVIEW_2',
-        meetLink: task.meetLink,
+        meetLink: persistentMeetLink,
         attachments: [
           {
             filename: 'review2_invite.ics',

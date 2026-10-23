@@ -47,7 +47,7 @@ export async function POST(request) {
         const finalReviewDate = reviewDate || schedule.callDateStr;
         const finalReviewTime = reviewTime || schedule.timeStr;
 
-        let meetUrl = task.meetLink;
+        let meetUrl = candidate.googleMeetUrl || task.meetLink;
         if (!meetUrl || meetUrl.includes('undefined')) {
           meetUrl = await getOrCreateCandidateMeetLink(candidate, finalReviewDate);
         }
