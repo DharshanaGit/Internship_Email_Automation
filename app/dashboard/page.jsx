@@ -33,6 +33,7 @@ import {
   ArrowRight,
   Sliders,
   FileText,
+  Trash2,
 } from 'lucide-react';
 import { generateGemmaTask, generateGemmaFeedback } from '@/lib/gemmaEngine';
 import { formatToDdMmYy, getRandomIstTime, getExplanationSchedule } from '@/lib/dateUtils';
@@ -294,6 +295,38 @@ export default function DashboardPage() {
       }
     } catch (err) {
       console.error('Error loading email logs:', err);
+    }
+  };
+
+  const handleDeleteEmailLog = async (logId) => {
+    if (!confirm('Are you sure you want to delete this email log record?')) return;
+    try {
+      const res = await fetch(`/api/emails?id=${logId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Email log deleted successfully', 'success');
+        setEmailLogs((prev) => prev.filter((item) => item.id !== logId));
+      } else {
+        showToast(data.error || 'Failed to delete email log', 'error');
+      }
+    } catch (e) {
+      showToast('Error deleting email log', 'error');
+    }
+  };
+
+  const handleClearAllEmailLogs = async () => {
+    if (!confirm('Are you sure you want to clear all email tracking history?')) return;
+    try {
+      const res = await fetch('/api/emails?all=true', { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('All email logs cleared successfully', 'success');
+        setEmailLogs([]);
+      } else {
+        showToast(data.error || 'Failed to clear email logs', 'error');
+      }
+    } catch (e) {
+      showToast('Error clearing email logs', 'error');
     }
   };
 
@@ -3574,6 +3607,17 @@ export default function DashboardPage() {
                     <option value="Delivered">Delivered</option>
                     <option value="Failed">Failed</option>
                   </select>
+
+                  <button
+                    type="button"
+                    onClick={handleClearAllEmailLogs}
+                    className={styles.btnAction}
+                    style={{ color: '#ef4444', borderColor: '#ef444444', fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                    title="Clear all email tracking records"
+                  >
+                    <Trash2 size={13} />
+                    <span>Clear All</span>
+                  </button>
                 </div>
               </div>
 
@@ -3587,12 +3631,13 @@ export default function DashboardPage() {
                     <th>Type</th>
                     <th>Attachments</th>
                     <th>Status</th>
+                    <th style={{ textAlign: 'center' }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {emailLogs.length === 0 ? (
                     <tr>
-                      <td colSpan={7} style={{ textAlign: 'center', padding: '36px 20px', color: 'var(--text-muted)' }}>
+                      <td colSpan={8} style={{ textAlign: 'center', padding: '36px 20px', color: 'var(--text-muted)' }}>
                         No email dispatch records found. Dispatched emails across Offer Letters, Tasks, Reviews, and Certificates will be tracked here in real time.
                       </td>
                     </tr>
@@ -3643,6 +3688,26 @@ export default function DashboardPage() {
                             >
                               {log.status}
                             </span>
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteEmailLog(log.id)}
+                              className={styles.btnAction}
+                              style={{
+                                color: '#ef4444',
+                                borderColor: '#ef444444',
+                                padding: '4px 8px',
+                                fontSize: '11px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}
+                              title="Delete email log"
+                            >
+                              <Trash2 size={12} />
+                              <span>Delete</span>
+                            </button>
                           </td>
                         </tr>
                       ))

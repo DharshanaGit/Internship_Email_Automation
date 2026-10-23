@@ -80,3 +80,30 @@ export async function GET(request) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
+
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const all = searchParams.get('all');
+
+    if (all === 'true') {
+      await prisma.emailLog.deleteMany({});
+      return NextResponse.json({ success: true, message: 'All email tracking logs deleted successfully' });
+    }
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Email log ID is required' }, { status: 400 });
+    }
+
+    await prisma.emailLog.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true, message: 'Email log deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting email log:', error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}

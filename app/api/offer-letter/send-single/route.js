@@ -31,11 +31,31 @@ export async function POST(request) {
     const degree = formData.get('degree') || 'Bachelor of Engineering';
     const stipend = formData.get('stipend') || 'Rs. 10,000';
 
-    let candidate;
+    let candidate = null;
 
+    // 1. Check if candidate exists by DB primary key or string candidateId
     if (candidateId) {
+      candidate = await prisma.candidate.findFirst({
+        where: {
+          OR: [
+            { id: candidateId },
+            { candidateId: candidateId },
+          ],
+        },
+      });
+    }
+
+    // 2. If not found by candidateId, check by email
+    if (!candidate && email) {
+      candidate = await prisma.candidate.findFirst({
+        where: { email },
+      });
+    }
+
+    // 3. Update existing or create new candidate
+    if (candidate) {
       candidate = await prisma.candidate.update({
-        where: { id: candidateId },
+        where: { id: candidate.id },
         data: {
           ...(fullName ? { fullName } : {}),
           ...(email ? { email } : {}),
@@ -43,6 +63,10 @@ export async function POST(request) {
           ...(department ? { department } : {}),
           ...(joiningDate ? { joiningDate } : {}),
           ...(endDate ? { endDate } : {}),
+          ...(duration ? { duration } : {}),
+          ...(workMode ? { workMode } : {}),
+          ...(reportingManager ? { reportingManager } : {}),
+          ...(assignedMentor ? { assignedMentor } : {}),
           ...(phone ? { phone } : {}),
           ...(collegeName ? { collegeName } : {}),
           ...(degree ? { degree } : {}),
@@ -50,8 +74,10 @@ export async function POST(request) {
         },
       });
     } else if (email && fullName) {
-      // Create candidate
-      const candId = `SF-INT-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+      const candId = (candidateId && candidateId.startsWith('SF-'))
+        ? candidateId
+        : `SF-INT-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+
       candidate = await prisma.candidate.create({
         data: {
           candidateId: candId,
