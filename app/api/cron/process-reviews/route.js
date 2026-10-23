@@ -115,7 +115,8 @@ async function handleCronProcess(request) {
         const rev2Date = formatToDdMmYy(rev2DateObj);
         const rev2Time = getRandomIstTime();
         const meetLink = task.meetLink || generateGoogleMeetLink();
-        const automatedFeedback = generateGemmaFeedback(candidate.role, 1);
+        const feedbackObj = generateGemmaFeedback(candidate.role, 1);
+        const automatedFeedback = typeof feedbackObj === 'object' ? (feedbackObj.feedback || JSON.stringify(feedbackObj)) : String(feedbackObj);
 
         const subject = `Scheduled: Internship Sprint Review 2 & Evaluation - ${candidate.fullName} | Shortfundly`;
         const htmlBody = `
