@@ -1,0 +1,79 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '../../../lib/prisma';
+
+export async function GET() {
+  try {
+    let settings = await prisma.systemSetting.findUnique({
+      where: { id: 'default' },
+    });
+
+    if (!settings) {
+      settings = await prisma.systemSetting.create({
+        data: { id: 'default' },
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        smtpHost: settings.smtpHost || 'smtp.gmail.com',
+        smtpPort: settings.smtpPort || 465,
+        smtpSecure: settings.smtpSecure,
+        smtpUser: settings.smtpUser || 'hr@shortfundly.com',
+        hasPassword: !!settings.smtpPass,
+        senderEmail: settings.senderEmail || 'hr@shortfundly.com',
+        senderName: settings.senderName || 'Shortfundly HR Team',
+        googleCalendarConnected: settings.googleCalendarConnected,
+        defaultMeetLinkPrefix: settings.defaultMeetLinkPrefix || 'https://meet.google.com',
+        simulationMode: settings.simulationMode,
+      },
+    });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const updateData = {};
+
+    if (body.smtpHost !== undefined) updateData.smtpHost = body.smtpHost;
+    if (body.smtpPort !== undefined) updateData.smtpPort = parseInt(body.smtpPort, 10);
+    if (body.smtpSecure !== undefined) updateData.smtpSecure = Boolean(body.smtpSecure);
+    if (body.smtpUser !== undefined) updateData.smtpUser = body.smtpUser;
+    if (body.smtpPass !== undefined && body.smtpPass.trim() !== '') {
+      updateData.smtpPass = body.smtpPass.trim();
+    }
+    if (body.senderEmail !== undefined) updateData.senderEmail = body.senderEmail;
+    if (body.senderName !== undefined) updateData.senderName = body.senderName;
+    if (body.googleCalendarConnected !== undefined) updateData.googleCalendarConnected = Boolean(body.googleCalendarConnected);
+    if (body.defaultMeetLinkPrefix !== undefined) updateData.defaultMeetLinkPrefix = body.defaultMeetLinkPrefix;
+    if (body.simulationMode !== undefined) updateData.simulationMode = Boolean(body.simulationMode);
+
+    const updated = await prisma.systemSetting.upsert({
+      where: { id: 'default' },
+      update: updateData,
+      create: { id: 'default', ...updateData },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Settings updated successfully',
+      data: {
+        smtpHost: updated.smtpHost,
+        smtpPort: updated.smtpPort,
+        smtpSecure: updated.smtpSecure,
+        smtpUser: updated.smtpUser,
+        hasPassword: !!updated.smtpPass,
+        senderEmail: updated.senderEmail,
+        senderName: updated.senderName,
+        googleCalendarConnected: updated.googleCalendarConnected,
+        defaultMeetLinkPrefix: updated.defaultMeetLinkPrefix,
+        simulationMode: updated.simulationMode,
+      },
+    });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}

@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Next.js build and diagnostics
+.next/
+out/
+build/
+dist/
+
+# Environment and secrets (CRITICAL: Never commit .env)
+.env
+.env*.local
+.env.development
+.env.test
+.env.production
+
+# Database & SQLite storage
+*.db
+*.db-journal
+dev.db
+dev.db-journal
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Generated test artifacts & PDFs
+storage/offer_letters/*.pdf
+storage/certificates/*.pdf
+storage/excel_exports/*.xlsx
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.pdf
+.vscode/
+.idea/

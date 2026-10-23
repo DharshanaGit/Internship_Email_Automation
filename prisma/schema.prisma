@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Candidate {
+  id                 String           @id @default(cuid())
+  candidateId        String           @unique
+  fullName           String
+  email              String
+  phone              String?
+  role               String
+  department         String
+  collegeName        String?
+  degree             String?
+  joiningDate        String
+  endDate            String
+  duration           String
+  workMode           String           @default("Online - Remote")
+  reportingManager   String
+  assignedMentor     String
+  offerLetterStatus  String           @default("Ready to Send")
+  taskStatus         String           @default("Not Assigned")
+  tasksCompleted     Int              @default(0)
+  reviewCycle        Int              @default(0)
+  score              Float            @default(0.0)
+  offerAcceptanceToken String?        @unique
+  offerAcceptedAt    DateTime?
+  googleMeetUrl      String?          @map("google_meet_url")
+  remarks            String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  tasks              TaskAssignment[]
+  emails             EmailLog[]
+  certificates       Certificate[]
+}
+
+model TaskAssignment {
+  id                 String    @id @default(cuid())
+  candidateId        String
+  candidate          Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  taskNumber         Int       @default(1)
+  title              String
+  description        String
+  role               String
+  explanationDate    String
+  explanationTime    String
+  meetLink           String
+  reviewDate         String
+  reviewTime         String
+  status             String    @default("Assigned")
+  feedback           String?
+  firstReviewDate    String?
+  firstReviewStatus  String?   @default("Pending")
+  secondReviewDate   String?
+  secondReviewStatus String?   @default("Pending")
+  secondReviewFeedback String?
+  reviewCount        Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model EmailLog {
+  id             String     @id @default(cuid())
+  candidateId    String?
+  candidate      Candidate? @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  recipientEmail String
+  recipientName  String?
+  cc             String?
+  subject        String
+  emailType      String
+  body           String
+  attachments    String?
+  meetLink       String?
+  status         String     @default("Sent")
+  error          String?
+  sentAt         DateTime   @default(now())
+}
+
+model Certificate {
+  id                String    @id @default(cuid())
+  candidateId       String
+  candidate         Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  certificateNumber String    @unique
+  issueDate         String
+  pdfPath           String?
+  sentAt            DateTime?
+  createdAt         DateTime  @default(now())
+}
+
+model SystemSetting {
+  id                      String   @id @default("default")
+  smtpHost                String?  @default("smtp.gmail.com")
+  smtpPort                Int?     @default(465)
+  smtpSecure              Boolean  @default(true)
+  smtpUser                String?  @default("hr@shortfundly.com")
+  smtpPass                String?
+  senderEmail             String?  @default("hr@shortfundly.com")
+  senderName              String?  @default("Shortfundly HR Team")
+  googleCalendarConnected Boolean  @default(false)
+  defaultMeetLinkPrefix   String?  @default("https://meet.google.com")
+  simulationMode          Boolean  @default(true)
+  updatedAt               DateTime @updatedAt
+}
+
+model EmailQueue {
+  id          String    @id @default(cuid())
+  type        String    // OFFER_LETTER, TASK_ASSIGNMENT, REVIEW, CERTIFICATE
+  candidateId String?
+  payload     String    // JSON string containing parameters
+  status      String    @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  attempts    Int       @default(0)
+  error       String?
+  scheduledAt DateTime  @default(now())
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
