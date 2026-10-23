@@ -34,7 +34,7 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    fetchCaptcha();
+    fetchCaptcha(); router.prefetch('/dashboard');
   }, []);
 
   const handleLogin = async (e) => {
@@ -64,7 +64,7 @@ export default function LoginPage() {
 
       if (!res.ok || !data.success) {
         setErrorMessage(data.error || 'Authentication failed. Please verify credentials.');
-        fetchCaptcha();
+        fetchCaptcha(); router.prefetch('/dashboard');
         return;
       }
 
@@ -72,7 +72,7 @@ export default function LoginPage() {
       router.push('/dashboard');
     } catch (err) {
       setErrorMessage(err.message || 'An unexpected authentication error occurred.');
-      fetchCaptcha();
+      fetchCaptcha(); router.prefetch('/dashboard');
     } finally {
       setLoading(false);
     }

@@ -38,7 +38,7 @@ export default function LandingPage() {
             <a href="#contact" className={styles.navLink}>Contact</a>
           </nav>
 
-          <Link href="/login" className={styles.btnPrimary}>
+          <Link href="/login" prefetch={true} className={styles.btnPrimary}>
             <span>Get Started</span>
             <ArrowRight size={15} />
           </Link>
@@ -62,7 +62,7 @@ export default function LandingPage() {
           </p>
 
           <div className={styles.heroActions}>
-            <Link href="/login" className={styles.btnPrimary} style={{ padding: '12px 28px', fontSize: '15px' }}>
+            <Link href="/login" prefetch={true} className={styles.btnPrimary} style={{ padding: '12px 28px', fontSize: '15px' }}>
               <span>Get Started</span>
               <ArrowRight size={17} />
             </Link>
@@ -256,7 +256,7 @@ export default function LandingPage() {
             <p className={styles.ctaContent}>
               Bring candidate information and internship communication together in one streamlined workflow.
             </p>
-            <Link href="/login" className={styles.btnPrimary} style={{ padding: '14px 34px', fontSize: '15px' }}>
+            <Link href="/login" prefetch={true} className={styles.btnPrimary} style={{ padding: '14px 34px', fontSize: '15px' }}>
               <span>Get Started</span>
               <ArrowRight size={17} />
             </Link>

@@ -136,7 +136,7 @@
   cursor: pointer;
   color: #f1f5f9;
   font-weight: 600;
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
 }
 
 .userPill:hover {
@@ -174,7 +174,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
 }
 
 .btnLogout:hover {
@@ -201,7 +201,7 @@
   font-weight: 600;
   color: #94a3b8;
   border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
   white-space: nowrap;
 }
 
@@ -280,7 +280,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
 }
 
 .btnAction:hover {
@@ -298,7 +298,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
@@ -333,7 +333,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
   background: transparent;
 }
 
@@ -481,7 +481,7 @@
   color: var(--text-primary);
   font-size: 13.5px;
   outline: none;
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
 }
 
 .inputField:focus {
@@ -527,7 +527,7 @@
   padding: 3px 8px;
   border-radius: var(--radius-xs);
   cursor: pointer;
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
 }
 
 .tokenPill:hover {
@@ -543,7 +543,7 @@
   text-align: center;
   background: rgba(14, 20, 34, 0.4);
   cursor: pointer;
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
 }
 
 .dropzone:hover {
@@ -736,7 +736,7 @@
   cursor: pointer;
   padding: 4px;
   border-radius: var(--radius-xs);
-  transition: all 0.2s ease;
+  cursor: pointer; transition: all 0.2s ease;
 }
 
 .modalClose:hover {

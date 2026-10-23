@@ -374,8 +374,10 @@ export default function DashboardPage() {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/');
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {}
+    window.location.href = '/';
   };
 
   // --- MODULE 1: SINGLE CANDIDATE SELECTION ---
@@ -971,7 +973,7 @@ export default function DashboardPage() {
             <span className={styles.userName}>{adminUser.name}</span>
           </div>
 
-          <button onClick={handleLogout} className={styles.btnLogout} title="Terminate Admin Session">
+          <button type="button" onClick={handleLogout} className={styles.btnLogout} title="Terminate Admin Session">
             <LogOut size={14} />
             <span>Sign Out</span>
           </button>

@@ -5,7 +5,7 @@ const COOKIE_NAME = 'sf_auth_session';
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Protect /dashboard
+  // Protect /dashboard and all nested operational screens
   if (pathname.startsWith('/dashboard')) {
     const sessionCookie = request.cookies.get(COOKIE_NAME)?.value;
     if (!sessionCookie) {
@@ -15,17 +15,9 @@ export function middleware(request) {
     }
   }
 
-  // If user is already authenticated and visits /login, redirect to /dashboard
-  if (pathname === '/login') {
-    const sessionCookie = request.cookies.get(COOKIE_NAME)?.value;
-    if (sessionCookie) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
-  }
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login'],
+  matcher: ['/dashboard/:path*'],
 };
