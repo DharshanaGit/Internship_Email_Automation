@@ -149,27 +149,20 @@ export async function POST(request) {
           .replace(/\{\{candidate_name\}\}/g, candidate.fullName)
           .replace(/\{\{candidate_id\}\}/g, candidate.candidateId)
           .replace(/\{\{internship_role\}\}/g, candidate.role)
+          .replace(/\{\{designation\}\}/g, candidate.role)
           .replace(/\{\{department\}\}/g, candidate.department)
           .replace(/\{\{joining_date\}\}/g, candidate.joiningDate)
           .replace(/\{\{end_date\}\}/g, candidate.endDate)
-          .replace(/\{\{work_mode\}\}/g, candidate.workMode)
+          .replace(/\{\{duration\}\}/g, candidate.duration || '3 Months')
+          .replace(/\{\{work_mode\}\}/g, candidate.workMode || 'Online - Remote')
           .replace(/\{\{stipend\}\}/g, candidate.stipend || stipend || 'Rs. 10,000')
           .replace(/\{\{degree\}\}/g, candidate.degree || degree || 'Bachelor of Engineering')
           .replace(/\{\{college_name\}\}/g, candidate.collegeName || collegeName || 'Recognized University')
           .replace(/\{\{phone\}\}/g, candidate.phone || phone || '')
-          .replace(/\n/g, '<br>')
       : '';
 
     const htmlBody = customBody
-      ? `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; padding: 20px;">
-          ${parsedBody}
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${acceptUrl}" style="background: linear-gradient(135deg, #2563eb, #38bdf8); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-              ACCEPT INTERNSHIP OFFER
-            </a>
-            <p style="color: #64748b; font-size: 12px; margin-top: 8px;">Direct link: ${acceptUrl}</p>
-          </div>
-        </div>`
+      ? (customBody.includes('<') ? parsedBody : `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; padding: 20px;">${parsedBody.replace(/\n/g, '<br>')}</div>`)
       : `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a; max-width: 620px; margin: 0 auto; line-height: 1.6; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
           <div style="background: linear-gradient(135deg, #090d16, #1e293b); padding: 28px 24px; text-align: center; border-bottom: 3px solid #38bdf8;">
@@ -188,16 +181,7 @@ export async function POST(request) {
               <p style="margin: 4px 0;"><strong>Work Mode:</strong> ${candidate.workMode}</p>
             </div>
 
-            <p>Please review your attached official Offer Letter PDF. To formally accept and automatically initiate your role sprint deliverables and explanation schedule, click below:</p>
-
-            <div style="text-align: center; margin: 32px 0 24px 0;">
-              <a href="${acceptUrl}" style="background: linear-gradient(135deg, #2563eb, #38bdf8); color: #ffffff; padding: 15px 32px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);">
-                ACCEPT INTERNSHIP OFFER
-              </a>
-              <p style="color: #64748b; font-size: 12px; margin-top: 10px;">Direct Link: <a href="${acceptUrl}" style="color: #2563eb;">${acceptUrl}</a></p>
-            </div>
-
-            <p style="font-size: 13px; color: #64748b; line-height: 1.5;">Once accepted, the system will instantly generate your role-specific Sprint deliverables via Gemma 2B and send your Google Meet explanation calendar invite.</p>
+            <p>Please find attached your official Shortfundly Internship Offer Letter PDF. Kindly review the attached offer letter and reach out to our HR team if you have any questions.</p>
 
             <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 28px 0;" />
             <p style="margin: 0; font-size: 13px; color: #475569;">Warm regards,<br><strong style="color: #0f172a;">Human Resources Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.<br><span style="color: #94a3b8; font-size: 12px;">Chennai, Tamil Nadu, India | hr@shortfundly.com</span></p>
@@ -213,7 +197,7 @@ export async function POST(request) {
       cc: cc || undefined,
       subject,
       html: htmlBody,
-      text: `Dear ${candidate.fullName}, your Shortfundly Offer Letter is attached. Accept online at: ${acceptUrl}`,
+      text: `Dear ${candidate.fullName}, your official Shortfundly Internship Offer Letter is attached. Please review the attached document.`,
       emailType: 'OFFER_LETTER',
       attachments,
     });

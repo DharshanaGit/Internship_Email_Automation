@@ -113,19 +113,23 @@ export async function POST(request) {
               .replace(/\{\{task_title\}\}/g, taskTitle)
           : `Internship Task Assignment & Explanation Call - ${candidate.role} | Shortfundly`;
 
-        const htmlBody = customBody
-          ? `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; padding: 20px;">
-              ${customBody
-                .replace(/\{\{candidate_name\}\}/g, candidate.fullName)
-                .replace(/\{\{email\}\}/g, candidate.email)
-                .replace(/\{\{designation\}\}/g, candidate.role)
-                .replace(/\{\{task_title\}\}/g, taskTitle)
-                .replace(/\{\{task_content\}\}/g, taskDesc.replace(/\n/g, '<br>'))
-                .replace(/\{\{explanation_date\}\}/g, expSchedule.dateStr)
-                .replace(/\{\{time\}\}/g, expSchedule.timeStr)
-                .replace(/\{\{meet_link\}\}/g, meetLink)
-                .replace(/\n/g, '<br>')}
-            </div>`
+        const parsedBulkBody = customBody
+          ? customBody
+              .replace(/\{\{candidate_name\}\}/g, candidate.fullName)
+              .replace(/\{\{email\}\}/g, candidate.email)
+              .replace(/\{\{designation\}\}/g, candidate.role)
+              .replace(/\{\{role\}\}/g, candidate.role)
+              .replace(/\{\{task_title\}\}/g, taskTitle)
+              .replace(/\{\{task_content\}\}/g, taskDesc.replace(/\n/g, '<br>'))
+              .replace(/\{\{task_description\}\}/g, taskDesc.replace(/\n/g, '<br>'))
+              .replace(/\{\{explanation_date\}\}/g, expSchedule.dateStr)
+              .replace(/\{\{time\}\}/g, expSchedule.timeStr)
+              .replace(/\{\{explanation_time\}\}/g, expSchedule.timeStr)
+              .replace(/\{\{meet_link\}\}/g, meetLink)
+          : null;
+
+        const htmlBody = parsedBulkBody
+          ? (parsedBulkBody.includes('<') ? parsedBulkBody : `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; padding: 20px;">${parsedBulkBody.replace(/\n/g, '<br>')}</div>`)
           : `
             <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; max-width: 620px; margin: 0 auto; line-height: 1.6; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;">
               <div style="background: #0f172a; padding: 24px; text-align: center; border-bottom: 3px solid #2563eb;">

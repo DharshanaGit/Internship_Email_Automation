@@ -55,22 +55,25 @@ export async function POST(request) {
       : `Internship Offer Letter - ${normalizedCandidate.fullName} (${normalizedCandidate.candidateId}) | Shortfundly`;
 
     // Render email body HTML
-    const emailBodyHtml = customBody
-      ? `<div style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1e293b; padding: 20px;">
-          ${customBody
-            .replace(/\{\{candidate_name\}\}/g, normalizedCandidate.fullName)
-            .replace(/\{\{candidate_id\}\}/g, normalizedCandidate.candidateId)
-            .replace(/\{\{internship_role\}\}/g, normalizedCandidate.role)
-            .replace(/\{\{department\}\}/g, normalizedCandidate.department)
-            .replace(/\{\{joining_date\}\}/g, normalizedCandidate.joiningDate)
-            .replace(/\{\{end_date\}\}/g, normalizedCandidate.endDate)
-            .replace(/\{\{work_mode\}\}/g, normalizedCandidate.workMode)
-            .replace(/\{\{stipend\}\}/g, normalizedCandidate.stipend)
-            .replace(/\{\{degree\}\}/g, normalizedCandidate.degree)
-            .replace(/\{\{college_name\}\}/g, normalizedCandidate.collegeName)
-            .replace(/\{\{phone\}\}/g, normalizedCandidate.phone)
-            .replace(/\n/g, '<br>')}
-        </div>`
+    const parsedPreviewCustom = customBody
+      ? customBody
+          .replace(/\{\{candidate_name\}\}/g, normalizedCandidate.fullName)
+          .replace(/\{\{candidate_id\}\}/g, normalizedCandidate.candidateId)
+          .replace(/\{\{internship_role\}\}/g, normalizedCandidate.role)
+          .replace(/\{\{designation\}\}/g, normalizedCandidate.role)
+          .replace(/\{\{department\}\}/g, normalizedCandidate.department)
+          .replace(/\{\{joining_date\}\}/g, normalizedCandidate.joiningDate)
+          .replace(/\{\{end_date\}\}/g, normalizedCandidate.endDate)
+          .replace(/\{\{duration\}\}/g, normalizedCandidate.duration || '3 Months')
+          .replace(/\{\{work_mode\}\}/g, normalizedCandidate.workMode || 'Online - Remote')
+          .replace(/\{\{stipend\}\}/g, normalizedCandidate.stipend || 'Rs. 10,000')
+          .replace(/\{\{degree\}\}/g, normalizedCandidate.degree || 'Bachelor of Technology')
+          .replace(/\{\{college_name\}\}/g, normalizedCandidate.collegeName || 'Recognized University')
+          .replace(/\{\{phone\}\}/g, normalizedCandidate.phone || '')
+      : null;
+
+    const emailBodyHtml = parsedPreviewCustom
+      ? (parsedPreviewCustom.includes('<') ? parsedPreviewCustom : `<div style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1e293b; padding: 20px;">${parsedPreviewCustom.replace(/\n/g, '<br>')}</div>`)
       : `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto; line-height: 1.6; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #ffffff;">
           <div style="background: #0f172a; padding: 24px; text-align: center; border-bottom: 3px solid #2563eb;">
@@ -87,7 +90,7 @@ export async function POST(request) {
               <p style="margin: 3px 0;"><strong>Stipend:</strong> ${normalizedCandidate.stipend}</p>
               <p style="margin: 3px 0;"><strong>Work Mode:</strong> ${normalizedCandidate.workMode}</p>
             </div>
-            <p>Please review your attached official Offer Letter PDF. Sign and return an accepted copy within 3 business days to confirm your onboarding.</p>
+            <p>Please find attached your official Shortfundly Internship Offer Letter PDF. Kindly review the attached offer letter and reach out to our HR team if you have any questions.</p>
             <p style="margin-top: 24px;">Warm regards,<br><strong>Human Resources Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.<br><span style="color: #64748b; font-size: 12px;">Chennai, Tamil Nadu, India | hr@shortfundly.com</span></p>
           </div>
         </div>

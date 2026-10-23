@@ -39,6 +39,163 @@ import { generateGemmaTask, generateGemmaFeedback } from '@/lib/gemmaEngine';
 import { formatToDdMmYy, getRandomIstTime, getExplanationSchedule } from '@/lib/dateUtils';
 import { generateGoogleMeetLink } from '@/lib/googleCalendar';
 
+
+// ============================================================================
+// FULL-MAIL COMPLETE EMAIL TEMPLATES FOR ALL MODULES (100% CUSTOMIZABLE)
+// ============================================================================
+const DEFAULT_EMAIL_TEMPLATES = {
+  offer: {
+    title: 'Offer Letter Email Template',
+    subject: 'Internship Offer Letter - {{candidate_name}} | Shortfundly',
+    body: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a; max-width: 620px; margin: 0 auto; line-height: 1.6; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+  <div style="background: linear-gradient(135deg, #090d16, #1e293b); padding: 28px 24px; text-align: center; border-bottom: 3px solid #38bdf8;">
+    <h1 style="color: #38bdf8; margin: 0; font-size: 24px; letter-spacing: 2px;">SHORTFUNDLY</h1>
+    <p style="color: #94a3b8; margin: 6px 0 0 0; font-size: 13px;">Shortfundly Media Technologies Pvt. Ltd. • Internship Automation</p>
+  </div>
+  <div style="padding: 32px 28px;">
+    <p style="font-size: 16px; margin-top: 0;">Dear <strong>{{candidate_name}}</strong>,</p>
+    <p>Congratulations! We are pleased to formally offer you an online internship as <strong>{{internship_role}}</strong> in our <strong>{{department}}</strong> department.</p>
+    
+    <div style="background: #f1f5f9; border-left: 4px solid #2563eb; padding: 16px 20px; margin: 24px 0; border-radius: 6px;">
+      <p style="margin: 4px 0;"><strong>Role:</strong> {{internship_role}}</p>
+      <p style="margin: 4px 0;"><strong>Department:</strong> {{department}}</p>
+      <p style="margin: 4px 0;"><strong>Tenure:</strong> {{joining_date}} to {{end_date}}</p>
+      <p style="margin: 4px 0;"><strong>Stipend:</strong> {{stipend}}</p>
+      <p style="margin: 4px 0;"><strong>Work Mode:</strong> {{work_mode}}</p>
+    </div>
+
+    <p>Please find attached your official Shortfundly Internship Offer Letter PDF. Kindly review the attached offer letter and reach out to our HR team if you have any questions.</p>
+
+    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 28px 0;" />
+    <p style="margin: 0; font-size: 13px; color: #475569;">Warm regards,<br><strong style="color: #0f172a;">Human Resources Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.<br><span style="color: #94a3b8; font-size: 12px;">Chennai, Tamil Nadu, India | hr@shortfundly.com</span></p>
+  </div>
+</div>`,
+    tags: [
+      { label: 'Candidate Name', val: '{{candidate_name}}' },
+      { label: 'Role', val: '{{internship_role}}' },
+      { label: 'Department', val: '{{department}}' },
+      { label: 'Joining Date', val: '{{joining_date}}' },
+      { label: 'Ending Date', val: '{{end_date}}' },
+      { label: 'Stipend Amount', val: '{{stipend}}' },
+      { label: 'Degree', val: '{{degree}}' },
+      { label: 'University / College', val: '{{college_name}}' },
+      { label: 'Phone', val: '{{phone}}' },
+      { label: 'Work Mode', val: '{{work_mode}}' },
+    ]
+  },
+  task: {
+    title: 'Task Assignment Email Template',
+    subject: 'Internship Task Assignment & Explanation Call - {{designation}} | Shortfundly',
+    body: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a; max-width: 620px; margin: 0 auto; line-height: 1.6; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+  <div style="background: linear-gradient(135deg, #090d16, #1e293b); padding: 26px 24px; text-align: center; border-bottom: 3px solid #38bdf8;">
+    <h1 style="color: #38bdf8; margin: 0; font-size: 22px; letter-spacing: 1.5px;">SHORTFUNDLY TASK ASSIGNMENT</h1>
+    <p style="color: #94a3b8; margin: 4px 0 0 0; font-size: 13px;">Role: {{designation}} • Milestone Deliverables</p>
+  </div>
+  <div style="padding: 28px 24px;">
+    <p style="font-size: 15px; margin-top: 0;">Dear <strong>{{candidate_name}}</strong>,</p>
+    <p>Your technical assignment for the <strong>{{designation}}</strong> internship has been assigned. Please find the sprint task details below:</p>
+    
+    <div style="background: #0f172a; color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #334155;">
+      <h3 style="color: #38bdf8; margin-top: 0; font-size: 17px;">{{task_title}}</h3>
+      <div style="white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: #cbd5e1; margin-bottom: 0;">{{task_content}}</div>
+    </div>
+
+    <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 16px; margin: 20px 0; border-radius: 6px;">
+      <h4 style="margin: 0 0 8px 0; color: #1e3a8a; font-size: 15px;">Onboarding Schedule & Explanation Call</h4>
+      <p style="margin: 3px 0;"><strong>Date:</strong> {{explanation_date}}</p>
+      <p style="margin: 3px 0;"><strong>Time Slot:</strong> {{time}}</p>
+      <p style="margin: 3px 0;"><strong>Google Meet Link:</strong> <a href="{{meet_link}}" style="color: #2563eb; font-weight: bold;">{{meet_link}}</a></p>
+      <p style="margin: 3px 0; font-size: 12px; color: #64748b;">A synchronized Google Calendar invitation (.ics) is attached to this email.</p>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 6px; margin: 20px 0;">
+      <h4 style="margin: 0 0 6px 0; color: #334155; font-size: 14px;">Review 1 Milestone</h4>
+      <p style="margin: 3px 0; font-size: 13px;">Your milestone review will take place 2 days after the explanation call via the same Google Meet link.</p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 28px 0;" />
+    <p style="font-size: 13px; color: #64748b; margin: 0;">Warm regards,<br><strong style="color: #0f172a;">Engineering & Mentorship Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.<br><span style="color: #94a3b8; font-size: 12px;">Chennai, Tamil Nadu, India | hr@shortfundly.com</span></p>
+  </div>
+</div>`,
+    tags: [
+      { label: 'Candidate Name', val: '{{candidate_name}}' },
+      { label: 'Role / Designation', val: '{{designation}}' },
+      { label: 'Task Title', val: '{{task_title}}' },
+      { label: 'Task Description', val: '{{task_content}}' },
+      { label: 'Explanation Date', val: '{{explanation_date}}' },
+      { label: 'Explanation Time', val: '{{time}}' },
+      { label: 'Google Meet Link', val: '{{meet_link}}' },
+    ]
+  },
+  review: {
+    title: 'Review Notification Email Template',
+    subject: 'Milestone Review Feedback & Evaluation - {{candidate_name}} | Shortfundly',
+    body: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a; max-width: 620px; margin: 0 auto; line-height: 1.6; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+  <div style="background: linear-gradient(135deg, #090d16, #1e293b); padding: 26px 24px; text-align: center; border-bottom: 3px solid #38bdf8;">
+    <h1 style="color: #38bdf8; margin: 0; font-size: 22px; letter-spacing: 1.5px;">SHORTFUNDLY SPRINT REVIEW</h1>
+    <p style="color: #94a3b8; margin: 4px 0 0 0; font-size: 13px;">Milestone Review • Evaluation Feedback</p>
+  </div>
+  <div style="padding: 28px 24px;">
+    <p style="font-size: 15px; margin-top: 0;">Dear <strong>{{candidate_name}}</strong>,</p>
+    <p>Your technical review evaluation for the role of <strong>{{designation}}</strong> has been recorded:</p>
+
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 18px; border-radius: 8px; margin: 20px 0;">
+      <h3 style="color: #1e293b; margin-top: 0; font-size: 16px;">{{review_title}}</h3>
+      <div style="white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: #334155;">{{feedback_notes}}</div>
+    </div>
+
+    <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 14px 18px; border-radius: 6px; margin: 20px 0;">
+      <p style="margin: 3px 0;"><strong>Scheduled Session:</strong> {{review_date}} at {{review_time}}</p>
+      <p style="margin: 3px 0;"><strong>Google Meet:</strong> <a href="{{meet_link}}" style="color: #2563eb; font-weight: bold;">{{meet_link}}</a></p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 28px 0;" />
+    <p style="font-size: 13px; color: #64748b; margin: 0;">Warm regards,<br><strong style="color: #0f172a;">Technical Review Board</strong><br>Shortfundly Media Technologies Pvt. Ltd.</p>
+  </div>
+</div>`,
+    tags: [
+      { label: 'Candidate Name', val: '{{candidate_name}}' },
+      { label: 'Designation', val: '{{designation}}' },
+      { label: 'Review Title', val: '{{review_title}}' },
+      { label: 'Mentor Notes', val: '{{feedback_notes}}' },
+      { label: 'Review Date', val: '{{review_date}}' },
+      { label: 'Review Time', val: '{{review_time}}' },
+      { label: 'Google Meet', val: '{{meet_link}}' },
+    ]
+  },
+  cert: {
+    title: 'Internship Certificate Email Template',
+    subject: 'Internship Completion Certificate - {{candidate_name}} | Shortfundly',
+    body: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a; max-width: 620px; margin: 0 auto; line-height: 1.6; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+  <div style="background: linear-gradient(135deg, #090d16, #1e293b); padding: 28px 24px; text-align: center; border-bottom: 3px solid #38bdf8;">
+    <h1 style="color: #38bdf8; margin: 0; font-size: 24px; letter-spacing: 2px;">SHORTFUNDLY</h1>
+    <p style="color: #94a3b8; margin: 6px 0 0 0; font-size: 13px;">Official Internship Completion & Recognition</p>
+  </div>
+  <div style="padding: 32px 28px;">
+    <p style="font-size: 16px; margin-top: 0;">Dear <strong>{{candidate_name}}</strong>,</p>
+    <p>Congratulations on successfully completing your tenure as <strong>{{internship_role}}</strong> at Shortfundly Media Technologies Pvt. Ltd.!</p>
+    
+    <div style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 16px 20px; margin: 24px 0; border-radius: 6px;">
+      <p style="margin: 4px 0;"><strong>Role:</strong> {{internship_role}}</p>
+      <p style="margin: 4px 0;"><strong>Issue Date:</strong> {{issue_date}}</p>
+      <p style="margin: 4px 0;"><strong>Verification Ref:</strong> {{certificate_id}}</p>
+    </div>
+
+    <p>Please find attached your official High-Resolution Internship Completion Certificate PDF signed by Founder Selvam.</p>
+
+    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 28px 0;" />
+    <p style="margin: 0; font-size: 13px; color: #475569;">Warm regards,<br><strong style="color: #0f172a;">Executive Management Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.<br><span style="color: #94a3b8; font-size: 12px;">Chennai, Tamil Nadu, India | hr@shortfundly.com</span></p>
+  </div>
+</div>`,
+    tags: [
+      { label: 'Candidate Name', val: '{{candidate_name}}' },
+      { label: 'Role', val: '{{internship_role}}' },
+      { label: 'Issue Date', val: '{{issue_date}}' },
+      { label: 'Certificate ID', val: '{{certificate_id}}' },
+    ]
+  }
+};
+
 export default function DashboardPage() {
   const router = useRouter();
 
@@ -72,6 +229,170 @@ export default function DashboardPage() {
   // Candidate Data & Email Logs from DB
   const [candidates, setCandidates] = useState([]);
   const [emailLogs, setEmailLogs] = useState([]);
+  // Full Template Customization Modal State
+  const [templateEditorModal, setTemplateEditorModal] = useState({
+    open: false,
+    mode: '', // 'offer-single' | 'offer-bulk' | 'task-single' | 'task-bulk' | 'review-single' | 'review-bulk' | 'cert-single' | 'cert-bulk'
+    type: 'offer',
+    title: '',
+    subject: '',
+    body: '',
+    activeTab: 'editor', // 'editor' | 'preview'
+  });
+
+  const openTemplateEditor = (mode) => {
+    let title = '';
+    let subject = '';
+    let body = '';
+    let type = 'offer';
+
+    if (mode === 'offer-single') {
+      title = 'Single Offer Letter Template';
+      type = 'offer';
+      subject = singleOfferForm.subject || DEFAULT_EMAIL_TEMPLATES.offer.subject;
+      body = singleOfferForm.body || DEFAULT_EMAIL_TEMPLATES.offer.body;
+    } else if (mode === 'offer-bulk') {
+      title = 'Bulk Offer Letters Template';
+      type = 'offer';
+      subject = bulkCustomSubject || DEFAULT_EMAIL_TEMPLATES.offer.subject;
+      body = bulkCustomBody || DEFAULT_EMAIL_TEMPLATES.offer.body;
+    } else if (mode === 'task-single') {
+      title = 'Single Task Assignment Template';
+      type = 'task';
+      subject = singleTaskForm.customSubject || DEFAULT_EMAIL_TEMPLATES.task.subject;
+      body = singleTaskForm.customBody || DEFAULT_EMAIL_TEMPLATES.task.body;
+    } else if (mode === 'task-bulk') {
+      title = 'Bulk Task Assignment Template';
+      type = 'task';
+      subject = bulkTaskSubject || DEFAULT_EMAIL_TEMPLATES.task.subject;
+      body = bulkTaskBody || DEFAULT_EMAIL_TEMPLATES.task.body;
+    } else if (mode === 'review-single') {
+      title = 'Manual Review Notification Template';
+      type = 'review';
+      subject = manualReviewForm.customSubject || DEFAULT_EMAIL_TEMPLATES.review.subject;
+      body = manualReviewForm.customBody || DEFAULT_EMAIL_TEMPLATES.review.body;
+    } else if (mode === 'review-bulk') {
+      title = 'Bulk Review 2 Template';
+      type = 'review';
+      subject = bulkReview2Subject || DEFAULT_EMAIL_TEMPLATES.review.subject;
+      body = bulkReview2CustomMessage || DEFAULT_EMAIL_TEMPLATES.review.body;
+    } else if (mode === 'cert-single') {
+      title = 'Single Certificate Email Template';
+      type = 'cert';
+      subject = singleCertForm.customSubject || DEFAULT_EMAIL_TEMPLATES.cert.subject;
+      body = singleCertForm.customBody || DEFAULT_EMAIL_TEMPLATES.cert.body;
+    } else if (mode === 'cert-bulk') {
+      title = 'Bulk Certificate Email Template';
+      type = 'cert';
+      subject = bulkCertSubject || DEFAULT_EMAIL_TEMPLATES.cert.subject;
+      body = bulkCertBody || DEFAULT_EMAIL_TEMPLATES.cert.body;
+    }
+
+    setTemplateEditorModal({
+      open: true,
+      mode,
+      type,
+      title,
+      subject,
+      body,
+      activeTab: 'editor',
+    });
+  };
+
+  const saveTemplateEditor = () => {
+    const { mode, subject, body } = templateEditorModal;
+    if (mode === 'offer-single') {
+      setSingleOfferForm(prev => ({ ...prev, subject, body }));
+    } else if (mode === 'offer-bulk') {
+      setBulkCustomSubject(subject);
+      setBulkCustomBody(body);
+    } else if (mode === 'task-single') {
+      setSingleTaskForm(prev => ({ ...prev, customSubject: subject, customBody: body }));
+    } else if (mode === 'task-bulk') {
+      setBulkTaskSubject(subject);
+      setBulkTaskBody(body);
+    } else if (mode === 'review-single') {
+      setManualReviewForm(prev => ({ ...prev, customSubject: subject, customBody: body }));
+    } else if (mode === 'review-bulk') {
+      setBulkReview2Subject(subject);
+      setBulkReview2CustomMessage(body);
+    } else if (mode === 'cert-single') {
+      setSingleCertForm(prev => ({ ...prev, customSubject: subject, customBody: body }));
+    } else if (mode === 'cert-bulk') {
+      setBulkCertSubject(subject);
+      setBulkCertBody(body);
+    }
+
+    setTemplateEditorModal(prev => ({ ...prev, open: false }));
+    showToast('Full email template customized and saved successfully!', 'success');
+  };
+
+  const resetTemplateToDefault = () => {
+    const type = templateEditorModal.type || 'offer';
+    const def = DEFAULT_EMAIL_TEMPLATES[type] || DEFAULT_EMAIL_TEMPLATES.offer;
+    setTemplateEditorModal(prev => ({
+      ...prev,
+      subject: def.subject,
+      body: def.body,
+    }));
+    showToast('Reset template to official Shortfundly default.', 'info');
+  };
+
+  const getModalLivePreviewHtml = () => {
+    const sample = {
+      fullName: 'Aarav Sharma',
+      candidateId: 'SF-INT-2026-1001',
+      role: 'Full Stack Developer Intern',
+      department: 'Engineering',
+      joiningDate: '01.06.26',
+      endDate: '31.08.26',
+      duration: '3 Months',
+      stipend: 'Rs. 10,000',
+      workMode: 'Online - Remote',
+      degree: 'B.Tech CSE',
+      collegeName: 'SRM Institute of Science and Technology',
+      phone: '+91 9876543210',
+      title: 'REST API & Distributed Microservices Implementation',
+      content: 'Design and deploy authentication endpoints with JWT, rate limiting, and SQLite transactions under mentor guidance.',
+      date: '28.10.26',
+      time: '11:00 AM IST',
+      meet: 'https://meet.google.com/abc-defg-hij',
+      reviewTitle: 'Milestone Sprint Review 1',
+      feedback: 'Excellent work on system architecture. Ensure query indices are added to dev.db.',
+      certId: 'SF-CERT-2026-A101',
+      issueDate: '31.08.2026',
+    };
+
+    return (templateEditorModal.body || '')
+      .replace(/\{\{candidate_name\}\}/g, sample.fullName)
+      .replace(/\{\{candidate_id\}\}/g, sample.candidateId)
+      .replace(/\{\{internship_role\}\}/g, sample.role)
+      .replace(/\{\{designation\}\}/g, sample.role)
+      .replace(/\{\{role\}\}/g, sample.role)
+      .replace(/\{\{department\}\}/g, sample.department)
+      .replace(/\{\{joining_date\}\}/g, sample.joiningDate)
+      .replace(/\{\{end_date\}\}/g, sample.endDate)
+      .replace(/\{\{duration\}\}/g, sample.duration)
+      .replace(/\{\{stipend\}\}/g, sample.stipend)
+      .replace(/\{\{work_mode\}\}/g, sample.workMode)
+      .replace(/\{\{degree\}\}/g, sample.degree)
+      .replace(/\{\{college_name\}\}/g, sample.collegeName)
+      .replace(/\{\{phone\}\}/g, sample.phone)
+      .replace(/\{\{task_title\}\}/g, sample.title)
+      .replace(/\{\{task_content\}\}/g, sample.content)
+      .replace(/\{\{task_description\}\}/g, sample.content)
+      .replace(/\{\{explanation_date\}\}/g, sample.date)
+      .replace(/\{\{time\}\}/g, sample.time)
+      .replace(/\{\{explanation_time\}\}/g, sample.time)
+      .replace(/\{\{meet_link\}\}/g, sample.meet)
+      .replace(/\{\{review_title\}\}/g, sample.reviewTitle)
+      .replace(/\{\{feedback_notes\}\}/g, sample.feedback)
+      .replace(/\{\{review_date\}\}/g, sample.date)
+      .replace(/\{\{review_time\}\}/g, sample.time)
+      .replace(/\{\{certificate_id\}\}/g, sample.certId)
+      .replace(/\{\{issue_date\}\}/g, sample.issueDate);
+  };
+
 
   // Settings State
   const [sysSettings, setSysSettings] = useState({
@@ -1458,6 +1779,17 @@ export default function DashboardPage() {
                   <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                     <button
                       type="button"
+                      onClick={() => openTemplateEditor('offer-single')}
+                      className={styles.btnAction}
+                      style={{ borderColor: 'var(--accent-indigo)' }}
+                      title="Customize entire HTML email template and subject"
+                    >
+                      <Sliders size={15} style={{ color: 'var(--accent-indigo)' }} />
+                      <span>Customize Email Template</span>
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => triggerOfferPreview(singleOfferForm)}
                       className={styles.btnAction}
                     >
@@ -1719,6 +2051,17 @@ export default function DashboardPage() {
                         <div style={{ display: 'flex', gap: '10px' }}>
                           <button
                             type="button"
+                            onClick={() => openTemplateEditor('offer-bulk')}
+                            className={styles.btnAction}
+                            style={{ borderColor: 'var(--accent-indigo)' }}
+                            title="Customize entire HTML email template and subject for bulk dispatch"
+                          >
+                            <Sliders size={14} style={{ color: 'var(--accent-indigo)' }} />
+                            <span>Customize Email Template</span>
+                          </button>
+
+                          <button
+                            type="button"
                             disabled={selectedCandidateKeys.size === 0}
                             onClick={() => {
                               const firstKey = Array.from(selectedCandidateKeys)[0];
@@ -1967,10 +2310,22 @@ export default function DashboardPage() {
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                  <button
-                    type="button"
-                    disabled={bulkTaskSelectedKeys.size === 0}
-                    onClick={() => {
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      type="button"
+                      onClick={() => openTemplateEditor('task-bulk')}
+                      className={styles.btnAction}
+                      style={{ borderColor: 'var(--accent-indigo)' }}
+                      title="Customize entire HTML email template and subject for bulk task assignment"
+                    >
+                      <Sliders size={14} style={{ color: 'var(--accent-indigo)' }} />
+                      <span>Customize Email Template</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={bulkTaskSelectedKeys.size === 0}
+                      onClick={() => {
                       const firstId = Array.from(bulkTaskSelectedKeys)[0];
                       const cand = eligibleTaskCandidates.find(c => c.id === firstId);
                       if (cand) {
@@ -1998,6 +2353,7 @@ export default function DashboardPage() {
                     <Eye size={14} />
                     <span>Preview Sample Task Email</span>
                   </button>
+                  </div>
 
                   <button
                     type="button"
@@ -2295,6 +2651,17 @@ export default function DashboardPage() {
                 </div>
 
                 <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => openTemplateEditor('task-single')}
+                    className={styles.btnAction}
+                    style={{ borderColor: 'var(--accent-indigo)' }}
+                    title="Customize entire HTML email template and subject for single task"
+                  >
+                    <Sliders size={15} style={{ color: 'var(--accent-indigo)' }} />
+                    <span>Customize Email Template</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => triggerTaskPreview(singleTaskForm)}
@@ -3073,6 +3440,17 @@ export default function DashboardPage() {
                 <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                   <button
                     type="button"
+                    onClick={() => openTemplateEditor('review-single')}
+                    className={styles.btnAction}
+                    style={{ borderColor: 'var(--accent-indigo)' }}
+                    title="Customize entire HTML email template for reviews"
+                  >
+                    <Sliders size={15} style={{ color: 'var(--accent-indigo)' }} />
+                    <span>Customize Email Template</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => triggerReviewPreview(manualReviewForm)}
                     className={styles.btnAction}
                   >
@@ -3296,6 +3674,17 @@ export default function DashboardPage() {
                     <div style={{ display: 'flex', gap: '12px' }}>
                       <button
                         type="button"
+                        onClick={() => openTemplateEditor('cert-bulk')}
+                        className={styles.btnAction}
+                        style={{ borderColor: 'var(--accent-indigo)' }}
+                        title="Customize entire HTML email template for bulk certificates"
+                      >
+                        <Sliders size={15} style={{ color: 'var(--accent-indigo)' }} />
+                        <span>Customize Email Template</span>
+                      </button>
+
+                      <button
+                        type="button"
                         disabled={candidates.length === 0}
                         onClick={() => {
                           const sampleCand = candidates.find(c => bulkCertSelectedKeys.has(c.id)) || candidates[0];
@@ -3461,6 +3850,17 @@ export default function DashboardPage() {
                 </div>
 
                 <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => openTemplateEditor('cert-single')}
+                    className={styles.btnAction}
+                    style={{ borderColor: 'var(--accent-indigo)' }}
+                    title="Customize entire HTML email template for single certificate"
+                  >
+                    <Sliders size={15} style={{ color: 'var(--accent-indigo)' }} />
+                    <span>Customize Email Template</span>
+                  </button>
+
                   {/* PREVIEW OPTION IN SINGLE CANDIDATE CERTIFICATE */}
                   <button
                     type="button"
@@ -3862,6 +4262,189 @@ export default function DashboardPage() {
       {/* ============================================================== */}
       {/* MODAL 1: LIVE SPLIT PREVIEW (EMAIL BODY & A4 PDF / CERTIFICATE)*/}
       {/* ============================================================== */}
+      
+        {/* ============================================================== */}
+        {/* FULL EMAIL TEMPLATE CUSTOMIZATION MODAL (WHOLE-MAIL CONTROL)  */}
+        {/* ============================================================== */}
+        {templateEditorModal.open && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalCard} style={{ maxWidth: '1050px', maxHeight: '94vh' }}>
+              <div className={styles.modalHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8' }}>
+                    <Sliders size={18} />
+                  </div>
+                  <div>
+                    <h3 className={styles.modalTitle} style={{ margin: 0, fontSize: '17px' }}>
+                      {templateEditorModal.title || 'Customize Entire Email Template'}
+                    </h3>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: 'var(--text-muted)' }}>
+                      Customize the whole HTML email structure, branding, styling, and subject line.
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'flex', background: 'var(--bg-surface-elevated)', borderRadius: '6px', padding: '3px', border: '1px solid var(--border-subtle)' }}>
+                    <button
+                      type="button"
+                      onClick={() => setTemplateEditorModal(prev => ({ ...prev, activeTab: 'editor' }))}
+                      className={templateEditorModal.activeTab === 'editor' ? styles.btnPrimaryAction : styles.btnAction}
+                      style={{ fontSize: '12px', padding: '4px 12px', height: '28px' }}
+                    >
+                      Template Editor
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTemplateEditorModal(prev => ({ ...prev, activeTab: 'preview' }))}
+                      className={templateEditorModal.activeTab === 'preview' ? styles.btnPrimaryAction : styles.btnAction}
+                      style={{ fontSize: '12px', padding: '4px 12px', height: '28px' }}
+                    >
+                      Live Output Preview
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setTemplateEditorModal(prev => ({ ...prev, open: false }))}
+                    className={styles.modalClose}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.modalBody} style={{ padding: '20px 24px', overflowY: 'auto' }}>
+                {templateEditorModal.activeTab === 'editor' ? (
+                  <div>
+                    <div className={styles.formGroup} style={{ marginBottom: '16px' }}>
+                      <label className={styles.label} style={{ fontSize: '13px' }}>
+                        Email Subject Line
+                      </label>
+                      <input
+                        type="text"
+                        className={styles.inputField}
+                        value={templateEditorModal.subject}
+                        onChange={(e) => setTemplateEditorModal(prev => ({ ...prev, subject: e.target.value }))}
+                        placeholder="Enter customized subject line..."
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <label className={styles.label} style={{ margin: 0, fontSize: '13px' }}>
+                          Insert Dynamic Variables (Click to insert into template)
+                        </label>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                          Automatically populated per candidate
+                        </span>
+                      </div>
+                      <div className={styles.tagPillsBar}>
+                        {(DEFAULT_EMAIL_TEMPLATES[templateEditorModal.type]?.tags || DEFAULT_EMAIL_TEMPLATES.offer.tags).map((tag) => (
+                          <button
+                            key={tag.val}
+                            type="button"
+                            className={styles.tagPill}
+                            onClick={() => setTemplateEditorModal(prev => ({
+                              ...prev,
+                              body: (prev.body ? prev.body + ' ' : '') + tag.val
+                            }))}
+                            title={`Insert ${tag.label}`}
+                          >
+                            + {tag.label} <code style={{ fontSize: '10.5px', opacity: 0.75 }}>({tag.val})</code>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className={styles.formGroup} style={{ marginBottom: '4px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <label className={styles.label} style={{ margin: 0, fontSize: '13px' }}>
+                          Complete HTML Email Body
+                        </label>
+                        <span style={{ fontSize: '11px', color: 'var(--accent-cyan)' }}>
+                          Full HTML & Inline Styles Supported
+                        </span>
+                      </div>
+                      <textarea
+                        className={styles.textareaField}
+                        rows={18}
+                        style={{
+                          fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+                          fontSize: '12.5px',
+                          lineHeight: '1.5',
+                          whiteSpace: 'pre',
+                          minHeight: '380px',
+                          background: 'var(--bg-canvas)',
+                          color: '#f8fafc',
+                          border: '1px solid var(--border-medium)',
+                        }}
+                        value={templateEditorModal.body}
+                        onChange={(e) => setTemplateEditorModal(prev => ({ ...prev, body: e.target.value }))}
+                        placeholder="Enter full HTML template code..."
+                      />
+                      <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                        &bull; This template replaces the <strong>entire</strong> email layout. You have full control over the header, body paragraphs, tables, and footer.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ marginBottom: '14px', padding: '12px 16px', background: 'var(--bg-surface-elevated)', borderRadius: '8px', border: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>SUBJECT LINE:</div>
+                        <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)', marginTop: '2px' }}>
+                          {templateEditorModal.subject || '(No Subject Line)'}
+                        </div>
+                      </div>
+                      <span className={styles.tabBadge}>Live Sample Render</span>
+                    </div>
+
+                    <div style={{ border: '1px solid var(--border-medium)', borderRadius: '10px', overflow: 'hidden', background: '#ffffff', minHeight: '440px' }}>
+                      <iframe
+                        title="Live Template Preview"
+                        srcDoc={getModalLivePreviewHtml()}
+                        style={{ width: '100%', height: '520px', border: 'none', display: 'block', background: '#ffffff' }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.modalFooter} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px' }}>
+                <button
+                  type="button"
+                  onClick={resetTemplateToDefault}
+                  className={styles.btnAction}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <RefreshCw size={13} />
+                  <span>Reset to Default Shortfundly Template</span>
+                </button>
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setTemplateEditorModal(prev => ({ ...prev, open: false }))}
+                    className={styles.btnAction}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={saveTemplateEditor}
+                    className={styles.btnPrimaryAction}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <CheckSquare size={14} />
+                    <span>Apply & Save Template</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       {previewModal.open && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard}>
