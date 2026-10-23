@@ -115,6 +115,7 @@ export default function DashboardPage() {
     workMode: 'Online - Remote',
     reportingManager: 'Priyanka Nair',
     assignedMentor: 'Rahul Kapoor',
+    stipend: 'Rs. 10,000',
     cc: '',
     subject: '',
     body: '',
@@ -401,6 +402,7 @@ export default function DashboardPage() {
         workMode: cand.workMode || 'Online - Remote',
         reportingManager: cand.reportingManager || 'Priyanka Nair',
         assignedMentor: cand.assignedMentor || 'Rahul Kapoor',
+        stipend: cand.stipend || 'Rs. 10,000',
         subject: `Internship Offer Letter - ${cand.fullName} (${cand.candidateId}) | Shortfundly`,
         body: '',
       });
@@ -1274,6 +1276,50 @@ export default function DashboardPage() {
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, department: e.target.value })}
                       />
                     </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Degree</label>
+                      <input
+                        type="text"
+                        className={styles.inputField}
+                        placeholder="e.g. B.Tech / B.E. / MCA"
+                        value={singleOfferForm.degree}
+                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, degree: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Required University / College Name</label>
+                      <input
+                        type="text"
+                        className={styles.inputField}
+                        placeholder="e.g. SRM Institute of Science and Technology"
+                        value={singleOfferForm.collegeName}
+                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, collegeName: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Phone Number</label>
+                      <input
+                        type="tel"
+                        className={styles.inputField}
+                        placeholder="e.g. +91 9876543210"
+                        value={singleOfferForm.phone}
+                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, phone: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Stipend Amount</label>
+                      <input
+                        type="text"
+                        className={styles.inputField}
+                        placeholder="e.g. Rs. 10,000"
+                        value={singleOfferForm.stipend}
+                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, stipend: e.target.value })}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1327,7 +1373,7 @@ export default function DashboardPage() {
                     />
                     <div className={styles.tagPillsBar}>
                       <span style={{ fontSize: '11px', color: '#94a3b8', marginRight: '4px' }}>Insert Tags:</span>
-                      {['{{candidate_name}}', '{{designation}}', '{{joining_date}}', '{{end_date}}', '{{department}}'].map((tag) => (
+                      {['{{candidate_name}}', '{{designation}}', '{{joining_date}}', '{{end_date}}', '{{department}}', '{{stipend}}', '{{degree}}', '{{college_name}}', '{{phone}}'].map((tag) => (
                         <button
                           key={tag}
                           type="button"

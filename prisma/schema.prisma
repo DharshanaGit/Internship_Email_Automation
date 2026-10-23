@@ -33,6 +33,7 @@ model Candidate {
   workMode           String           @default("Online - Remote")
   reportingManager   String
   assignedMentor     String
+  stipend            String?          @default("Rs. 10,000")
   offerLetterStatus  String           @default("Ready to Send")
   taskStatus         String           @default("Not Assigned")
   tasksCompleted     Int              @default(0)

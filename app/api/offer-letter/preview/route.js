@@ -38,6 +38,7 @@ export async function POST(request) {
       collegeName: candidate.collegeName || 'Recognized University',
       degree: candidate.degree || 'Bachelor of Technology',
       phone: candidate.phone || '+91 9876543210',
+      stipend: candidate.stipend || 'Rs. 10,000',
     };
 
     // Render A4 printable Offer Letter HTML
@@ -64,6 +65,10 @@ export async function POST(request) {
             .replace(/\{\{joining_date\}\}/g, normalizedCandidate.joiningDate)
             .replace(/\{\{end_date\}\}/g, normalizedCandidate.endDate)
             .replace(/\{\{work_mode\}\}/g, normalizedCandidate.workMode)
+            .replace(/\{\{stipend\}\}/g, normalizedCandidate.stipend)
+            .replace(/\{\{degree\}\}/g, normalizedCandidate.degree)
+            .replace(/\{\{college_name\}\}/g, normalizedCandidate.collegeName)
+            .replace(/\{\{phone\}\}/g, normalizedCandidate.phone)
             .replace(/\n/g, '<br>')}
         </div>`
       : `
@@ -79,6 +84,7 @@ export async function POST(request) {
               <p style="margin: 3px 0;"><strong>Role:</strong> ${normalizedCandidate.role}</p>
               <p style="margin: 3px 0;"><strong>Department:</strong> ${normalizedCandidate.department}</p>
               <p style="margin: 3px 0;"><strong>Tenure:</strong> ${normalizedCandidate.joiningDate} to ${normalizedCandidate.endDate} (${normalizedCandidate.duration})</p>
+              <p style="margin: 3px 0;"><strong>Stipend:</strong> ${normalizedCandidate.stipend}</p>
               <p style="margin: 3px 0;"><strong>Work Mode:</strong> ${normalizedCandidate.workMode}</p>
             </div>
             <p>Please review your attached official Offer Letter PDF. Sign and return an accepted copy within 3 business days to confirm your onboarding.</p>

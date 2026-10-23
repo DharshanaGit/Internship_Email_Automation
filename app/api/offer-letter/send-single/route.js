@@ -29,12 +29,25 @@ export async function POST(request) {
     const phone = formData.get('phone') || '';
     const collegeName = formData.get('collegeName') || 'Recognized University';
     const degree = formData.get('degree') || 'Bachelor of Engineering';
+    const stipend = formData.get('stipend') || 'Rs. 10,000';
 
     let candidate;
 
     if (candidateId) {
-      candidate = await prisma.candidate.findUnique({
+      candidate = await prisma.candidate.update({
         where: { id: candidateId },
+        data: {
+          ...(fullName ? { fullName } : {}),
+          ...(email ? { email } : {}),
+          ...(role ? { role } : {}),
+          ...(department ? { department } : {}),
+          ...(joiningDate ? { joiningDate } : {}),
+          ...(endDate ? { endDate } : {}),
+          ...(phone ? { phone } : {}),
+          ...(collegeName ? { collegeName } : {}),
+          ...(degree ? { degree } : {}),
+          ...(stipend ? { stipend } : {}),
+        },
       });
     } else if (email && fullName) {
       // Create candidate
@@ -49,6 +62,7 @@ export async function POST(request) {
           department: department || 'Engineering',
           collegeName,
           degree,
+          stipend,
           joiningDate: joiningDate || '2026-06-01',
           endDate: endDate || '2026-08-31',
           duration,
@@ -104,9 +118,25 @@ export async function POST(request) {
       customSubject ||
       `Internship Offer Letter - ${candidate.fullName} (${candidate.candidateId}) | Shortfundly`;
 
+    const parsedBody = customBody
+      ? customBody
+          .replace(/\{\{candidate_name\}\}/g, candidate.fullName)
+          .replace(/\{\{candidate_id\}\}/g, candidate.candidateId)
+          .replace(/\{\{internship_role\}\}/g, candidate.role)
+          .replace(/\{\{department\}\}/g, candidate.department)
+          .replace(/\{\{joining_date\}\}/g, candidate.joiningDate)
+          .replace(/\{\{end_date\}\}/g, candidate.endDate)
+          .replace(/\{\{work_mode\}\}/g, candidate.workMode)
+          .replace(/\{\{stipend\}\}/g, candidate.stipend || stipend || 'Rs. 10,000')
+          .replace(/\{\{degree\}\}/g, candidate.degree || degree || 'Bachelor of Engineering')
+          .replace(/\{\{college_name\}\}/g, candidate.collegeName || collegeName || 'Recognized University')
+          .replace(/\{\{phone\}\}/g, candidate.phone || phone || '')
+          .replace(/\n/g, '<br>')
+      : '';
+
     const htmlBody = customBody
       ? `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; padding: 20px;">
-          ${customBody.replace(/\n/g, '<br>')}
+          ${parsedBody}
           <div style="text-align: center; margin: 30px 0;">
             <a href="${acceptUrl}" style="background: linear-gradient(135deg, #2563eb, #38bdf8); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
               ACCEPT INTERNSHIP OFFER
@@ -128,6 +158,7 @@ export async function POST(request) {
               <p style="margin: 4px 0;"><strong>Role:</strong> ${candidate.role}</p>
               <p style="margin: 4px 0;"><strong>Department:</strong> ${candidate.department}</p>
               <p style="margin: 4px 0;"><strong>Tenure:</strong> ${candidate.joiningDate} to ${candidate.endDate} (${candidate.duration})</p>
+              <p style="margin: 4px 0;"><strong>Stipend:</strong> ${candidate.stipend || stipend || 'Rs. 10,000'}</p>
               <p style="margin: 4px 0;"><strong>Work Mode:</strong> ${candidate.workMode}</p>
             </div>
 
