@@ -385,17 +385,40 @@ export default function DashboardPage() {
   // --- MODULE 1: SINGLE CANDIDATE SELECTION ---
   const handleSelectExistingCandidate = (candId) => {
     setSelectedCandidateId(candId);
+    if (!candId) {
+      setSingleOfferForm({
+        candidateId: '',
+        fullName: '',
+        email: '',
+        phone: '',
+        role: 'Web Developer Intern',
+        department: 'Engineering',
+        collegeName: '',
+        degree: 'B.Tech / B.E.',
+        stipend: 'Rs. 10,000',
+        joiningDate: '2026-06-01',
+        endDate: '2026-08-31',
+        duration: '3 Months',
+        workMode: 'Online - Remote',
+        reportingManager: 'Priyanka Nair',
+        assignedMentor: 'Rahul Kapoor',
+        cc: '',
+        subject: '',
+        body: '',
+      });
+      return;
+    }
     const cand = candidates.find((c) => c.id === candId);
     if (cand) {
       setSingleOfferForm({
         candidateId: cand.id,
-        fullName: cand.fullName,
-        email: cand.email,
+        fullName: cand.fullName || '',
+        email: cand.email || '',
         phone: cand.phone || '',
-        role: cand.role,
-        department: cand.department,
+        role: cand.role || 'Web Developer Intern',
+        department: cand.department || 'Engineering',
         collegeName: cand.collegeName || '',
-        degree: cand.degree || 'Bachelor of Engineering',
+        degree: cand.degree || 'B.Tech / B.E.',
         joiningDate: cand.joiningDate || '2026-06-01',
         endDate: cand.endDate || '2026-08-31',
         duration: cand.duration || '3 Months',
@@ -403,7 +426,8 @@ export default function DashboardPage() {
         reportingManager: cand.reportingManager || 'Priyanka Nair',
         assignedMentor: cand.assignedMentor || 'Rahul Kapoor',
         stipend: cand.stipend || 'Rs. 10,000',
-        subject: `Internship Offer Letter - ${cand.fullName} (${cand.candidateId}) | Shortfundly`,
+        cc: '',
+        subject: `Internship Offer Letter - ${cand.fullName || ''} (${cand.candidateId || ''}) | Shortfundly`,
         body: '',
       });
     }
@@ -1168,12 +1192,14 @@ export default function DashboardPage() {
                             department: 'Engineering',
                             collegeName: '',
                             degree: 'B.Tech / B.E.',
+                            stipend: 'Rs. 10,000',
                             joiningDate: '2026-06-01',
                             endDate: '2026-08-31',
                             duration: '3 Months',
                             workMode: 'Online - Remote',
                             reportingManager: 'Priyanka Nair',
                             assignedMentor: 'Rahul Kapoor',
+                            cc: '',
                             subject: '',
                             body: '',
                           });
@@ -1215,7 +1241,7 @@ export default function DashboardPage() {
                         required
                         className={styles.inputField}
                         placeholder="e.g. Akash Kumar"
-                        value={singleOfferForm.fullName}
+                        value={singleOfferForm.fullName || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, fullName: e.target.value })}
                       />
                     </div>
@@ -1227,7 +1253,7 @@ export default function DashboardPage() {
                         required
                         className={styles.inputField}
                         placeholder="e.g. Web Developer Intern"
-                        value={singleOfferForm.role}
+                        value={singleOfferForm.role || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, role: e.target.value })}
                       />
                     </div>
@@ -1238,7 +1264,7 @@ export default function DashboardPage() {
                         type="date"
                         required
                         className={styles.inputField}
-                        value={singleOfferForm.joiningDate}
+                        value={singleOfferForm.joiningDate || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, joiningDate: e.target.value })}
                       />
                     </div>
@@ -1249,7 +1275,7 @@ export default function DashboardPage() {
                         type="date"
                         required
                         className={styles.inputField}
-                        value={singleOfferForm.endDate}
+                        value={singleOfferForm.endDate || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, endDate: e.target.value })}
                       />
                     </div>
@@ -1261,7 +1287,7 @@ export default function DashboardPage() {
                         required
                         className={styles.inputField}
                         placeholder="candidate@example.com"
-                        value={singleOfferForm.email}
+                        value={singleOfferForm.email || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, email: e.target.value })}
                       />
                     </div>
@@ -1272,7 +1298,7 @@ export default function DashboardPage() {
                         type="text"
                         className={styles.inputField}
                         placeholder="e.g. Engineering"
-                        value={singleOfferForm.department}
+                        value={singleOfferForm.department || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, department: e.target.value })}
                       />
                     </div>
@@ -1283,7 +1309,7 @@ export default function DashboardPage() {
                         type="text"
                         className={styles.inputField}
                         placeholder="e.g. B.Tech / B.E. / MCA"
-                        value={singleOfferForm.degree}
+                        value={singleOfferForm.degree || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, degree: e.target.value })}
                       />
                     </div>
@@ -1294,7 +1320,7 @@ export default function DashboardPage() {
                         type="text"
                         className={styles.inputField}
                         placeholder="e.g. SRM Institute of Science and Technology"
-                        value={singleOfferForm.collegeName}
+                        value={singleOfferForm.collegeName || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, collegeName: e.target.value })}
                       />
                     </div>
@@ -1305,7 +1331,7 @@ export default function DashboardPage() {
                         type="tel"
                         className={styles.inputField}
                         placeholder="e.g. +91 9876543210"
-                        value={singleOfferForm.phone}
+                        value={singleOfferForm.phone || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, phone: e.target.value })}
                       />
                     </div>
@@ -1316,7 +1342,7 @@ export default function DashboardPage() {
                         type="text"
                         className={styles.inputField}
                         placeholder="e.g. Rs. 10,000"
-                        value={singleOfferForm.stipend}
+                        value={singleOfferForm.stipend || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, stipend: e.target.value })}
                       />
                     </div>
@@ -1339,7 +1365,7 @@ export default function DashboardPage() {
                         type="text"
                         className={styles.inputField}
                         placeholder={`Internship Offer Letter - ${singleOfferForm.fullName || '{{candidate_name}}'} | Shortfundly`}
-                        value={singleOfferForm.subject}
+                        value={singleOfferForm.subject || ''}
                         onChange={(e) => setSingleOfferForm({ ...singleOfferForm, subject: e.target.value })}
                       />
                     </div>
@@ -1368,7 +1394,7 @@ export default function DashboardPage() {
                       className={styles.textareaField}
                       rows={4}
                       placeholder="Customized greetings or instructions. Click tags below to insert automatically."
-                      value={singleOfferForm.body}
+                      value={singleOfferForm.body || ''}
                       onChange={(e) => setSingleOfferForm({ ...singleOfferForm, body: e.target.value })}
                     />
                     <div className={styles.tagPillsBar}>
@@ -2037,14 +2063,15 @@ export default function DashboardPage() {
                           const expSchedule = getExplanationSchedule(new Date());
                           setSingleTaskForm({
                             candidateId: c.id,
-                            candidateName: c.fullName,
-                            email: c.email,
-                            role: c.role,
-                            title: gemma.title,
-                            description: gemma.description,
-                            explanationDate: expSchedule.dateStr,
-                            explanationTime: expSchedule.timeStr,
+                            candidateName: c.fullName || '',
+                            email: c.email || '',
+                            role: c.role || '',
+                            title: gemma.title || '',
+                            description: gemma.description || '',
+                            explanationDate: expSchedule.dateStr || '',
+                            explanationTime: expSchedule.timeStr || '',
                             meetLink: generateGoogleMeetLink(),
+                            cc: '',
                             customSubject: '',
                             customBody: '',
                           });
@@ -2078,7 +2105,7 @@ export default function DashboardPage() {
                       required
                       className={styles.inputField}
                       placeholder="Candidate full name"
-                      value={singleTaskForm.candidateName}
+                      value={singleTaskForm.candidateName || ''}
                       onChange={(e) => setSingleTaskForm({ ...singleTaskForm, candidateName: e.target.value })}
                     />
                   </div>
@@ -2090,7 +2117,7 @@ export default function DashboardPage() {
                       required
                       className={styles.inputField}
                       placeholder="candidate@example.com"
-                      value={singleTaskForm.email}
+                      value={singleTaskForm.email || ''}
                       onChange={(e) => setSingleTaskForm({ ...singleTaskForm, email: e.target.value })}
                     />
                   </div>
@@ -2113,7 +2140,7 @@ export default function DashboardPage() {
                       required
                       className={styles.inputField}
                       placeholder="e.g. Web Developer Intern"
-                      value={singleTaskForm.role}
+                      value={singleTaskForm.role || ''}
                       onChange={(e) => {
                         const newRole = e.target.value;
                         const gemma = generateGemmaTask(newRole, 0);
@@ -2133,7 +2160,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       className={styles.inputField}
-                      value={singleTaskForm.explanationDate}
+                      value={singleTaskForm.explanationDate || ''}
                       onChange={(e) => setSingleTaskForm({ ...singleTaskForm, explanationDate: e.target.value })}
                     />
                   </div>
@@ -2144,7 +2171,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       className={styles.inputField}
-                      value={singleTaskForm.explanationTime}
+                      value={singleTaskForm.explanationTime || ''}
                       onChange={(e) => setSingleTaskForm({ ...singleTaskForm, explanationTime: e.target.value })}
                     />
                   </div>
@@ -2183,7 +2210,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       className={styles.inputField}
-                      value={singleTaskForm.meetLink}
+                      value={singleTaskForm.meetLink || ''}
                       onChange={(e) => setSingleTaskForm({ ...singleTaskForm, meetLink: e.target.value })}
                     />
                   </div>
@@ -2193,7 +2220,7 @@ export default function DashboardPage() {
                     <input
                       type="text"
                       className={styles.inputField}
-                      value={singleTaskForm.title}
+                      value={singleTaskForm.title || ''}
                       onChange={(e) => setSingleTaskForm({ ...singleTaskForm, title: e.target.value })}
                     />
                   </div>
@@ -2203,7 +2230,7 @@ export default function DashboardPage() {
                     <textarea
                       className={styles.textareaField}
                       rows={4}
-                      value={singleTaskForm.description}
+                      value={singleTaskForm.description || ''}
                       onChange={(e) => setSingleTaskForm({ ...singleTaskForm, description: e.target.value })}
                     />
                   </div>
@@ -2815,7 +2842,7 @@ export default function DashboardPage() {
                       required
                       className={styles.inputField}
                       placeholder="Candidate full name"
-                      value={manualReviewForm.candidateName}
+                      value={manualReviewForm.candidateName || ''}
                       onChange={(e) => setManualReviewForm({ ...manualReviewForm, candidateName: e.target.value })}
                     />
                   </div>
@@ -2827,7 +2854,7 @@ export default function DashboardPage() {
                       required
                       className={styles.inputField}
                       placeholder="candidate@example.com"
-                      value={manualReviewForm.email}
+                      value={manualReviewForm.email || ''}
                       onChange={(e) => setManualReviewForm({ ...manualReviewForm, email: e.target.value })}
                     />
                   </div>
@@ -2839,7 +2866,7 @@ export default function DashboardPage() {
                       required
                       className={styles.inputField}
                       placeholder="e.g. Frontend Developer Intern"
-                      value={manualReviewForm.role}
+                      value={manualReviewForm.role || ''}
                       onChange={(e) => setManualReviewForm({ ...manualReviewForm, role: e.target.value })}
                     />
                   </div>
@@ -2870,7 +2897,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       className={styles.inputField}
-                      value={manualReviewForm.reviewTitle}
+                      value={manualReviewForm.reviewTitle || ''}
                       onChange={(e) => setManualReviewForm({ ...manualReviewForm, reviewTitle: e.target.value })}
                     />
                   </div>
@@ -2892,7 +2919,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       className={styles.inputField}
-                      value={manualReviewForm.reviewDate}
+                      value={manualReviewForm.reviewDate || ''}
                       onChange={(e) => setManualReviewForm({ ...manualReviewForm, reviewDate: e.target.value })}
                     />
                   </div>
@@ -2903,7 +2930,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       className={styles.inputField}
-                      value={manualReviewForm.reviewTime}
+                      value={manualReviewForm.reviewTime || ''}
                       onChange={(e) => setManualReviewForm({ ...manualReviewForm, reviewTime: e.target.value })}
                     />
                   </div>
@@ -2932,7 +2959,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       className={styles.inputField}
-                      value={manualReviewForm.meetLink}
+                      value={manualReviewForm.meetLink || ''}
                       onChange={(e) => setManualReviewForm({ ...manualReviewForm, meetLink: e.target.value })}
                     />
                   </div>
@@ -2965,7 +2992,7 @@ export default function DashboardPage() {
                         rows={8}
                         style={{ minHeight: '180px', lineHeight: '1.6', fontSize: '14px', resize: 'vertical' }}
                         placeholder="Enter mentor notes, code feedback, and required deliverables for this review..."
-                        value={manualReviewForm.feedbackNotes}
+                        value={manualReviewForm.feedbackNotes || ''}
                         onChange={(e) => setManualReviewForm({ ...manualReviewForm, feedbackNotes: e.target.value })}
                       />
                     </div>
@@ -3326,9 +3353,10 @@ export default function DashboardPage() {
                         const c = candidates.find(cand => cand.id === id);
                         if (c) {
                           setSingleCertForm({
-                            fullName: c.fullName,
-                            email: c.email,
-                            role: c.role,
+                            fullName: c.fullName || '',
+                            email: c.email || '',
+                            cc: '',
+                            role: c.role || '',
                             issueDate: c.endDate || new Date().toISOString().split('T')[0],
                           });
                         }
@@ -3349,7 +3377,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       className={styles.inputField}
-                      value={singleCertForm.fullName}
+                      value={singleCertForm.fullName || ''}
                       onChange={(e) => setSingleCertForm({ ...singleCertForm, fullName: e.target.value })}
                     />
                   </div>
@@ -3360,7 +3388,7 @@ export default function DashboardPage() {
                       type="email"
                       required
                       className={styles.inputField}
-                      value={singleCertForm.email}
+                      value={singleCertForm.email || ''}
                       onChange={(e) => setSingleCertForm({ ...singleCertForm, email: e.target.value })}
                     />
                   </div>
@@ -3382,7 +3410,7 @@ export default function DashboardPage() {
                       type="text"
                       required
                       className={styles.inputField}
-                      value={singleCertForm.role}
+                      value={singleCertForm.role || ''}
                       onChange={(e) => setSingleCertForm({ ...singleCertForm, role: e.target.value })}
                     />
                   </div>
@@ -3393,7 +3421,7 @@ export default function DashboardPage() {
                       type="date"
                       required
                       className={styles.inputField}
-                      value={singleCertForm.issueDate}
+                      value={singleCertForm.issueDate || ''}
                       onChange={(e) => setSingleCertForm({ ...singleCertForm, issueDate: e.target.value })}
                     />
                   </div>

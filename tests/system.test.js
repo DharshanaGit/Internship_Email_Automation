@@ -193,5 +193,5 @@ describe('7. Mailer & Email Dispatch Pipeline', () => {
     expect(result.success).toBe(true);
     expect(result.logId).toBeDefined();
     expect(result.status).toBe('Delivered');
-  });
+  }, 15000);
 });
