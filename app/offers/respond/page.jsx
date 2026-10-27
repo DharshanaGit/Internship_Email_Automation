@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './respond.module.css';
-import { Shield, Clock, CheckCircle2, AlertCircle, Upload, PenTool, Type, FileText, Download, XCircle, ArrowRight } from 'lucide-react';
+import { Shield, Clock, CheckCircle2, AlertCircle, Upload, PenTool, Type, FileText, Download, XCircle, ArrowRight, Eye, Check } from 'lucide-react';
 
 export default function OfferRespondPage() {
   const [token, setToken] = useState('');
@@ -10,6 +10,7 @@ export default function OfferRespondPage() {
   const [candidate, setCandidate] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showPdfViewer, setShowPdfViewer] = useState(false);
 
   // Decision State: 'ACCEPT' or 'REJECT'
   const [decision, setDecision] = useState('ACCEPT');
@@ -370,31 +371,52 @@ export default function OfferRespondPage() {
           </div>
         </div>
 
-        {/* PDF Offer Letter Viewer */}
+        {/* PDF Offer Letter Card - Compact without massive empty space */}
         <div className={styles.sectionCard}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h2 className={styles.sectionTitle} style={{ margin: 0 }}>
-              <FileText size={18} color="#a855f7" />
-              <span>Formal Offer Letter PDF</span>
-            </h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ background: 'rgba(168, 85, 247, 0.15)', border: '1px solid rgba(168, 85, 247, 0.3)', padding: '10px', borderRadius: '8px', color: '#c084fc' }}>
+                <FileText size={22} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '15px', color: '#ffffff', fontWeight: 700 }}>
+                  Official Internship Offer Letter (PDF)
+                </h3>
+                <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                  Document: Shortfundly_Offer_{(candidate.fullName || 'Candidate').replace(/\s+/g, '_')}.pdf &bull; A4 Corporate Standard
+                </p>
+              </div>
+            </div>
 
-            <a
-              href={candidate.pdfUrl}
-              download={`Shortfundly_Offer_${(candidate.fullName || 'Candidate').replace(/\s+/g, '_')}.pdf`}
-              className={styles.btnSecondary}
-            >
-              <Download size={14} />
-              <span>Download PDF</span>
-            </a>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setShowPdfViewer(!showPdfViewer)}
+                className={styles.btnSecondary}
+              >
+                <Eye size={14} />
+                <span>{showPdfViewer ? 'Hide PDF Preview' : 'Preview Document'}</span>
+              </button>
+              <a
+                href={candidate.pdfUrl}
+                download={`Shortfundly_Offer_${(candidate.fullName || 'Candidate').replace(/\s+/g, '_')}.pdf`}
+                className={styles.btnSecondary}
+              >
+                <Download size={14} />
+                <span>Download PDF</span>
+              </a>
+            </div>
           </div>
 
-          <div className={styles.pdfViewerBox}>
-            <iframe
-              src={candidate.pdfUrl}
-              title="Internship Offer Letter PDF"
-              className={styles.pdfIframe}
-            />
-          </div>
+          {showPdfViewer && (
+            <div className={styles.pdfViewerBox} style={{ marginTop: '16px' }}>
+              <iframe
+                src={candidate.pdfUrl}
+                title="Internship Offer Letter PDF"
+                className={styles.pdfIframe}
+              />
+            </div>
+          )}
         </div>
 
         {/* Decision & Digital Signature Form (Only visible if not responded & not expired) */}
@@ -529,12 +551,21 @@ export default function OfferRespondPage() {
                     <div style={{ marginTop: '14px' }}>
                       <label className={styles.uploadArea}>
                         <Upload size={24} color="#a855f7" />
-                        <span style={{ marginTop: '8px', fontSize: '13px', color: '#cbd5e1' }}>Click to select a photo of your signature (PNG / JPG)</span>
+                        <span style={{ marginTop: '8px', fontSize: '13px', color: '#cbd5e1', fontWeight: 600 }}>
+                          Click to upload signature image or photo (PNG / JPG / WEBP)
+                        </span>
+                        <span style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '4px' }}>
+                          Image will be cryptographically verified and securely stored in Cloudinary
+                        </span>
                         <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
                       </label>
                       {signatureData && signatureData.startsWith('data:image/') && (
-                        <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                          <img src={signatureData} alt="Uploaded signature" style={{ maxHeight: '100px', border: '1px solid #a855f7', borderRadius: '6px', background: '#ffffff', padding: '6px' }} />
+                        <div style={{ marginTop: '12px', textAlign: 'center', background: '#09090b', padding: '12px', borderRadius: '8px', border: '1px solid #27272a' }}>
+                          <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                            <Check size={14} color="#10b981" />
+                            <span>Signature Image Ready for Cloudinary Upload</span>
+                          </div>
+                          <img src={signatureData} alt="Uploaded signature" style={{ maxHeight: '90px', border: '1px solid #a855f7', borderRadius: '6px', background: '#ffffff', padding: '6px' }} />
                         </div>
                       )}
                     </div>

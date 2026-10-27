@@ -455,7 +455,7 @@ export default function ReviewDashboardView({
                   <th>Batch</th>
                   <th>Task No.</th>
                   <th>Task Title</th>
-                  <th>Status</th>
+                  <th>Review Stage</th>
                   <th>Reviews Held</th>
                   <th>Score (%)</th>
                   <th>Google Meet Link</th>
@@ -465,7 +465,7 @@ export default function ReviewDashboardView({
                 {filteredCandidates.length === 0 ? (
                   <tr>
                     <td colSpan={10} style={{ textAlign: 'center', padding: '40px', color: '#71717a' }}>
-                      No candidates currently in the review queue.
+                      No candidates currently in the review queue. (Candidates appear here only after task emails are dispatched.)
                     </td>
                   </tr>
                 ) : (
@@ -488,12 +488,18 @@ export default function ReviewDashboardView({
                         <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>#{task?.taskNumber || 1}</td>
                         <td>{task?.title || 'Milestone Task'}</td>
                         <td>
-                          <span className={c.taskStatus?.includes('Completed') ? styles.badgeEmerald : styles.badgeAmber}>
-                            {c.taskStatus}
+                          <span className={
+                            c.reviewStage === 'Checkpoint Ready'
+                              ? styles.badgeEmerald
+                              : c.reviewStage === 'Review 2 Pending'
+                              ? styles.badgePurple
+                              : styles.badgeAmber
+                          }>
+                            {c.reviewStage || 'Review 1 Pending'}
                           </span>
                         </td>
-                        <td style={{ fontFamily: 'monospace' }}>{task?.reviews?.length || 0} Sessions</td>
-                        <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                        <td style={{ fontFamily: 'monospace' }}>{c.reviewCount || task?.reviews?.length || 0} Sessions</td>
+                        <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
                           {c.performancePercentage?.toFixed(1)}%
                         </td>
                         <td>
@@ -676,51 +682,73 @@ export default function ReviewDashboardView({
           </p>
 
           <div className={styles.tableResponsive} style={{ marginBottom: '20px' }}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th style={{ width: '40px' }}>Select</th>
-                  <th>Intern ID</th>
-                  <th>Candidate Name</th>
-                  <th>Batch</th>
-                  <th>Current Score</th>
-                  <th>Override Final Task Score (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCandidates.map((c) => {
-                  const isSelected = selectedCandidateIds.includes(c.id);
-                  return (
-                    <tr key={c.id}>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => handleToggleSelectOne(c.id)}
-                          style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
-                        />
-                      </td>
-                      <td style={{ fontFamily: 'monospace', color: '#c084fc' }}>{c.internId}</td>
-                      <td style={{ fontWeight: 600 }}>{c.fullName}</td>
-                      <td><span className={styles.badgePurple}>{c.batch}</span></td>
-                      <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>{c.performancePercentage?.toFixed(1)}%</td>
-                      <td>
-                        <input
-                          type="number"
-                          min={0}
-                          max={100}
-                          placeholder={String(c.performancePercentage || 100)}
-                          value={finalScoreMap[c.id] || ''}
-                          onChange={(e) => setFinalScoreMap({ ...finalScoreMap, [c.id]: e.target.value })}
-                          className={styles.searchInput}
-                          style={{ width: '100px', height: '32px' }}
-                        />
-                      </td>
+            {(() => {
+              const checkpointCandidates = filteredCandidates.filter(
+                (c) => (c.reviewCount && c.reviewCount >= 1) || c.reviewStage === 'Checkpoint Ready' || c.taskStatus?.includes('Completed')
+              );
+
+              if (checkpointCandidates.length === 0) {
+                return (
+                  <div style={{ textAlign: 'center', padding: '36px', background: '#09090b', borderRadius: '8px', border: '1px dashed #27272a', color: '#94a3b8' }}>
+                    <Award size={36} color="#a855f7" style={{ margin: '0 auto 10px auto' }} />
+                    <h4 style={{ color: '#ffffff', margin: '0 0 6px 0' }}>No Candidates Ready for Final Checkpoint</h4>
+                    <p style={{ margin: 0, fontSize: '13px', maxWidth: '480px', marginInline: 'auto' }}>
+                      Step-by-step review gating active: Only candidates who have received task emails and completed Review 1 & Review 2 evaluation will move into this checkpoint list.
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={{ width: '40px' }}>Select</th>
+                      <th>Intern ID</th>
+                      <th>Candidate Name</th>
+                      <th>Batch</th>
+                      <th>Calculated Score</th>
+                      <th>Override Final Task Score (%)</th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {checkpointCandidates.map((c) => {
+                      const isSelected = selectedCandidateIds.includes(c.id);
+                      return (
+                        <tr key={c.id}>
+                          <td>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleToggleSelectOne(c.id)}
+                              style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
+                            />
+                          </td>
+                          <td style={{ fontFamily: 'monospace', color: '#c084fc' }}>{c.internId}</td>
+                          <td style={{ fontWeight: 600 }}>{c.fullName}</td>
+                          <td><span className={styles.badgePurple}>{c.batch}</span></td>
+                          <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
+                            {c.performancePercentage?.toFixed(1)}%
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min={0}
+                              max={100}
+                              placeholder={String(c.performancePercentage || 100)}
+                              value={finalScoreMap[c.id] || ''}
+                              onChange={(e) => setFinalScoreMap({ ...finalScoreMap, [c.id]: e.target.value })}
+                              className={styles.searchInput}
+                              style={{ width: '100px', height: '32px' }}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              );
+            })()}
           </div>
 
           <button

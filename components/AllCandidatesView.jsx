@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './web3Deck.module.css';
 import {
   Users,
@@ -15,7 +15,9 @@ import {
   GraduationCap,
   Building,
   RotateCcw,
-  X
+  X,
+  Trash2,
+  Undo2
 } from 'lucide-react';
 
 export default function AllCandidatesView({
@@ -34,9 +36,24 @@ export default function AllCandidatesView({
   const [departureReason, setDepartureReason] = useState('');
   const [submittingLeave, setSubmittingLeave] = useState(false);
 
-  // Filter candidates
+  // 3-Second Undo Deletion State
+  const [undoState, setUndoState] = useState(null);
+  const [hiddenCandidateIds, setHiddenCandidateIds] = useState([]);
+  const timerRef = useRef(null);
+  const intervalRef = useRef(null);
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  // Filter candidates (omit candidates queued in undo deletion)
   const filteredCandidates = useMemo(() => {
     return candidates.filter((c) => {
+      if (hiddenCandidateIds.includes(c.id)) return false;
       if (selectedStatus === 'ACTIVE' && c.isLeaved) return false;
       if (selectedStatus === 'LEAVED' && !c.isLeaved) return false;
       if (selectedBatch !== 'ALL' && c.batch !== selectedBatch) return false;
@@ -51,7 +68,7 @@ export default function AllCandidatesView({
       }
       return true;
     });
-  }, [candidates, selectedBatch, selectedRole, selectedStatus, searchTerm]);
+  }, [candidates, selectedBatch, selectedRole, selectedStatus, searchTerm, hiddenCandidateIds]);
 
   // Open Leave Modal
   const handleOpenLeaveModal = (cand) => {
@@ -115,6 +132,75 @@ export default function AllCandidatesView({
     } catch (err) {
       showToast?.(err.message, 'error');
     }
+  };
+
+  // Permanently Delete Candidate with 3-Second Undo
+  const handleRequestDelete = (cand) => {
+    // If a deletion is already pending, finalize it immediately
+    if (undoState) {
+      finalizeDelete(undoState.candidate.id);
+    }
+
+    // Hide candidate optimistically
+    setHiddenCandidateIds((prev) => [...prev, cand.id]);
+
+    let countdown = 3;
+    setUndoState({
+      candidate: cand,
+      countdown: 3,
+    });
+
+    // Update countdown every second
+    intervalRef.current = setInterval(() => {
+      countdown -= 1;
+      if (countdown > 0) {
+        setUndoState((prev) => (prev ? { ...prev, countdown } : null));
+      }
+    }, 1000);
+
+    // After 3 seconds, perform permanent deletion
+    timerRef.current = setTimeout(async () => {
+      clearInterval(intervalRef.current);
+      await finalizeDelete(cand.id, cand.fullName);
+    }, 3000);
+  };
+
+  // Finalize Deletion after 3 seconds
+  const finalizeDelete = async (candId, candName = '') => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setUndoState(null);
+
+    try {
+      const res = await fetch(`/api/candidates/${candId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast?.(`Candidate ${candName || ''} permanently removed from portal.`, 'success');
+        onRefresh?.();
+      } else {
+        showToast?.(data.error || 'Failed to delete candidate.', 'error');
+        // Restore visibility on failure
+        setHiddenCandidateIds((prev) => prev.filter((id) => id !== candId));
+      }
+    } catch (err) {
+      showToast?.(err.message, 'error');
+      setHiddenCandidateIds((prev) => prev.filter((id) => id !== candId));
+    }
+  };
+
+  // Undo Delete within 3 seconds
+  const handleUndoDelete = () => {
+    if (!undoState) return;
+    const restoredCandidate = undoState.candidate;
+
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    setHiddenCandidateIds((prev) => prev.filter((id) => id !== restoredCandidate.id));
+    setUndoState(null);
+    showToast?.(`Deletion cancelled. Candidate "${restoredCandidate.fullName}" restored.`, 'info');
   };
 
   return (
@@ -236,7 +322,7 @@ export default function AllCandidatesView({
                       <div>{c.joiningDate}</div>
                       <div>to {c.endDate}</div>
                     </td>
-                    <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                    <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
                       {c.performancePercentage?.toFixed(1)}%
                     </td>
                     <td>
@@ -247,29 +333,47 @@ export default function AllCandidatesView({
                       )}
                     </td>
                     <td>
-                      {c.isLeaved ? (
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        {c.isLeaved ? (
+                          <button
+                            type="button"
+                            onClick={() => handleReinstate(c)}
+                            className={styles.btnSecondary}
+                            style={{ fontSize: '11px', padding: '4px 8px' }}
+                            title="Reinstate to Active Internship"
+                          >
+                            <RotateCcw size={11} />
+                            <span>Reinstate</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenLeaveModal(c)}
+                            className={styles.btnDanger}
+                            style={{ fontSize: '11px', padding: '4px 8px' }}
+                            title="Record Candidate Departure"
+                          >
+                            <UserX size={11} />
+                            <span>Remove</span>
+                          </button>
+                        )}
                         <button
                           type="button"
-                          onClick={() => handleReinstate(c)}
-                          className={styles.btnSecondary}
-                          style={{ fontSize: '11px', padding: '4px 8px' }}
-                          title="Reinstate to Active Internship"
-                        >
-                          <RotateCcw size={11} />
-                          <span>Reinstate</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleOpenLeaveModal(c)}
+                          onClick={() => handleRequestDelete(c)}
                           className={styles.btnDanger}
-                          style={{ fontSize: '11px', padding: '4px 8px' }}
-                          title="Record Candidate Departure"
+                          style={{
+                            fontSize: '11px',
+                            padding: '4px 8px',
+                            background: 'rgba(239, 68, 68, 0.12)',
+                            borderColor: 'rgba(239, 68, 68, 0.35)',
+                            color: '#f87171',
+                          }}
+                          title="Permanently Delete Candidate (with 3-second undo)"
                         >
-                          <UserX size={11} />
-                          <span>Remove</span>
+                          <Trash2 size={11} />
+                          <span>Delete</span>
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -278,6 +382,59 @@ export default function AllCandidatesView({
           </table>
         </div>
       </div>
+
+      {/* FLOATING 3-SECOND UNDO NOTIFICATION */}
+      {undoState && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '28px',
+            right: '28px',
+            background: '#121118',
+            border: '1px solid #a855f7',
+            borderRadius: '10px',
+            padding: '14px 20px',
+            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.9), 0 0 15px rgba(168, 85, 247, 0.25)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}
+        >
+          <div style={{ background: 'rgba(239, 68, 68, 0.15)', padding: '8px', borderRadius: '8px', color: '#f87171' }}>
+            <Trash2 size={18} />
+          </div>
+          <div>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: '#f8fafc' }}>
+              Candidate &quot;{undoState.candidate.fullName}&quot; deleting in {undoState.countdown}s...
+            </div>
+            <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+              Record will be permanently purged from database when timer finishes.
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleUndoDelete}
+            style={{
+              background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
+              border: 'none',
+              borderRadius: '6px',
+              color: '#ffffff',
+              padding: '8px 14px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 2px 10px rgba(124, 58, 237, 0.4)',
+            }}
+          >
+            <Undo2 size={13} />
+            <span>Undo ({undoState.countdown}s)</span>
+          </button>
+        </div>
+      )}
 
       {/* MODAL: REMOVE CANDIDATE (LEAVED INTERNSHIP) */}
       {leavingCandidate && (
@@ -302,7 +459,7 @@ export default function AllCandidatesView({
 
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                  Departure Reason / Notes (Captured from Candidate's Resignation Email)
+                  Departure Reason / Notes (Captured from Candidate&apos;s Resignation Email)
                 </label>
                 <textarea
                   rows={4}

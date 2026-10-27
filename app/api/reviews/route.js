@@ -22,10 +22,14 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const batch = searchParams.get('batch');
     const role = searchParams.get('role');
-    const taskNumber = searchParams.get('taskNumber');
 
+    // ONLY fetch candidates who have had task mail dispatched (taskStatus !== 'Not Assigned' or tasks exist)
     const where = {
       isLeaved: false,
+      OR: [
+        { taskStatus: { not: 'Not Assigned' } },
+        { tasks: { some: {} } },
+      ],
     };
 
     if (batch && batch !== 'ALL') where.batch = batch;
@@ -49,6 +53,35 @@ export async function GET(request) {
 
     const formatted = candidates.map(c => {
       const activeTask = c.tasks[0];
+      const reviews = activeTask?.reviews || [];
+      const reviewCount = reviews.length;
+
+      // Calculate genuine performance percentage dynamically:
+      // - Task Assigned (no reviews yet): 25.0%
+      // - Review 1 scheduled / completed: 50.0% (or score from evaluation)
+      // - Review 2 completed: average of reviewer scores or 85%
+      // - Task Completed: final certified score
+      let calculatedPerf = c.performancePercentage;
+      if (c.taskStatus === 'Task Completed' || c.taskStatus === 'Completed') {
+        calculatedPerf = c.performancePercentage || 90.0;
+      } else if (reviews.length > 0) {
+        const scores = reviews.map(r => Number(r.score || 0)).filter(s => s > 0);
+        if (scores.length > 0) {
+          const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+          calculatedPerf = Math.round(avgScore * 10) / 10;
+        } else {
+          calculatedPerf = reviews.length === 1 ? 50.0 : 75.0;
+        }
+      } else if (c.taskStatus === 'Assigned' || activeTask) {
+        calculatedPerf = 25.0;
+      }
+
+      const reviewStage = reviews.length === 0
+        ? 'Review 1 Pending'
+        : reviews.length === 1
+        ? 'Review 2 Pending'
+        : 'Checkpoint Ready';
+
       return {
         id: c.id,
         internId: c.internId || c.candidateId,
@@ -58,7 +91,9 @@ export async function GET(request) {
         role: c.role,
         batch: c.batch || 'Batch A',
         taskStatus: c.taskStatus,
-        performancePercentage: c.performancePercentage,
+        performancePercentage: calculatedPerf,
+        reviewStage,
+        reviewCount,
         activeTask: activeTask ? {
           id: activeTask.id,
           taskNumber: activeTask.taskNumber,
@@ -110,101 +145,88 @@ export async function POST(request) {
       },
     });
 
-    const results = [];
+    const scheduled = [];
 
-    for (const candidate of candidates) {
-      const activeTask = candidate.tasks[0];
-      const meetLink = activeTask?.meetLink || candidate.googleMeetUrl || 'https://meet.google.com/new';
-      const taskNumber = activeTask ? activeTask.taskNumber : 1;
-      const taskTitle = activeTask ? activeTask.title : 'Milestone Task';
+    for (const cand of candidates) {
+      const activeTask = cand.tasks[0];
+      const meetLink = activeTask?.meetLink || cand.googleMeetUrl || 'https://meet.google.com/xyz-sf-review';
+      const taskId = activeTask?.taskId || `TSK-INT-${cand.internId || 'DEV'}`;
 
-      // Create TaskReview record
+      // 1. Create or record review record
       if (activeTask) {
         await prisma.taskReview.create({
           data: {
-            taskAssignmentId: activeTask.id,
+            taskId: activeTask.id,
             reviewNumber: Number(reviewNumber),
             reviewDate: scheduledDate,
-            reviewTime,
-            feedback: customNotes || `Milestone review #${reviewNumber} session scheduled.`,
-            scoreAwarded: candidate.performancePercentage || 100.0,
-            meetLink,
-            sentAt: new Date(),
+            reviewTime: reviewTime,
+            meetLink: meetLink,
+            feedback: customNotes || 'Review 1 scheduled. Please prepare demonstration and GitHub repository.',
+            score: 50.0,
+            status: 'Scheduled',
           },
         });
 
         await prisma.taskAssignment.update({
           where: { id: activeTask.id },
           data: {
-            reviewCount: (activeTask.reviewCount || 0) + 1,
-            status: `Review ${reviewNumber} Scheduled`,
+            reviewDate: scheduledDate,
+            reviewTime: reviewTime,
+            reviewCount: { increment: 1 },
           },
         });
       }
 
-      const jinjaContent = `Dear ${candidate.fullName},
-
-Your **Milestone Review #${reviewNumber}** for **Task #${taskNumber}: ${taskTitle}** has been scheduled.
-
-**Review Session Details:**
-- **Intern ID:** ${candidate.internId || candidate.candidateId}
-- **Role / Domain:** ${candidate.role}
-- **Scheduled Date:** **${scheduledDate}**
-- **Scheduled Time:** **${reviewTime}**
-- **Google Meet Link (Same meeting room assigned to you):**
-👉 **[Join Scheduled Review Meeting Room](${meetLink})**
-
-${customNotes ? `**Reviewer Pre-Session Guidelines:**\n${customNotes}\n` : ''}
-**Preparation Instructions:**
-1. Please join the Google Meet room 5 minutes prior to the scheduled time.
-2. Have your GitHub repository, commit history, and live demonstration ready for screen sharing.
-3. Prepare a concise 5-minute technical walkthrough of your architecture and code implementation.
-
-Warm regards,
-**Technical Review Board & Engineering Mentorship**
-Shortfundly Media Technologies Pvt. Ltd.`;
-
-      const htmlBody = jinjaTextToEmailHtml(jinjaContent);
-      const subject = `Scheduled: Milestone Review #${reviewNumber} - Task #${taskNumber} | ${candidate.fullName}`;
-
-      const dispatch = await sendEmail({
-        to: candidate.email,
-        subject,
-        text: jinjaContent,
-        html: htmlBody,
-      });
-
-      await prisma.emailLog.create({
+      // Update candidate performance to 50.0% on Review 1 scheduling
+      await prisma.candidate.update({
+        where: { id: cand.id },
         data: {
-          candidateId: candidate.id,
-          recipientEmail: candidate.email,
-          recipientName: candidate.fullName,
-          subject,
-          emailType: `REVIEW_${reviewNumber}_NOTIFICATION`,
-          body: jinjaContent,
-          meetLink,
-          status: dispatch.success ? 'Sent' : 'Failed',
-          error: dispatch.error || null,
+          performancePercentage: 50.0,
         },
       });
 
-      results.push({
-        candidateId: candidate.id,
-        email: candidate.email,
-        scheduledDate,
-        success: dispatch.success,
+      // 2. Dispatch Review Notification Email
+      const emailSubject = `Review #${reviewNumber} Scheduled: ${activeTask?.title || taskId} | Shortfundly`;
+      const emailBody = `Dear ${cand.fullName},
+
+Your Milestone Review #${reviewNumber} has been officially scheduled.
+
+Review Details:
+- Intern ID: ${cand.internId || cand.candidateId}
+- Role: ${cand.role}
+- Scheduled Review Date: ${scheduledDate}
+- Scheduled Review Time: ${reviewTime} IST
+- Google Meet Link: ${meetLink}
+
+${customNotes ? `Important Guidelines:\n${customNotes}\n` : ''}
+Please ensure your code is pushed to your assigned GitHub repository prior to the call.
+
+Best regards,
+Engineering & Evaluation Committee
+Shortfundly Media Technologies Pvt. Ltd.`;
+
+      await sendEmail({
+        candidateId: cand.id,
+        to: cand.email,
+        recipientName: cand.fullName,
+        subject: emailSubject,
+        html: jinjaTextToEmailHtml(emailBody),
+        text: emailBody,
+        emailType: `REVIEW_${reviewNumber}_SCHEDULED`,
+        meetLink,
       });
+
+      scheduled.push(cand.id);
     }
 
     return NextResponse.json({
       success: true,
-      reviewNumber,
+      message: `Review #${reviewNumber} successfully scheduled for ${scheduled.length} candidates on ${scheduledDate}!`,
+      count: scheduled.length,
       scheduledDate,
-      count: results.length,
-      results,
     });
   } catch (error) {
-    console.error('Error scheduling review sessions:', error);
+    console.error('Error scheduling review:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

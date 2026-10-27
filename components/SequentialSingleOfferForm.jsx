@@ -61,9 +61,15 @@ export default function SequentialSingleOfferForm({
   const [previewTab, setPreviewTab] = useState('email');
   const [sending, setSending] = useState(false);
   const [portalToken, setPortalToken] = useState(() => Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2));
-  const candidatePortalUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/offers/respond?token=${portalToken}`
-    : `${process.env.NEXT_PUBLIC_APP_URL || 'https://internship-email-automation.vercel.app'}/offers/respond?token=${portalToken}`;
+  const VERCEL_PROD_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://internship-email-automation.vercel.app').replace(/\/+$/, '');
+  const candidatePortalUrl = `${VERCEL_PROD_URL}/offers/respond?token=${portalToken}`;
+
+  const setDeadlinePreset = (hours) => {
+    const d = new Date(Date.now() + hours * 60 * 60 * 1000);
+    const formatted = d.toISOString().slice(0, 16);
+    setFormData((prev) => ({ ...prev, deadline: formatted }));
+    showToast?.(`Offer response deadline set to ${hours} hours (${d.toLocaleString()})`, 'info');
+  };
 
   // Auto-generate Gemma 2B unique Intern ID
   const generateNewGemmaId = () => {
@@ -297,9 +303,9 @@ export default function SequentialSingleOfferForm({
       duration: formData.duration || '3 Months',
       stipend: `Rs. ${Number(formData.stipend || 10000).toLocaleString('en-IN')}`,
       deadline: formData.deadline ? new Date(formData.deadline).toLocaleString() : '3 Days',
-      responseUrl: `${typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://internship-email-automation.vercel.app')}/offers/respond?token=sample_token_${formData.internId}`,
+      responseUrl: `${VERCEL_PROD_URL}/offers/respond?token=sample_token_${formData.internId}`,
     };
-  }, [formData]);
+  }, [formData, VERCEL_PROD_URL]);
 
   const defaultJinjaBody = `Dear {{candidateName}},
 
@@ -346,7 +352,7 @@ www.shortfundly.com`;
         </div>
 
         <div className={`${styles.stepPill} ${currentStep === 2 ? styles.stepPillActive : currentStep > 2 ? styles.stepPillCompleted : ''}`}>
-          <span>2. Jinja Text Template & CC</span>
+          <span>2. Select Text Template & Add cc</span>
         </div>
 
         <div className={`${styles.stepPill} ${currentStep === 3 ? styles.stepPillActive : ''}`}>
@@ -461,13 +467,13 @@ www.shortfundly.com`;
               )}
             </div>
 
-            {/* Field 1b: Unique Candidate Offer Response Portal Link */}
-            <div className={styles.fieldGroup} style={{ gridColumn: 'span 2', background: '#09090b', padding: '12px 16px', borderRadius: '8px', border: '1px solid #232328' }}>
+            {/* Field 1b: Unique Candidate Offer Response Portal Link with Deadline Fixer */}
+            <div className={styles.fieldGroup} style={{ gridColumn: 'span 2', background: '#09090b', padding: '14px 16px', borderRadius: '8px', border: '1px solid #232328' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <label className={styles.fieldLabel} style={{ margin: 0 }}>
-                  <span style={{ color: '#ffffff', fontWeight: 600 }}>Unique Candidate Portal Response URL</span>
-                  <span style={{ fontSize: '11px', color: '#c084fc', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <Sparkles size={11} /> Auto-Linked in Offer Email
+                  <span style={{ color: '#ffffff', fontWeight: 700 }}>Unique Candidate Portal Response URL</span>
+                  <span style={{ fontSize: '11px', color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Sparkles size={11} /> Live Production Vercel Link
                   </span>
                 </label>
                 <div style={{ display: 'flex', gap: '6px' }}>
@@ -475,7 +481,7 @@ www.shortfundly.com`;
                     type="button"
                     onClick={() => {
                       navigator.clipboard?.writeText(candidatePortalUrl);
-                      showToast?.('Copied Candidate Portal URL to clipboard!', 'success');
+                      showToast?.('Copied Vercel Candidate Portal URL to clipboard!', 'success');
                     }}
                     style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#cbd5e1', cursor: 'pointer' }}
                   >
@@ -499,10 +505,26 @@ www.shortfundly.com`;
                 readOnly
                 value={candidatePortalUrl}
                 className={styles.inputField}
-                style={{ fontFamily: 'monospace', fontSize: '12px', color: '#c084fc', background: '#000000', border: '1px solid #27272a' }}
+                style={{ fontFamily: 'monospace', fontSize: '12px', color: '#38bdf8', background: '#000000', border: '1px solid #27272a' }}
               />
+
+              {/* Deadline Fixer Option Bar */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #1c1b24' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Clock size={12} color="#c084fc" />
+                  <span style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 600 }}>Deadline Fixer:</span>
+                  <button type="button" onClick={() => setDeadlinePreset(24)} className={styles.btnDeadlinePreset}>+24h (1 Day)</button>
+                  <button type="button" onClick={() => setDeadlinePreset(48)} className={styles.btnDeadlinePreset}>+48h (2 Days)</button>
+                  <button type="button" onClick={() => setDeadlinePreset(72)} className={styles.btnDeadlinePreset}>+72h (3 Days)</button>
+                  <button type="button" onClick={() => setDeadlinePreset(168)} className={styles.btnDeadlinePreset}>+7 Days (1 Wk)</button>
+                </div>
+                <div style={{ fontSize: '11px', color: '#34d399' }}>
+                  Expires: <strong>{formData.deadline ? new Date(formData.deadline).toLocaleString() : 'Not Set'}</strong>
+                </div>
+              </div>
+
               <p style={{ margin: '6px 0 0 0', fontSize: '11.5px', color: '#94a3b8' }}>
-                &bull; The candidate reviews terms, provides their digital signature or uploads a signature image via this link before the offer expires.
+                &bull; Secure Vercel link dispatched in email. The candidate reviews terms and provides digital signature or uploads photo of signature in Cloudinary before expiration.
               </p>
             </div>
 
@@ -514,11 +536,13 @@ www.shortfundly.com`;
               </label>
               <input
                 type="email"
+                autoComplete="off"
                 disabled={isFieldLocked('email')}
                 placeholder="candidate@gmail.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value.toLowerCase() })}
                 className={`${styles.inputField} ${isFieldLocked('email') ? styles.inputLocked : ''} ${formData.email && validationErrors.email ? styles.inputError : formData.email ? styles.inputValid : ''}`}
+                style={{ backgroundColor: '#09090b', color: '#f8fafc' }}
               />
               {!isFieldLocked('email') && formData.email && validationErrors.email && (
                 <div className={styles.fieldError}>
@@ -674,7 +698,14 @@ www.shortfundly.com`;
                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                 className={styles.inputField}
               />
-              <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+              <div className={styles.deadlinePresets}>
+                <span style={{ fontSize: '11px', color: '#94a3b8', alignSelf: 'center' }}>Presets:</span>
+                <button type="button" onClick={() => setDeadlinePreset(24)} className={styles.btnDeadlinePreset}>+24 Hours</button>
+                <button type="button" onClick={() => setDeadlinePreset(48)} className={styles.btnDeadlinePreset}>+48 Hours</button>
+                <button type="button" onClick={() => setDeadlinePreset(72)} className={styles.btnDeadlinePreset}>+3 Days</button>
+                <button type="button" onClick={() => setDeadlinePreset(168)} className={styles.btnDeadlinePreset}>+7 Days</button>
+              </div>
+              <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
                 Unique offer link will automatically expire at this date/time.
               </span>
             </div>
@@ -714,7 +745,7 @@ www.shortfundly.com`;
               onClick={() => setCurrentStep(2)}
               className={`${styles.btnPrimary} ${!isStep1Valid ? styles.btnPrimaryDisabled : ''}`}
             >
-              <span>Proceed to Jinja Template & CC</span>
+              <span>Proceed to Select Text Template & Add cc</span>
               <ArrowRight size={16} />
             </button>
           </div>
@@ -727,7 +758,7 @@ www.shortfundly.com`;
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FileText size={18} color="#a855f7" />
-              <span>Select Jinja Text Template & Add CC</span>
+              <span>Select Text Template & Add cc</span>
             </h3>
           </div>
 
@@ -779,11 +810,11 @@ www.shortfundly.com`;
               </div>
             </div>
             <textarea
-              rows={12}
+              rows={18}
               value={formData.customBody || activeTemplate?.emailBody || defaultJinjaBody}
               onChange={(e) => setFormData({ ...formData, customBody: e.target.value })}
-              className={styles.inputField}
-              style={{ fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.6, padding: '12px' }}
+              className={styles.templateTextarea}
+              placeholder="Customize offer letter text..."
             />
           </div>
 

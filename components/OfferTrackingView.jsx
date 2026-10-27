@@ -16,6 +16,7 @@ import {
   Download,
   AlertCircle
 } from 'lucide-react';
+import { isDeadlineExpired, formatFlexibleDate } from '../lib/dateUtils.js';
 
 export default function OfferTrackingView({
   candidates = [],
@@ -37,8 +38,8 @@ export default function OfferTrackingView({
   // Telemetry counts
   const totalOffers = candidates.filter((c) => c.offerLetterStatus !== 'Not Assigned');
   const acceptedCount = candidates.filter((c) => c.offerLetterStatus === 'Accepted').length;
-  const rejectedCount = candidates.filter((c) => c.offerLetterStatus?.startsWith('Rejected')).length;
-  const pendingCount = candidates.filter((c) => c.offerLetterStatus === 'Sent').length;
+  const rejectedCount = candidates.filter((c) => c.offerLetterStatus?.startsWith('Rejected') || (c.offerLetterStatus === 'Sent' && isDeadlineExpired(c.offerDeadline))).length;
+  const pendingCount = candidates.filter((c) => c.offerLetterStatus === 'Sent' && !isDeadlineExpired(c.offerDeadline)).length;
   const deliveredEmailCount = candidates.filter((c) => c.offerDeliveryStatus === 'Delivered').length;
 
   // Filter logic
@@ -48,51 +49,51 @@ export default function OfferTrackingView({
       !term ||
       (cand.fullName && cand.fullName.toLowerCase().includes(term)) ||
       (cand.internId && cand.internId.toLowerCase().includes(term)) ||
-      (cand.candidateId && cand.candidateId.toLowerCase().includes(term)) ||
       (cand.email && cand.email.toLowerCase().includes(term));
 
     const matchBatch = selectedBatch === 'ALL' || cand.batch === selectedBatch;
     const matchRole = selectedRole === 'ALL' || cand.role === selectedRole;
 
+    const isCandExpired = isDeadlineExpired(cand.offerDeadline);
+
     let matchStatus = true;
     if (selectedResponseStatus === 'Accepted') {
       matchStatus = cand.offerLetterStatus === 'Accepted';
+    } else if (selectedResponseStatus === 'Pending') {
+      matchStatus = cand.offerLetterStatus === 'Sent' && !isCandExpired;
     } else if (selectedResponseStatus === 'Rejected') {
       matchStatus = cand.offerLetterStatus?.startsWith('Rejected') && !cand.offerLetterStatus?.includes('Expired');
     } else if (selectedResponseStatus === 'Expired') {
-      matchStatus = cand.offerLetterStatus?.includes('Expired') || (cand.offerLetterStatus === 'Sent' && cand.offerDeadline && Date.now() > new Date(cand.offerDeadline).getTime());
-    } else if (selectedResponseStatus === 'Pending') {
-      matchStatus = cand.offerLetterStatus === 'Sent' && (!cand.offerDeadline || Date.now() <= new Date(cand.offerDeadline).getTime());
+      matchStatus = cand.offerLetterStatus?.includes('Expired') || (cand.offerLetterStatus === 'Sent' && isCandExpired);
     }
 
     return matchSearch && matchBatch && matchRole && matchStatus;
   });
 
-  // Action: Move accidentally accepted candidate to rejected list
+  // Action: Revert accidental acceptance
   const handleRevert = async (candidate) => {
-    const reasonPrompt = window.prompt(
-      `Confirm moving ${candidate.fullName} to Rejected List (Submitted by mistake)?\nOptional withdrawal note:`,
-      'Candidate accidentally accepted and notified HR of withdrawal.'
+    const confirm = window.confirm(
+      `Are you sure you want to revert acceptance for ${candidate.fullName}? This will unlock the offer for re-evaluation.`
     );
-
-    if (reasonPrompt === null) return;
+    if (!confirm) return;
 
     try {
-      const res = await fetch('/api/offers/revert-accidental', {
-        method: 'POST',
+      const res = await fetch(`/api/candidates/${candidate.id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          candidateId: candidate.id,
-          reason: reasonPrompt || 'Submitted by mistake',
+          offerLetterStatus: 'Sent',
+          offerAcceptedAt: null,
+          remarks: 'Offer acceptance reverted by HR admin.',
         }),
       });
 
       const data = await res.json();
       if (data.success) {
-        showToast?.(`Candidate ${candidate.fullName} reclassified to Rejected list.`, 'info');
+        showToast?.(`Reverted acceptance for ${candidate.fullName}`, 'success');
         onCandidateUpdated?.();
       } else {
-        showToast?.(data.error || 'Failed to revert candidate', 'error');
+        showToast?.(data.error || 'Failed to revert status.', 'error');
       }
     } catch (err) {
       showToast?.(err.message, 'error');
@@ -106,12 +107,10 @@ export default function OfferTrackingView({
       showToast?.('Scanning candidates for expired decision deadlines...', 'info');
 
       let expiredCount = 0;
-      const now = Date.now();
 
       for (const cand of candidates) {
         if (cand.offerLetterStatus === 'Sent' && cand.offerDeadline) {
-          const deadlineMs = new Date(cand.offerDeadline).getTime();
-          if (now > deadlineMs) {
+          if (isDeadlineExpired(cand.offerDeadline)) {
             await fetch(`/api/candidates/${cand.id}`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
@@ -159,24 +158,24 @@ export default function OfferTrackingView({
         <div className={styles.metricCard} style={{ borderLeft: '4px solid #3b82f6' }}>
           <div className={styles.metricTitle} style={{ color: '#60a5fa' }}>DELIVERED EMAILS</div>
           <div className={styles.metricValue}>{deliveredEmailCount}</div>
-          <div className={styles.metricSubtitle}>SMTP Confirmed Receipts</div>
+          <div className={styles.metricSubtitle}>Confirmed SMTP Dispatches</div>
         </div>
       </div>
 
       {/* 2. FILTER & SEARCH CONTROL BAR */}
-      <div className={styles.filterBar}>
-        <div className={styles.searchWrapper}>
-          <Search size={16} className={styles.searchIcon} />
+      <div className={styles.controlBar}>
+        <div className={styles.searchBox}>
+          <Search size={15} className={styles.searchIcon} />
           <input
             type="text"
-            placeholder="Search by candidate name, Intern ID, or email..."
+            placeholder="Search candidate name, Intern ID, or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles.searchInput}
           />
         </div>
 
-        <div className={styles.selectGroup}>
+        <div className={styles.filtersGroup}>
           <div className={styles.selectWrapper}>
             <Filter size={14} className={styles.selectIcon} />
             <select
@@ -266,7 +265,7 @@ export default function OfferTrackingView({
                 filteredCandidates.map((cand) => {
                   const isAccepted = cand.offerLetterStatus === 'Accepted';
                   const isRejected = cand.offerLetterStatus?.startsWith('Rejected');
-                  const isExpired = cand.offerLetterStatus?.includes('Expired') || (cand.offerLetterStatus === 'Sent' && cand.offerDeadline && Date.now() > new Date(cand.offerDeadline).getTime());
+                  const isExpired = cand.offerLetterStatus?.includes('Expired') || (cand.offerLetterStatus === 'Sent' && cand.offerDeadline && isDeadlineExpired(cand.offerDeadline));
 
                   return (
                     <tr key={cand.id}>
@@ -314,10 +313,10 @@ export default function OfferTrackingView({
                       <td>
                         <div className={styles.dateBlock}>
                           <div style={{ fontSize: '11px', color: '#94a3b8' }}>
-                            Sent: {cand.offerLetterSentAt ? new Date(cand.offerLetterSentAt).toLocaleDateString() : 'N/A'}
+                            Sent: {formatFlexibleDate(cand.offerLetterSentAt)}
                           </div>
                           <div style={{ fontSize: '11px', color: '#c084fc' }}>
-                            Deadline: {cand.offerDeadline ? new Date(cand.offerDeadline).toLocaleDateString() : 'N/A'}
+                            Deadline: {formatFlexibleDate(cand.offerDeadline)}
                           </div>
                         </div>
                       </td>

@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
+import { prisma } from '../../../../lib/prisma.js';
 
 export async function GET(request, { params }) {
   try {
@@ -43,8 +43,10 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
+    // Clean up any acceptance record first
+    await prisma.candidateOfferAcceptance.deleteMany({ where: { candidateId: id } });
     await prisma.candidate.delete({ where: { id } });
-    return NextResponse.json({ success: true, message: 'Candidate removed' });
+    return NextResponse.json({ success: true, message: 'Candidate permanently deleted.' });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

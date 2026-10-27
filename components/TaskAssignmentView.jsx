@@ -202,14 +202,19 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       return;
     }
     const template = taskTemplates.find(t => t.id === selectedTemplateId) || taskTemplates[0];
-    if (template) {
-      setAssignForm(prev => ({
-        ...prev,
-        taskId: template.taskId,
-        title: template.title,
-        customJinja: template.jinjaBody || '',
-      }));
-    }
+    const defaultExpDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const defaultDeadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16);
+    const randSeq = Math.floor(1000 + Math.random() * 9000);
+
+    setAssignForm(prev => ({
+      taskNumber: prev.taskNumber || 1,
+      taskId: template?.taskId || `TSK-2026-${randSeq}`,
+      title: template?.title || 'Core Milestone 1: Engineering Implementation',
+      explanationDate: prev.explanationDate || defaultExpDate,
+      explanationTime: prev.explanationTime || '04:00 PM',
+      deadline: prev.deadline || defaultDeadline,
+      customJinja: template?.jinjaBody || defaultTaskJinjaBody,
+    }));
     setIsAssignModalOpen(true);
   };
 

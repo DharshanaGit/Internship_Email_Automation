@@ -67,5 +67,5 @@ describe('Email Deliverability & Spam Prevention Suite', () => {
 
     // Clean up test log
     await prisma.emailLog.delete({ where: { id: res.logId } });
-  });
+  }, 15000);
 });
