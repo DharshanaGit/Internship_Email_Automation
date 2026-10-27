@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "seed": "node prisma/seed.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dev:3000": "next dev -p 3000",
+    "start:3000": "next start -p 3000"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +19,7 @@
   "dependencies": {
     "@prisma/client": "^6.4.1",
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
     "cookie": "^2.0.1",
     "exceljs": "^4.4.0",
     "googleapis": "^187.0.0",

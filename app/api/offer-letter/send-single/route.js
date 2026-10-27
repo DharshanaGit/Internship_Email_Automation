@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { generateOfferLetterPdf } from '@/lib/pdfEngine';
 import { sendEmail } from '@/lib/mailer';
+import { generateSecureResponseToken, buildOfferEmailContent, generateUniqueInternId } from '@/lib/offerService';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3001';
 
 export async function POST(request) {
   try {
@@ -13,13 +13,16 @@ export async function POST(request) {
     const candidateId = formData.get('candidateId');
     const customSubject = formData.get('subject');
     const customBody = formData.get('body');
+    const customPdfTemplate = formData.get('pdfTemplate');
+    const templateId = formData.get('templateId');
     const cc = formData.get('cc');
+    const deadlineInput = formData.get('deadline') || formData.get('commonDeadline');
 
-    // If new candidate fields are provided in FormData
+    // Candidate fields
     const fullName = formData.get('fullName');
     const email = formData.get('email');
     const role = formData.get('role');
-    const department = formData.get('department');
+    const department = formData.get('department') || 'Engineering';
     const joiningDate = formData.get('joiningDate');
     const endDate = formData.get('endDate');
     const duration = formData.get('duration') || '3 Months';
@@ -30,10 +33,10 @@ export async function POST(request) {
     const collegeName = formData.get('collegeName') || 'Recognized University';
     const degree = formData.get('degree') || 'Bachelor of Engineering';
     const stipend = formData.get('stipend') || 'Rs. 10,000';
+    const batch = formData.get('batch') || 'Batch A';
 
     let candidate = null;
 
-    // 1. Check if candidate exists by DB primary key or string candidateId
     if (candidateId) {
       candidate = await prisma.candidate.findFirst({
         where: {
@@ -45,20 +48,26 @@ export async function POST(request) {
       });
     }
 
-    // 2. If not found by candidateId, check by email
     if (!candidate && email) {
       candidate = await prisma.candidate.findFirst({
-        where: { email },
+        where: { email: email.toLowerCase() },
       });
     }
 
-    // 3. Update existing or create new candidate
+    // Determine offer deadline (e.g. from input or default 3 days from now)
+    let deadlineDate = null;
+    if (deadlineInput) {
+      deadlineDate = new Date(deadlineInput);
+    } else {
+      deadlineDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+    }
+
     if (candidate) {
       candidate = await prisma.candidate.update({
         where: { id: candidate.id },
         data: {
           ...(fullName ? { fullName } : {}),
-          ...(email ? { email } : {}),
+          ...(email ? { email: email.toLowerCase() } : {}),
           ...(role ? { role } : {}),
           ...(department ? { department } : {}),
           ...(joiningDate ? { joiningDate } : {}),
@@ -71,6 +80,8 @@ export async function POST(request) {
           ...(collegeName ? { collegeName } : {}),
           ...(degree ? { degree } : {}),
           ...(stipend ? { stipend } : {}),
+          ...(batch ? { batch } : {}),
+          offerDeadline: deadlineDate,
         },
       });
     } else if (email && fullName) {
@@ -78,14 +89,17 @@ export async function POST(request) {
         ? candidateId
         : `SF-INT-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 
+      const internId = await generateUniqueInternId();
+
       candidate = await prisma.candidate.create({
         data: {
           candidateId: candId,
+          internId,
           fullName,
-          email,
+          email: email.toLowerCase(),
           phone,
           role: role || 'Web Developer Intern',
-          department: department || 'Engineering',
+          department,
           collegeName,
           degree,
           stipend,
@@ -95,28 +109,52 @@ export async function POST(request) {
           workMode,
           reportingManager,
           assignedMentor,
+          batch,
           offerLetterStatus: 'Ready to Send',
           taskStatus: 'Not Assigned',
+          offerDeadline: deadlineDate,
         },
       });
     }
 
     if (!candidate) {
-      return NextResponse.json({ success: false, error: 'Candidate information required' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Candidate information is required.' }, { status: 400 });
     }
 
-    // Generate unique acceptance token
-    const acceptanceToken = crypto.randomBytes(24).toString('hex');
+    // Fetch template if templateId passed
+    let selectedTemplate = null;
+    if (templateId) {
+      selectedTemplate = await prisma.offerTemplate.findUnique({ where: { id: templateId } });
+    } else {
+      selectedTemplate = await prisma.offerTemplate.findFirst({ where: { isDefault: true } });
+    }
+
+    // Generate secure unpredictable cryptographic token and SHA-256 hash
+    const { rawToken, tokenHash } = generateSecureResponseToken();
+
     await prisma.candidate.update({
       where: { id: candidate.id },
-      data: { offerAcceptanceToken: acceptanceToken },
+      data: {
+        offerAcceptanceToken: rawToken,
+        offerAcceptanceTokenHash: tokenHash,
+        offerDeadline: deadlineDate,
+      },
     });
-    candidate.offerAcceptanceToken = acceptanceToken;
 
-    // 1. Generate Offer Letter PDF with Playwright and save to storage
-    const pdfResult = await generateOfferLetterPdf(candidate);
+    candidate.offerAcceptanceToken = rawToken;
+    candidate.offerDeadline = deadlineDate;
 
-    // 2. Process extra attachments (images/files uploaded by admin)
+    // 1. Generate Offer Letter PDF
+    const pdfTemplateToUse = customPdfTemplate || selectedTemplate?.pdfTemplate || null;
+    const pdfResult = await generateOfferLetterPdf(candidate, pdfTemplateToUse);
+
+    // Save PDF path
+    await prisma.candidate.update({
+      where: { id: candidate.id },
+      data: { offerPdfPath: pdfResult.filePath },
+    });
+
+    // 2. Attachments
     const attachments = [
       {
         filename: pdfResult.filename,
@@ -137,67 +175,34 @@ export async function POST(request) {
       }
     }
 
-    // 3. Email Body with Acceptance Trigger
-    const acceptUrl = `${APP_URL}/api/offers/accept?token=${acceptanceToken}`;
+    // 3. Compose Email using official Shortfundly offer structure
+    const responseLink = `${APP_URL}/offers/respond?token=${rawToken}`;
+    const deadlineFormatted = deadlineDate.toLocaleDateString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
-    const subject =
-      customSubject ||
-      `Internship Offer Letter - ${candidate.fullName} (${candidate.candidateId}) | Shortfundly`;
+    const emailContent = buildOfferEmailContent({
+      candidate,
+      template: selectedTemplate,
+      customSubject,
+      customBody,
+      deadlineStr: deadlineFormatted,
+      responseLink,
+    });
 
-    const parsedBody = customBody
-      ? customBody
-          .replace(/\{\{candidate_name\}\}/g, candidate.fullName)
-          .replace(/\{\{candidate_id\}\}/g, candidate.candidateId)
-          .replace(/\{\{internship_role\}\}/g, candidate.role)
-          .replace(/\{\{designation\}\}/g, candidate.role)
-          .replace(/\{\{department\}\}/g, candidate.department)
-          .replace(/\{\{joining_date\}\}/g, candidate.joiningDate)
-          .replace(/\{\{end_date\}\}/g, candidate.endDate)
-          .replace(/\{\{duration\}\}/g, candidate.duration || '3 Months')
-          .replace(/\{\{work_mode\}\}/g, candidate.workMode || 'Online - Remote')
-          .replace(/\{\{stipend\}\}/g, candidate.stipend || stipend || 'Rs. 10,000')
-          .replace(/\{\{degree\}\}/g, candidate.degree || degree || 'Bachelor of Engineering')
-          .replace(/\{\{college_name\}\}/g, candidate.collegeName || collegeName || 'Recognized University')
-          .replace(/\{\{phone\}\}/g, candidate.phone || phone || '')
-      : '';
-
-    const htmlBody = customBody
-      ? (customBody.includes('<') ? parsedBody : `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; padding: 20px;">${parsedBody.replace(/\n/g, '<br>')}</div>`)
-      : `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a; max-width: 620px; margin: 0 auto; line-height: 1.6; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
-          <div style="background: linear-gradient(135deg, #090d16, #1e293b); padding: 28px 24px; text-align: center; border-bottom: 3px solid #38bdf8;">
-            <h1 style="color: #38bdf8; margin: 0; font-size: 24px; letter-spacing: 2px;">SHORTFUNDLY</h1>
-            <p style="color: #94a3b8; margin: 6px 0 0 0; font-size: 13px;">Shortfundly Media Technologies Pvt. Ltd. • Internship Automation</p>
-          </div>
-          <div style="padding: 32px 28px;">
-            <p style="font-size: 16px; margin-top: 0;">Dear <strong>${candidate.fullName}</strong>,</p>
-            <p>Congratulations! We are pleased to formally offer you an online internship as <strong>${candidate.role}</strong> in our <strong>${candidate.department}</strong> department.</p>
-            
-            <div style="background: #f1f5f9; border-left: 4px solid #2563eb; padding: 16px 20px; margin: 24px 0; border-radius: 6px;">
-              <p style="margin: 4px 0;"><strong>Role:</strong> ${candidate.role}</p>
-              <p style="margin: 4px 0;"><strong>Department:</strong> ${candidate.department}</p>
-              <p style="margin: 4px 0;"><strong>Tenure:</strong> ${candidate.joiningDate} to ${candidate.endDate} (${candidate.duration})</p>
-              <p style="margin: 4px 0;"><strong>Stipend:</strong> ${candidate.stipend || stipend || 'Rs. 10,000'}</p>
-              <p style="margin: 4px 0;"><strong>Work Mode:</strong> ${candidate.workMode}</p>
-            </div>
-
-            <p>Please find attached your official Shortfundly Internship Offer Letter PDF. Kindly review the attached offer letter and reach out to our HR team if you have any questions.</p>
-
-            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 28px 0;" />
-            <p style="margin: 0; font-size: 13px; color: #475569;">Warm regards,<br><strong style="color: #0f172a;">Human Resources Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.<br><span style="color: #94a3b8; font-size: 12px;">Chennai, Tamil Nadu, India | hr@shortfundly.com</span></p>
-          </div>
-        </div>
-      `;
-
-    // 4. Send Email via Google SMTP
+    // 4. Send Email
     const emailResult = await sendEmail({
       candidateId: candidate.id,
       to: candidate.email,
       recipientName: candidate.fullName,
       cc: cc || undefined,
-      subject,
-      html: htmlBody,
-      text: `Dear ${candidate.fullName}, your official Shortfundly Internship Offer Letter is attached. Please review the attached document.`,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: `Official Internship Offer from Shortfundly for ${candidate.fullName}. Review and sign your offer before ${deadlineFormatted}: ${responseLink}`,
       emailType: 'OFFER_LETTER',
       attachments,
     });
@@ -205,7 +210,11 @@ export async function POST(request) {
     // 5. Update Candidate Status
     await prisma.candidate.update({
       where: { id: candidate.id },
-      data: { offerLetterStatus: 'Sent' },
+      data: {
+        offerLetterStatus: 'Sent',
+        offerDeliveryStatus: emailResult.status,
+        offerLetterSentAt: new Date(),
+      },
     });
 
     return NextResponse.json({
@@ -213,6 +222,7 @@ export async function POST(request) {
       candidate,
       pdfPath: pdfResult.filePath,
       emailResult,
+      responseLink,
     });
   } catch (error) {
     console.error('Single offer letter dispatch error:', error);

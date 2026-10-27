@@ -38,6 +38,7 @@ import {
 import { generateGemmaTask, generateGemmaFeedback } from '@/lib/gemmaEngine';
 import { formatToDdMmYy, getRandomIstTime, getExplanationSchedule } from '@/lib/dateUtils';
 import { generateGoogleMeetLink } from '@/lib/googleCalendar';
+import OfferTrackingView from '@/components/OfferTrackingView';
 
 
 // ============================================================================
@@ -473,6 +474,12 @@ export default function DashboardPage() {
 
   // --- MODULE 2 (ASSIGN TASK): STATE ---
   const [bulkTaskRoleFilter, setBulkTaskRoleFilter] = useState('ALL');
+  const [bulkTaskBatchFilter, setBulkTaskBatchFilter] = useState('ALL');
+  const [bulkTaskSearch, setBulkTaskSearch] = useState('');
+  const [bulkTaskTier, setBulkTaskTier] = useState('Intermediate');
+  const [bulkTaskAssignmentMode, setBulkTaskAssignmentMode] = useState('SAME_FOR_ALL');
+  const [bulkTaskScheduledAt, setBulkTaskScheduledAt] = useState('');
+  const [bulkTaskDeadlineDate, setBulkTaskDeadlineDate] = useState(() => formatToDdMmYy(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)));
   const [bulkTaskSelectedKeys, setBulkTaskSelectedKeys] = useState(new Set());
   const [bulkTaskExpDate, setBulkTaskExpDate] = useState(() => formatToDdMmYy(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)));
   const [bulkTaskSending, setBulkTaskSending] = useState(false);
@@ -574,6 +581,9 @@ export default function DashboardPage() {
           email: data.user.email,
           role: data.user.role,
         });
+        if (data.user.role === 'CEO') {
+          setActiveTab('certificates');
+        }
       } else {
         router.push('/login');
       }
@@ -1170,6 +1180,54 @@ export default function DashboardPage() {
     }
   };
 
+  // --- MODULE 1: UPLOAD GOOGLE FORM INTAKE SPREADSHEET (AUTO-BATCH & INTERN IDS) ---
+  const handleUploadGoogleFormExcel = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      showToast(`Importing Google Form intake from ${file.name}...`, 'info');
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/candidates/bulk-upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Successfully imported ${data.count} candidates into ${data.batches?.join(', ') || 'Batches'} with unique Intern IDs!`, 'success');
+        await loadCandidates();
+        await loadStats();
+      } else {
+        showToast(data.error || 'Google Form import failed', 'error');
+      }
+    } catch (err) {
+      showToast('Error uploading Google Form spreadsheet', 'error');
+    }
+  };
+
+  // --- MODULE 2: AUTOMATED OVERDUE & WARNING DEADLINE AUDIT ---
+  const handleRunWarningAudit = async () => {
+    try {
+      showToast('Running automated task deadline & warning audit...', 'info');
+      const res = await fetch('/api/tasks/check-deadlines-and-warn', {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Audit complete: ${data.warnedCount} overdue candidate(s) issued warning with -10% performance score.`, 'success');
+        await loadCandidates();
+        await loadStats();
+      } else {
+        showToast(data.error || 'Warning audit failed', 'error');
+      }
+    } catch (err) {
+      showToast('Error running warning audit', 'error');
+    }
+  };
+
   // Bulk Filtered Rows
   const filteredBulkRows = bulkValidationReport
     ? bulkValidationReport.rows.filter((r) => {
@@ -1248,10 +1306,21 @@ export default function DashboardPage() {
     }
   };
 
-  // Candidates who have RECEIVED offer letter (Gate condition for Module 2)
+  // Candidates who have RECEIVED/ACCEPTED offer letter (Gate condition for Module 2)
   const eligibleTaskCandidates = candidates.filter(
-    (c) => c.offerLetterStatus === 'Sent' || c.offerLetterStatus === 'Accepted'
+    (c) => c.offerLetterStatus === 'Accepted' || c.offerLetterStatus === 'Sent'
   );
+
+  const filteredTaskCandidates = eligibleTaskCandidates.filter((c) => {
+    const matchesRole = bulkTaskRoleFilter === 'ALL' || (c.role && c.role.toLowerCase().includes(bulkTaskRoleFilter.toLowerCase()));
+    const matchesBatch = bulkTaskBatchFilter === 'ALL' || (c.batch === bulkTaskBatchFilter);
+    const matchesSearch = !bulkTaskSearch ||
+      (c.fullName && c.fullName.toLowerCase().includes(bulkTaskSearch.toLowerCase())) ||
+      (c.internId && c.internId.toLowerCase().includes(bulkTaskSearch.toLowerCase())) ||
+      (c.candidateId && c.candidateId.toLowerCase().includes(bulkTaskSearch.toLowerCase())) ||
+      (c.email && c.email.toLowerCase().includes(bulkTaskSearch.toLowerCase()));
+    return matchesRole && matchesBatch && matchesSearch;
+  });
 
   return (
     <div className={styles.dashboardLayout}>
@@ -1363,22 +1432,26 @@ export default function DashboardPage() {
 
       {/* 2. PRIMARY OPERATIONS NAVIGATION */}
       <nav className={styles.navBar}>
-        <button
-          onClick={() => setActiveTab('offer-letter')}
-          className={`${styles.navTab} ${activeTab === 'offer-letter' ? styles.navTabActive : ''}`}
-        >
-          <FileCheck size={16} />
-          <span>Automate Offer Letter</span>
-          <span className={styles.tabBadge}>{stats.offerLetters?.total || 0}</span>
-        </button>
+        {(adminUser.role === 'ADMIN' || adminUser.role === 'HR') && (
+          <button
+            onClick={() => setActiveTab('offer-letter')}
+            className={`${styles.navTab} ${activeTab === 'offer-letter' ? styles.navTabActive : ''}`}
+          >
+            <FileCheck size={16} />
+            <span>Automate Offer Letter</span>
+            <span className={styles.tabBadge}>{stats.offerLetters?.total || 0}</span>
+          </button>
+        )}
 
-        <button
-          onClick={() => setActiveTab('tasks')}
-          className={`${styles.navTab} ${activeTab === 'tasks' ? styles.navTabActive : ''}`}
-        >
-          <Calendar size={16} />
-          <span>Assign tasks</span>
-        </button>
+        {(adminUser.role === 'ADMIN' || adminUser.role === 'HR') && (
+          <button
+            onClick={() => setActiveTab('tasks')}
+            className={`${styles.navTab} ${activeTab === 'tasks' ? styles.navTabActive : ''}`}
+          >
+            <Calendar size={16} />
+            <span>Assign tasks</span>
+          </button>
+        )}
 
         <button
           onClick={() => setActiveTab('reviews')}
@@ -1388,13 +1461,15 @@ export default function DashboardPage() {
           <span>Reviews</span>
         </button>
 
-        <button
-          onClick={() => setActiveTab('certificates')}
-          className={`${styles.navTab} ${activeTab === 'certificates' ? styles.navTabActive : ''}`}
-        >
-          <Award size={16} />
-          <span>Internship certificates</span>
-        </button>
+        {(adminUser.role === 'ADMIN' || adminUser.role === 'CEO') && (
+          <button
+            onClick={() => setActiveTab('certificates')}
+            className={`${styles.navTab} ${activeTab === 'certificates' ? styles.navTabActive : ''}`}
+          >
+            <Award size={16} />
+            <span>Internship certificates</span>
+          </button>
+        )}
 
         <button
           onClick={() => setActiveTab('emails')}
@@ -1405,13 +1480,15 @@ export default function DashboardPage() {
           <span className={styles.tabBadge}>{stats.emails?.total || 0}</span>
         </button>
 
-        <button
-          onClick={() => setActiveTab('settings')}
-          className={`${styles.navTab} ${activeTab === 'settings' ? styles.navTabActive : ''}`}
-        >
-          <Settings size={16} />
-          <span>Setting</span>
-        </button>
+        {adminUser.role === 'ADMIN' && (
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`${styles.navTab} ${activeTab === 'settings' ? styles.navTabActive : ''}`}
+          >
+            <Settings size={16} />
+            <span>Setting</span>
+          </button>
+        )}
       </nav>
 
       {/* 3. MAIN WORKSPACE */}
@@ -1447,6 +1524,15 @@ export default function DashboardPage() {
                 >
                   <FileSpreadsheet size={14} />
                   <span>Bulk Dataset Loader (CSV / Excel)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOfferSubTab('tracking')}
+                  className={`${styles.segmentedTab} ${offerSubTab === 'tracking' ? styles.segmentedTabActive : ''}`}
+                >
+                  <UserCheck size={14} />
+                  <span>Decision Tracking (Accepted & Rejected)</span>
                 </button>
               </div>
             </div>
@@ -1831,9 +1917,9 @@ export default function DashboardPage() {
                         <span>Load Project Dataset (Shortfundly_Internship_Candidates_Dummy.xlsx)</span>
                       </button>
 
-                      <label className={styles.btnPrimaryAction} style={{ fontSize: '12px', padding: '6px 12px', cursor: 'pointer' }}>
+                      <label className={styles.btnAction} style={{ fontSize: '12px', padding: '6px 12px', cursor: 'pointer' }}>
                         <Upload size={13} />
-                        <span>Upload CSV / Excel File</span>
+                        <span>Upload Dataset (Validate)</span>
                         <input
                           type="file"
                           accept=".xlsx,.xls,.csv"
@@ -1841,7 +1927,22 @@ export default function DashboardPage() {
                           onChange={handleBulkFileUpload}
                         />
                       </label>
+
+                      <label className={styles.btnPrimaryAction} style={{ fontSize: '12px', padding: '6px 12px', cursor: 'pointer' }}>
+                        <Upload size={13} />
+                        <span>Import Google Form Intake (Auto-Batch & Intern IDs)</span>
+                        <input
+                          type="file"
+                          accept=".xlsx,.xls,.csv"
+                          style={{ display: 'none' }}
+                          onChange={handleUploadGoogleFormExcel}
+                        />
+                      </label>
                     </div>
+                  </div>
+
+                  <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid var(--border-subtle)', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                    <strong style={{ color: '#38bdf8' }}>Google Form Intake Specification:</strong> HR sets joining/ending dates, roles, stipend. Responses captured include Name, Email, Role, Phone, College, Degree, Ongoing batch or graduate status. Uploading the responses spreadsheet automatically groups candidates with common joining dates into <strong>Batches (Batch A, Batch B)</strong> and generates unique sequential <strong>Intern IDs (SF-2026-A-001)</strong>.
                   </div>
 
                   {bulkValidationReport ? (
@@ -2098,6 +2199,18 @@ export default function DashboardPage() {
                 )}
               </div>
             )}
+
+            {/* --- WORKFLOW C: DECISION TRACKING (ACCEPTED & REJECTED) --- */}
+            {offerSubTab === 'tracking' && (
+              <OfferTrackingView
+                candidates={candidates}
+                onCandidateUpdated={() => {
+                  loadCandidates();
+                  loadStats();
+                }}
+                showToast={showToast}
+              />
+            )}
           </div>
         )}
 
@@ -2152,13 +2265,13 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        const targetList = eligibleTaskCandidates.length > 0 ? eligibleTaskCandidates : candidates;
+                        const targetList = filteredTaskCandidates.length > 0 ? filteredTaskCandidates : (eligibleTaskCandidates.length > 0 ? eligibleTaskCandidates : candidates);
                         setBulkTaskSelectedKeys(new Set(targetList.map(c => c.id)));
                       }}
                       className={styles.btnAction}
                       style={{ fontSize: '12px', padding: '5px 12px' }}
                     >
-                      Select All ({eligibleTaskCandidates.length > 0 ? eligibleTaskCandidates.length : candidates.length})
+                      Select Filtered ({filteredTaskCandidates.length})
                     </button>
                     <button
                       type="button"
@@ -2171,20 +2284,94 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
+                {/* Filter and Configuration Toolbar for Tasks */}
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '14px', background: 'rgba(255,255,255,0.02)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
+                  <div className={styles.tableSearchWrapper} style={{ minWidth: '220px', flex: 1 }}>
+                    <Search size={14} className={styles.tableSearchIcon} />
+                    <input
+                      type="text"
+                      placeholder="Search by Intern ID, Name, or Email..."
+                      value={bulkTaskSearch}
+                      onChange={(e) => setBulkTaskSearch(e.target.value)}
+                      className={styles.tableSearchInput}
+                    />
+                  </div>
+
+                  <select
+                    value={bulkTaskRoleFilter}
+                    onChange={(e) => setBulkTaskRoleFilter(e.target.value)}
+                    className={styles.filterSelect}
+                  >
+                    <option value="ALL">All Roles</option>
+                    <option value="Web Developer">Web Developer</option>
+                    <option value="Digital Marketing">Digital Marketing</option>
+                    <option value="Data Analytics">Data Analytics</option>
+                    <option value="UI/UX">UI/UX Designer</option>
+                    <option value="Python">Python / AI</option>
+                  </select>
+
+                  <select
+                    value={bulkTaskBatchFilter}
+                    onChange={(e) => setBulkTaskBatchFilter(e.target.value)}
+                    className={styles.filterSelect}
+                  >
+                    <option value="ALL">All Batches</option>
+                    {Array.from(new Set(candidates.map(c => c.batch).filter(Boolean))).map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={bulkTaskTier}
+                    onChange={(e) => setBulkTaskTier(e.target.value)}
+                    className={styles.filterSelect}
+                    title="Sprint Task Complexity Tier"
+                  >
+                    <option value="Intermediate">Tier: Intermediate Sprint</option>
+                    <option value="Developer">Tier: Developer Sprint</option>
+                    <option value="Enterprise">Tier: Enterprise Architecture</option>
+                    <option value="AI_GEMMA">Tier: Gemma 2B AI Generated</option>
+                  </select>
+
+                  <select
+                    value={bulkTaskAssignmentMode}
+                    onChange={(e) => setBulkTaskAssignmentMode(e.target.value)}
+                    className={styles.filterSelect}
+                    title="Assignment Distribution Strategy"
+                  >
+                    <option value="SAME_FOR_ALL">Same Task for Role</option>
+                    <option value="INDIVIDUAL">Separate Tasks per Candidate</option>
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={handleRunWarningAudit}
+                    className={styles.btnAction}
+                    style={{ borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}
+                    title="Audit overdue submissions and dispatch formal -10% warning emails"
+                  >
+                    <AlertCircle size={14} />
+                    <span>Run Warning Audit</span>
+                  </button>
+                </div>
+
                 <div style={{ maxHeight: '350px', overflowY: 'auto', marginBottom: '20px' }}>
                   <table className={styles.dataTable}>
                     <thead>
                       <tr>
                         <th style={{ width: '40px', textAlign: 'center' }}>#</th>
+                        <th>Intern ID</th>
                         <th>Candidate Name</th>
+                        <th>Batch</th>
                         <th>Mail Id</th>
                         <th>Designation</th>
                         <th>Offer Status</th>
+                        <th>Score</th>
                         <th>Current Task Status</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {(eligibleTaskCandidates.length > 0 ? eligibleTaskCandidates : candidates).map((c) => {
+                      {(filteredTaskCandidates.length > 0 ? filteredTaskCandidates : (eligibleTaskCandidates.length > 0 ? eligibleTaskCandidates : candidates)).map((c) => {
                         const isSelected = bulkTaskSelectedKeys.has(c.id);
                         return (
                           <tr key={c.id} style={{ background: isSelected ? 'rgba(99, 102, 241, 0.05)' : 'transparent' }}>
@@ -2200,12 +2387,19 @@ export default function DashboardPage() {
                                 }}
                               />
                             </td>
+                            <td><code style={{ color: 'var(--accent-cyan)', fontSize: '12px' }}>{c.internId || c.candidateId}</code></td>
                             <td><strong>{c.fullName}</strong></td>
+                            <td><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{c.batch || 'Batch A'}</span></td>
                             <td>{c.email}</td>
                             <td>{c.role}</td>
                             <td>
-                              <span className={styles.statusBadge} style={{ background: c.offerLetterStatus === 'Sent' || c.offerLetterStatus === 'Accepted' ? 'rgba(52, 211, 153, 0.1)' : 'rgba(148, 163, 184, 0.1)', color: c.offerLetterStatus === 'Sent' || c.offerLetterStatus === 'Accepted' ? '#34d399' : 'var(--text-muted)' }}>
+                              <span className={styles.statusBadge} style={{ background: c.offerLetterStatus === 'Accepted' ? 'rgba(52, 211, 153, 0.12)' : 'rgba(148, 163, 184, 0.1)', color: c.offerLetterStatus === 'Accepted' ? '#34d399' : 'var(--text-muted)' }}>
                                 {c.offerLetterStatus}
+                              </span>
+                            </td>
+                            <td>
+                              <span style={{ fontWeight: 700, color: (c.performancePercentage ?? 100) >= 90 ? '#34d399' : (c.performancePercentage ?? 100) >= 75 ? '#fbbf24' : '#fb7185' }}>
+                                {c.performancePercentage ?? 100}%
                               </span>
                             </td>
                             <td>
@@ -2238,6 +2432,26 @@ export default function DashboardPage() {
                       className={styles.inputField}
                       value={bulkTaskExpDate}
                       onChange={(e) => setBulkTaskExpDate(e.target.value)}
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Task Submission Deadline (Strict Token Expiry)</label>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={bulkTaskDeadlineDate}
+                      onChange={(e) => setBulkTaskDeadlineDate(e.target.value)}
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Scheduled Email Dispatch (Optional)</label>
+                    <input
+                      type="datetime-local"
+                      className={styles.inputField}
+                      value={bulkTaskScheduledAt}
+                      onChange={(e) => setBulkTaskScheduledAt(e.target.value)}
                     />
                   </div>
 
@@ -2367,6 +2581,11 @@ export default function DashboardPage() {
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
                             candidateIds: Array.from(bulkTaskSelectedKeys),
+                            taskTier: bulkTaskTier,
+                            taskAssignmentMode: bulkTaskAssignmentMode,
+                            explanationDate: bulkTaskExpDate,
+                            taskDeadline: bulkTaskDeadlineDate,
+                            scheduledSendAt: bulkTaskScheduledAt || null,
                             cc: bulkTaskCc,
                             customSubject: bulkTaskSubject,
                             customBody: bulkTaskBody,
@@ -3712,11 +3931,15 @@ export default function DashboardPage() {
 
                       <button
                         type="button"
-                        disabled={bulkCertSending || bulkCertSelectedKeys.size === 0}
+                        disabled={bulkCertSending || bulkCertSelectedKeys.size === 0 || adminUser.role !== 'CEO'}
                         onClick={async () => {
+                          if (adminUser.role !== 'CEO') {
+                            showToast('Access Denied: Only CEO is authorized to approve and dispatch completion certificates.', 'error');
+                            return;
+                          }
                           try {
                             setBulkCertSending(true);
-                            showToast(`Compiling signed Playwright certificates for ${bulkCertSelectedKeys.size} candidates...`, 'info');
+                            showToast(`CEO Approving & compiling certificates for ${bulkCertSelectedKeys.size} candidates...`, 'info');
                             const res = await fetch('/api/certificate/bulk-send', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
@@ -3729,7 +3952,7 @@ export default function DashboardPage() {
                             });
                             const data = await res.json();
                             if (data.success) {
-                              showToast(`Certificates successfully dispatched to ${data.results?.length || bulkCertSelectedKeys.size} candidates!`, 'success');
+                              showToast(`Certificates successfully approved and dispatched to ${data.results?.length || bulkCertSelectedKeys.size} candidates!`, 'success');
                               loadCandidates();
                               loadStats();
                               loadEmails();
@@ -3743,9 +3966,10 @@ export default function DashboardPage() {
                           }
                         }}
                         className={styles.btnPrimaryAction}
+                        title={adminUser.role !== 'CEO' ? 'Only CEO can approve certificates based on performance percentage' : 'Approve and issue certificates'}
                       >
                         <Award size={15} />
-                        <span>{bulkCertSending ? 'Generating & Sending...' : `Send Certificates to Selected (${bulkCertSelectedKeys.size})`}</span>
+                        <span>{adminUser.role !== 'CEO' ? 'CEO Approval Required' : (bulkCertSending ? 'Generating & Sending...' : `Approve & Dispatch Certificates (${bulkCertSelectedKeys.size})`)}</span>
                       </button>
                     </div>
                   </div>
@@ -3906,11 +4130,15 @@ export default function DashboardPage() {
 
                   <button
                     type="button"
-                    disabled={certSending || !singleCertForm.fullName || !singleCertForm.email}
+                    disabled={certSending || !singleCertForm.fullName || !singleCertForm.email || adminUser.role !== 'CEO'}
                     onClick={async () => {
+                      if (adminUser.role !== 'CEO') {
+                        showToast('Access Denied: Only CEO is authorized to approve and issue completion certificates.', 'error');
+                        return;
+                      }
                       try {
                         setCertSending(true);
-                        showToast('Generating signed Playwright Canva certificate & dispatching...', 'info');
+                        showToast('CEO Approving & generating signed certificate...', 'info');
                         const res = await fetch('/api/certificate/send', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
@@ -3939,9 +4167,10 @@ export default function DashboardPage() {
                       }
                     }}
                     className={styles.btnPrimaryAction}
+                    title={adminUser.role !== 'CEO' ? 'Only CEO can approve certificates' : 'Approve and send certificate'}
                   >
                     <Award size={15} />
-                    <span>{certSending ? 'Generating & Sending...' : 'Send Internship Certificate'}</span>
+                    <span>{adminUser.role !== 'CEO' ? 'CEO Approval Required' : (certSending ? 'Generating & Sending...' : 'Approve & Send Certificate')}</span>
                   </button>
                 </div>
               </div>

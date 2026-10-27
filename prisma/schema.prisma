@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,9 +17,58 @@ model User {
   updatedAt    DateTime @updatedAt
 }
 
+model InternshipBatch {
+  id             String      @id @default(cuid())
+  batchName      String      @unique
+  roles          String      // JSON string array of approved roles
+  stipend        String      @default("Rs. 10,000")
+  joiningDate    String
+  endDate        String
+  duration       String
+  commonDeadline DateTime?
+  googleFormUrl  String?
+  googleFormId   String?
+  status         String      @default("Active") // Active, Completed, Archived
+  candidates     Candidate[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model OfferTemplate {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  subject     String
+  emailBody   String
+  pdfTemplate String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CandidateOfferAcceptance {
+  id              String   @id @default(cuid())
+  candidateId     String   @unique
+  candidateName   String
+  internId        String
+  role            String
+  stipend         String
+  joiningDate     String
+  signatureType   String   // TYPED, DRAWN, UPLOADED
+  signatureData   String   // text, data URI, or URL
+  ipAddress       String?
+  userAgent       String?
+  acceptedAt      DateTime @default(now())
+  originalPdfPath String?
+}
+
 model Candidate {
   id                 String           @id @default(cuid())
   candidateId        String           @unique
+  internId           String?          @unique
+  batch              String?
+  batchId            String?
+  batchRel           InternshipBatch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  googleResponseId   String?          @unique
   fullName           String
   email              String
   phone              String?
@@ -27,6 +76,7 @@ model Candidate {
   department         String
   collegeName        String?
   degree             String?
+  studentStatus      String?          @default("Ongoing")
   joiningDate        String
   endDate            String
   duration           String
@@ -34,14 +84,29 @@ model Candidate {
   reportingManager   String
   assignedMentor     String
   stipend            String?          @default("Rs. 10,000")
-  offerLetterStatus  String           @default("Ready to Send")
+  offerLetterStatus  String           @default("Ready to Send") // Ready to Send, Queued, Sent, Accepted, Rejected, Expired
+  offerDeliveryStatus String          @default("Not Sent")     // Not Sent, Queued, Sent, Delivered, Failed
+  offerLetterSentAt  DateTime?
   taskStatus         String           @default("Not Assigned")
   tasksCompleted     Int              @default(0)
   reviewCycle        Int              @default(0)
   score              Float            @default(0.0)
+  performancePercentage Float         @default(100.0)
   offerAcceptanceToken String?        @unique
+  offerAcceptanceTokenHash String?    @unique
+  offerDeadline      DateTime?
   offerAcceptedAt    DateTime?
+  offerRejectedAt    DateTime?
+  rejectionReason    String?
+  signatureType      String?          // TYPED, DRAWN, UPLOADED
+  signatureData      String?          // Base64 or plain text
+  signatureUrl       String?
+  signaturePublicId  String?
+  offerPdfPath       String?
   googleMeetUrl      String?          @map("google_meet_url")
+  googleCalendarEventId String?       @map("google_calendar_event_id")
+  googleMeetStatus   String           @default("NOT_CREATED") @map("google_meet_status")
+  interviewDate      String?          @map("interview_date")
   remarks            String?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
@@ -55,7 +120,13 @@ model TaskAssignment {
   candidateId        String
   candidate          Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   taskNumber         Int       @default(1)
+  taskId             String?
+  taskName           String?
   title              String
+  objective          String?
+  modules            String?
+  toolsAndTech       String?
+  clientRequirements String?
   description        String
   role               String
   explanationDate    String
@@ -63,6 +134,18 @@ model TaskAssignment {
   meetLink           String
   reviewDate         String
   reviewTime         String
+  deadline           DateTime?
+  scheduledSendAt    DateTime?
+  isSent             Boolean   @default(true)
+  submissionToken    String?   @unique
+  submissionStatus   String    @default("PENDING")
+  projectUrl         String?
+  githubUrl          String?
+  submissionDocs     String?
+  submittedAt        DateTime?
+  warningSentAt      DateTime?
+  warningDeadline    DateTime?
+  penaltyApplied     Float     @default(0.0)
   status             String    @default("Assigned")
   feedback           String?
   firstReviewDate    String?
@@ -114,7 +197,7 @@ model SystemSetting {
   senderName              String?  @default("Shortfundly HR Team")
   googleCalendarConnected Boolean  @default(false)
   defaultMeetLinkPrefix   String?  @default("https://meet.google.com")
-  simulationMode          Boolean  @default(true)
+  simulationMode          Boolean  @default(false)
   updatedAt               DateTime @updatedAt
 }
 

@@ -1,0 +1,432 @@
+.trackingContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.telemetryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .telemetryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.metricCard {
+  background: #110e1b;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.metricTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.metricValue {
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.metricSubtitle {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.filterBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: #110e1b;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+.searchWrapper {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #71717a;
+}
+
+.searchInput {
+  width: 100%;
+  height: 38px;
+  background: #09090b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  padding: 0 12px 0 38px;
+  color: #f8fafc;
+  font-size: 13px;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+}
+
+.selectGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.selectIcon {
+  position: absolute;
+  left: 10px;
+  color: #a855f7;
+  pointer-events: none;
+}
+
+.selectInput {
+  height: 38px;
+  background: #09090b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  padding: 0 12px 0 32px;
+  color: #cbd5e1;
+  font-size: 12.5px;
+  outline: none;
+  cursor: pointer;
+}
+
+.selectInput:focus {
+  border-color: #a855f7;
+}
+
+.btnAudit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 6px;
+  color: #c084fc;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnAudit:hover:not(:disabled) {
+  background: rgba(168, 85, 247, 0.25);
+  color: #ffffff;
+}
+
+.tableCard {
+  background: #110e1b;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.tableHeaderRow {
+  padding: 16px 20px;
+  border-bottom: 1px solid #1f1b2e;
+}
+
+.tableTitle {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tableResponsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.table th {
+  background: #09090b;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  border-bottom: 1px solid #1f1b2e;
+}
+
+.table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #171424;
+  vertical-align: middle;
+}
+
+.table tr:hover {
+  background: rgba(168, 85, 247, 0.03);
+}
+
+.emptyCell {
+  text-align: center;
+  padding: 40px !important;
+  color: #71717a;
+}
+
+.candidatePrimary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.candInternId {
+  font-size: 11px;
+  font-weight: 700;
+  color: #c084fc;
+  font-family: monospace;
+}
+
+.candName {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.candEmail {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+.rolePrimary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.candRole {
+  font-size: 13px;
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.candBatch {
+  font-size: 11px;
+  color: #a855f7;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pillGreen {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.pillPurple {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.pillYellow {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.pillRed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.dateBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.btnViewSignature {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 6px;
+  color: #34d399;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnViewSignature:hover {
+  background: rgba(16, 185, 129, 0.22);
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnActionIcon {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #09090b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnActionIcon:hover {
+  border-color: #a855f7;
+  color: #c084fc;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 520px;
+  background: #110e1b;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+}
+
+.modalContentLarge {
+  width: 100%;
+  max-width: 780px;
+  background: #110e1b;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+}
+
+.modalHeader {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1f1b2e;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.modalClose {
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.modalClose:hover {
+  color: #ffffff;
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.sigCandidateSummary {
+  background: #09090b;
+  border: 1px solid #1f1b2e;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.signaturePreviewBox {
+  background: #09090b;
+  border: 1px dashed rgba(168, 85, 247, 0.3);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.sigImg {
+  max-height: 120px;
+  max-width: 100%;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.signatureStyledFont {
+  font-family: 'Brush Script MT', cursive, 'Segoe Script', sans-serif;
+  font-size: 34px;
+  color: #c084fc;
+}
+
+.spin {
+  animation: spin 1.5s linear infinite;
+}

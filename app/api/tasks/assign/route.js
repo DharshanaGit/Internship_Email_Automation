@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { generateGemmaTask } from '@/lib/gemmaEngine';
-import { getExplanationSchedule, getReviewOneSchedule } from '@/lib/dateUtils';
-import { generateGoogleMeetLink, createIcsCalendarInvite } from '@/lib/googleCalendar';
-import { createRealMeetLink, getOrCreateCandidateMeetLink } from '@/lib/googleMeet';
-import { sendEmail } from '@/lib/mailer';
+import crypto from 'crypto';
+import { prisma } from '@/lib/prisma.js';
+import { generateGemmaTask } from '@/lib/gemmaEngine.js';
+import { getExplanationSchedule, getReviewOneSchedule } from '@/lib/dateUtils.js';
+import { generateGoogleMeetLink, createIcsCalendarInvite } from '@/lib/googleCalendar.js';
+import { createRealMeetLink, getOrCreateCandidateMeetLink } from '@/lib/googleMeet.js';
+import { sendEmail } from '@/lib/mailer.js';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3001';
 
 export async function POST(request) {
   try {
@@ -14,10 +17,18 @@ export async function POST(request) {
       candidateName,
       email,
       role,
+      taskId: customTaskId,
+      taskName: customTaskName,
+      objective,
+      modules,
+      toolsAndTech,
+      clientRequirements,
       title,
       description,
       explanationDate,
       explanationTime,
+      deadline,
+      scheduledSendAt,
       customMeetLink,
       customSubject,
       customBody,
@@ -72,14 +83,24 @@ export async function POST(request) {
     // 2. Generate task content based on Designation / Role
     const candidateRole = role || candidate.role || 'Web Developer Intern';
     const gemmaTask = generateGemmaTask(candidateRole, candidate.tasksCompleted || 0);
-    const taskTitle = title || gemmaTask.title;
-    const taskDesc = description || gemmaTask.description;
+    const taskTitle = customTaskName || title || gemmaTask.title;
+    const taskDesc = objective || description || gemmaTask.description;
+    const assignedTaskId = customTaskId || `TSK-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 
     // 3. Schedule: Explanation call date 2 days after task mail sent, IST time (9 AM - 7 PM)
     const expSchedule = getExplanationSchedule(new Date());
     const finalExpDate = explanationDate || expSchedule.dateStr;
     const finalExpTime = explanationTime || expSchedule.timeStr;
     const rev1Schedule = getReviewOneSchedule(finalExpDate);
+
+    // Submission Deadline (Default 7 days from now if not specified by HR)
+    const finalDeadline = deadline
+      ? new Date(deadline)
+      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    // Generate unique expiring submission token
+    const submissionToken = crypto.randomBytes(24).toString('hex');
+    const submissionUrl = `${APP_URL}/tasks/submit?token=${submissionToken}`;
 
     // 4. Backend checks Database: Does candidate have a google_meet_url?
     //    NO  --> Calls Google Calendar API (conferenceDataVersion: 1), creates Meet room, stores in candidates.google_meet_url
@@ -110,6 +131,8 @@ export async function POST(request) {
           .replace(/\{\{time\}\}/g, finalExpTime)
           .replace(/\{\{explanation_time\}\}/g, finalExpTime)
           .replace(/\{\{meet_link\}\}/g, meetLink)
+          .replace(/\{\{submission_link\}\}/g, submissionUrl)
+          .replace(/\{\{deadline\}\}/g, finalDeadline.toLocaleString())
       : null;
 
     const emailHtml = parsedCustomBody
@@ -125,8 +148,10 @@ export async function POST(request) {
             <p>Your milestone task tailored to your designation as <strong>${candidateRole}</strong> has been assigned:</p>
             
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin: 20px 0;">
-              <h3 style="color: #1e293b; margin-top: 0; font-size: 16px;">${taskTitle}</h3>
+              <h3 style="color: #1e293b; margin-top: 0; font-size: 16px;">[${assignedTaskId}] ${taskTitle}</h3>
               <p style="color: #475569; font-size: 13.5px; white-space: pre-line; line-height: 1.6;">${taskDesc}</p>
+              ${modules ? `<p style="margin: 8px 0 0 0; font-size: 13px;"><strong>Functional Modules:</strong> ${modules}</p>` : ''}
+              ${toolsAndTech ? `<p style="margin: 4px 0 0 0; font-size: 13px;"><strong>Tech Stack:</strong> ${toolsAndTech}</p>` : ''}
             </div>
 
             <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 16px 20px; border-radius: 6px; margin: 20px 0;">
@@ -136,11 +161,16 @@ export async function POST(request) {
               <p style="margin: 8px 0 0 0;"><strong>Joining Google Meet Link:</strong> <a href="${meetLink}" style="color: #2563eb; font-weight: bold; text-decoration: underline;">${meetLink}</a></p>
             </div>
 
-            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px 16px; border-radius: 6px; margin: 16px 0; font-size: 12.5px; color: #166534;">
-              <strong>Review Schedule:</strong> Your milestone review will take place 2 days after the explanation call on <strong>${rev1Schedule.callDateStr}</strong> via the same Google Meet link.
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px 20px; border-radius: 6px; margin: 20px 0;">
+              <h4 style="margin: 0 0 8px 0; color: #166534; font-size: 14px;">Project Deliverable Submission:</h4>
+              <p style="margin: 4px 0; font-size: 13px;"><strong>Submission Deadline:</strong> ${finalDeadline.toLocaleString()}</p>
+              <div style="text-align: center; margin: 16px 0;">
+                <a href="${submissionUrl}" style="display: inline-block; padding: 12px 24px; background-color: #0f172a; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px;">Open Submission Portal</a>
+              </div>
+              <p style="margin: 0; font-size: 11px; color: #64748b; text-align: center;">Notice: This unique submission URL strictly expires on ${finalDeadline.toLocaleString()}. Failure to submit within the deadline incurs an automated performance deduction.</p>
             </div>
 
-            <p style="margin-top: 24px;">Best regards,<br><strong>Technical Mentorship & HR Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.</p>
+            <p style="margin-top: 24px;">Best regards,<br><strong>Technical Mentorship & HR Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.<br><span style="color: #64748b; font-size: 12px;">Chennai, Tamil Nadu, India | hr@shortfundly.com</span></p>
           </div>
         </div>
       `;
@@ -154,9 +184,11 @@ export async function POST(request) {
           html: emailHtml,
           explanationDate: finalExpDate,
           explanationTime: finalExpTime,
+          deadline: finalDeadline.toISOString(),
           meetLink,
           taskTitle,
           taskDesc,
+          submissionUrl,
           candidate,
         },
       });
@@ -167,7 +199,13 @@ export async function POST(request) {
       data: {
         candidateId: candidate.id,
         taskNumber: (candidate.tasksCompleted || 0) + 1,
+        taskId: assignedTaskId,
+        taskName: taskTitle,
         title: taskTitle,
+        objective: taskDesc,
+        modules: modules || null,
+        toolsAndTech: toolsAndTech || null,
+        clientRequirements: clientRequirements || null,
         description: taskDesc,
         role: candidateRole,
         explanationDate: finalExpDate,
@@ -175,6 +213,11 @@ export async function POST(request) {
         meetLink,
         reviewDate: rev1Schedule.callDateStr,
         reviewTime: rev1Schedule.timeStr,
+        deadline: finalDeadline,
+        scheduledSendAt: scheduledSendAt ? new Date(scheduledSendAt) : null,
+        isSent: true,
+        submissionToken,
+        submissionStatus: 'PENDING',
         status: 'Assigned',
         reviewCount: 0,
       },
@@ -184,7 +227,7 @@ export async function POST(request) {
     const icsInvite = createIcsCalendarInvite({
       uid: `sf-task-exp-${task.id}@shortfundly.com`,
       title: `[Shortfundly] Role Sprint Briefing - ${candidateRole} (${candidate.fullName})`,
-      description: `Task: ${taskTitle}\n\nDeliverables:\n${taskDesc}\n\nJoin Google Meet: ${meetLink}`,
+      description: `Task: ${taskTitle}\n\nDeliverables:\n${taskDesc}\n\nJoin Google Meet: ${meetLink}\nSubmission Portal: ${submissionUrl}`,
       meetLink,
       startDateStr: new Date().toISOString().split('T')[0],
       startTimeStr: '11:00',
@@ -201,7 +244,7 @@ export async function POST(request) {
       cc: cc || undefined,
       subject: emailSubject,
       html: emailHtml,
-      text: `Dear ${candidate.fullName}, your task for ${candidateRole} has been assigned. Explanation date: ${finalExpDate} at ${finalExpTime}. Meet: ${meetLink}`,
+      text: `Dear ${candidate.fullName}, your task [${assignedTaskId}] for ${candidateRole} has been assigned. Explanation date: ${finalExpDate} at ${finalExpTime}. Meet link: ${meetLink}. Submit deliverables before ${finalDeadline.toLocaleString()} at: ${submissionUrl}`,
       emailType: 'TASK_ASSIGNMENT',
       meetLink,
       attachments: [
@@ -223,6 +266,7 @@ export async function POST(request) {
       success: true,
       message: `Task successfully assigned to ${candidate.fullName}!`,
       task,
+      submissionUrl,
       emailResult,
     });
   } catch (error) {

@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { verifyToken, signToken, COOKIE_NAME } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 const roleSchema = z.object({
   role: z.enum(['ADMIN', 'HR', 'CEO']),
 });
@@ -56,9 +58,15 @@ export async function POST(request) {
       role: newRole,
     });
 
+    const isProduction = process.env.NODE_ENV === 'production';
+    const host = request.headers.get('host') || '';
+    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+    const isHttps = request.nextUrl.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https';
+    const secureCookie = isProduction && !isLocal && isHttps;
+
     response.cookies.set(COOKIE_NAME, newToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: secureCookie,
       sameSite: 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60,

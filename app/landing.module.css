@@ -8,20 +8,6 @@
   overflow-x: hidden;
 }
 
-/* Background Ambient Glows */
-.landingWrapper::before {
-  content: '';
-  position: absolute;
-  top: -120px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 900px;
-  height: 480px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 80%);
-  pointer-events: none;
-  z-index: 0;
-}
-
 .container {
   width: 100%;
   max-width: 1200px;
@@ -36,10 +22,9 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(8, 12, 21, 0.85);
-  backdrop-filter: blur(14px);
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 16px 0;
+  padding: 14px 0;
 }
 
 .navContainer {
