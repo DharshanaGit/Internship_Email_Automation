@@ -6,6 +6,9 @@ import {
   sendCompletionCertificate,
 } from '@/lib/automationEngine';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function POST(request) {
   try {
     const body = await request.json().catch(() => ({}));

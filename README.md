@@ -2,7 +2,7 @@
 
 > Enterprise-grade, Web3-inspired internship operations, candidate onboarding, and automated email dispatch platform architected for **Shortfundly Media Technologies Pvt. Ltd.**
 
-Built with **Next.js 15 (App Router)**, **React 19**, **Supabase (PostgreSQL) with Prisma ORM**, **Playwright Headless Engine**, **Gemma 2B AI Engine**, and **Google Workspace & Meet APIs**.
+Built with **Next.js 16 (App Router)**, **React 19**, **Supabase (PostgreSQL) with Prisma ORM**, **Playwright Headless Engine**, **Gemma 2B AI Engine**, and **Google Workspace & Meet APIs**.
 
 ---
 
@@ -84,7 +84,7 @@ Module 1: Offer Dispatch              Module 2: Sprint Briefing             Modu
 
 | Component | Technology |
 | :--- | :--- |
-| **Framework** | Next.js 15.2.1 (App Router) |
+| **Framework** | Next.js 16.4.3 (App Router) |
 | **UI Library** | React 19.0.0 |
 | **Styling** | Vanilla CSS Modules (`dashboard.module.css`, `login.module.css`) & Obsidian Web3 Theme |
 | **Database & ORM** | Supabase (PostgreSQL) / SQLite with Prisma ORM 6.4.1 |

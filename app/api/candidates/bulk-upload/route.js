@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import * as xlsx from 'xlsx';
 import { z } from 'zod';

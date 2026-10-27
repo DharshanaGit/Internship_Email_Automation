@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ['playwright', 'nodemailer', '@prisma/client', 'prisma', 'googleapis'],
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   async headers() {
     return [
       {

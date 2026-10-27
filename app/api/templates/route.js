@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { DEFAULT_OFFER_EMAIL_BODY, DEFAULT_OFFER_EMAIL_SUBJECT } from '@/lib/offerService';
