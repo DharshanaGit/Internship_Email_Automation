@@ -117,8 +117,9 @@ Create a `.env` file in the root directory (never commit this file to version co
 # Database Connection (Supabase PostgreSQL or SQLite)
 DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT].supabase.co:5432/postgres"
 
-# Application URL
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+# Application URL (Use your deployed Vercel domain in production)
+APP_BASE_URL="https://internship-email-automation.vercel.app"
+NEXT_PUBLIC_APP_URL="https://internship-email-automation.vercel.app"
 
 # Google SMTP Credentials
 SMTP_HOST="smtp.gmail.com"

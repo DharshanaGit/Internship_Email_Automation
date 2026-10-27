@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { sendEmail } from '../../../../lib/mailer';
+import { getAppBaseUrl } from '../../../../lib/offerService';
 
 export async function POST(request) {
   try {
@@ -15,13 +16,23 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Email record not found' }, { status: 404 });
     }
 
+    let textBody = log.body || '';
+    let htmlBody = `<div style="font-family: sans-serif; padding: 20px;">${textBody.replace(/\n/g, '<br>')}</div>`;
+
+    // Ensure retries and resends never use localhost URLs
+    if (log.emailType === 'OFFER_LETTER' || textBody.includes('/offers/respond')) {
+      const baseUrl = getAppBaseUrl();
+      textBody = textBody.replace(/https?:\/\/localhost:[0-9]+/g, baseUrl);
+      htmlBody = htmlBody.replace(/https?:\/\/localhost:[0-9]+/g, baseUrl);
+    }
+
     const res = await sendEmail({
       candidateId: log.candidateId,
       to: log.recipientEmail,
       recipientName: log.recipientName || '',
       subject: `[Resent] ${log.subject}`,
-      html: `<div style="font-family: sans-serif; padding: 20px;">${log.body.replace(/\n/g, '<br>')}</div>`,
-      text: log.body,
+      html: htmlBody,
+      text: textBody,
       emailType: log.emailType,
       meetLink: log.meetLink,
     });

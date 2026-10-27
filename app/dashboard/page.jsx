@@ -383,8 +383,8 @@ export default function DashboardPage() {
       degree: 'B.Tech CSE',
       college_name: 'SRM Institute of Science and Technology',
       phone: '+91 9876543210',
-      response_url: 'http://localhost:3000/offers/respond?token=sample_preview_token',
-      responseUrl: 'http://localhost:3000/offers/respond?token=sample_preview_token',
+      response_url: 'https://internship-email-automation.vercel.app/offers/respond?token=sample_preview_token',
+      responseUrl: 'https://internship-email-automation.vercel.app/offers/respond?token=sample_preview_token',
       deadline: '2026-06-15 06:00 PM IST',
       task_title: 'REST API & Distributed Microservices Implementation',
       task_content: 'Design and deploy authentication endpoints with JWT, rate limiting, and PostgreSQL transactions.',
@@ -1890,7 +1890,7 @@ export default function DashboardPage() {
                           {filteredBulkRows.slice(0, 50).map((row, idx) => {
                             const isSelected = selectedCandidateKeys.has(row.candidateId);
                             const internId = String(row.internId || row.raw?.internId || row.candidateId || `INT-2026-${String(idx + 100).padStart(5, '0')}`);
-                            const portalUrl = String(row.responseUrl || (typeof window !== 'undefined' ? `${window.location.origin}/offers/respond?token=${row.token || row.candidateId}` : `/offers/respond?token=${row.token || row.candidateId}`));
+                            const portalUrl = String(row.responseUrl || (typeof window !== 'undefined' ? `${window.location.origin}/offers/respond?token=${row.token || row.candidateId}` : `https://internship-email-automation.vercel.app/offers/respond?token=${row.token || row.candidateId}`));
                             const fullName = typeof row.fullName === 'string' ? row.fullName : String(row.fullName || '');
                             const email = typeof row.email === 'string' ? row.email : String(row.email || '');
                             const role = typeof row.role === 'string' ? row.role : String(row.role || '');

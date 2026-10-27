@@ -4,9 +4,11 @@ import { prisma } from '@/lib/prisma';
 import { generateOfferLetterPdf } from '@/lib/pdfEngine';
 import { sendEmail } from '@/lib/mailer';
 import { enqueueBulkOfferLetters } from '@/lib/queueWorker';
-import { generateSecureResponseToken, buildOfferEmailContent } from '@/lib/offerService';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3001';
+import {
+  generateSecureResponseToken,
+  buildOfferEmailContent,
+  buildCandidateResponseUrl,
+} from '@/lib/offerService';
 
 export async function POST(request) {
   try {
@@ -150,7 +152,7 @@ export async function POST(request) {
         });
 
         // 2. Prepare personalized email
-        const responseLink = `${APP_URL}/offers/respond?token=${rawToken}`;
+        const responseLink = buildCandidateResponseUrl(rawToken);
         const emailContent = buildOfferEmailContent({
           candidate,
           template: selectedTemplate,

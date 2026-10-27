@@ -90,7 +90,7 @@ www.shortfundly.com`;
     stipend: 'Rs. 10,000',
     workMode: 'Online / Remote',
     deadline: 'June 4, 2026 at 06:00 PM',
-    responseUrl: 'https://shortfundly.com/offers/respond?token=sample_token_hash_00042',
+    responseUrl: 'https://internship-email-automation.vercel.app/offers/respond?token=sample_token_hash_00042',
   };
 
   const handleOpenCreate = () => {

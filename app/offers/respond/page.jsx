@@ -19,8 +19,8 @@ export default function OfferRespondPage() {
   // Terms Consent
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  // Signature Mode: 'type' | 'draw' | 'upload'
-  const [signatureMode, setSignatureMode] = useState('type');
+  // Signature Mode: 'upload' | 'draw' | 'type'
+  const [signatureMode, setSignatureMode] = useState('upload');
   const [typedName, setTypedName] = useState('');
   const [signatureData, setSignatureData] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -126,27 +126,46 @@ export default function OfferRespondPage() {
       }
 
       let finalSig = signatureData;
-      let finalSigType = 'DRAWN';
+      let finalSigType = 'UPLOADED';
 
-      if (signatureMode === 'type') {
+      if (signatureMode === 'upload') {
+        if (!signatureData) {
+          setErrorMessage('Please upload a photo or image file of your signature (PNG or JPG).');
+          return;
+        }
+        finalSig = signatureData;
+        finalSigType = 'UPLOADED';
+      } else if (signatureMode === 'draw') {
+        if (!signatureData) {
+          setErrorMessage('Please draw your digital signature on the canvas area provided.');
+          return;
+        }
+        finalSig = signatureData;
+        finalSigType = 'DRAWN';
+      } else if (signatureMode === 'type') {
         if (!typedName.trim()) {
           setErrorMessage('Please type your full legal name for digital signature.');
           return;
         }
-        finalSig = typedName.trim();
-        finalSigType = 'TYPED';
-      } else if (signatureMode === 'draw') {
-        if (!signatureData) {
-          setErrorMessage('Please draw your signature on the canvas area provided.');
-          return;
+        // Convert typed name to canvas signature image for Cloudinary storage
+        try {
+          const offCanvas = document.createElement('canvas');
+          offCanvas.width = 600;
+          offCanvas.height = 150;
+          const ctx = offCanvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, offCanvas.width, offCanvas.height);
+          ctx.fillStyle = '#0f172a';
+          ctx.font = 'italic bold 38px "Brush Script MT", "Caveat", "Dancing Script", cursive, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(typedName.trim(), offCanvas.width / 2, offCanvas.height / 2);
+          finalSig = offCanvas.toDataURL('image/png');
+          finalSigType = 'TYPED_IMAGE';
+        } catch (e) {
+          finalSig = typedName.trim();
+          finalSigType = 'TYPED';
         }
-        finalSigType = 'DRAWN';
-      } else if (signatureMode === 'upload') {
-        if (!signatureData) {
-          setErrorMessage('Please upload an image photo of your signature.');
-          return;
-        }
-        finalSigType = 'UPLOADED';
       }
 
       try {
@@ -440,11 +459,11 @@ export default function OfferRespondPage() {
                   <div className={styles.sigModeTabs}>
                     <button
                       type="button"
-                      onClick={() => setSignatureMode('type')}
-                      className={`${styles.sigTab} ${signatureMode === 'type' ? styles.sigTabActive : ''}`}
+                      onClick={() => setSignatureMode('upload')}
+                      className={`${styles.sigTab} ${signatureMode === 'upload' ? styles.sigTabActive : ''}`}
                     >
-                      <Type size={14} />
-                      <span>Type Full Name</span>
+                      <Upload size={14} />
+                      <span>Upload Signature Photo</span>
                     </button>
                     <button
                       type="button"
@@ -456,11 +475,11 @@ export default function OfferRespondPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setSignatureMode('upload')}
-                      className={`${styles.sigTab} ${signatureMode === 'upload' ? styles.sigTabActive : ''}`}
+                      onClick={() => setSignatureMode('type')}
+                      className={`${styles.sigTab} ${signatureMode === 'type' ? styles.sigTabActive : ''}`}
                     >
-                      <Upload size={14} />
-                      <span>Upload Signature Photo</span>
+                      <Type size={14} />
+                      <span>Type Full Name</span>
                     </button>
                   </div>
 

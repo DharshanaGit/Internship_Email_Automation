@@ -61,7 +61,9 @@ export default function SequentialSingleOfferForm({
   const [previewTab, setPreviewTab] = useState('email');
   const [sending, setSending] = useState(false);
   const [portalToken, setPortalToken] = useState(() => Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2));
-  const candidatePortalUrl = typeof window !== 'undefined' ? `${window.location.origin}/offers/respond?token=${portalToken}` : `http://localhost:3000/offers/respond?token=${portalToken}`;
+  const candidatePortalUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/offers/respond?token=${portalToken}`
+    : `${process.env.NEXT_PUBLIC_APP_URL || 'https://internship-email-automation.vercel.app'}/offers/respond?token=${portalToken}`;
 
   // Auto-generate Gemma 2B unique Intern ID
   const generateNewGemmaId = () => {
@@ -295,7 +297,7 @@ export default function SequentialSingleOfferForm({
       duration: formData.duration || '3 Months',
       stipend: `Rs. ${Number(formData.stipend || 10000).toLocaleString('en-IN')}`,
       deadline: formData.deadline ? new Date(formData.deadline).toLocaleString() : '3 Days',
-      responseUrl: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001'}/offers/respond?token=sample_token_${formData.internId}`,
+      responseUrl: `${typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://internship-email-automation.vercel.app')}/offers/respond?token=sample_token_${formData.internId}`,
     };
   }, [formData]);
 

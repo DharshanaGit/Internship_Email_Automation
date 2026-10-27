@@ -3,9 +3,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateOfferLetterPdf } from '@/lib/pdfEngine';
 import { sendEmail } from '@/lib/mailer';
-import { generateSecureResponseToken, buildOfferEmailContent, generateUniqueInternId } from '@/lib/offerService';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3001';
+import {
+  generateSecureResponseToken,
+  buildOfferEmailContent,
+  generateUniqueInternId,
+  buildCandidateResponseUrl,
+} from '@/lib/offerService';
 
 export async function POST(request) {
   try {
@@ -178,7 +181,7 @@ export async function POST(request) {
     }
 
     // 3. Compose Email using official Shortfundly offer structure
-    const responseLink = `${APP_URL}/offers/respond?token=${rawToken}`;
+    const responseLink = buildCandidateResponseUrl(rawToken);
     const deadlineFormatted = deadlineDate.toLocaleDateString('en-US', {
       day: '2-digit',
       month: 'short',
