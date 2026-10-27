@@ -39,49 +39,68 @@ import { generateGemmaTask, generateGemmaFeedback } from '@/lib/gemmaEngine';
 import { formatToDdMmYy, getRandomIstTime, getExplanationSchedule } from '@/lib/dateUtils';
 import { generateGoogleMeetLink } from '@/lib/googleCalendar';
 import OfferTrackingView from '@/components/OfferTrackingView';
-
+import SequentialSingleOfferForm from '@/components/SequentialSingleOfferForm';
+import OfferTemplateManager from '@/components/OfferTemplateManager';
+import TaskAssignmentView from '@/components/TaskAssignmentView';
+import ReviewDashboardView from '@/components/ReviewDashboardView';
+import AllCandidatesView from '@/components/AllCandidatesView';
+import CertificateDeckView from '@/components/CertificateDeckView';
+import UnifiedEmailTracker from '@/components/UnifiedEmailTracker';
+import BatchDragDropManager from '@/components/BatchDragDropManager';
+import { Layers } from 'lucide-react';
+import { jinjaTextToEmailHtml, renderJinja } from '@/lib/jinjaEngine.js';
 
 // ============================================================================
 // FULL-MAIL COMPLETE EMAIL TEMPLATES FOR ALL MODULES (100% CUSTOMIZABLE)
 // ============================================================================
 const DEFAULT_EMAIL_TEMPLATES = {
   offer: {
-    title: 'Offer Letter Email Template',
-    subject: 'Internship Offer Letter - {{candidate_name}} | Shortfundly',
-    body: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a; max-width: 620px; margin: 0 auto; line-height: 1.6; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
-  <div style="background: linear-gradient(135deg, #090d16, #1e293b); padding: 28px 24px; text-align: center; border-bottom: 3px solid #38bdf8;">
-    <h1 style="color: #38bdf8; margin: 0; font-size: 24px; letter-spacing: 2px;">SHORTFUNDLY</h1>
-    <p style="color: #94a3b8; margin: 6px 0 0 0; font-size: 13px;">Shortfundly Media Technologies Pvt. Ltd. • Internship Automation</p>
-  </div>
-  <div style="padding: 32px 28px;">
-    <p style="font-size: 16px; margin-top: 0;">Dear <strong>{{candidate_name}}</strong>,</p>
-    <p>Congratulations! We are pleased to formally offer you an online internship as <strong>{{internship_role}}</strong> in our <strong>{{department}}</strong> department.</p>
-    
-    <div style="background: #f1f5f9; border-left: 4px solid #2563eb; padding: 16px 20px; margin: 24px 0; border-radius: 6px;">
-      <p style="margin: 4px 0;"><strong>Role:</strong> {{internship_role}}</p>
-      <p style="margin: 4px 0;"><strong>Department:</strong> {{department}}</p>
-      <p style="margin: 4px 0;"><strong>Tenure:</strong> {{joining_date}} to {{end_date}}</p>
-      <p style="margin: 4px 0;"><strong>Stipend:</strong> {{stipend}}</p>
-      <p style="margin: 4px 0;"><strong>Work Mode:</strong> {{work_mode}}</p>
-    </div>
+    title: 'Bulk Offer Letter Email Template (Jinja Text Format)',
+    subject: 'Official Internship Offer from Shortfundly - {{candidate_name}}',
+    body: `Dear {{candidate_name}},
 
-    <p>Please find attached your official Shortfundly Internship Offer Letter PDF. Kindly review the attached offer letter and reach out to our HR team if you have any questions.</p>
+Congratulations! We are thrilled to offer you the position of {{internship_role}} at Shortfundly. We were deeply impressed by your skills, background, and performance throughout our evaluation process.
 
-    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 28px 0;" />
-    <p style="margin: 0; font-size: 13px; color: #475569;">Warm regards,<br><strong style="color: #0f172a;">Human Resources Team</strong><br>Shortfundly Media Technologies Pvt. Ltd.<br><span style="color: #94a3b8; font-size: 12px;">Chennai, Tamil Nadu, India | hr@shortfundly.com</span></p>
-  </div>
-</div>`,
+Internship Details:
+Role / Position: {{internship_role}}
+Intern ID: {{intern_id}}
+Anticipated Start Date: {{joining_date}}
+Duration: {{duration}}
+Stipend / Compensation: {{stipend}}
+Work Location / Mode: {{work_mode}}
+
+Action Required: Review & Respond
+To review the full formal offer letter PDF attached to this email and record your response, please access your secure candidate portal via the unique link below:
+👉 Access Your Secure Offer Portal & Sign Offer:
+{{response_url}}
+
+Important Note on Expiration: This unique link and offer will officially expire on {{deadline}}. Please ensure you complete your response before this deadline.
+
+How to Confirm Acceptance:
+1. Click the secure link above to open your candidate portal.
+2. Review the terms outlined in the formal offer letter.
+3. Provide your digital signature directly on the platform.
+4. Upload a photo of your signature (or signature document/ID as required) to officially confirm your acceptance of this offer.
+
+If you have any questions or require clarifications regarding the terms, please feel free to reach out to us by replying directly to this email.
+
+We are excited about the prospect of having you join the Shortfundly family and look forward to building amazing things together!
+
+Best regards,
+Hiring & Talent Acquisition Team
+Shortfundly
+www.shortfundly.com`,
     tags: [
       { label: 'Candidate Name', val: '{{candidate_name}}' },
-      { label: 'Role', val: '{{internship_role}}' },
-      { label: 'Department', val: '{{department}}' },
+      { label: 'Intern ID', val: '{{intern_id}}' },
+      { label: 'Role / Designation', val: '{{internship_role}}' },
       { label: 'Joining Date', val: '{{joining_date}}' },
       { label: 'Ending Date', val: '{{end_date}}' },
+      { label: 'Duration', val: '{{duration}}' },
       { label: 'Stipend Amount', val: '{{stipend}}' },
-      { label: 'Degree', val: '{{degree}}' },
-      { label: 'University / College', val: '{{college_name}}' },
-      { label: 'Phone', val: '{{phone}}' },
       { label: 'Work Mode', val: '{{work_mode}}' },
+      { label: 'Response Portal URL', val: '{{response_url}}' },
+      { label: 'Offer Expiry Deadline', val: '{{deadline}}' },
     ]
   },
   task: {
@@ -341,57 +360,54 @@ export default function DashboardPage() {
 
   const getModalLivePreviewHtml = () => {
     const sample = {
+      candidate_name: 'Aarav Sharma',
+      candidateName: 'Aarav Sharma',
       fullName: 'Aarav Sharma',
-      candidateId: 'SF-INT-2026-1001',
+      candidateId: 'INT-2026-48201',
+      candidate_id: 'INT-2026-48201',
+      internId: 'INT-2026-48201',
+      intern_id: 'INT-2026-48201',
+      internship_role: 'Full Stack Developer Intern',
+      designation: 'Full Stack Developer Intern',
       role: 'Full Stack Developer Intern',
       department: 'Engineering',
-      joiningDate: '01.06.26',
-      endDate: '31.08.26',
+      joining_date: '01.06.2026',
+      joiningDate: '01.06.2026',
+      startDate: '01.06.2026',
+      end_date: '31.08.2026',
+      endDate: '31.08.2026',
       duration: '3 Months',
       stipend: 'Rs. 10,000',
+      work_mode: 'Online - Remote',
       workMode: 'Online - Remote',
       degree: 'B.Tech CSE',
-      collegeName: 'SRM Institute of Science and Technology',
+      college_name: 'SRM Institute of Science and Technology',
       phone: '+91 9876543210',
-      title: 'REST API & Distributed Microservices Implementation',
-      content: 'Design and deploy authentication endpoints with JWT, rate limiting, and SQLite transactions under mentor guidance.',
-      date: '28.10.26',
-      time: '11:00 AM IST',
-      meet: 'https://meet.google.com/abc-defg-hij',
-      reviewTitle: 'Milestone Sprint Review 1',
-      feedback: 'Excellent work on system architecture. Ensure query indices are added to dev.db.',
-      certId: 'SF-CERT-2026-A101',
-      issueDate: '31.08.2026',
+      response_url: 'http://localhost:3000/offers/respond?token=sample_preview_token',
+      responseUrl: 'http://localhost:3000/offers/respond?token=sample_preview_token',
+      deadline: '2026-06-15 06:00 PM IST',
+      task_title: 'REST API & Distributed Microservices Implementation',
+      task_content: 'Design and deploy authentication endpoints with JWT, rate limiting, and PostgreSQL transactions.',
+      explanation_date: '28.10.2026',
+      time: '04:00 PM IST',
+      explanation_time: '04:00 PM IST',
+      meet_link: 'https://meet.google.com/abc-defg-hij',
+      review_title: 'Milestone Sprint Review 1',
+      feedback_notes: 'Excellent work on system architecture. Ensure query indices are added.',
+      certificate_id: 'SF-CERT-2026-A101',
+      issue_date: '31.08.2026',
     };
 
-    return (templateEditorModal.body || '')
-      .replace(/\{\{candidate_name\}\}/g, sample.fullName)
-      .replace(/\{\{candidate_id\}\}/g, sample.candidateId)
-      .replace(/\{\{internship_role\}\}/g, sample.role)
-      .replace(/\{\{designation\}\}/g, sample.role)
-      .replace(/\{\{role\}\}/g, sample.role)
-      .replace(/\{\{department\}\}/g, sample.department)
-      .replace(/\{\{joining_date\}\}/g, sample.joiningDate)
-      .replace(/\{\{end_date\}\}/g, sample.endDate)
-      .replace(/\{\{duration\}\}/g, sample.duration)
-      .replace(/\{\{stipend\}\}/g, sample.stipend)
-      .replace(/\{\{work_mode\}\}/g, sample.workMode)
-      .replace(/\{\{degree\}\}/g, sample.degree)
-      .replace(/\{\{college_name\}\}/g, sample.collegeName)
-      .replace(/\{\{phone\}\}/g, sample.phone)
-      .replace(/\{\{task_title\}\}/g, sample.title)
-      .replace(/\{\{task_content\}\}/g, sample.content)
-      .replace(/\{\{task_description\}\}/g, sample.content)
-      .replace(/\{\{explanation_date\}\}/g, sample.date)
-      .replace(/\{\{time\}\}/g, sample.time)
-      .replace(/\{\{explanation_time\}\}/g, sample.time)
-      .replace(/\{\{meet_link\}\}/g, sample.meet)
-      .replace(/\{\{review_title\}\}/g, sample.reviewTitle)
-      .replace(/\{\{feedback_notes\}\}/g, sample.feedback)
-      .replace(/\{\{review_date\}\}/g, sample.date)
-      .replace(/\{\{review_time\}\}/g, sample.time)
-      .replace(/\{\{certificate_id\}\}/g, sample.certId)
-      .replace(/\{\{issue_date\}\}/g, sample.issueDate);
+    const raw = templateEditorModal.body || '';
+    if (raw.trim().startsWith('<') && raw.includes('</html>')) {
+      let out = raw;
+      for (const [k, v] of Object.entries(sample)) {
+        out = out.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), v);
+      }
+      return out;
+    }
+
+    return jinjaTextToEmailHtml(raw, sample);
   };
 
 
@@ -413,13 +429,60 @@ export default function DashboardPage() {
   const [toasts, setToasts] = useState([]);
   const showToast = (message, type = 'info') => {
     const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
+    const cleanMessage = typeof message === 'string'
+      ? message
+      : (message?.message || (typeof message === 'object' ? JSON.stringify(message) : String(message || '')));
+    setToasts((prev) => [...prev, { id, message: cleanMessage, type }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 4500);
   };
 
   // --- MODULE 1 (OFFER LETTER): SINGLE SENDER STATE ---
+  
+  // Templates & Batches State
+  const [templates, setTemplates] = useState([]);
+  const [batches, setBatches] = useState([]);
+  const [offerBatchFilter, setOfferBatchFilter] = useState('ALL');
+  const [offerRoleFilter, setOfferRoleFilter] = useState('ALL');
+  const [offerSearchFilter, setOfferSearchFilter] = useState('');
+
+  const loadTemplates = async () => {
+    try {
+      const res = await fetch('/api/templates');
+      const data = await res.json();
+      if (data.success && data.templates) {
+        setTemplates(data.templates);
+      }
+    } catch (err) {
+      console.error('Failed to load templates:', err);
+    }
+  };
+
+  const loadBatches = async () => {
+    try {
+      const res = await fetch('/api/batches');
+      const data = await res.json();
+      if (data.success && data.batches) {
+        setBatches(data.batches);
+      }
+    } catch (err) {
+      console.error('Failed to load batches:', err);
+    }
+  };
+
+  const filteredOfferCandidates = candidates.filter((c) => {
+    const matchBatch = offerBatchFilter === 'ALL' || c.batch === offerBatchFilter;
+    const matchRole = offerRoleFilter === 'ALL' || (c.role && c.role.toLowerCase().includes(offerRoleFilter.toLowerCase()));
+    const search = offerSearchFilter.toLowerCase().trim();
+    const matchSearch = !search ||
+      (c.fullName && c.fullName.toLowerCase().includes(search)) ||
+      (c.internId && c.internId.toLowerCase().includes(search)) ||
+      (c.candidateId && c.candidateId.toLowerCase().includes(search)) ||
+      (c.email && c.email.toLowerCase().includes(search));
+    return matchBatch && matchRole && matchSearch;
+  });
+
   const [singleCandidateSource, setSingleCandidateSource] = useState('existing'); // 'existing' | 'manual'
   const [selectedCandidateId, setSelectedCandidateId] = useState('');
   const [recentOfferCandidate, setRecentOfferCandidate] = useState(null);
@@ -455,6 +518,9 @@ export default function DashboardPage() {
   const [bulkCustomSubject, setBulkCustomSubject] = useState('');
   const [bulkCustomBody, setBulkCustomBody] = useState('');
   const [bulkCustomCc, setBulkCustomCc] = useState('');
+  const [bulkOfferDeadline, setBulkOfferDeadline] = useState(
+    () => new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 16)
+  );
   const [bulkSending, setBulkSending] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0, status: '' });
   const [bulkDispatchResults, setBulkDispatchResults] = useState(null);
@@ -695,6 +761,8 @@ export default function DashboardPage() {
     loadEmails();
     loadSettings();
     loadQueueStats();
+    loadTemplates();
+    loadBatches();
 
     const interval = setInterval(() => {
       loadQueueStats();
@@ -1177,7 +1245,19 @@ export default function DashboardPage() {
       }
     } catch (err) {
       showToast('Error parsing file', 'error');
+    } finally {
+      if (e.target) {
+        e.target.value = '';
+      }
     }
+  };
+
+  const handleClearBulkDataset = () => {
+    setBulkValidationReport(null);
+    setSelectedCandidateKeys(new Set());
+    setBulkSearchTerm('');
+    setBulkBatchFilter('ALL');
+    showToast('Cleared uploaded dataset. You can now load a new file.', 'info');
   };
 
   // --- MODULE 1: UPLOAD GOOGLE FORM INTAKE SPREADSHEET (AUTO-BATCH & INTERN IDS) ---
@@ -1282,6 +1362,8 @@ export default function DashboardPage() {
           customSubject: bulkCustomSubject,
           customBody: bulkCustomBody,
           cc: bulkCustomCc,
+          deadline: bulkOfferDeadline,
+          commonDeadline: bulkOfferDeadline,
           forceResend: !skipAlreadySent,
         }),
       });
@@ -1356,27 +1438,8 @@ export default function DashboardPage() {
 
           <div className={styles.systemBadge}>
             <span className={styles.beaconDot} />
-            <span style={{ color: '#86efac', fontWeight: 600 }}>SQLite Prisma &bull; Google SMTP Production Ready</span>
+            <span style={{ color: '#c084fc', fontWeight: 600 }}>Supabase PostgreSQL Prisma &bull; Google SMTP Production Ready</span>
           </div>
-
-          {/* Master Sheet Download Button */}
-          <a
-            href="/api/candidates/export-master"
-            download
-            className={styles.userPill}
-            style={{
-              cursor: 'pointer',
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15))',
-              border: '1px solid rgba(16, 185, 129, 0.45)',
-              color: '#34d399',
-              textDecoration: 'none',
-              fontWeight: 700,
-            }}
-            title="Download fresh Master Excel Roster from SQLite"
-          >
-            <FileSpreadsheet size={14} style={{ color: '#34d399' }} />
-            <span style={{ color: '#34d399' }}>Download Master Sheet</span>
-          </a>
 
           {/* Real-time Queue Status Indicator */}
           {(queueStats.pending > 0 || queueStats.processing > 0) && (
@@ -1402,18 +1465,10 @@ export default function DashboardPage() {
 
         <div className={styles.topBarRight}>
           {/* Operational Role Switcher */}
-          <div className={styles.roleSelectWrapper}>
-            <Shield size={14} style={{ color: 'var(--accent-indigo)' }} />
+          <div className={styles.roleSelectWrapper} style={{ cursor: 'default' }} title="Role switching requires signing out">
+            <Shield size={14} style={{ color: '#a855f7' }} />
             <span className={styles.roleLabel}>Role:</span>
-            <select
-              className={styles.roleSelect}
-              value={adminUser.role}
-              onChange={(e) => handleRoleSwitch(e.target.value)}
-            >
-              <option value="ADMIN">ADMIN</option>
-              <option value="HR">HR DIRECTOR</option>
-              <option value="CEO">FOUNDER & CEO</option>
-            </select>
+            <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '12px' }}>{adminUser.role}</span>
           </div>
 
           <div className={styles.userPill}>
@@ -1460,6 +1515,16 @@ export default function DashboardPage() {
           <Clock size={16} />
           <span>Reviews</span>
         </button>
+
+        {(adminUser.role === 'ADMIN' || adminUser.role === 'HR') && (
+          <button
+            onClick={() => setActiveTab('candidates')}
+            className={`${styles.navTab} ${activeTab === 'candidates' ? styles.navTabActive : ''}`}
+          >
+            <Users size={16} />
+            <span>All Candidates & Attrition</span>
+          </button>
+        )}
 
         {(adminUser.role === 'ADMIN' || adminUser.role === 'CEO') && (
           <button
@@ -1534,11 +1599,63 @@ export default function DashboardPage() {
                   <UserCheck size={14} />
                   <span>Decision Tracking (Accepted & Rejected)</span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOfferSubTab('templates')}
+                  className={`${styles.segmentedTab} ${offerSubTab === 'templates' ? styles.segmentedTabActive : ''}`}
+                  title="Create new and customize offer letter templates"
+                >
+                  <FileText size={14} />
+                  <span>Offer Letter Templates</span>
+                </button>
               </div>
             </div>
 
-            {/* LIVE TELEMETRY COUNTER BANNER: Sent, Failed, Waiting, Queued */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginBottom: '22px' }}>
+            
+            {/* Filter Bar for Automated Offer Letter */}
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', background: '#0c0c0e', padding: '12px 18px', borderRadius: '8px', border: '1px solid #232328' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#c084fc', fontSize: '13px', fontWeight: 700 }}>
+                <Filter size={15} />
+                <span>Filter Interns:</span>
+              </div>
+
+              <select
+                value={offerBatchFilter}
+                onChange={(e) => setOfferBatchFilter(e.target.value)}
+                style={{ height: '36px', background: '#09090b', color: '#cbd5e1', border: '1px solid #27272a', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
+              >
+                <option value="ALL">All Batches</option>
+                {batches.map((b) => (
+                  <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>
+                ))}
+              </select>
+
+              <select
+                value={offerRoleFilter}
+                onChange={(e) => setOfferRoleFilter(e.target.value)}
+                style={{ height: '36px', background: '#09090b', color: '#cbd5e1', border: '1px solid #27272a', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
+              >
+                <option value="ALL">All Roles</option>
+                {Array.from(new Set(candidates.map((c) => c.role).filter(Boolean))).map((r) => (
+                  <option key={r} value={r}>{r}</option>
+                ))}
+              </select>
+
+              <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
+                <Search size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: '#71717a' }} />
+                <input
+                  type="text"
+                  placeholder="Search by intern ID, candidate name, or email..."
+                  value={offerSearchFilter}
+                  onChange={(e) => setOfferSearchFilter(e.target.value)}
+                  style={{ width: '100%', height: '36px', background: '#09090b', color: '#ffffff', border: '1px solid #27272a', borderRadius: '6px', padding: '0 12px 0 32px', fontSize: '12.5px', outline: 'none' }}
+                />
+              </div>
+            </div>
+
+            {/* LIVE TELEMETRY COUNTER BANNER: Sent, Failed, Waiting */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '22px' }}>
               <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #10b981', background: 'rgba(14, 20, 34, 0.85)' }}>
                 <div className={styles.metricTitle} style={{ color: '#34d399', fontWeight: 700 }}>OFFER LETTERS SENT</div>
                 <div className={styles.metricValue} style={{ fontSize: '28px', color: '#ffffff', fontWeight: 800 }}>
@@ -1561,14 +1678,6 @@ export default function DashboardPage() {
                   {stats.offerLetters?.waiting || stats.offerLetters?.readyToSend || 0}
                 </div>
                 <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Pending Dispatch Confirmation</div>
-              </div>
-
-              <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #8b5cf6', background: 'rgba(14, 20, 34, 0.85)' }}>
-                <div className={styles.metricTitle} style={{ color: '#c084fc', fontWeight: 700 }}>QUEUED CANDIDATES</div>
-                <div className={styles.metricValue} style={{ fontSize: '28px', color: '#ffffff', fontWeight: 800 }}>
-                  {queueStats.pending > 0 ? queueStats.pending : (stats.offerLetters?.queued || 0)}
-                </div>
-                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Background Dispatch Buffer</div>
               </div>
             </div>
 
@@ -1599,301 +1708,25 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* --- WORKFLOW A: SINGLE CANDIDATE DISPATCH --- */}
+            
+            {/* --- WORKFLOW A: SEQUENTIAL SINGLE CANDIDATE DISPATCH --- */}
             {offerSubTab === 'single' && (
-              <form onSubmit={handleSingleOfferSend}>
-                <div className={styles.formCard}>
-                  <div className={styles.cardSectionHeader}>
-                    <div className={styles.cardSectionTitle}>
-                      <Users size={16} />
-                      <span>Candidate Source & Intake Mode</span>
-                    </div>
+              <SequentialSingleOfferForm
+                candidates={filteredOfferCandidates}
+                templates={templates}
+                batches={batches}
+                onOfferSent={() => { loadCandidates(); loadStats(); }}
+                showToast={showToast}
+              />
+            )}
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        type="button"
-                        onClick={() => setSingleCandidateSource('existing')}
-                        className={singleCandidateSource === 'existing' ? styles.btnPrimaryAction : styles.btnAction}
-                        style={{ fontSize: '12px', padding: '5px 12px' }}
-                      >
-                        Select from Database
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSingleCandidateSource('manual');
-                          setSelectedCandidateId('');
-                          setSingleOfferForm({
-                            candidateId: `SF-INT-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`,
-                            fullName: '',
-                            email: '',
-                            phone: '',
-                            role: 'Web Developer Intern',
-                            department: 'Engineering',
-                            collegeName: '',
-                            degree: 'B.Tech / B.E.',
-                            stipend: 'Rs. 10,000',
-                            joiningDate: '2026-06-01',
-                            endDate: '2026-08-31',
-                            duration: '3 Months',
-                            workMode: 'Online - Remote',
-                            reportingManager: 'Priyanka Nair',
-                            assignedMentor: 'Rahul Kapoor',
-                            cc: '',
-                            subject: '',
-                            body: '',
-                          });
-                        }}
-                        className={singleCandidateSource === 'manual' ? styles.btnPrimaryAction : styles.btnAction}
-                        style={{ fontSize: '12px', padding: '5px 12px' }}
-                      >
-                        Manual Entry Option
-                      </button>
-                    </div>
-                  </div>
-
-                  {singleCandidateSource === 'existing' && (
-                    <div className={styles.formGroup} style={{ marginBottom: '16px' }}>
-                      <label className={styles.label}>
-                        <span>Select Existing Candidate Record</span>
-                        <span className={styles.labelHelper}>Auto-populates candidate details</span>
-                      </label>
-                      <select
-                        className={styles.inputField}
-                        value={selectedCandidateId}
-                        onChange={(e) => handleSelectExistingCandidate(e.target.value)}
-                      >
-                        <option value="">-- Choose Candidate ({candidates.length} available) --</option>
-                        {candidates.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.candidateId} &bull; {c.fullName} &bull; {c.role} ({c.offerLetterStatus})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  <div className={styles.formGrid}>
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Candidate Name *</label>
-                      <input
-                        type="text"
-                        required
-                        className={styles.inputField}
-                        placeholder="e.g. Akash Kumar"
-                        value={singleOfferForm.fullName || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, fullName: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Designation / Internship Role *</label>
-                      <input
-                        type="text"
-                        required
-                        className={styles.inputField}
-                        placeholder="e.g. Web Developer Intern"
-                        value={singleOfferForm.role || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, role: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Joining Date *</label>
-                      <input
-                        type="date"
-                        required
-                        className={styles.inputField}
-                        value={singleOfferForm.joiningDate || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, joiningDate: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Ending Date *</label>
-                      <input
-                        type="date"
-                        required
-                        className={styles.inputField}
-                        value={singleOfferForm.endDate || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, endDate: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Mail Id *</label>
-                      <input
-                        type="email"
-                        required
-                        className={styles.inputField}
-                        placeholder="candidate@example.com"
-                        value={singleOfferForm.email || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, email: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Department</label>
-                      <input
-                        type="text"
-                        className={styles.inputField}
-                        placeholder="e.g. Engineering"
-                        value={singleOfferForm.department || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, department: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Degree</label>
-                      <input
-                        type="text"
-                        className={styles.inputField}
-                        placeholder="e.g. B.Tech / B.E. / MCA"
-                        value={singleOfferForm.degree || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, degree: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Required University / College Name</label>
-                      <input
-                        type="text"
-                        className={styles.inputField}
-                        placeholder="e.g. SRM Institute of Science and Technology"
-                        value={singleOfferForm.collegeName || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, collegeName: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Phone Number</label>
-                      <input
-                        type="tel"
-                        className={styles.inputField}
-                        placeholder="e.g. +91 9876543210"
-                        value={singleOfferForm.phone || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, phone: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Stipend Amount</label>
-                      <input
-                        type="text"
-                        className={styles.inputField}
-                        placeholder="e.g. Rs. 10,000"
-                        value={singleOfferForm.stipend || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, stipend: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Email Subject & Body Customization */}
-                <div className={styles.formCard}>
-                  <div className={styles.cardSectionHeader}>
-                    <div className={styles.cardSectionTitle}>
-                      <Mail size={16} />
-                      <span>Email Template Customization</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.formGrid} style={{ marginBottom: '14px' }}>
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Email Subject Line</label>
-                      <input
-                        type="text"
-                        className={styles.inputField}
-                        placeholder={`Internship Offer Letter - ${singleOfferForm.fullName || '{{candidate_name}}'} | Shortfundly`}
-                        value={singleOfferForm.subject || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, subject: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <label className={styles.label}>Cc (Carbon Copy)</label>
-                        <span style={{ fontSize: '11px', color: '#94a3b8' }}>Optional &bull; comma separated</span>
-                      </div>
-                      <input
-                        type="text"
-                        className={styles.inputField}
-                        placeholder="hr-archive@shortfundly.com, mentor@shortfundly.com"
-                        value={singleOfferForm.cc || ''}
-                        onChange={(e) => setSingleOfferForm({ ...singleOfferForm, cc: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className={styles.formGroup} style={{ marginBottom: '14px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <label className={styles.label}>Custom Body Content (Leave empty to use official Shortfundly offer template)</label>
-                      <span style={{ fontSize: '11px', color: '#38bdf8', fontWeight: 600 }}>Google Mail Styled Template</span>
-                    </div>
-                    <textarea
-                      className={styles.textareaField}
-                      rows={4}
-                      placeholder="Customized greetings or instructions. Click tags below to insert automatically."
-                      value={singleOfferForm.body || ''}
-                      onChange={(e) => setSingleOfferForm({ ...singleOfferForm, body: e.target.value })}
-                    />
-                    <div className={styles.tagPillsBar}>
-                      <span style={{ fontSize: '11px', color: '#94a3b8', marginRight: '4px' }}>Insert Tags:</span>
-                      {['{{candidate_name}}', '{{designation}}', '{{joining_date}}', '{{end_date}}', '{{department}}', '{{stipend}}', '{{degree}}', '{{college_name}}', '{{phone}}'].map((tag) => (
-                        <button
-                          key={tag}
-                          type="button"
-                          className={styles.tagPill}
-                          onClick={() => setSingleOfferForm((prev) => ({ ...prev, body: (prev.body ? prev.body + ' ' : '') + tag }))}
-                        >
-                          + {tag}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Supplemental Attachments (Images, Annexures, Guidelines)</label>
-                    <input
-                      type="file"
-                      multiple
-                      className={styles.inputField}
-                      onChange={(e) => setSingleOfferFiles(Array.from(e.target.files || []))}
-                    />
-                  </div>
-
-                  <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                    <button
-                      type="button"
-                      onClick={() => openTemplateEditor('offer-single')}
-                      className={styles.btnAction}
-                      style={{ borderColor: 'var(--accent-indigo)' }}
-                      title="Customize entire HTML email template and subject"
-                    >
-                      <Sliders size={15} style={{ color: 'var(--accent-indigo)' }} />
-                      <span>Customize Email Template</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => triggerOfferPreview(singleOfferForm)}
-                      className={styles.btnAction}
-                    >
-                      <Eye size={15} />
-                      <span>Preview Offer Letter & PDF</span>
-                    </button>
-
-                    <button
-                      type="submit"
-                      disabled={singleOfferSending}
-                      className={styles.btnPrimaryAction}
-                    >
-                      <Send size={15} />
-                      <span>{singleOfferSending ? 'Compiling & Sending...' : 'Send Offer Letter'}</span>
-                    </button>
-                  </div>
-                </div>
-              </form>
+            {/* --- WORKFLOW D: OFFER LETTER TEMPLATES CUSTOMIZER --- */}
+            {offerSubTab === 'templates' && (
+              <OfferTemplateManager
+                templates={templates}
+                onTemplatesUpdated={loadTemplates}
+                showToast={showToast}
+              />
             )}
 
             {/* --- WORKFLOW B: BULK DATASET CSV / EXCEL LOADER --- */}
@@ -1906,20 +1739,20 @@ export default function DashboardPage() {
                       <span>Dataset Ingestion & Validation</span>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        type="button"
-                        onClick={handleLoadProjectSampleExcel}
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <a
+                        href="/api/candidates/download-template"
+                        download="Shortfundly_Bulk_Offer_Template.xlsx"
                         className={styles.btnAction}
-                        style={{ fontSize: '12px', padding: '6px 12px' }}
+                        style={{ fontSize: '12px', padding: '6px 12px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                       >
-                        <RefreshCw size={13} />
-                        <span>Load Project Dataset (Shortfundly_Internship_Candidates_Dummy.xlsx)</span>
-                      </button>
+                        <FileSpreadsheet size={13} />
+                        <span>Download Bulk Offer Template (.xlsx)</span>
+                      </a>
 
-                      <label className={styles.btnAction} style={{ fontSize: '12px', padding: '6px 12px', cursor: 'pointer' }}>
+                      <label className={styles.btnPrimaryAction} style={{ fontSize: '12px', padding: '6px 12px', cursor: 'pointer' }}>
                         <Upload size={13} />
-                        <span>Upload Dataset (Validate)</span>
+                        <span>Upload Dataset (Validate Excel/CSV)</span>
                         <input
                           type="file"
                           accept=".xlsx,.xls,.csv"
@@ -1928,21 +1761,33 @@ export default function DashboardPage() {
                         />
                       </label>
 
-                      <label className={styles.btnPrimaryAction} style={{ fontSize: '12px', padding: '6px 12px', cursor: 'pointer' }}>
-                        <Upload size={13} />
-                        <span>Import Google Form Intake (Auto-Batch & Intern IDs)</span>
-                        <input
-                          type="file"
-                          accept=".xlsx,.xls,.csv"
-                          style={{ display: 'none' }}
-                          onChange={handleUploadGoogleFormExcel}
-                        />
-                      </label>
+                      {bulkValidationReport && (
+                        <button
+                          type="button"
+                          onClick={handleClearBulkDataset}
+                          className={styles.btnAction}
+                          style={{
+                            fontSize: '12px',
+                            padding: '6px 12px',
+                            color: '#f87171',
+                            borderColor: 'rgba(239, 68, 68, 0.4)',
+                            background: 'rgba(239, 68, 68, 0.08)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            cursor: 'pointer',
+                          }}
+                          title="Clear uploaded spreadsheet and load a new one"
+                        >
+                          <Trash2 size={13} />
+                          <span>Clear Uploaded Dataset</span>
+                        </button>
+                      )}
                     </div>
                   </div>
 
-                  <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid var(--border-subtle)', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                    <strong style={{ color: '#38bdf8' }}>Google Form Intake Specification:</strong> HR sets joining/ending dates, roles, stipend. Responses captured include Name, Email, Role, Phone, College, Degree, Ongoing batch or graduate status. Uploading the responses spreadsheet automatically groups candidates with common joining dates into <strong>Batches (Batch A, Batch B)</strong> and generates unique sequential <strong>Intern IDs (SF-2026-A-001)</strong>.
+                  <div style={{ background: '#09090b', border: '1px solid #232328', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: '#cbd5e1', lineHeight: 1.6 }}>
+                    <strong style={{ color: '#c084fc' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#e9d5ff' }}>Name, Email, Phone, Role, Degree, College, JoiningDate, Duration, Stipend</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Gemma 2B Intern IDs & Expiring URLs</strong>.
                   </div>
 
                   {bulkValidationReport ? (
@@ -2031,25 +1876,30 @@ export default function DashboardPage() {
                         <thead>
                           <tr>
                             <th style={{ width: '40px', textAlign: 'center' }}>#</th>
-                            <th>Candidate ID</th>
+                            <th>Gemma 2B Intern ID</th>
                             <th>Candidate Name</th>
                             <th>Mail Id</th>
                             <th>Designation</th>
-                            <th>Joining Date</th>
-                            <th>Ending Date</th>
+                            <th>Batch</th>
+                            <th>Unique Portal Response URL</th>
                             <th>Offer Status</th>
                             <th style={{ textAlign: 'right' }}>Preview</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {filteredBulkRows.slice(0, 50).map((row) => {
+                          {filteredBulkRows.slice(0, 50).map((row, idx) => {
                             const isSelected = selectedCandidateKeys.has(row.candidateId);
-                            const joining = row.joiningDate || row.raw?.joiningDate || '18-05-2026';
-                            const ending = row.endDate || row.raw?.endDate || '17-08-2026';
+                            const internId = String(row.internId || row.raw?.internId || row.candidateId || `INT-2026-${String(idx + 100).padStart(5, '0')}`);
+                            const portalUrl = String(row.responseUrl || (typeof window !== 'undefined' ? `${window.location.origin}/offers/respond?token=${row.token || row.candidateId}` : `/offers/respond?token=${row.token || row.candidateId}`));
+                            const fullName = typeof row.fullName === 'string' ? row.fullName : String(row.fullName || '');
+                            const email = typeof row.email === 'string' ? row.email : String(row.email || '');
+                            const role = typeof row.role === 'string' ? row.role : String(row.role || '');
+                            const batchName = typeof row.batch === 'string' ? row.batch : (typeof row.raw?.batch === 'string' ? row.raw.batch : 'Batch A');
+                            const offerStatus = typeof row.offerLetterStatus === 'string' ? row.offerLetterStatus : 'Ready to Send';
 
                             return (
                               <tr
-                                key={row.candidateId}
+                                key={String(row.candidateId || idx)}
                                 style={{ background: isSelected ? 'rgba(99, 102, 241, 0.05)' : 'transparent' }}
                               >
                                 <td style={{ textAlign: 'center' }}>
@@ -2059,15 +1909,36 @@ export default function DashboardPage() {
                                     onChange={() => handleToggleRowSelect(row.candidateId)}
                                   />
                                 </td>
-                                <td><code>{row.candidateId}</code></td>
-                                <td><strong>{row.fullName}</strong></td>
-                                <td>{row.email}</td>
-                                <td>{row.role}</td>
-                                <td><span style={{ color: 'var(--accent-indigo)', fontWeight: 600 }}>{joining}</span></td>
-                                <td><span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{ending}</span></td>
                                 <td>
-                                  <span className={`${styles.statusBadge} ${row.offerLetterStatus === 'Sent' ? styles.statusDelivered : styles.statusPending}`}>
-                                    {row.offerLetterStatus || 'Ready to Send'}
+                                  <code style={{ color: '#c084fc', fontWeight: 700, fontSize: '11.5px', background: '#141417', padding: '2px 6px', borderRadius: '4px', border: '1px solid #27272a' }}>
+                                    {internId}
+                                  </code>
+                                </td>
+                                <td><strong>{fullName}</strong></td>
+                                <td>{email}</td>
+                                <td>{role}</td>
+                                <td><span style={{ color: '#a855f7', fontWeight: 600 }}>{batchName}</span></td>
+                                <td>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <span style={{ fontFamily: 'monospace', fontSize: '11px', color: '#94a3b8' }}>
+                                      {portalUrl.length > 28 ? `${portalUrl.slice(0, 26)}...` : portalUrl}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        navigator.clipboard?.writeText(portalUrl);
+                                        showToast('Copied candidate portal link!', 'success');
+                                      }}
+                                      style={{ background: '#1c1c21', border: '1px solid #27272a', borderRadius: '4px', padding: '2px 6px', fontSize: '10px', color: '#c084fc', cursor: 'pointer' }}
+                                      title="Copy URL"
+                                    >
+                                      Copy
+                                    </button>
+                                  </div>
+                                </td>
+                                <td>
+                                  <span className={`${styles.statusBadge} ${offerStatus === 'Sent' ? styles.statusDelivered : styles.statusPending}`}>
+                                    {offerStatus}
                                   </span>
                                 </td>
                                 <td style={{ textAlign: 'right' }}>
@@ -2090,6 +1961,27 @@ export default function DashboardPage() {
 
                     {/* Template Customizer & Dispatch Trigger */}
                     <div style={{ padding: '18px 24px', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-surface-elevated)' }}>
+                      <div style={{ background: '#09090b', padding: '14px 18px', borderRadius: '8px', border: '1px solid #232328', marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+                        <div>
+                          <div style={{ color: '#c084fc', fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                            <Clock size={15} />
+                            <span>Candidate Portal URL Expiration Deadline (Fixed by HR for all candidates)</span>
+                          </div>
+                          <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                            Populated into <code>{'{{deadline}}'}</code> in the offer email. Candidates must submit their digital signature via their unique portal link before this timestamp.
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <label style={{ fontSize: '12px', color: '#cbd5e1', fontWeight: 600 }}>Set Expiry Deadline:</label>
+                          <input
+                            type="datetime-local"
+                            value={bulkOfferDeadline}
+                            onChange={(e) => setBulkOfferDeadline(e.target.value)}
+                            style={{ background: '#141417', border: '1px solid #7c3aed', borderRadius: '6px', color: '#ffffff', padding: '6px 12px', fontSize: '12.5px', outline: 'none' }}
+                          />
+                        </div>
+                      </div>
+
                       <div className={styles.formGrid} style={{ marginBottom: '14px' }}>
                         <div className={styles.formGroup}>
                           <label className={styles.label}>Custom Subject Line (All Selected Candidates)</label>
@@ -2215,9 +2107,17 @@ export default function DashboardPage() {
         )}
 
         {/* ============================================================== */}
-        {/* MODULE 2: ASSIGN TASKS                                         */}
+        {/* MODULE 2: ASSIGN TASKS (Gemma 2B Templates, Reminders & Evaluator) */}
         {/* ============================================================== */}
         {activeTab === 'tasks' && (
+          <TaskAssignmentView
+            candidates={candidates}
+            batches={batches}
+            onRefresh={() => { loadCandidates(); loadStats(); }}
+            showToast={showToast}
+          />
+        )}
+        {false && (
           <div>
             <div className={styles.pageHeader}>
               <div className={styles.pageHeaderLeft}>
@@ -2905,9 +2805,28 @@ export default function DashboardPage() {
         )}
 
         {/* ============================================================== */}
-        {/* MODULE 3: REVIEWS (REVIEW UNTIL TASK COMPLETE)                 */}
+        {/* MODULE 3: REVIEWS (Multi-Session Reviews & Checkpoint Approval) */}
         {/* ============================================================== */}
         {activeTab === 'reviews' && (
+          <ReviewDashboardView
+            batches={batches}
+            onRefresh={() => { loadCandidates(); loadStats(); }}
+            showToast={showToast}
+          />
+        )}
+
+        {/* ============================================================== */}
+        {/* MODULE 4: ALL CANDIDATES & ATTRITION LEDGER                    */}
+        {/* ============================================================== */}
+        {activeTab === 'candidates' && (
+          <AllCandidatesView
+            candidates={candidates}
+            batches={batches}
+            onRefresh={() => { loadCandidates(); loadStats(); }}
+            showToast={showToast}
+          />
+        )}
+        {false && (
           <div>
             <div className={styles.pageHeader}>
               <div className={styles.pageHeaderLeft}>
@@ -3692,9 +3611,16 @@ export default function DashboardPage() {
         )}
 
         {/* ============================================================== */}
-        {/* MODULE 5: INTERNSHIP CERTIFICATES                              */}
+        {/* MODULE 5: INTERNSHIP CERTIFICATES (CEO Approval Deck)           */}
         {/* ============================================================== */}
         {activeTab === 'certificates' && (
+          <CertificateDeckView
+            batches={batches}
+            onRefresh={() => { loadCandidates(); loadStats(); }}
+            showToast={showToast}
+          />
+        )}
+        {false && (
           <div>
             <div className={styles.pageHeader}>
               <div className={styles.pageHeaderLeft}>
@@ -4179,9 +4105,15 @@ export default function DashboardPage() {
         )}
 
         {/* ============================================================== */}
-        {/* MODULE 6: TRACK EMAILS                                         */}
+        {/* MODULE 6: TRACK EMAILS (Unified Telemetry Stream)               */}
         {/* ============================================================== */}
         {activeTab === 'emails' && (
+          <UnifiedEmailTracker
+            batches={batches}
+            showToast={showToast}
+          />
+        )}
+        {false && (
           <div>
             <div className={styles.pageHeader}>
               <div className={styles.pageHeaderLeft}>
@@ -4484,6 +4416,16 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
+
+            {/* Batch Drag-and-Drop Segregation Manager */}
+            <div style={{ marginTop: '24px' }}>
+              <BatchDragDropManager
+                candidates={candidates}
+                batches={batches}
+                onBatchesUpdated={() => { loadBatches(); loadCandidates(); }}
+                showToast={showToast}
+              />
+            </div>
           </div>
         )}
       </main>
@@ -4588,32 +4530,34 @@ export default function DashboardPage() {
 
                     <div className={styles.formGroup} style={{ marginBottom: '4px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <label className={styles.label} style={{ margin: 0, fontSize: '13px' }}>
-                          Complete HTML Email Body
+                        <label className={styles.label} style={{ margin: 0, fontSize: '13px', color: '#c084fc', fontWeight: 600 }}>
+                          Email Body (Plain Text & Jinja Format)
                         </label>
-                        <span style={{ fontSize: '11px', color: 'var(--accent-cyan)' }}>
-                          Full HTML & Inline Styles Supported
+                        <span style={{ fontSize: '11px', color: '#a855f7' }}>
+                          Jinja Variables Supported &bull; No HTML Required
                         </span>
                       </div>
                       <textarea
                         className={styles.textareaField}
-                        rows={18}
+                        rows={16}
                         style={{
                           fontFamily: 'Consolas, Monaco, "Courier New", monospace',
-                          fontSize: '12.5px',
-                          lineHeight: '1.5',
-                          whiteSpace: 'pre',
-                          minHeight: '380px',
-                          background: 'var(--bg-canvas)',
+                          fontSize: '13px',
+                          lineHeight: '1.6',
+                          whiteSpace: 'pre-wrap',
+                          minHeight: '360px',
+                          background: '#09090b',
                           color: '#f8fafc',
-                          border: '1px solid var(--border-medium)',
+                          border: '1px solid #27272a',
+                          borderRadius: '8px',
+                          padding: '14px',
                         }}
                         value={templateEditorModal.body}
                         onChange={(e) => setTemplateEditorModal(prev => ({ ...prev, body: e.target.value }))}
-                        placeholder="Enter full HTML template code..."
+                        placeholder="Write your email body in clean plain text with {{tags}}..."
                       />
-                      <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
-                        &bull; This template replaces the <strong>entire</strong> email layout. You have full control over the header, body paragraphs, tables, and footer.
+                      <p style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '6px' }}>
+                        &bull; Write your email in human-readable plain text using Jinja tags. The automation engine automatically converts it into a responsive, inbox-optimized Shortfundly email layout.
                       </p>
                     </div>
                   </div>
@@ -4956,7 +4900,7 @@ export default function DashboardPage() {
             {toast.type === 'error' && <AlertCircle size={16} style={{ color: 'var(--accent-rose)' }} />}
             {toast.type === 'warning' && <AlertCircle size={16} style={{ color: 'var(--accent-amber)' }} />}
             {toast.type === 'info' && <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />}
-            <span>{toast.message}</span>
+            <span>{typeof toast.message === 'string' ? toast.message : (toast.message?.message || JSON.stringify(toast.message) || '')}</span>
           </div>
         ))}
       </div>

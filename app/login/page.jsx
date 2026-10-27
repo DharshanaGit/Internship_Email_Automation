@@ -59,7 +59,7 @@ export default function LoginPage() {
 
     const expected = expectedCredentials[role]?.email;
     if (expected && email !== expected) {
-      return `Typed email does not match configured ${role} account (${expected}).`;
+      return `Typed email does not match configured ${role} account.`;
     }
 
     return null;
@@ -176,9 +176,6 @@ export default function LoginPage() {
                 <option value="HR">HR Director (Offer Letters, Google Forms, Batches & Reviews)</option>
                 <option value="CEO">Chief Executive Officer (Performance-Based Certificate Approvals)</option>
               </select>
-            </div>
-            <div className={styles.roleHint}>
-              Expected authorized email for {role}: <code>{expectedCredentials[role]?.email}</code>
             </div>
           </div>
 

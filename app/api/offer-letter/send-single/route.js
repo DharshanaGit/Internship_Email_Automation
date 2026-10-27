@@ -66,6 +66,7 @@ export async function POST(request) {
       candidate = await prisma.candidate.update({
         where: { id: candidate.id },
         data: {
+          ...(formData.get('internId') ? { internId: formData.get('internId') } : {}),
           ...(fullName ? { fullName } : {}),
           ...(email ? { email: email.toLowerCase() } : {}),
           ...(role ? { role } : {}),

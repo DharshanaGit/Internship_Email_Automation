@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { DEFAULT_OFFER_EMAIL_BODY, DEFAULT_OFFER_EMAIL_SUBJECT } from '@/lib/offerService';
 import { corporateOfferTemplateSource } from '@/lib/pdfEngine';
+import { normalizeToJinjaPlainText } from '@/lib/jinjaEngine';
 
 export async function GET(request) {
   try {
@@ -23,7 +24,18 @@ export async function GET(request) {
       return NextResponse.json({ success: true, templates: [defaultTmpl] });
     }
 
-    return NextResponse.json({ success: true, templates });
+    // Ensure all templates return clean plain-text Jinja format (no raw HTML in emailBody)
+    const sanitizedTemplates = templates.map((tmpl) => {
+      if (tmpl.emailBody && (tmpl.emailBody.includes('<p>') || tmpl.emailBody.includes('<div>'))) {
+        return {
+          ...tmpl,
+          emailBody: normalizeToJinjaPlainText(tmpl.emailBody),
+        };
+      }
+      return tmpl;
+    });
+
+    return NextResponse.json({ success: true, templates: sanitizedTemplates });
   } catch (error) {
     console.error('Error fetching templates:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

@@ -1,9 +1,8 @@
 .container {
   min-height: 100vh;
-  background-color: #09090b;
+  background-color: #000000;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.12) 0%, transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.08) 0%, transparent 60%);
   padding: 40px 20px;
   color: #f8fafc;
 }
@@ -35,7 +34,7 @@
 .errorCard {
   max-width: 480px;
   margin: 80px auto;
-  background: #110e1b;
+  background: #0c0c0e;
   border: 1px solid rgba(239, 68, 68, 0.35);
   border-radius: 12px;
   padding: 36px 28px;
@@ -63,11 +62,11 @@
 }
 
 .headerCard {
-  background: #110e1b;
-  border: 1px solid rgba(168, 85, 247, 0.25);
+  background: #0c0c0e;
+  border: 1px solid #232328;
   border-radius: 12px;
   padding: 24px 28px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 .brandTitleRow {
@@ -163,11 +162,11 @@
 }
 
 .sectionCard {
-  background: #110e1b;
-  border: 1px solid rgba(168, 85, 247, 0.2);
+  background: #0c0c0e;
+  border: 1px solid #232328;
   border-radius: 12px;
   padding: 24px 28px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .sectionTitle {
@@ -194,7 +193,7 @@
 
 .infoItem {
   background: #09090b;
-  border: 1px solid #1f1b2e;
+  border: 1px solid #232328;
   border-radius: 8px;
   padding: 12px 16px;
   display: flex;
@@ -219,8 +218,8 @@
   align-items: center;
   gap: 6px;
   padding: 7px 14px;
-  background: #181524;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: #141417;
+  border: 1px solid #27272a;
   border-radius: 6px;
   color: #cbd5e1;
   font-size: 12.5px;
@@ -340,9 +339,9 @@
 }
 
 .sigTabActive {
-  background: #181524;
+  background: rgba(168, 85, 247, 0.15);
   color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.4);
 }
 
 .sigTextInput {
@@ -392,7 +391,7 @@
 }
 
 .btnClearCanvas {
-  background: #181524;
+  background: #141417;
   color: #94a3b8;
   border: 1px solid #27272a;
   border-radius: 4px;
@@ -462,7 +461,7 @@
 
 .rejectTextarea {
   width: 100%;
-  background: #110e1b;
+  background: #09090b;
   border: 1px solid #27272a;
   border-radius: 8px;
   padding: 12px;

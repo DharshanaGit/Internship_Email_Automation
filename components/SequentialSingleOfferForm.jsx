@@ -14,8 +14,11 @@ import {
   ArrowLeft,
   Eye,
   Info,
-  Clock
+  Clock,
+  Sparkles,
+  Link2
 } from 'lucide-react';
+import { renderJinja, jinjaTextToEmailHtml } from '../lib/jinjaEngine.js';
 
 export default function SequentialSingleOfferForm({
   candidates = [],
@@ -34,8 +37,7 @@ export default function SequentialSingleOfferForm({
   // Form Fields
   const [formData, setFormData] = useState({
     fullName: '',
-    candidateId: '',
-    internId: '',
+    internId: 'INT-2026-00001',
     email: '',
     phone: '',
     degree: '',
@@ -58,8 +60,16 @@ export default function SequentialSingleOfferForm({
 
   const [previewTab, setPreviewTab] = useState('email');
   const [sending, setSending] = useState(false);
+  const [portalToken, setPortalToken] = useState(() => Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2));
+  const candidatePortalUrl = typeof window !== 'undefined' ? `${window.location.origin}/offers/respond?token=${portalToken}` : `http://localhost:3000/offers/respond?token=${portalToken}`;
 
-  // Set default deadline to 3 days from now
+  // Auto-generate Gemma 2B unique Intern ID
+  const generateNewGemmaId = () => {
+    const randomSeq = Math.floor(1000 + Math.random() * 9000);
+    return `INT-2026-${String(randomSeq).padStart(5, '0')}`;
+  };
+
+  // Set default deadline to 3 days from now and initial template
   useEffect(() => {
     const defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
     const formatted = defaultDate.toISOString().slice(0, 16);
@@ -67,19 +77,19 @@ export default function SequentialSingleOfferForm({
       ...prev,
       deadline: prev.deadline || formatted,
       templateId: prev.templateId || (templates[0]?.id || ''),
+      internId: prev.internId || generateNewGemmaId(),
     }));
   }, [templates]);
 
   // When selecting candidate from DB
   const handleSelectFromDb = (candId) => {
     setSelectedCandidateId(candId);
-    const cand = candidates.find((c) => c.id === candId || c.candidateId === candId);
+    const cand = candidates.find((c) => c.id === candId || c.candidateId === candId || c.internId === candId);
     if (cand) {
       setFormData((prev) => ({
         ...prev,
         fullName: cand.fullName || '',
-        candidateId: cand.candidateId || '',
-        internId: cand.internId || '',
+        internId: cand.internId || cand.candidateId || generateNewGemmaId(),
         email: cand.email || '',
         phone: cand.phone || '',
         degree: cand.degree || 'B.Tech / B.E.',
@@ -101,11 +111,9 @@ export default function SequentialSingleOfferForm({
   const handleSwitchToManual = () => {
     setIntakeMode('manual');
     setSelectedCandidateId('');
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
     setFormData((prev) => ({
       ...prev,
-      candidateId: `SF-INT-2026-${randomNum}`,
-      internId: `INT-2026-${String(randomNum).padStart(5, '0')}`,
+      internId: generateNewGemmaId(),
       fullName: '',
       email: '',
       phone: '',
@@ -113,6 +121,26 @@ export default function SequentialSingleOfferForm({
       collegeName: '',
       role: 'Web Developer Intern',
       stipend: '10000',
+    }));
+  };
+
+  // Auto-associate batch based on joining date
+  const handleJoiningDateChange = (newDate) => {
+    let suggestedBatch = 'Batch A';
+    if (newDate) {
+      const existingBatch = batches.find((b) => b.joiningDate === newDate);
+      if (existingBatch) {
+        suggestedBatch = existingBatch.batchName;
+      } else if (newDate.startsWith('2026-07')) {
+        suggestedBatch = 'Batch B';
+      } else if (newDate.startsWith('2026-08')) {
+        suggestedBatch = 'Batch C';
+      }
+    }
+    setFormData((prev) => ({
+      ...prev,
+      joiningDate: newDate,
+      batch: suggestedBatch,
     }));
   };
 
@@ -129,11 +157,11 @@ export default function SequentialSingleOfferForm({
       errs.fullName = 'Name must be at least 2 characters.';
     }
 
-    // 1. Candidate ID: Required string
-    if (!formData.candidateId.trim()) {
-      errs.candidateId = 'Candidate ID is required.';
-    } else if (!/^[A-Z0-9_-]{4,}$/i.test(formData.candidateId.trim())) {
-      errs.candidateId = 'Candidate ID must contain letters, numbers, hyphens or underscores (min 4 chars).';
+    // 1. Intern ID: Required unique identifier
+    if (!formData.internId.trim()) {
+      errs.internId = 'Intern ID is required.';
+    } else if (!/^INT-\d{4}-\d{4,5}$/i.test(formData.internId.trim())) {
+      errs.internId = 'Intern ID format must be INT-YYYY-XXXXX (e.g. INT-2026-00001).';
     }
 
     // 2. Email ID: Valid email format
@@ -183,12 +211,11 @@ export default function SequentialSingleOfferForm({
   }, [formData]);
 
   // Sequential Field Sequence definition
-  const sequenceOrder = ['fullName', 'candidateId', 'email', 'phone', 'degree', 'collegeName', 'role', 'stipend', 'logistics'];
+  const sequenceOrder = ['fullName', 'internId', 'email', 'phone', 'degree', 'collegeName', 'role', 'stipend', 'logistics'];
 
   const isFieldLocked = (fieldKey) => {
     const idx = sequenceOrder.indexOf(fieldKey);
     if (idx <= 0) return false;
-    // Check if any previous field has an error or is empty
     for (let i = 0; i < idx; i++) {
       const prevKey = sequenceOrder[i];
       if (validationErrors[prevKey]) return true;
@@ -215,8 +242,9 @@ export default function SequentialSingleOfferForm({
     try {
       setSending(true);
       const payload = new FormData();
-      payload.append('candidateId', formData.candidateId);
       payload.append('fullName', formData.fullName);
+      payload.append('internId', formData.internId);
+      payload.append('candidateId', formData.internId);
       payload.append('email', formData.email);
       payload.append('phone', formData.phone);
       payload.append('role', formData.role);
@@ -245,7 +273,6 @@ export default function SequentialSingleOfferForm({
       if (data.success) {
         showToast?.(`Offer letter successfully dispatched to ${formData.fullName}!`, 'success');
         onOfferSent?.();
-        // Reset or step back
         setCurrentStep(1);
       } else {
         showToast?.(data.error || 'Failed to dispatch offer letter.', 'error');
@@ -257,6 +284,56 @@ export default function SequentialSingleOfferForm({
     }
   };
 
+  // Jinja Context for Preview
+  const previewContext = useMemo(() => {
+    return {
+      candidateName: formData.fullName || 'Candidate Name',
+      role: formData.role || 'Web Developer Intern',
+      internId: formData.internId || 'INT-2026-00001',
+      startDate: formData.joiningDate || '2026-06-01',
+      endDate: formData.endDate || '2026-08-31',
+      duration: formData.duration || '3 Months',
+      stipend: `Rs. ${Number(formData.stipend || 10000).toLocaleString('en-IN')}`,
+      deadline: formData.deadline ? new Date(formData.deadline).toLocaleString() : '3 Days',
+      responseUrl: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001'}/offers/respond?token=sample_token_${formData.internId}`,
+    };
+  }, [formData]);
+
+  const defaultJinjaBody = `Dear {{candidateName}},
+
+Congratulations! We are thrilled to offer you the position of {{role}} at Shortfundly. We were deeply impressed by your skills, background, and performance throughout our evaluation process.
+
+Internship Details:
+• Role / Position: {{role}}
+• Intern ID: {{internId}}
+• Anticipated Start Date: {{startDate}}
+• Duration: {{duration}}
+• Stipend / Compensation: {{stipend}}
+• Work Location / Mode: Online
+
+Action Required: Review & Respond
+To review the full formal offer letter PDF attached to this email and record your response, please access your secure candidate portal via the unique link below:
+
+👉 Access Your Secure Offer Portal & Sign Offer:
+{{responseUrl}}
+
+Important Note on Expiration: This unique link and offer will officially expire on {{deadline}}. Please ensure you complete your response before this deadline.
+
+How to Confirm Acceptance:
+1. Click the secure link above to open your candidate portal.
+2. Review the terms outlined in the formal offer letter.
+3. Provide your digital signature directly on the platform.
+4. Upload a photo of your signature (or signature document/ID as required) to officially confirm your acceptance of this offer.
+
+If you have any questions or require clarifications regarding the terms, please feel free to reach out to us by replying directly to this email.
+
+We are excited about the prospect of having you join the Shortfundly family and look forward to building amazing things together!
+
+Best regards,
+Hiring & Talent Acquisition Team
+Shortfundly
+www.shortfundly.com`;
+
   return (
     <div className={styles.formContainer}>
       {/* 1. PROGRESS WORKFLOW STEPPER */}
@@ -267,11 +344,11 @@ export default function SequentialSingleOfferForm({
         </div>
 
         <div className={`${styles.stepPill} ${currentStep === 2 ? styles.stepPillActive : currentStep > 2 ? styles.stepPillCompleted : ''}`}>
-          <span>2. Select / Customize Template & CC</span>
+          <span>2. Jinja Text Template & CC</span>
         </div>
 
         <div className={`${styles.stepPill} ${currentStep === 3 ? styles.stepPillActive : ''}`}>
-          <span>3. Preview Email & PDF $\rightarrow$ Send</span>
+          <span>3. Preview Email & PDF &rarr; Send</span>
         </div>
       </div>
 
@@ -302,27 +379,12 @@ export default function SequentialSingleOfferForm({
             </div>
           </div>
 
-          {/* Rules Banner for Manual Entry Option */}
-          {intakeMode === 'manual' && (
-            <div className={styles.rulesCard}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <Info size={16} color="#c084fc" />
-                <strong style={{ color: '#e9d5ff', fontSize: '13px' }}>Candidate ID Creation Rules for HR:</strong>
-              </div>
-              <ul style={{ margin: 0, paddingLeft: '20px', color: '#cbd5e1', fontSize: '12px', lineHeight: 1.6 }}>
-                <li>Format must follow: <code>SF-INT-YYYY-XXXX</code> or <code>INT-YYYY-XXXXX</code>.</li>
-                <li>Must contain uppercase letters, hyphens, and digits only (no spaces or special symbols).</li>
-                <li>Enforce uniqueness before dispatch to prevent duplicate candidate records.</li>
-              </ul>
-            </div>
-          )}
-
           {/* Database Selector Dropdown */}
           {intakeMode === 'database' && (
             <div className={styles.fieldGroup} style={{ marginBottom: '20px' }}>
               <label className={styles.fieldLabel}>
-                <span>Select Existing Candidate Record <span className={styles.requiredStar}>*</span></span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Auto-populates unique Candidate ID & Details</span>
+                <span>Select Candidate Record <span className={styles.requiredStar}>*</span></span>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Auto-populates candidate details & unique Intern ID</span>
               </label>
               <select
                 value={selectedCandidateId}
@@ -361,29 +423,88 @@ export default function SequentialSingleOfferForm({
               )}
             </div>
 
-            {/* Field 1: Candidate ID (Sequential: locked until Name valid) */}
+            {/* Field 1: Gemma 2B Generated Intern ID (Customizable by HR) */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
-                <span>Candidate ID <span className={styles.requiredStar}>*</span></span>
-                {isFieldLocked('candidateId') && <span className={styles.lockedBadge}>Locked</span>}
+                <span>Gemma 2B Unique Intern ID <span className={styles.requiredStar}>*</span></span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10.5px', color: '#c084fc' }}>
+                  <Sparkles size={11} /> AI Guaranteed Unique
+                </span>
               </label>
-              <input
-                type="text"
-                disabled={isFieldLocked('candidateId')}
-                placeholder="e.g. SF-INT-2026-1001"
-                value={formData.candidateId}
-                onChange={(e) => setFormData({ ...formData, candidateId: e.target.value.toUpperCase() })}
-                className={`${styles.inputField} ${isFieldLocked('candidateId') ? styles.inputLocked : ''} ${formData.candidateId && validationErrors.candidateId ? styles.inputError : formData.candidateId ? styles.inputValid : ''}`}
-              />
-              {!isFieldLocked('candidateId') && formData.candidateId && validationErrors.candidateId && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  disabled={isFieldLocked('internId')}
+                  placeholder="INT-2026-00001"
+                  value={formData.internId}
+                  onChange={(e) => setFormData({ ...formData, internId: e.target.value.toUpperCase() })}
+                  className={`${styles.inputField} ${isFieldLocked('internId') ? styles.inputLocked : ''} ${formData.internId && validationErrors.internId ? styles.inputError : formData.internId ? styles.inputValid : ''}`}
+                  style={{ fontFamily: 'monospace' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, internId: generateNewGemmaId() })}
+                  disabled={isFieldLocked('internId')}
+                  style={{ padding: '0 12px', background: '#141417', border: '1px solid #27272a', borderRadius: '6px', color: '#c084fc', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  title="Generate New Unique Intern ID"
+                >
+                  Regenerate
+                </button>
+              </div>
+              {!isFieldLocked('internId') && formData.internId && validationErrors.internId && (
                 <div className={styles.fieldError}>
                   <AlertCircle size={12} />
-                  <span>{validationErrors.candidateId}</span>
+                  <span>{validationErrors.internId}</span>
                 </div>
               )}
             </div>
 
-            {/* Field 2: Email ID (Locked until Candidate ID valid) */}
+            {/* Field 1b: Unique Candidate Offer Response Portal Link */}
+            <div className={styles.fieldGroup} style={{ gridColumn: 'span 2', background: '#09090b', padding: '12px 16px', borderRadius: '8px', border: '1px solid #232328' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label className={styles.fieldLabel} style={{ margin: 0 }}>
+                  <span style={{ color: '#ffffff', fontWeight: 600 }}>Unique Candidate Portal Response URL</span>
+                  <span style={{ fontSize: '11px', color: '#c084fc', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Sparkles size={11} /> Auto-Linked in Offer Email
+                  </span>
+                </label>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(candidatePortalUrl);
+                      showToast?.('Copied Candidate Portal URL to clipboard!', 'success');
+                    }}
+                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#cbd5e1', cursor: 'pointer' }}
+                  >
+                    Copy URL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextTok = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+                      setPortalToken(nextTok);
+                      showToast?.('Regenerated candidate portal URL token!', 'info');
+                    }}
+                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#c084fc', cursor: 'pointer' }}
+                  >
+                    Regenerate URL
+                  </button>
+                </div>
+              </div>
+              <input
+                type="text"
+                readOnly
+                value={candidatePortalUrl}
+                className={styles.inputField}
+                style={{ fontFamily: 'monospace', fontSize: '12px', color: '#c084fc', background: '#000000', border: '1px solid #27272a' }}
+              />
+              <p style={{ margin: '6px 0 0 0', fontSize: '11.5px', color: '#94a3b8' }}>
+                &bull; The candidate reviews terms, provides their digital signature or uploads a signature image via this link before the offer expires.
+              </p>
+            </div>
+
+            {/* Field 2: Email ID (Locked until Intern ID valid) */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 <span>Candidate Email ID <span className={styles.requiredStar}>*</span></span>
@@ -509,7 +630,7 @@ export default function SequentialSingleOfferForm({
               )}
             </div>
 
-            {/* Field 8: Joining Date */}
+            {/* Field 8: Joining Date (Auto-associates Batch) */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 <span>Joining Date <span className={styles.requiredStar}>*</span></span>
@@ -519,7 +640,7 @@ export default function SequentialSingleOfferForm({
                 type="date"
                 disabled={isFieldLocked('logistics')}
                 value={formData.joiningDate}
-                onChange={(e) => setFormData({ ...formData, joiningDate: e.target.value })}
+                onChange={(e) => handleJoiningDateChange(e.target.value)}
                 className={`${styles.inputField} ${isFieldLocked('logistics') ? styles.inputLocked : ''}`}
               />
             </div>
@@ -556,10 +677,10 @@ export default function SequentialSingleOfferForm({
               </span>
             </div>
 
-            {/* Field 11: Hiring Batch */}
+            {/* Field 11: Hiring Batch (Auto-assigned based on Joining Date) */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
-                <span>Assigned Batch</span>
+                <span>Assigned Batch (Auto-Grouped)</span>
               </label>
               <select
                 value={formData.batch}
@@ -591,20 +712,20 @@ export default function SequentialSingleOfferForm({
               onClick={() => setCurrentStep(2)}
               className={`${styles.btnPrimary} ${!isStep1Valid ? styles.btnPrimaryDisabled : ''}`}
             >
-              <span>Proceed to Template & CC</span>
+              <span>Proceed to Jinja Template & CC</span>
               <ArrowRight size={16} />
             </button>
           </div>
         </div>
       )}
 
-      {/* --- STEP 2: SELECT / EDIT TEMPLATE & ADD CC --- */}
+      {/* --- STEP 2: SELECT / EDIT JINJA TEMPLATE & ADD CC --- */}
       {currentStep === 2 && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FileText size={18} color="#a855f7" />
-              <span>Select Offer Letter Template & Add CC</span>
+              <span>Select Jinja Text Template & Add CC</span>
             </h3>
           </div>
 
@@ -627,7 +748,7 @@ export default function SequentialSingleOfferForm({
 
           <div className={styles.fieldGroup} style={{ marginBottom: '18px' }}>
             <label className={styles.fieldLabel}>
-              <span>Email Subject</span>
+              <span>Email Subject (Jinja Text Format)</span>
             </label>
             <input
               type="text"
@@ -635,6 +756,32 @@ export default function SequentialSingleOfferForm({
               value={formData.customSubject || activeTemplate?.subject || ''}
               onChange={(e) => setFormData({ ...formData, customSubject: e.target.value })}
               className={styles.inputField}
+            />
+          </div>
+
+          <div className={styles.fieldGroup} style={{ marginBottom: '18px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className={styles.fieldLabel}>
+                <span>Email Body (User-Friendly Jinja Plain Text Format)</span>
+              </label>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {['{{candidateName}}', '{{role}}', '{{internId}}', '{{stipend}}', '{{startDate}}', '{{deadline}}', '{{responseUrl}}'].map(tag => (
+                  <span
+                    key={tag}
+                    onClick={() => setFormData({ ...formData, customBody: (formData.customBody || defaultJinjaBody) + ' ' + tag })}
+                    style={{ fontSize: '10.5px', background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer' }}
+                  >
+                    + {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <textarea
+              rows={12}
+              value={formData.customBody || activeTemplate?.emailBody || defaultJinjaBody}
+              onChange={(e) => setFormData({ ...formData, customBody: e.target.value })}
+              className={styles.inputField}
+              style={{ fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.6, padding: '12px' }}
             />
           </div>
 
@@ -703,41 +850,32 @@ export default function SequentialSingleOfferForm({
           <div className={styles.previewBox}>
             {previewTab === 'email' ? (
               <div style={{ color: '#cbd5e1' }}>
-                <div style={{ background: '#181524', padding: '12px 16px', borderRadius: '6px', marginBottom: '16px' }}>
+                <div style={{ background: '#141417', border: '1px solid #27272a', padding: '12px 16px', borderRadius: '6px', marginBottom: '16px', fontSize: '13px' }}>
                   <div><strong>To:</strong> {formData.email} ({formData.fullName})</div>
                   {formData.cc && <div><strong>CC:</strong> {formData.cc}</div>}
-                  <div><strong>Subject:</strong> Official Internship Offer from Shortfundly - {formData.fullName}</div>
-                  <div><strong>Deadline:</strong> {new Date(formData.deadline).toLocaleString()}</div>
+                  <div><strong>Subject:</strong> {renderJinja(formData.customSubject || activeTemplate?.subject || 'Official Internship Offer from Shortfundly - {{candidateName}}', previewContext)}</div>
+                  <div><strong>Unique Intern ID:</strong> <code style={{ color: '#c084fc' }}>{formData.internId}</code></div>
+                  <div><strong>Expiration Deadline:</strong> {new Date(formData.deadline).toLocaleString()}</div>
+                  <div style={{ marginTop: '4px', wordBreak: 'break-all', color: '#94a3b8', fontSize: '11.5px' }}>
+                    <Link2 size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+                    Generated Candidate Portal URL: <span style={{ color: '#a855f7' }}>{previewContext.responseUrl}</span>
+                  </div>
                 </div>
 
-                <div style={{ background: '#ffffff', color: '#1e293b', padding: '24px', borderRadius: '8px', lineHeight: 1.6 }}>
-                  <p>Dear <strong>{formData.fullName}</strong>,</p>
-                  <p>Congratulations! We are thrilled to offer you the position of <strong>{formData.role}</strong> at Shortfundly.</p>
-                  <div style={{ background: '#f5f3ff', borderLeft: '4px solid #a855f7', padding: '12px 16px', margin: '14px 0' }}>
-                    <p style={{ margin: '4px 0' }}>• <strong>Role:</strong> {formData.role}</p>
-                    <p style={{ margin: '4px 0' }}>• <strong>Start Date:</strong> {formData.joiningDate}</p>
-                    <p style={{ margin: '4px 0' }}>• <strong>Duration:</strong> {formData.duration}</p>
-                    <p style={{ margin: '4px 0' }}>• <strong>Stipend:</strong> Rs. {Number(formData.stipend).toLocaleString('en-IN')}</p>
-                    <p style={{ margin: '4px 0' }}>• <strong>Location:</strong> Online - Remote</p>
-                  </div>
-                  <p>To review the formal offer letter PDF and record your digital signature, access your portal link:</p>
-                  <div style={{ textAlign: 'center', margin: '18px 0' }}>
-                    <span style={{ display: 'inline-block', background: '#9333ea', color: '#fff', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold' }}>
-                      👉 Access Your Secure Offer Portal & Sign Offer
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: '#64748b' }}>
-                    Attachment: <code>Offer_Letter_{(formData.fullName || 'Candidate').replace(/\s+/g, '_')}.pdf</code>
-                  </p>
-                </div>
+                <div
+                  style={{ background: '#ffffff', color: '#1e293b', padding: '24px', borderRadius: '8px', lineHeight: 1.6 }}
+                  dangerouslySetInnerHTML={{
+                    __html: jinjaTextToEmailHtml(formData.customBody || activeTemplate?.emailBody || defaultJinjaBody, previewContext),
+                  }}
+                />
               </div>
             ) : (
               <div>
                 <div style={{ textAlign: 'center', color: '#94a3b8', padding: '20px' }}>
                   <FileText size={40} color="#a855f7" style={{ margin: '0 auto 10px auto' }} />
-                  <h4>Playwright Single-Page A4 Corporate Template</h4>
+                  <h4 style={{ color: '#ffffff' }}>Playwright Single-Page A4 Corporate Template</h4>
                   <p style={{ fontSize: '13px' }}>
-                    Personalized with {formData.fullName}, {formData.role}, stipend Rs. {formData.stipend}, tenure {formData.joiningDate} to {formData.endDate}.
+                    Personalized with {formData.fullName}, Intern ID: {formData.internId}, {formData.role}, stipend Rs. {formData.stipend}, tenure {formData.joiningDate} to {formData.endDate}.
                   </p>
                 </div>
               </div>

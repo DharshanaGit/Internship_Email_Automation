@@ -4,20 +4,19 @@
   align-items: center;
   justify-content: center;
   padding: 32px 20px;
-  background-color: #09090b;
+  background-color: #000000;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.15) 0%, transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.08) 0%, transparent 60%);
 }
 
 .loginCard {
   width: 100%;
   max-width: 460px;
-  background: #110f1c;
-  border: 1px solid rgba(168, 85, 247, 0.25);
+  background: #0d0d10;
+  border: 1px solid #232328;
   border-radius: 14px;
   padding: 36px 32px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(147, 51, 234, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(168, 85, 247, 0.12);
 }
 
 .brandHeader {
@@ -114,30 +113,68 @@
 .input {
   width: 100%;
   height: 44px;
-  background-color: #09090b;
+  background-color: #09090b !important;
   border: 1px solid #27272a;
   border-radius: 8px;
   padding: 0 14px 0 42px;
-  color: #f4f4f5;
+  color: #f4f4f5 !important;
+  -webkit-text-fill-color: #f4f4f5 !important;
   font-size: 14px;
   outline: none;
   transition: all 0.15s ease;
 }
 
 .input:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
-  background-color: #0e0d16;
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
+  background-color: #0e0d16 !important;
+  color: #f4f4f5 !important;
+  -webkit-text-fill-color: #f4f4f5 !important;
+}
+
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover, 
+.input:-webkit-autofill:focus, 
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #09090b inset !important;
+  box-shadow: 0 0 0 1000px #09090b inset !important;
+  -webkit-text-fill-color: #f4f4f5 !important;
+  color: #f4f4f5 !important;
+  caret-color: #c084fc !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .inputError {
   border-color: #ef4444 !important;
-  background-color: rgba(239, 68, 68, 0.04) !important;
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  color: #f4f4f5 !important;
 }
 
 .inputSuccess {
   border-color: #10b981 !important;
-  background-color: rgba(16, 185, 129, 0.04) !important;
+  background-color: rgba(16, 185, 129, 0.08) !important;
+  color: #f4f4f5 !important;
+}
+
+.input[type="password"] {
+  background-color: #09090b !important;
+  color: #f4f4f5 !important;
+  -webkit-text-fill-color: #f4f4f5 !important;
+  caret-color: #c084fc !important;
+}
+
+.input[type="password"]:focus {
+  background-color: #0e0d16 !important;
+  color: #f4f4f5 !important;
+  -webkit-text-fill-color: #f4f4f5 !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
+}
+
+.input[type="password"]:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #09090b inset !important;
+  box-shadow: 0 0 0 1000px #09090b inset !important;
+  -webkit-text-fill-color: #f4f4f5 !important;
+  color: #f4f4f5 !important;
 }
 
 .realtimeError {

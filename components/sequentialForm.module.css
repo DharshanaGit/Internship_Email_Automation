@@ -1,9 +1,9 @@
 .formContainer {
-  background: #110e1b;
-  border: 1px solid rgba(168, 85, 247, 0.25);
+  background: #0c0c0e;
+  border: 1px solid #232328;
   border-radius: 12px;
   padding: 28px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 
 .stepIndicator {
@@ -47,7 +47,7 @@
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #1f1b2e;
+  border-bottom: 1px solid #232328;
 }
 
 .modeToggleButtons {
@@ -68,9 +68,9 @@
 }
 
 .btnModeActive {
-  background: #181524;
+  background: rgba(168, 85, 247, 0.15);
   border-color: #a855f7;
-  color: #c084fc;
+  color: #e9d5ff;
 }
 
 .rulesCard {
@@ -216,7 +216,7 @@
   align-items: center;
   gap: 6px;
   padding: 10px 18px;
-  background: #181524;
+  background: #141417;
   border: 1px solid #27272a;
   border-radius: 8px;
   color: #cbd5e1;
@@ -243,14 +243,14 @@
 }
 
 .previewTabActive {
-  background: #181524;
+  background: rgba(168, 85, 247, 0.15);
   border-color: #a855f7;
-  color: #c084fc;
+  color: #e9d5ff;
 }
 
 .previewBox {
   background: #09090b;
-  border: 1px solid rgba(168, 85, 247, 0.2);
+  border: 1px solid #232328;
   border-radius: 8px;
   padding: 24px;
   max-height: 480px;

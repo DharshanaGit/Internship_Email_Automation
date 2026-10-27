@@ -9,12 +9,21 @@ out/
 build/
 dist/
 
-# Environment and secrets (CRITICAL: Never commit .env)
+# Environment and secrets (CRITICAL: Never commit credentials or env files)
 .env
+.env*
 .env*.local
+.env.local
 .env.development
 .env.test
 .env.production
+*credential*
+*secret*
+*.pem
+*.key
+service-account*.json
+client_secret*.json
+oauth*.json
 
 # Database & SQLite storage
 *.db

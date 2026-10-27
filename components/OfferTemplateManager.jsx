@@ -12,8 +12,13 @@ import {
   Mail,
   Eye,
   Star,
-  Copy
+  Copy,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  FileCheck,
 } from 'lucide-react';
+import { renderJinja, jinjaTextToEmailHtml, normalizeToJinjaPlainText } from '../lib/jinjaEngine.js';
 
 export default function OfferTemplateManager({
   templates = [],
@@ -23,28 +28,80 @@ export default function OfferTemplateManager({
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [isNew, setIsNew] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [previewMode, setPreviewMode] = useState('email');
+  const [activeTab, setActiveTab] = useState('editor'); // 'editor' | 'preview'
+  const [previewSubTab, setPreviewSubTab] = useState('email'); // 'email' | 'pdf'
+  const [showAdvancedPdfHtml, setShowAdvancedPdfHtml] = useState(false);
 
   const availableTags = [
     '{{candidateName}}',
     '{{role}}',
+    '{{internId}}',
     '{{startDate}}',
     '{{endDate}}',
     '{{duration}}',
     '{{stipend}}',
     '{{workMode}}',
-    '{{reportingManager}}',
     '{{deadline}}',
-    '{{responseLink}}',
-    '{{internId}}',
+    '{{responseUrl}}',
   ];
+
+  const defaultJinjaText = `Dear {{candidateName}},
+
+Congratulations! We are thrilled to offer you the position of {{role}} at Shortfundly. We were deeply impressed by your skills, background, and performance throughout our evaluation process.
+
+Internship Details:
+• Role / Position: {{role}}
+• Intern ID: {{internId}}
+• Anticipated Start Date: {{startDate}}
+• Duration: {{duration}}
+• Stipend / Compensation: {{stipend}}
+• Work Location / Mode: Online
+
+Action Required: Review & Respond
+To review the full formal offer letter PDF attached to this email and record your response, please access your secure candidate portal via the unique link below:
+
+👉 Access Your Secure Offer Portal & Sign Offer:
+{{responseUrl}}
+
+Important Note on Expiration: This unique link and offer will officially expire on {{deadline}}. Please ensure you complete your response before this deadline.
+
+How to Confirm Acceptance:
+1. Click the secure link above to open your candidate portal.
+2. Review the terms outlined in the formal offer letter.
+3. Provide your digital signature directly on the platform.
+4. Upload a photo of your signature (or signature document/ID as required) to officially confirm your acceptance of this offer.
+
+If you have any questions or require clarifications regarding the terms, please feel free to reach out to us by replying directly to this email.
+
+We are excited about the prospect of having you join the Shortfundly family and look forward to building amazing things together!
+
+Best regards,
+Hiring & Talent Acquisition Team
+Shortfundly
+www.shortfundly.com`;
+
+  const samplePreviewContext = {
+    candidateName: 'Rahul Sharma',
+    role: 'Full Stack Engineer Intern',
+    internId: 'INT-2026-00042',
+    startDate: '2026-06-01',
+    endDate: '2026-08-31',
+    duration: '3 Months',
+    stipend: 'Rs. 10,000',
+    workMode: 'Online / Remote',
+    deadline: 'June 4, 2026 at 06:00 PM',
+    responseUrl: 'https://shortfundly.com/offers/respond?token=sample_token_hash_00042',
+  };
 
   const handleOpenCreate = () => {
     setIsNew(true);
+    setActiveTab('editor');
+    setPreviewSubTab('email');
+    setShowAdvancedPdfHtml(false);
     setEditingTemplate({
       name: '',
       subject: 'Official Internship Offer from Shortfundly - {{candidateName}}',
-      emailBody: `<p>Dear {{candidateName}},</p>\n<p>Congratulations! We are thrilled to offer you the position of <strong>{{role}}</strong> at Shortfundly.</p>`,
+      emailBody: defaultJinjaText,
       pdfTemplate: templates[0]?.pdfTemplate || '',
       isDefault: false,
     });
@@ -52,7 +109,13 @@ export default function OfferTemplateManager({
 
   const handleOpenEdit = (t) => {
     setIsNew(false);
-    setEditingTemplate({ ...t });
+    setActiveTab('editor');
+    setPreviewSubTab('email');
+    setShowAdvancedPdfHtml(false);
+    setEditingTemplate({
+      ...t,
+      emailBody: normalizeToJinjaPlainText(t.emailBody || defaultJinjaText),
+    });
   };
 
   const handleInsertTag = (tag, field) => {
@@ -74,10 +137,15 @@ export default function OfferTemplateManager({
       const url = '/api/templates';
       const method = isNew ? 'POST' : 'PUT';
 
+      const payload = {
+        ...editingTemplate,
+        emailBody: normalizeToJinjaPlainText(editingTemplate.emailBody),
+      };
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingTemplate),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -100,7 +168,7 @@ export default function OfferTemplateManager({
       <div className={styles.headerRow}>
         <div className={styles.title}>
           <FileText size={20} color="#a855f7" />
-          <span>Offer Letter Templates & Corporate Formats</span>
+          <span>Offer Letter Templates (Jinja Text Format)</span>
         </div>
 
         <button type="button" onClick={handleOpenCreate} className={styles.btnNew}>
@@ -121,6 +189,9 @@ export default function OfferTemplateManager({
               <div className={styles.templateSubject}>
                 <strong>Subject:</strong> {tmpl.subject}
               </div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+                Format: <span style={{ color: '#c084fc' }}>Plain-Text Jinja Template</span>
+              </div>
             </div>
 
             <div className={styles.cardActions}>
@@ -130,102 +201,338 @@ export default function OfferTemplateManager({
                 className={styles.btnEdit}
               >
                 <Edit3 size={12} style={{ display: 'inline', marginRight: '4px' }} />
-                <span>Customize Template</span>
+                Customize Template
               </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* MODAL: EDIT / CREATE TEMPLATE */}
+      {/* MODAL: CUSTOMIZE / CREATE TEMPLATE */}
       {editingTemplate && (
-        <div className={styles.editorModal} onClick={() => setEditingTemplate(null)}>
-          <div className={styles.editorBox} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.editorModal}>
+          <div className={styles.editorBox}>
             <div className={styles.editorHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Edit3 size={18} color="#a855f7" />
+                <FileText size={18} color="#a855f7" />
                 <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff' }}>
-                  {isNew ? 'Create New Offer Letter Template' : `Customize: ${editingTemplate.name}`}
+                  {isNew ? 'Create New Offer Template' : `Customize: ${editingTemplate.name}`}
                 </h3>
               </div>
-              <button type="button" onClick={() => setEditingTemplate(null)} style={{ color: '#94a3b8', cursor: 'pointer' }}>
-                <X size={18} />
-              </button>
+
+              {/* Toggle Editor vs Live Preview */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('editor')}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    background: activeTab === 'editor' ? 'rgba(168, 85, 247, 0.25)' : '#141417',
+                    border: `1px solid ${activeTab === 'editor' ? '#a855f7' : '#27272a'}`,
+                    color: activeTab === 'editor' ? '#ffffff' : '#94a3b8',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Jinja Editor
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('preview')}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    background: activeTab === 'preview' ? 'rgba(168, 85, 247, 0.25)' : '#141417',
+                    border: `1px solid ${activeTab === 'preview' ? '#a855f7' : '#27272a'}`,
+                    color: activeTab === 'preview' ? '#ffffff' : '#94a3b8',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <Eye size={13} />
+                  <span>Live Preview</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingTemplate(null)}
+                  style={{ color: '#94a3b8', cursor: 'pointer', marginLeft: '8px', background: 'transparent', border: 'none' }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             <div className={styles.editorBody}>
-              <div className={styles.fieldGroup}>
-                <label className={styles.label}>Template Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Standard 2026 Engineering Offer"
-                  value={editingTemplate.name}
-                  onChange={(e) => setEditingTemplate({ ...editingTemplate, name: e.target.value })}
-                  className={styles.input}
-                />
-              </div>
+              {activeTab === 'editor' ? (
+                <>
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Template Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Standard 2026 Engineering Offer"
+                      value={editingTemplate.name}
+                      onChange={(e) => setEditingTemplate({ ...editingTemplate, name: e.target.value })}
+                      className={styles.input}
+                    />
+                  </div>
 
-              <div className={styles.fieldGroup}>
-                <label className={styles.label}>Email Subject</label>
-                <input
-                  type="text"
-                  placeholder="Official Internship Offer from Shortfundly - {{candidateName}}"
-                  value={editingTemplate.subject}
-                  onChange={(e) => setEditingTemplate({ ...editingTemplate, subject: e.target.value })}
-                  className={styles.input}
-                />
-              </div>
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Email Subject (Plain Text with Jinja Variables)</label>
+                    <input
+                      type="text"
+                      placeholder="Official Internship Offer from Shortfundly - {{candidateName}}"
+                      value={editingTemplate.subject}
+                      onChange={(e) => setEditingTemplate({ ...editingTemplate, subject: e.target.value })}
+                      className={styles.input}
+                    />
+                  </div>
 
-              <div className={styles.fieldGroup}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <label className={styles.label}>Dynamic Replacement Tags (Click to insert)</label>
-                </div>
-                <div className={styles.tagsHelperRow}>
-                  {availableTags.map((t) => (
-                    <span
-                      key={t}
-                      onClick={() => handleInsertTag(t, 'emailBody')}
-                      className={styles.tagPill}
+                  <div className={styles.fieldGroup}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <label className={styles.label}>Available Jinja Replacement Variables (Click to insert)</label>
+                    </div>
+                    <div className={styles.tagsHelperRow}>
+                      {availableTags.map((t) => (
+                        <span
+                          key={t}
+                          onClick={() => handleInsertTag(t, 'emailBody')}
+                          className={styles.tagPill}
+                          title={`Click to append ${t} into the Email Body`}
+                        >
+                          + {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <label className={styles.label}>Email Body (Clean Plain Text Jinja Format - No raw HTML tags)</label>
+                      <span style={{ fontSize: '11px', color: '#a855f7' }}>Supports paragraphs, bullets, bolding, and links</span>
+                    </div>
+                    <textarea
+                      rows={12}
+                      value={editingTemplate.emailBody}
+                      onChange={(e) => setEditingTemplate({ ...editingTemplate, emailBody: e.target.value })}
+                      className={styles.textarea}
+                      style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', fontSize: '13px', lineHeight: 1.6 }}
+                    />
+                  </div>
+
+                  {/* Advanced PDF Template Toggle */}
+                  <div style={{ background: '#111115', border: '1px solid #232328', borderRadius: '8px', padding: '14px' }}>
+                    <div
+                      onClick={() => setShowAdvancedPdfHtml(!showAdvancedPdfHtml)}
+                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
                     >
-                      {t}
-                    </span>
-                  ))}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <FileCheck size={16} color="#a855f7" />
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#f4f4f5' }}>
+                          Offer Letter PDF Layout & Styling
+                        </span>
+                        <span style={{ fontSize: '11px', color: '#64748b' }}>
+                          (Pre-configured official Shortfundly letterhead)
+                        </span>
+                      </div>
+                      <div style={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
+                        <span>{showAdvancedPdfHtml ? 'Hide Source' : 'Customize PDF HTML Source'}</span>
+                        {showAdvancedPdfHtml ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                      </div>
+                    </div>
+
+                    {showAdvancedPdfHtml && (
+                      <div style={{ marginTop: '12px' }}>
+                        <p style={{ margin: '0 0 8px 0', fontSize: '11.5px', color: '#94a3b8' }}>
+                          This HTML is compiled into a pixel-perfect, single-page A4 PDF using Playwright with official branding and signatures.
+                        </p>
+                        <textarea
+                          rows={8}
+                          value={editingTemplate.pdfTemplate}
+                          onChange={(e) => setEditingTemplate({ ...editingTemplate, pdfTemplate: e.target.value })}
+                          className={styles.textarea}
+                          style={{ fontSize: '11.5px', fontFamily: 'monospace' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="checkbox"
+                      id="isDefaultCheckbox"
+                      checked={Boolean(editingTemplate.isDefault)}
+                      onChange={(e) => setEditingTemplate({ ...editingTemplate, isDefault: e.target.checked })}
+                      style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="isDefaultCheckbox" style={{ fontSize: '13px', color: '#cbd5e1', cursor: 'pointer' }}>
+                      Set as default offer letter template for single and bulk dispatches
+                    </label>
+                  </div>
+                </>
+              ) : (
+                /* LIVE PREVIEW TAB */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {/* Sub-tab switcher */}
+                  <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid #27272a', paddingBottom: '10px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewSubTab('email')}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        background: previewSubTab === 'email' ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
+                        border: `1px solid ${previewSubTab === 'email' ? '#a855f7' : '#27272a'}`,
+                        color: previewSubTab === 'email' ? '#ffffff' : '#94a3b8',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <Mail size={13} />
+                      <span>Email Message Preview</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPreviewSubTab('pdf')}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        background: previewSubTab === 'pdf' ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
+                        border: `1px solid ${previewSubTab === 'pdf' ? '#a855f7' : '#27272a'}`,
+                        color: previewSubTab === 'pdf' ? '#ffffff' : '#94a3b8',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <FileText size={13} />
+                      <span>Offer Letter PDF Document Preview</span>
+                    </button>
+                  </div>
+
+                  {previewSubTab === 'email' ? (
+                    /* RENDERED EMAIL PREVIEW */
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {/* Email Header Info */}
+                      <div style={{ background: '#141417', border: '1px solid #27272a', padding: '12px 16px', borderRadius: '8px', fontSize: '12.5px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <div><strong>From:</strong> Shortfundly HR Team &lt;hr@shortfundly.com&gt;</div>
+                        <div><strong>To:</strong> {samplePreviewContext.candidateName} &lt;rahul.sharma@example.com&gt;</div>
+                        <div><strong>Subject:</strong> {renderJinja(editingTemplate.subject, samplePreviewContext)}</div>
+                        <div style={{ display: 'flex', gap: '16px', marginTop: '4px', paddingTop: '6px', borderTop: '1px solid #232328' }}>
+                          <div><strong>Intern ID:</strong> <code style={{ color: '#c084fc' }}>{samplePreviewContext.internId}</code></div>
+                          <div><strong>Expiration Deadline:</strong> <span style={{ color: '#fbbf24' }}>{samplePreviewContext.deadline}</span></div>
+                        </div>
+                      </div>
+
+                      {/* Rendered HTML Container */}
+                      <div
+                        style={{
+                          background: '#ffffff',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          border: '1px solid #cbd5e1',
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: jinjaTextToEmailHtml(editingTemplate.emailBody, samplePreviewContext),
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    /* RENDERED PDF DOCUMENT PREVIEW */
+                    <div style={{ background: '#ffffff', color: '#0f172a', padding: '36px 32px', borderRadius: '8px', border: '1px solid #cbd5e1', boxShadow: '0 4px 16px rgba(0,0,0,0.4)', fontFamily: 'ui-sans-serif, system-ui, sans-serif' }}>
+                      {/* Shortfundly Header Letterhead */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #7c3aed', paddingBottom: '16px', marginBottom: '24px' }}>
+                        <div>
+                          <h2 style={{ margin: 0, fontSize: '22px', color: '#1e1b4b', fontWeight: 800, letterSpacing: '1px' }}>SHORTFUNDLY</h2>
+                          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>Shortfundly Media Technologies Pvt. Ltd. &bull; Chennai, India</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <span style={{ display: 'inline-block', background: 'rgba(124, 58, 237, 0.1)', color: '#7c3aed', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '4px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: 700 }}>
+                            Ref: {samplePreviewContext.internId}
+                          </span>
+                          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>Date: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                        </div>
+                      </div>
+
+                      {/* Recipient Block */}
+                      <div style={{ marginBottom: '20px', fontSize: '13px', lineHeight: 1.5 }}>
+                        <div><strong>To,</strong></div>
+                        <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>{samplePreviewContext.candidateName}</div>
+                        <div style={{ color: '#475569' }}>Intern ID: {samplePreviewContext.internId}</div>
+                      </div>
+
+                      <div style={{ textAlign: 'center', margin: '20px 0', padding: '8px', background: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                        <span style={{ fontWeight: 800, fontSize: '14px', letterSpacing: '0.5px', color: '#1e1b4b' }}>
+                          OFFICIAL INTERNSHIP APPOINTMENT LETTER
+                        </span>
+                      </div>
+
+                      <p style={{ fontSize: '13px', lineHeight: 1.6, color: '#334155' }}>
+                        Dear <strong>{samplePreviewContext.candidateName}</strong>, on behalf of Shortfundly, we are pleased to confirm your appointment for the position of <strong>{samplePreviewContext.role}</strong>.
+                      </p>
+
+                      {/* Key Details Table */}
+                      <div style={{ margin: '20px 0', border: '1px solid #e2e8f0', borderRadius: '6px', overflow: 'hidden' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                          <tbody>
+                            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                              <td style={{ padding: '8px 12px', fontWeight: 600, width: '35%', color: '#475569' }}>Position / Role</td>
+                              <td style={{ padding: '8px 12px', fontWeight: 700, color: '#0f172a' }}>{samplePreviewContext.role}</td>
+                            </tr>
+                            <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                              <td style={{ padding: '8px 12px', fontWeight: 600, color: '#475569' }}>Anticipated Start Date</td>
+                              <td style={{ padding: '8px 12px', color: '#0f172a' }}>{samplePreviewContext.startDate}</td>
+                            </tr>
+                            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                              <td style={{ padding: '8px 12px', fontWeight: 600, color: '#475569' }}>Tenure / Duration</td>
+                              <td style={{ padding: '8px 12px', color: '#0f172a' }}>{samplePreviewContext.duration}</td>
+                            </tr>
+                            <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                              <td style={{ padding: '8px 12px', fontWeight: 600, color: '#475569' }}>Stipend / Compensation</td>
+                              <td style={{ padding: '8px 12px', fontWeight: 700, color: '#15803d' }}>{samplePreviewContext.stipend}</td>
+                            </tr>
+                            <tr style={{ background: '#f8fafc' }}>
+                              <td style={{ padding: '8px 12px', fontWeight: 600, color: '#475569' }}>Location / Work Mode</td>
+                              <td style={{ padding: '8px 12px', color: '#0f172a' }}>Online / Remote</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Expiration Note */}
+                      <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', padding: '10px 14px', borderRadius: '6px', fontSize: '11.5px', color: '#92400e', marginBottom: '24px' }}>
+                        <strong>Offer Validity Deadline:</strong> Please confirm and submit your signature before <strong>{samplePreviewContext.deadline}</strong>.
+                      </div>
+
+                      {/* Signatory */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a' }}>For Shortfundly Media Technologies Pvt. Ltd.</div>
+                          <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '2px' }}>Talent Acquisition & People Operations</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ borderBottom: '1px dashed #94a3b8', width: '160px', marginBottom: '6px' }} />
+                          <div style={{ fontSize: '11px', color: '#64748b' }}>Authorized Corporate Seal</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label className={styles.label}>Email HTML Content Body</label>
-                <textarea
-                  rows={8}
-                  value={editingTemplate.emailBody}
-                  onChange={(e) => setEditingTemplate({ ...editingTemplate, emailBody: e.target.value })}
-                  className={styles.textarea}
-                />
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label className={styles.label}>PDF HTML / CSS Layout Template (Playwright Rendered)</label>
-                <textarea
-                  rows={10}
-                  value={editingTemplate.pdfTemplate}
-                  onChange={(e) => setEditingTemplate({ ...editingTemplate, pdfTemplate: e.target.value })}
-                  className={styles.textarea}
-                  style={{ fontSize: '11.5px' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input
-                  type="checkbox"
-                  id="isDefaultCheckbox"
-                  checked={Boolean(editingTemplate.isDefault)}
-                  onChange={(e) => setEditingTemplate({ ...editingTemplate, isDefault: e.target.checked })}
-                  style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
-                />
-                <label htmlFor="isDefaultCheckbox" style={{ fontSize: '13px', color: '#cbd5e1', cursor: 'pointer' }}>
-                  Set as default offer letter template for single and bulk dispatches
-                </label>
-              </div>
+              )}
             </div>
 
             <div className={styles.editorFooter}>
@@ -243,7 +550,7 @@ export default function OfferTemplateManager({
                 disabled={saving}
                 className={styles.btnSave}
               >
-                {saving ? 'Saving Template...' : 'Save & Apply Template'}
+                {saving ? 'Saving Template...' : 'Save & Confirm Changes'}
               </button>
             </div>
           </div>

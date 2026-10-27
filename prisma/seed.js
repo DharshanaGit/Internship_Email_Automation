@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { seedGemmaTaskTemplates } from '../lib/gemmaService.js';
 
 const prisma = new PrismaClient();
 
@@ -224,6 +225,9 @@ async function main() {
     },
   });
   console.log('Batch A initialized.');
+
+  await seedGemmaTaskTemplates(prisma);
+  console.log('15 Gemma Task Templates initialized.');
 
   console.log('Database seeding finished successfully.');
 }

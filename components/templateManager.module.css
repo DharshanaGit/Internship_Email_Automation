@@ -1,9 +1,9 @@
 .managerContainer {
-  background: #110e1b;
-  border: 1px solid rgba(168, 85, 247, 0.25);
+  background: #0c0c0e;
+  border: 1px solid #232328;
   border-radius: 12px;
   padding: 24px 28px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 
 .headerRow {
@@ -12,7 +12,7 @@
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #1f1b2e;
+  border-bottom: 1px solid #232328;
 }
 
 .title {
@@ -98,13 +98,13 @@
   gap: 8px;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #1f1b2e;
+  border-top: 1px solid #232328;
 }
 
 .btnEdit {
   flex: 1;
   padding: 6px;
-  background: #181524;
+  background: #141417;
   border: 1px solid rgba(168, 85, 247, 0.3);
   border-radius: 6px;
   color: #c084fc;
@@ -134,8 +134,8 @@
   width: 100%;
   max-width: 960px;
   max-height: 90vh;
-  background: #110e1b;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: #0c0c0e;
+  border: 1px solid #232328;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -148,7 +148,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #1f1b2e;
+  border-bottom: 1px solid #232328;
 }
 
 .editorBody {
@@ -229,12 +229,12 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  border-top: 1px solid #1f1b2e;
+  border-top: 1px solid #232328;
 }
 
 .btnCancel {
   padding: 8px 18px;
-  background: #181524;
+  background: #141417;
   border: 1px solid #27272a;
   border-radius: 6px;
   color: #cbd5e1;

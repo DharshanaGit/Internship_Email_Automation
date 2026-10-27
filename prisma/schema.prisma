@@ -108,6 +108,13 @@ model Candidate {
   googleMeetStatus   String           @default("NOT_CREATED") @map("google_meet_status")
   interviewDate      String?          @map("interview_date")
   remarks            String?
+  isLeaved           Boolean          @default(false)
+  leavedReason       String?
+  leavedAt           DateTime?
+  averageTaskScore   Float            @default(100.0)
+  certificateApproved Boolean         @default(false)
+  certificateApprovedAt DateTime?
+  certificateApprovedBy String?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
   tasks              TaskAssignment[]
@@ -146,6 +153,7 @@ model TaskAssignment {
   warningSentAt      DateTime?
   warningDeadline    DateTime?
   penaltyApplied     Float     @default(0.0)
+  performanceScore   Float     @default(100.0)
   status             String    @default("Assigned")
   feedback           String?
   firstReviewDate    String?
@@ -156,6 +164,37 @@ model TaskAssignment {
   reviewCount        Int       @default(0)
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  reviews            TaskReview[]
+}
+
+model TaskTemplate {
+  id               String   @id @default(cuid())
+  taskId           String   @unique
+  title            String
+  level            String   @default("DEVELOPER") // INTERMEDIATE, DEVELOPER, ENTERPRISE
+  role             String
+  objective        String   @db.Text
+  modules          String   @db.Text
+  expectedOutput   String   @db.Text
+  techStack        String
+  jinjaBody        String?  @db.Text
+  isGemmaGenerated Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model TaskReview {
+  id               String         @id @default(cuid())
+  taskAssignmentId String
+  taskAssignment   TaskAssignment @relation(fields: [taskAssignmentId], references: [id], onDelete: Cascade)
+  reviewNumber     Int            @default(1)
+  reviewDate       String
+  reviewTime       String?
+  feedback         String         @db.Text
+  scoreAwarded     Float          @default(100.0)
+  meetLink         String?
+  sentAt           DateTime?
+  createdAt        DateTime       @default(now())
 }
 
 model EmailLog {

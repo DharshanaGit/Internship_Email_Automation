@@ -95,7 +95,7 @@ export async function POST(request) {
       batchCounters.set(batchLetter, currentSeq);
 
       const generatedInternId = String(
-        row['Intern ID'] || row['intern_id'] || `SF-2026-${batchLetter}-${String(currentSeq).padStart(3, '0')}`
+        row['Intern ID'] || row['intern_id'] || `INT-2026-${String(currentSeq + 100).padStart(5, '0')}`
       ).trim();
 
       const candidateId = String(
