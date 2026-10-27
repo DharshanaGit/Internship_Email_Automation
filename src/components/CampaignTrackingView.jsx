@@ -172,6 +172,49 @@ export default function CampaignTrackingView({ session }) {
         </div>
       </div>
 
+      {/* Celery Beat Automated Monthly Registry Synchronization Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        color: '#f8fafc',
+        borderRadius: '10px',
+        padding: '18px 22px',
+        margin: '16px 0 24px 0',
+        border: '1px solid #334155',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 600, fontSize: '15px', color: '#38bdf8' }}>
+            <span style={{ fontSize: '20px' }}>🔄</span>
+            <span>Automated Monthly Registry Synchronization Active (Celery Beat Engine)</span>
+          </div>
+          <span style={{
+            background: '#0284c7',
+            color: '#fff',
+            fontSize: '11px',
+            fontWeight: 700,
+            padding: '4px 12px',
+            borderRadius: '9999px',
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase'
+          }}>
+            Monthly Live Update
+          </span>
+        </div>
+        <div style={{ fontSize: '13px', lineHeight: '1.6', color: '#cbd5e1' }}>
+          The nationwide higher education directory is continuously audited and live-updated using an automated <strong>Celery Beat scheduled worker</strong> that runs periodically once every month (1st of every month at 3:00 AM IST).
+          Whenever official regulatory authorities update institutional records, accreditations, or leadership contacts on official portals:
+          <div style={{ margin: '8px 0', padding: '10px 14px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', borderLeft: '3px solid #38bdf8' }}>
+            <div>🌐 <strong>AISHE Higher Education Directory:</strong> <a href="https://dashboard.aishe.gov.in/hedirectory/#/hedirectory" target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', textDecoration: 'underline' }}>https://dashboard.aishe.gov.in/hedirectory/#/hedirectory</a></div>
+            <div style={{ marginTop: '4px' }}>🎓 <strong>UGC Portal:</strong> University Grants Commission Approved Central, State, Private &amp; Deemed Universities</div>
+            <div style={{ marginTop: '4px' }}>⚙️ <strong>AICTE Official Portal:</strong> Approved Engineering, Technical, Management &amp; Polytechnic Institutes</div>
+          </div>
+          The Celery Beat pipeline automatically scrapes/fetches updated state reports, verifies RFC-5322 email syntax and DNS MX deliverability, and performs an atomic merge into the PostgreSQL master <code>colleges</code> and <code>college_contacts</code> tables so outreach dispatches always run against fresh, verified data.
+        </div>
+      </div>
+
       {/* Aggregate KPI Cards */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>

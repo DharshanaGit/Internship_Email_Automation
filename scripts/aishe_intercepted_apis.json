@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://pdf.aishe.nic.in/aisheinstitutemanagement/dashboard/gpi?stateCode=ALL",
+    "status": 200,
+    "data_preview": "[{'stateId': '99', 'allGpi': '1.08', 'scGpi': '1.11', 'stGpi': '1.08', 'stateName': 'All India', 'surveyYear': 2023}, {'stateId': '35', 'allGpi': '1.15', 'scGpi': '0', 'stGpi': '1.9', 'stateName': 'Andaman and Nicobar Islands', 'surveyYear': 2023}, {'stateId': '28', 'allGpi': '1.00', 'scGpi': '1.05'"
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aisheinstitutemanagement/dashboard/ger?stateCode=ALL",
+    "status": 200,
+    "data_preview": "[{'stateId': '99', 'female': '31.2', 'male': '28.9', 'scFemale': '29.3', 'scMale': '26.4', 'scTotal': '27.8', 'stFemale': '23.7', 'stMale': '21.9', 'stTotal': '22.8', 'stateName': 'All India', 'surveyYear': 2023, 'total': '30'}, {'stateId': '35', 'female': '14.5', 'male': '12.6', 'scFemale': '0', 's"
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aisheinstitutemanagement/dashboard/enrollment?stateCode=ALL",
+    "status": 200,
+    "data_preview": "[{'stateId': '99', 'female': 22352948, 'male': 22648175, 'scFemale': 3508766, 'scMale': 3463623, 'scTotal': 6972389, 'stFemale': 1507712, 'stMale': 1375506, 'stTotal': 2883218, 'stateName': 'All India', 'surveyYear': 2023, 'total': 45001123}, {'stateId': '35', 'female': 3621, 'male': 3507, 'scFemale"
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aishemasterservice/api/institutiontypes?type=S",
+    "status": 200,
+    "data_preview": "[{'id': '2', 'type': 'Technical/Polytechnic'}, {'id': '10', 'type': 'Ayurvedic Nursing (Diploma) Institution'}, {'id': '11', 'type': 'Medical Board'}, {'id': '12', 'type': 'Journalism and Mass Communication'}, {'id': '1', 'type': 'Paramedical Institute'}, {'id': '3', 'type': 'Nursing (Diploma) Insti"
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aisheinstitutemanagement/institutionDirectory%20/getNationalUniversity?universityName=OWM2NTVhYzU5YjI3N2FhMGMzN2Q5NDQ4OWU0YzI5Mzk6OmIxMmMxMTQwYzVhNjQ0ODliYmNkZWIxMDZkYjBmYTg4NTM1Y2I3MzE1YTU5OGQ3YzQ2YzYwYjJhNmM3ODRhYTI6OlhhS1ZVTW9GSHc2MFFpTUY1NE43MGc9PQ==&surveyYear=YzFkODM1YzE1NzZjMzIzMGI1NjIxNGQ0MzlmZmVlNGQ6OjU3YzJkMTJiNTBiNmRkMGE3MDQwYmJmNWFmMmFjZDAwYjAzNmQxMTc5MzMzMTJmNGI5OTJhMmZjOWU5MzQ2NjQ6OjBMODJVWklhUG1IYjRmSVc3Wk5kM2c9PQ==",
+    "status": 200,
+    "data_preview": "{'statusCode': 'AISH001', 'statusDesc': 'Success', 'institutionDirectoryDto': [{'aisheCode': 'U-0500', 'name': 'Banaras Hindu University, Banaras', 'address1': 'The Registrar,Banaras Hindu University,Varanasi', 'stateName': 'Uttar Pradesh', 'stateId': '09', 'districtName': 'Varanasi', 'webSite': 'ww"
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aishemasterservice/institutionDirectory%20/getInstitutionCount?surveyYear=2020",
+    "status": 200,
+    "data_preview": "{'statusCode': 'AISH001', 'statusDesc': 'Success', 'universityTypeCount': {'totalUniversity': '1437', 'centralUniversity': '59', 'statePublicUniversity': '492', 'statePrivateUniversity': '546', 'deemedGovUniversity': '43', 'deemedGovAidedUniversity': '11', 'deemedPrivateUniversity': '101', 'institut"
+  }
+]

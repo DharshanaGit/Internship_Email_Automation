@@ -1,0 +1,46 @@
+[
+  {
+    "url": "https://dashboard.aishe.gov.in/hedirectory/",
+    "status": 200
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aisheinstitutemanagement/dashboard/ger?stateCode=ALL",
+    "status": 200
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aisheinstitutemanagement/dashboard/enrollment?stateCode=ALL",
+    "status": 200
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aisheinstitutemanagement/dashboard/gpi?stateCode=ALL",
+    "status": 200
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aishemasterservice/institutionDirectory%20/getInstitutionCount?surveyYear=2020",
+    "status": 200
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aishemasterservice/api/institutiontypes?type=S",
+    "status": 200
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aisheinstitutemanagement/institutionDirectory%20/getNationalUniversity?universityName=YTg3YzAwNDg2ZGEzODQ4ODY4YWUzNzAxYzc1MjVmMzM6OmNiNWYzNWNhMzk0ZWQ5NmFiYjBiOWI0ZGEzZjViZTFlMzEwZDU2OWMzM2MwYTdiODllZmRjOWEyYTg1NDkwNWM6OlZJZE0rdWVSVTRPTWkxUDZZZnd6MEE9PQ==&surveyYear=NWI2OWM0MDQ1MGY4MjNjY2QxZTZhZjZhNjU2ZDEyOGM6OmFlOWMwNzNiYzZmY2NkOGZhODEzMmMzODZmOWE4YjY3OTIxNDQ3M2ZiY2IxZTZkNTYxZmI1ODMzOThhMDhhMzQ6Omw5NE44eHJKenYxNXlMYTlTeWpNZEE9PQ==",
+    "status": 200
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aishemasterservice/api/institutiontypes?type=C",
+    "status": 200
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aishemasterservice/api/state",
+    "status": 200
+  },
+  {
+    "url": "https://pdf.aishe.nic.in/aisheinstitutemanagement/institutionDirectory%20/getCollegeList?districtcode=&stateCode=NTk2YzYyNGI5M2Q2YzcyMWMyNGUyNDVhYjBiNzk1MDU6OjlkNThjZDdmYmMxODU1NWIzM2YyYTgyYWJkYzNjMjcwNjBiMmQxNjI2YmQ5ODI1MTY1YTkzYTE2Mzc2NzAwMjI6OlpCUjZjV3R1OXlXTmlvQUNkdi95VlE9PQ==&typeid=OTc5ZWM2YjRjZWE4MTk5YzlhNTZiZjUzYmMxYzExNzA6OmJlMTQ0YTViNmRiNzk5ZGM5Y2RmODg2ZjM0MDIyNWFlNGIzOGFlNThhOWVmMzQ2YTk5N2E0ZDRkOTk4ZDI1ZjM6OnNCK2RaUUlxRVp1L0pNd1hYSFZsclE9PQ==&surveyYear=YmRmOThiY2RjYmUwNDgwZWM3OTFiNTNjNGUzODlkZTY6OjM3NzIwYzkwNjRhYzA2ZTNhODYwM2U5MDllN2Y4NTFjYWIwMDhlZWUzNzdlOTMzM2JmNThlNjBiOWM3M2NhZmM6OjBUbDdtbTB0a0xTSW1UWmNwY0p5VHc9PQ==&universityId=&universityType=",
+    "status": 200
+  },
+  {
+    "url": "https://dashboard.aishe.gov.in/hedirectory/fontawesome-webfont.e9955780856cf8aa.woff2?v=4.7.0",
+    "status": 200
+  }
+]
