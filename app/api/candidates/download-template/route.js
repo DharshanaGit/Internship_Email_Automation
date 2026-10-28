@@ -9,14 +9,14 @@ export async function GET() {
 
     worksheet.columns = [
       { header: 'Name', key: 'name', width: 22 },
-      { header: 'Email', key: 'email', width: 28 },
-      { header: 'Phone', key: 'phone', width: 18 },
+      { header: 'Email ID', key: 'email', width: 28 },
+      { header: 'Phone Number', key: 'phone', width: 18 },
       { header: 'Role', key: 'role', width: 24 },
       { header: 'Degree', key: 'degree', width: 20 },
       { header: 'College', key: 'college', width: 28 },
       { header: 'JoiningDate', key: 'joiningDate', width: 16 },
-      { header: 'Duration', key: 'duration', width: 14 },
-      { header: 'Stipend', key: 'stipend', width: 14 },
+      { header: 'EndingDate', key: 'endingDate', width: 16 },
+      { header: 'Monthly Stipend (INR)', key: 'stipend', width: 22 },
     ];
 
     // Style Header Row
@@ -36,7 +36,7 @@ export async function GET() {
       degree: 'B.Tech IT',
       college: 'Anna University, Chennai',
       joiningDate: '2026-06-01',
-      duration: '3 Months',
+      endingDate: '2026-08-31',
       stipend: '10000',
     });
 
@@ -48,7 +48,7 @@ export async function GET() {
       degree: 'B.E. Computer Science',
       college: 'PSG College of Technology',
       joiningDate: '2026-06-01',
-      duration: '3 Months',
+      endingDate: '2026-08-31',
       stipend: '10000',
     });
 

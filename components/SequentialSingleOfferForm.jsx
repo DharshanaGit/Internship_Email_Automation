@@ -18,7 +18,10 @@ import {
   Link2,
   Plus,
   RefreshCw,
-  Printer
+  Printer,
+  Upload,
+  X,
+  Paperclip,
 } from 'lucide-react';
 import { renderJinja, jinjaTextToEmailHtml } from '../lib/jinjaEngine.js';
 
@@ -102,9 +105,55 @@ export default function SequentialSingleOfferForm({
   const [pdfPreviewHtml, setPdfPreviewHtml] = useState('');
   const [pdfLoading, setPdfLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState([]);
+  const [prereqNotice, setPrereqNotice] = useState('');
   const [portalToken, setPortalToken] = useState(() => Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2));
   const VERCEL_PROD_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://internship-email-automation.vercel.app').replace(/\/+$/, '');
   const candidatePortalUrl = `${VERCEL_PROD_URL}/offers/respond?token=${portalToken}`;
+
+  // Guaranteed fallback templates if database or API is still loading
+  const availableTemplates = useMemo(() => {
+    if (templates && templates.length > 0) return templates;
+    return [
+      {
+        id: 'corporate-std',
+        name: 'Corporate Standard Offer Letter',
+        isDefault: true,
+        subject: 'Official Internship Offer from Shortfundly - {{candidateName}}',
+      },
+      {
+        id: 'fast-track-tech',
+        name: 'Fast-Track Technical Internship Offer',
+        isDefault: false,
+        subject: 'Fast-Track Technical Internship Offer - {{candidateName}}',
+      },
+    ];
+  }, [templates]);
+
+  // Sequential prerequisite check
+  const checkPrerequisite = (fieldKey) => {
+    const rules = [
+      { key: 'email', prereq: formData.fullName.trim(), label: 'Candidate Name', target: 'Candidate Email ID' },
+      { key: 'phone', prereq: formData.email.trim(), label: 'Candidate Email ID', target: 'Phone Number' },
+      { key: 'degree', prereq: formData.phone.trim(), label: 'Phone Number', target: 'Degree / Program' },
+      { key: 'collegeName', prereq: formData.degree.trim(), label: 'Degree / Program', target: 'College / University' },
+      { key: 'role', prereq: formData.collegeName.trim(), label: 'College / University', target: 'Designation / Role' },
+      { key: 'stipend', prereq: formData.role.trim(), label: 'Designation / Role', target: 'Monthly Stipend' },
+      { key: 'joiningDate', prereq: formData.stipend.toString().trim(), label: 'Monthly Stipend', target: 'Joining Date' },
+      { key: 'endDate', prereq: formData.joiningDate, label: 'Joining Date', target: 'End Date' },
+      { key: 'deadline', prereq: formData.endDate, label: 'End Date', target: 'Offer Expiry Deadline' },
+    ];
+
+    const rule = rules.find((r) => r.key === fieldKey);
+    if (rule && !rule.prereq) {
+      const msg = `Please fill ${rule.label} before entering ${rule.target}!`;
+      setPrereqNotice(msg);
+      showToast?.(msg, 'warning');
+      return false;
+    }
+    setPrereqNotice('');
+    return true;
+  };
 
   const setDeadlinePreset = (hours) => {
     const d = new Date(Date.now() + hours * 60 * 60 * 1000);
@@ -287,8 +336,8 @@ export default function SequentialSingleOfferForm({
 
   // Selected Template
   const activeTemplate = useMemo(() => {
-    return templates.find((t) => t.id === formData.templateId) || templates[0] || null;
-  }, [templates, formData.templateId]);
+    return availableTemplates.find((t) => t.id === formData.templateId) || availableTemplates[0] || null;
+  }, [availableTemplates, formData.templateId]);
 
   // Load PDF preview when switching to PDF tab or entering Step 3
   const loadPdfPreview = async () => {
@@ -368,6 +417,13 @@ export default function SequentialSingleOfferForm({
       if (formData.templateId) payload.append('templateId', formData.templateId);
       if (formData.customSubject) payload.append('subject', formData.customSubject);
       if (formData.customBody) payload.append('body', formData.customBody);
+
+      // Append any uploaded files or images
+      if (attachedFiles && attachedFiles.length > 0) {
+        attachedFiles.forEach((file) => {
+          payload.append('attachments', file);
+        });
+      }
 
       const res = await fetch('/api/offer-letter/send-single', {
         method: 'POST',
@@ -460,21 +516,11 @@ www.shortfundly.com`;
       {/* --- STEP 1: SEQUENTIAL CANDIDATE DETAILS --- */}
       {currentStep === 1 && (
         <div>
-          {/* Friendly Guidance Indicator Banner */}
-          {!formData.fullName.trim() ? (
-            <div className={`${styles.guidanceBanner} ${styles.guidanceBannerAlert}`}>
-              <Info size={16} />
-              <span>💡 <strong>Next Step:</strong> Please enter the Candidate's Name below before proceeding with the remaining details.</span>
-            </div>
-          ) : !formData.email.trim() ? (
-            <div className={`${styles.guidanceBanner} ${styles.guidanceBannerAlert}`}>
-              <Info size={16} />
-              <span>💡 <strong>Candidate name set ({formData.fullName}):</strong> Enter candidate email address to link offer response link.</span>
-            </div>
-          ) : (
-            <div className={`${styles.guidanceBanner} ${styles.guidanceBannerSuccess}`}>
-              <CheckCircle2 size={16} />
-              <span>✓ <strong>Candidate details ready:</strong> All details are editable. Configure role, stipend, and calendar dates below.</span>
+          {/* Sequential Prerequisite Warning Notice */}
+          {prereqNotice && (
+            <div className={styles.prereqNotice}>
+              <AlertCircle size={15} />
+              <span>{prereqNotice}</span>
             </div>
           )}
 
@@ -524,7 +570,7 @@ www.shortfundly.com`;
             </div>
           )}
 
-          {/* Sequential Fields Grid (Fully Visible & Editable, no harsh locking) */}
+          {/* Sequential Fields Grid (Fully Visible & Editable) */}
           <div className={styles.fieldGrid}>
             {/* Field 0: Full Name */}
             <div className={styles.fieldGroup}>
@@ -546,12 +592,12 @@ www.shortfundly.com`;
               )}
             </div>
 
-            {/* Field 1: Intern ID (Keyword-based e.g. SF-WD-2026-001) */}
+            {/* Field 1: Intern ID (Generated bright text) */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 <span>Intern ID <span className={styles.requiredStar}>*</span></span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10.5px', color: '#c084fc' }}>
-                  <Sparkles size={11} /> Readable Keyword ID
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10.5px', color: '#38bdf8' }}>
+                  <Sparkles size={11} /> Auto-Generated Readable ID
                 </span>
               </label>
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -560,13 +606,12 @@ www.shortfundly.com`;
                   placeholder="SF-WD-2026-001"
                   value={formData.internId}
                   onChange={(e) => setFormData({ ...formData, internId: e.target.value.toUpperCase() })}
-                  className={`${styles.inputField} ${formData.internId && validationErrors.internId ? styles.inputError : formData.internId ? styles.inputValid : ''}`}
-                  style={{ fontFamily: 'monospace' }}
+                  className={`${styles.inputField} ${styles.brightGeneratedInput}`}
                 />
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, internId: generateReadableInternId(formData.role) })}
-                  style={{ padding: '0 12px', background: '#141417', border: '1px solid #27272a', borderRadius: '6px', color: '#c084fc', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  style={{ padding: '0 12px', background: '#141417', border: '1px solid #7c3aed', borderRadius: '6px', color: '#c084fc', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}
                   title="Generate New Readable Intern ID"
                 >
                   Regenerate
@@ -580,63 +625,6 @@ www.shortfundly.com`;
               )}
             </div>
 
-            {/* Field 1b: Unique Candidate Offer Response Portal Link with Deadline Fixer */}
-            <div className={styles.fieldGroup} style={{ gridColumn: 'span 2', background: '#09090b', padding: '14px 16px', borderRadius: '8px', border: '1px solid #232328' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <label className={styles.fieldLabel} style={{ margin: 0 }}>
-                  <span style={{ color: '#ffffff', fontWeight: 700 }}>Unique Candidate Portal Response URL</span>
-                  <span style={{ fontSize: '11px', color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <Sparkles size={11} /> Live Production Vercel Link
-                  </span>
-                </label>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard?.writeText(candidatePortalUrl);
-                      showToast?.('Copied Vercel Candidate Portal URL to clipboard!', 'success');
-                    }}
-                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#cbd5e1', cursor: 'pointer' }}
-                  >
-                    Copy URL
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const nextTok = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
-                      setPortalToken(nextTok);
-                      showToast?.('Regenerated candidate portal URL token!', 'info');
-                    }}
-                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#c084fc', cursor: 'pointer' }}
-                  >
-                    Regenerate URL
-                  </button>
-                </div>
-              </div>
-              <input
-                type="text"
-                readOnly
-                value={candidatePortalUrl}
-                className={styles.inputField}
-                style={{ fontFamily: 'monospace', fontSize: '12px', color: '#38bdf8', background: '#000000', border: '1px solid #27272a' }}
-              />
-
-              {/* Deadline Fixer Option Bar */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #1c1b24' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Clock size={12} color="#c084fc" />
-                  <span style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 600 }}>Deadline Fixer:</span>
-                  <button type="button" onClick={() => setDeadlinePreset(24)} className={styles.btnDeadlinePreset}>+24h (1 Day)</button>
-                  <button type="button" onClick={() => setDeadlinePreset(48)} className={styles.btnDeadlinePreset}>+48h (2 Days)</button>
-                  <button type="button" onClick={() => setDeadlinePreset(72)} className={styles.btnDeadlinePreset}>+72h (3 Days)</button>
-                  <button type="button" onClick={() => setDeadlinePreset(168)} className={styles.btnDeadlinePreset}>+7 Days (1 Wk)</button>
-                </div>
-                <div style={{ fontSize: '11px', color: '#34d399' }}>
-                  Expires: <strong>{formData.deadline ? new Date(formData.deadline).toLocaleString() : 'Not Set'}</strong>
-                </div>
-              </div>
-            </div>
-
             {/* Field 2: Email ID */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
@@ -647,6 +635,7 @@ www.shortfundly.com`;
                 autoComplete="off"
                 placeholder="candidate@gmail.com"
                 value={formData.email}
+                onFocus={() => checkPrerequisite('email')}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value.toLowerCase() })}
                 className={`${styles.inputField} ${formData.email && validationErrors.email ? styles.inputError : formData.email ? styles.inputValid : ''}`}
                 style={{ backgroundColor: '#09090b', color: '#ffffff' }}
@@ -668,6 +657,7 @@ www.shortfundly.com`;
                 type="text"
                 placeholder="+91 9876543210"
                 value={formData.phone}
+                onFocus={() => checkPrerequisite('phone')}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className={`${styles.inputField} ${formData.phone && validationErrors.phone ? styles.inputError : formData.phone ? styles.inputValid : ''}`}
               />
@@ -688,6 +678,7 @@ www.shortfundly.com`;
                 type="text"
                 placeholder="e.g. B.Tech Computer Science"
                 value={formData.degree}
+                onFocus={() => checkPrerequisite('degree')}
                 onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
                 className={`${styles.inputField} ${formData.degree && validationErrors.degree ? styles.inputError : formData.degree ? styles.inputValid : ''}`}
               />
@@ -702,6 +693,7 @@ www.shortfundly.com`;
                 type="text"
                 placeholder="e.g. Anna University, Chennai"
                 value={formData.collegeName}
+                onFocus={() => checkPrerequisite('collegeName')}
                 onChange={(e) => setFormData({ ...formData, collegeName: e.target.value })}
                 className={`${styles.inputField} ${formData.collegeName && validationErrors.collegeName ? styles.inputError : formData.collegeName ? styles.inputValid : ''}`}
               />
@@ -716,12 +708,13 @@ www.shortfundly.com`;
                 type="text"
                 placeholder="e.g. Web Developer Intern"
                 value={formData.role}
+                onFocus={() => checkPrerequisite('role')}
                 onChange={(e) => handleRoleChange(e.target.value)}
                 className={styles.inputField}
               />
             </div>
 
-            {/* Field 7: Stipend with 10k, 15k, 20k suggestions + stepper */}
+            {/* Field 7: Stipend with suggestions + stepper */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 <span>Monthly Stipend (INR) <span className={styles.requiredStar}>*</span></span>
@@ -731,6 +724,7 @@ www.shortfundly.com`;
                   type="number"
                   placeholder="10000"
                   value={formData.stipend}
+                  onFocus={() => checkPrerequisite('stipend')}
                   onChange={(e) => setFormData({ ...formData, stipend: e.target.value })}
                   className={`${styles.inputField} ${formData.stipend && validationErrors.stipend ? styles.inputError : ''}`}
                 />
@@ -796,6 +790,7 @@ www.shortfundly.com`;
                 type="date"
                 min={todayStr}
                 value={formData.joiningDate}
+                onFocus={() => checkPrerequisite('joiningDate')}
                 onChange={(e) => handleJoiningDateChange(e.target.value)}
                 className={styles.inputField}
               />
@@ -811,6 +806,7 @@ www.shortfundly.com`;
                 type="date"
                 min={formData.joiningDate || todayStr}
                 value={formData.endDate}
+                onFocus={() => checkPrerequisite('endDate')}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                 className={styles.inputField}
               />
@@ -827,13 +823,70 @@ www.shortfundly.com`;
                 type="datetime-local"
                 min={todayDateTimeStr}
                 value={formData.deadline}
+                onFocus={() => checkPrerequisite('deadline')}
                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                 className={styles.inputField}
               />
               <span style={{ fontSize: '11px', color: '#94a3b8' }}>Link automatically locks after this date/time</span>
             </div>
 
-            {/* Field 11: Assigned Batch with Add New Option and Solo Intern */}
+            {/* Field 11: Unique Candidate Offer Response Portal Link with Deadline Fixer (Moved here near Expiry Deadline) */}
+            <div className={styles.fieldGroup} style={{ gridColumn: 'span 2', background: '#09090b', padding: '14px 16px', borderRadius: '8px', border: '1px solid #232328' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label className={styles.fieldLabel} style={{ margin: 0 }}>
+                  <span style={{ color: '#ffffff', fontWeight: 700 }}>Unique Candidate Portal Response URL</span>
+                  <span style={{ fontSize: '11px', color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Sparkles size={11} /> Live Production Vercel Link
+                  </span>
+                </label>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(candidatePortalUrl);
+                      showToast?.('Copied Vercel Candidate Portal URL to clipboard!', 'success');
+                    }}
+                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#cbd5e1', cursor: 'pointer' }}
+                  >
+                    Copy URL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextTok = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+                      setPortalToken(nextTok);
+                      showToast?.('Regenerated candidate portal URL token!', 'info');
+                    }}
+                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#c084fc', cursor: 'pointer' }}
+                  >
+                    Regenerate URL
+                  </button>
+                </div>
+              </div>
+              <input
+                type="text"
+                readOnly
+                value={candidatePortalUrl}
+                className={`${styles.inputField} ${styles.brightUrlInput}`}
+              />
+
+              {/* Deadline Fixer Option Bar */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #1c1b24' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Clock size={12} color="#c084fc" />
+                  <span style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 600 }}>Deadline Fixer:</span>
+                  <button type="button" onClick={() => setDeadlinePreset(24)} className={styles.btnDeadlinePreset}>+24h (1 Day)</button>
+                  <button type="button" onClick={() => setDeadlinePreset(48)} className={styles.btnDeadlinePreset}>+48h (2 Days)</button>
+                  <button type="button" onClick={() => setDeadlinePreset(72)} className={styles.btnDeadlinePreset}>+72h (3 Days)</button>
+                  <button type="button" onClick={() => setDeadlinePreset(168)} className={styles.btnDeadlinePreset}>+7 Days (1 Wk)</button>
+                </div>
+                <div style={{ fontSize: '11px', color: '#34d399' }}>
+                  Expires: <strong>{formData.deadline ? new Date(formData.deadline).toLocaleString() : 'Not Set'}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Field 12: Assigned Batch with Add New Option and Solo Intern */}
             <div className={styles.fieldGroup}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <label className={styles.fieldLabel} style={{ margin: 0 }}>
@@ -914,11 +967,11 @@ www.shortfundly.com`;
               <span>Choose Corporate Template</span>
             </label>
             <select
-              value={formData.templateId}
+              value={formData.templateId || availableTemplates[0]?.id || ''}
               onChange={(e) => setFormData({ ...formData, templateId: e.target.value })}
               className={styles.inputField}
             >
-              {templates.map((t) => (
+              {availableTemplates.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name} {t.isDefault ? '(Default)' : ''}
                 </option>
@@ -978,6 +1031,59 @@ www.shortfundly.com`;
             />
           </div>
 
+          {/* Additional File and Image Attachments */}
+          <div className={styles.attachmentsContainer} style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+              <label className={styles.fieldLabel} style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Paperclip size={15} color="#a855f7" />
+                <span style={{ color: '#ffffff', fontWeight: 600 }}>Attach Images &amp; Documents to Email (Optional)</span>
+              </label>
+              <label style={{ cursor: 'pointer', background: 'rgba(168, 85, 247, 0.15)', border: '1px solid #a855f7', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', color: '#c084fc', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+                <Upload size={13} />
+                <span>+ Upload Files / Images</span>
+                <input
+                  type="file"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      const selected = Array.from(e.target.files);
+                      setAttachedFiles((prev) => [...prev, ...selected]);
+                      showToast?.(`Attached ${selected.length} file(s)`, 'info');
+                    }
+                  }}
+                />
+              </label>
+            </div>
+            <div style={{ fontSize: '11.5px', color: '#94a3b8' }}>
+              Add PDF handbook, onboarding materials, identity proof guidelines, or banner images to be sent alongside the formal Offer Letter PDF.
+            </div>
+
+            {attachedFiles.length > 0 && (
+              <div className={styles.attachmentsList}>
+                {attachedFiles.map((file, idx) => (
+                  <div key={idx} className={styles.attachmentItem}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Paperclip size={13} color="#a855f7" />
+                      <span style={{ fontWeight: 600, color: '#f8fafc' }}>{file.name}</span>
+                      <span style={{ fontSize: '10.5px', color: '#94a3b8' }}>
+                        ({(file.size / 1024).toFixed(1)} KB)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAttachedFiles((prev) => prev.filter((_, i) => i !== idx))}
+                      className={styles.attachmentRemoveBtn}
+                      title="Remove attachment"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className={styles.actionStepRow}>
             <button
               type="button"
@@ -1014,8 +1120,10 @@ www.shortfundly.com`;
                 type="button"
                 onClick={() => setPreviewTab('email')}
                 className={`${styles.previewTab} ${previewTab === 'email' ? styles.previewTabActive : ''}`}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
               >
-                Email Preview
+                <Mail size={14} />
+                <span>✉️ 1. Email Content Preview</span>
               </button>
               <button
                 type="button"
@@ -1024,8 +1132,10 @@ www.shortfundly.com`;
                   loadPdfPreview();
                 }}
                 className={`${styles.previewTab} ${previewTab === 'pdf' ? styles.previewTabActive : ''}`}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
               >
-                PDF Offer Letter Preview
+                <FileText size={14} />
+                <span>📄 2. Offer Letter PDF Preview</span>
               </button>
             </div>
           </div>
@@ -1034,14 +1144,32 @@ www.shortfundly.com`;
             {previewTab === 'email' ? (
               <div style={{ color: '#cbd5e1' }}>
                 <div style={{ background: '#141417', border: '1px solid #27272a', padding: '12px 16px', borderRadius: '6px', marginBottom: '16px', fontSize: '13px' }}>
-                  <div><strong>To:</strong> {formData.email} ({formData.fullName})</div>
-                  {formData.cc && <div><strong>CC:</strong> {formData.cc}</div>}
-                  <div><strong>Subject:</strong> {renderJinja(formData.customSubject || activeTemplate?.subject || 'Official Internship Offer from Shortfundly - {{candidateName}}', previewContext)}</div>
-                  <div><strong>Intern ID:</strong> <code style={{ color: '#c084fc' }}>{formData.internId}</code></div>
-                  <div><strong>Expiration Deadline:</strong> {new Date(formData.deadline).toLocaleString()}</div>
-                  <div style={{ marginTop: '4px', wordBreak: 'break-all', color: '#94a3b8', fontSize: '11.5px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <div><strong>To:</strong> {formData.email} ({formData.fullName})</div>
+                      {formData.cc && <div><strong>CC:</strong> {formData.cc}</div>}
+                      <div><strong>Subject:</strong> {renderJinja(formData.customSubject || activeTemplate?.subject || 'Official Internship Offer from Shortfundly - {{candidateName}}', previewContext)}</div>
+                      <div><strong>Intern ID:</strong> <code style={{ color: '#ffffff', fontWeight: 700 }}>{formData.internId}</code></div>
+                      <div><strong>Expiration Deadline:</strong> {formData.deadline ? new Date(formData.deadline).toLocaleString() : '3 Days'}</div>
+                      {attachedFiles.length > 0 && (
+                        <div><strong>Attached Files:</strong> <span style={{ color: '#c084fc' }}>{attachedFiles.length} file(s) ({attachedFiles.map(f => f.name).join(', ')})</span></div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreviewTab('pdf');
+                        loadPdfPreview();
+                      }}
+                      style={{ background: 'rgba(168, 85, 247, 0.15)', border: '1px solid #a855f7', color: '#c084fc', borderRadius: '4px', padding: '5px 12px', fontSize: '11px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap', fontWeight: 600 }}
+                    >
+                      <FileText size={12} />
+                      <span>Switch to PDF Preview &rarr;</span>
+                    </button>
+                  </div>
+                  <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px solid #27272a', wordBreak: 'break-all', color: '#94a3b8', fontSize: '11.5px' }}>
                     <Link2 size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
-                    Generated Candidate Portal URL: <span style={{ color: '#a855f7' }}>{previewContext.responseUrl}</span>
+                    Generated Candidate Portal URL: <span style={{ color: '#38bdf8', fontWeight: 600 }}>{previewContext.responseUrl}</span>
                   </div>
                 </div>
 

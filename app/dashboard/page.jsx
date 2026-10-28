@@ -1793,7 +1793,7 @@ export default function DashboardPage() {
                   </div>
 
                   <div style={{ background: '#09090b', border: '1px solid #232328', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: '#cbd5e1', lineHeight: 1.6 }}>
-                    <strong style={{ color: '#c084fc' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#e9d5ff' }}>Name, Email, Phone, Role, Degree, College, JoiningDate, Duration, Stipend</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Intern IDs & Expiring URLs</strong>.
+                    <strong style={{ color: '#c084fc' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#e9d5ff' }}>Name, Email ID, Phone Number, Role, Degree, College, JoiningDate, EndingDate, Monthly Stipend (INR)</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Intern IDs & Expiring URLs</strong>.
                   </div>
 
                   {bulkValidationReport ? (

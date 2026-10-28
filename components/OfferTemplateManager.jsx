@@ -93,6 +93,62 @@ www.shortfundly.com`;
     responseUrl: 'https://internship-email-automation.vercel.app/offers/respond?token=sample_token_hash_00042',
   };
 
+  const defaultPdfTextTemplate = `We are delighted to offer you an online internship as {{role}} at Shortfundly Media Technologies Pvt. Ltd.
+
+Internship Terms & Schedule:
+• Position & Role: {{role}}
+• Intern ID: {{internId}}
+• Duration & Period: {{startDate}} to {{endDate}} ({{duration}})
+• Work Mode: {{workMode}}
+• Monthly Stipend: {{stipend}}
+• Reporting Manager: {{reportingManager}}
+• Assigned Technical Mentor: {{assignedMentor}}
+
+Roles & Responsibilities:
+During this internship, you will participate in engineering sprints, collaborate with technical leads, and develop scalable features. All deliverables and source code developed during your tenure shall remain the intellectual property of Shortfundly Media Technologies Pvt. Ltd.
+
+Upon satisfactory completion of your deliverables and milestone evaluation, you will receive an Official Internship Completion Certificate.
+
+Please confirm your acceptance by signing and submitting your digital acceptance on your secure candidate portal before {{deadline}}.`;
+
+  const displayTemplates = (templates && templates.length > 0)
+    ? templates
+    : [
+        {
+          id: 'default-standard-tmpl',
+          name: 'Corporate Standard Offer Letter',
+          subject: 'Official Internship Offer from Shortfundly - {{candidateName}}',
+          emailBody: defaultJinjaText,
+          pdfTemplate: defaultPdfTextTemplate,
+          isDefault: true,
+        },
+        {
+          id: 'default-fast-track-tmpl',
+          name: 'Fast-Track Technical Internship Offer',
+          subject: 'Fast-Track Technical Internship Offer Letter | Shortfundly - {{candidateName}}',
+          emailBody: `Dear {{candidateName}},
+
+Congratulations! Following your outstanding technical evaluation, we are thrilled to offer you the position of {{role}} at Shortfundly under our Fast-Track Engineering Program.
+
+Internship Logistics:
+• Role / Position: {{role}}
+• Intern ID: {{internId}}
+• Anticipated Start Date: {{startDate}}
+• Duration: {{duration}}
+• Monthly Stipend: {{stipend}}
+
+Action Required:
+Review your attached formal offer letter PDF and record your acceptance using your candidate portal link below:
+{{responseUrl}}
+
+Best regards,
+Talent Acquisition Team
+Shortfundly`,
+          pdfTemplate: defaultPdfTextTemplate,
+          isDefault: false,
+        },
+      ];
+
   const handleOpenCreate = () => {
     setIsNew(true);
     setActiveTab('editor');
@@ -102,7 +158,7 @@ www.shortfundly.com`;
       name: '',
       subject: 'Official Internship Offer from Shortfundly - {{candidateName}}',
       emailBody: defaultJinjaText,
-      pdfTemplate: templates[0]?.pdfTemplate || '<!DOCTYPE html><html><body>Corporate Offer Letter</body></html>',
+      pdfTemplate: defaultPdfTextTemplate,
       isDefault: false,
     });
   };
@@ -115,6 +171,7 @@ www.shortfundly.com`;
     setEditingTemplate({
       ...t,
       emailBody: normalizeToJinjaPlainText(t.emailBody || defaultJinjaText),
+      pdfTemplate: t.pdfTemplate || defaultPdfTextTemplate,
     });
   };
 
@@ -179,7 +236,7 @@ www.shortfundly.com`;
 
       {/* Grid of Templates */}
       <div className={styles.templatesGrid}>
-        {templates.map((tmpl) => (
+        {displayTemplates.map((tmpl) => (
           <div key={tmpl.id} className={styles.templateCard}>
             <div>
               <div className={styles.templateName}>
@@ -325,41 +382,46 @@ www.shortfundly.com`;
                     />
                   </div>
 
-                  {/* Advanced PDF Template Toggle */}
-                  <div style={{ background: '#111115', border: '1px solid #232328', borderRadius: '8px', padding: '14px' }}>
-                    <div
-                      onClick={() => setShowAdvancedPdfHtml(!showAdvancedPdfHtml)}
-                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-                    >
+                  {/* User-Friendly Plain Text PDF Content Customizer */}
+                  <div style={{ background: '#111115', border: '1px solid #232328', borderRadius: '8px', padding: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <FileCheck size={16} color="#a855f7" />
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#f4f4f5' }}>
-                          Offer Letter PDF Layout & Styling
-                        </span>
-                        <span style={{ fontSize: '11px', color: '#64748b' }}>
-                          (Pre-configured official Shortfundly letterhead)
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#f4f4f5' }}>
+                          Offer Letter PDF Terms & Body (User-Friendly Plain Text Format - No HTML)
                         </span>
                       </div>
-                      <div style={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
-                        <span>{showAdvancedPdfHtml ? 'Hide Source' : 'Customize PDF HTML Source'}</span>
-                        {showAdvancedPdfHtml ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                      </div>
+                      <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
+                        &bull; Auto-Formatted into Official A4 Letterhead
+                      </span>
                     </div>
 
-                    {showAdvancedPdfHtml && (
-                      <div style={{ marginTop: '12px' }}>
-                        <p style={{ margin: '0 0 8px 0', fontSize: '11.5px', color: '#94a3b8' }}>
-                          This HTML is compiled into a pixel-perfect, single-page A4 PDF using Playwright with official branding and signatures.
-                        </p>
-                        <textarea
-                          rows={8}
-                          value={editingTemplate.pdfTemplate}
-                          onChange={(e) => setEditingTemplate({ ...editingTemplate, pdfTemplate: e.target.value })}
-                          className={styles.textarea}
-                          style={{ fontSize: '11.5px', fontFamily: 'monospace' }}
-                        />
-                      </div>
-                    )}
+                    <p style={{ margin: '0 0 10px 0', fontSize: '11.5px', color: '#94a3b8' }}>
+                      Customize the text content of the formal A4 PDF attachment. No coding or HTML required. Uses variables like <code>&#123;&#123;candidateName&#125;&#125;</code>, <code>&#123;&#123;role&#125;&#125;</code>, <code>&#123;&#123;stipend&#125;&#125;</code>.
+                    </p>
+
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                      {availableTags.map((t) => (
+                        <span
+                          key={`pdf-${t}`}
+                          onClick={() => handleInsertTag(t, 'pdfTemplate')}
+                          className={styles.tagPill}
+                          style={{ fontSize: '10.5px' }}
+                          title={`Click to insert ${t}`}
+                        >
+                          + {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    <textarea
+                      rows={10}
+                      value={editingTemplate.pdfTemplate}
+                      onChange={(e) => setEditingTemplate({ ...editingTemplate, pdfTemplate: e.target.value })}
+                      className={styles.textarea}
+                      style={{ fontSize: '12.5px', fontFamily: 'monospace', lineHeight: 1.6 }}
+                      placeholder="Enter the official terms for the offer letter PDF..."
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
