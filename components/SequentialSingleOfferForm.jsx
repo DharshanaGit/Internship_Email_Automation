@@ -5,7 +5,6 @@ import styles from './sequentialForm.module.css';
 import {
   Users,
   CheckCircle2,
-  Lock,
   AlertCircle,
   FileText,
   Mail,
@@ -16,7 +15,10 @@ import {
   Info,
   Clock,
   Sparkles,
-  Link2
+  Link2,
+  Plus,
+  RefreshCw,
+  Printer
 } from 'lucide-react';
 import { renderJinja, jinjaTextToEmailHtml } from '../lib/jinjaEngine.js';
 
@@ -34,10 +36,48 @@ export default function SequentialSingleOfferForm({
   const [intakeMode, setIntakeMode] = useState('database');
   const [selectedCandidateId, setSelectedCandidateId] = useState('');
 
+  // Batch options state with customization
+  const [batchOptions, setBatchOptions] = useState(() => {
+    const defaultList = ['Batch A', 'Batch B', 'Batch C', 'Solo Intern (Individual Track)'];
+    if (batches && batches.length > 0) {
+      batches.forEach((b) => {
+        const name = b.batchName || b.name;
+        if (name && !defaultList.includes(name)) defaultList.unshift(name);
+      });
+    }
+    return defaultList;
+  });
+  const [isAddingNewBatch, setIsAddingNewBatch] = useState(false);
+  const [newBatchName, setNewBatchName] = useState('');
+
+  // Helper function: get role keyword for readable Intern ID (e.g. wd, sd)
+  const getRoleKeyword = (roleName = '') => {
+    const r = (roleName || '').toLowerCase();
+    if (r.includes('web')) return 'WD';
+    if (r.includes('software')) return 'SD';
+    if (r.includes('frontend')) return 'FE';
+    if (r.includes('backend')) return 'BE';
+    if (r.includes('full')) return 'FS';
+    if (r.includes('ui') || r.includes('ux') || r.includes('design')) return 'UI';
+    if (r.includes('ai') || r.includes('ml') || r.includes('machine') || r.includes('data')) return 'AI';
+    if (r.includes('android') || r.includes('flutter') || r.includes('mobile') || r.includes('ios')) return 'MB';
+    return 'DEV';
+  };
+
+  // Generate readable Intern ID (e.g., SF-WD-2026-001)
+  const generateReadableInternId = (role = 'Web Developer Intern') => {
+    const kw = getRoleKeyword(role);
+    const randomSeq = Math.floor(100 + Math.random() * 900);
+    return `SF-${kw}-2026-${randomSeq}`;
+  };
+
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const todayDateTimeStr = useMemo(() => new Date().toISOString().slice(0, 16), []);
+
   // Form Fields
   const [formData, setFormData] = useState({
     fullName: '',
-    internId: 'INT-2026-00001',
+    internId: 'SF-WD-2026-001',
     email: '',
     phone: '',
     degree: '',
@@ -59,6 +99,8 @@ export default function SequentialSingleOfferForm({
   });
 
   const [previewTab, setPreviewTab] = useState('email');
+  const [pdfPreviewHtml, setPdfPreviewHtml] = useState('');
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [portalToken, setPortalToken] = useState(() => Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2));
   const VERCEL_PROD_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://internship-email-automation.vercel.app').replace(/\/+$/, '');
@@ -71,10 +113,13 @@ export default function SequentialSingleOfferForm({
     showToast?.(`Offer response deadline set to ${hours} hours (${d.toLocaleString()})`, 'info');
   };
 
-  // Auto-generate Gemma 2B unique Intern ID
-  const generateNewGemmaId = () => {
-    const randomSeq = Math.floor(1000 + Math.random() * 9000);
-    return `INT-2026-${String(randomSeq).padStart(5, '0')}`;
+  // Adjust stipend with stepper (+50, -50, +500, etc.)
+  const handleAdjustStipend = (amount) => {
+    setFormData((prev) => {
+      const current = Number(prev.stipend.toString().replace(/[^0-9]/g, '')) || 0;
+      const next = Math.max(0, current + amount);
+      return { ...prev, stipend: next.toString() };
+    });
   };
 
   // Set default deadline to 3 days from now and initial template
@@ -85,7 +130,7 @@ export default function SequentialSingleOfferForm({
       ...prev,
       deadline: prev.deadline || formatted,
       templateId: prev.templateId || (templates[0]?.id || ''),
-      internId: prev.internId || generateNewGemmaId(),
+      internId: prev.internId || generateReadableInternId(prev.role),
     }));
   }, [templates]);
 
@@ -94,15 +139,16 @@ export default function SequentialSingleOfferForm({
     setSelectedCandidateId(candId);
     const cand = candidates.find((c) => c.id === candId || c.candidateId === candId || c.internId === candId);
     if (cand) {
+      const role = cand.role || 'Web Developer Intern';
       setFormData((prev) => ({
         ...prev,
         fullName: cand.fullName || '',
-        internId: cand.internId || cand.candidateId || generateNewGemmaId(),
+        internId: cand.internId || cand.candidateId || generateReadableInternId(role),
         email: cand.email || '',
         phone: cand.phone || '',
         degree: cand.degree || 'B.Tech / B.E.',
         collegeName: cand.collegeName || 'Recognized University',
-        role: cand.role || 'Web Developer Intern',
+        role,
         stipend: cand.stipend ? cand.stipend.replace(/[^0-9]/g, '') : '10000',
         joiningDate: cand.joiningDate || '2026-06-01',
         endDate: cand.endDate || '2026-08-31',
@@ -121,7 +167,7 @@ export default function SequentialSingleOfferForm({
     setSelectedCandidateId('');
     setFormData((prev) => ({
       ...prev,
-      internId: generateNewGemmaId(),
+      internId: generateReadableInternId('Web Developer Intern'),
       fullName: '',
       email: '',
       phone: '',
@@ -134,7 +180,7 @@ export default function SequentialSingleOfferForm({
 
   // Auto-associate batch based on joining date
   const handleJoiningDateChange = (newDate) => {
-    let suggestedBatch = 'Batch A';
+    let suggestedBatch = formData.batch || 'Batch A';
     if (newDate) {
       const existingBatch = batches.find((b) => b.joiningDate === newDate);
       if (existingBatch) {
@@ -152,11 +198,36 @@ export default function SequentialSingleOfferForm({
     }));
   };
 
-  // --- Strict Sequential Validations (Zod-equivalent inline checks) ---
+  // Handle Role change: update readable Intern ID keyword
+  const handleRoleChange = (newRole) => {
+    setFormData((prev) => ({
+      ...prev,
+      role: newRole,
+      internId: generateReadableInternId(newRole),
+    }));
+  };
+
+  // Add custom new batch
+  const handleSaveNewBatch = () => {
+    if (!newBatchName.trim()) {
+      showToast?.('Please enter a batch name.', 'error');
+      return;
+    }
+    const trimmed = newBatchName.trim();
+    if (!batchOptions.includes(trimmed)) {
+      setBatchOptions((prev) => [trimmed, ...prev]);
+    }
+    setFormData((prev) => ({ ...prev, batch: trimmed }));
+    setNewBatchName('');
+    setIsAddingNewBatch(false);
+    showToast?.(`New batch "${trimmed}" created and selected!`, 'success');
+  };
+
+  // Inline Validations
   const validationErrors = useMemo(() => {
     const errs = {};
 
-    // 0. Full Name: Required, letters & spaces only (no numbers)
+    // Full Name: Required, letters & spaces only
     if (!formData.fullName.trim()) {
       errs.fullName = 'Candidate name is required.';
     } else if (/\d/.test(formData.fullName)) {
@@ -165,73 +236,52 @@ export default function SequentialSingleOfferForm({
       errs.fullName = 'Name must be at least 2 characters.';
     }
 
-    // 1. Intern ID: Required unique identifier
+    // Intern ID: Required
     if (!formData.internId.trim()) {
       errs.internId = 'Intern ID is required.';
-    } else if (!/^INT-\d{4}-\d{4,5}$/i.test(formData.internId.trim())) {
-      errs.internId = 'Intern ID format must be INT-YYYY-XXXXX (e.g. INT-2026-00001).';
     }
 
-    // 2. Email ID: Valid email format
+    // Email ID: Valid email format
     if (!formData.email.trim()) {
       errs.email = 'Email address is required.';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       errs.email = 'Please enter a valid email address.';
     }
 
-    // 3. Phone: numbers and leading + only (10 to 15 digits)
+    // Phone: 10 to 15 digits
     if (!formData.phone.trim()) {
       errs.phone = 'Phone number is required.';
     } else if (!/^\+?[0-9]{10,15}$/.test(formData.phone.trim().replace(/[\s-]/g, ''))) {
-      errs.phone = 'Phone must contain numbers and optional leading + only (10–15 digits).';
+      errs.phone = 'Phone must contain 10–15 digits.';
     }
 
-    // 4. Degree: Required string
+    // Degree: Required
     if (!formData.degree.trim()) {
       errs.degree = 'Degree / qualification is required.';
     }
 
-    // 5. College: Required string
+    // College: Required
     if (!formData.collegeName.trim()) {
       errs.collegeName = 'College / university name is required.';
-    } else if (formData.collegeName.trim().length < 3) {
-      errs.collegeName = 'College name must be at least 3 characters.';
     }
 
-    // 6. Designation / Role: Required
+    // Designation / Role: Required
     if (!formData.role.trim()) {
       errs.role = 'Designation / role is required.';
     }
 
-    // 7. Stipend: Numeric only
+    // Stipend: Numeric only
     if (!formData.stipend.toString().trim()) {
       errs.stipend = 'Stipend amount is required.';
-    } else if (!/^[0-9]+$/.test(formData.stipend.toString().trim().replace(/[^0-9]/g, ''))) {
-      errs.stipend = 'Stipend must be a valid numeric amount.';
     }
 
-    // 8. Logistics
+    // Dates
     if (!formData.joiningDate) errs.joiningDate = 'Joining date is required.';
     if (!formData.endDate) errs.endDate = 'End date is required.';
     if (!formData.deadline) errs.deadline = 'Offer response deadline is required.';
 
     return errs;
   }, [formData]);
-
-  // Sequential Field Sequence definition
-  const sequenceOrder = ['fullName', 'internId', 'email', 'phone', 'degree', 'collegeName', 'role', 'stipend', 'logistics'];
-
-  const isFieldLocked = (fieldKey) => {
-    const idx = sequenceOrder.indexOf(fieldKey);
-    if (idx <= 0) return false;
-    for (let i = 0; i < idx; i++) {
-      const prevKey = sequenceOrder[i];
-      if (validationErrors[prevKey]) return true;
-      if (prevKey === 'logistics') continue;
-      if (!formData[prevKey] || !formData[prevKey].toString().trim()) return true;
-    }
-    return false;
-  };
 
   const isStep1Valid = Object.keys(validationErrors).length === 0;
 
@@ -240,10 +290,57 @@ export default function SequentialSingleOfferForm({
     return templates.find((t) => t.id === formData.templateId) || templates[0] || null;
   }, [templates, formData.templateId]);
 
-  // Handle Send Single Offer
+  // Load PDF preview when switching to PDF tab or entering Step 3
+  const loadPdfPreview = async () => {
+    try {
+      setPdfLoading(true);
+      const res = await fetch('/api/offer-letter/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateData: {
+            fullName: formData.fullName || 'Candidate Name',
+            candidateId: formData.internId || 'SF-WD-2026-001',
+            role: formData.role || 'Web Developer Intern',
+            stipend: `Rs. ${Number(formData.stipend || 10000).toLocaleString('en-IN')}`,
+            joiningDate: formData.joiningDate || '2026-06-01',
+            endDate: formData.endDate || '2026-08-31',
+            duration: formData.duration || '3 Months',
+            workMode: formData.workMode || 'Online - Remote',
+            reportingManager: formData.reportingManager || 'Priyanka Nair',
+            assignedMentor: formData.assignedMentor || 'Rahul Kapoor',
+            collegeName: formData.collegeName || 'Recognized University',
+            degree: formData.degree || 'Bachelor of Technology',
+            phone: formData.phone || '+91 9876543210',
+            email: formData.email || 'candidate@example.com',
+          },
+          customSubject: formData.customSubject,
+          customBody: formData.customBody,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.html) {
+        setPdfPreviewHtml(data.html);
+      }
+    } catch (err) {
+      console.warn('Error generating PDF preview:', err.message);
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (currentStep === 3) {
+      loadPdfPreview();
+    }
+  }, [currentStep, formData]);
+
+  // Dispatch single offer letter
   const handleSendOffer = async () => {
     if (!isStep1Valid) {
-      showToast?.('Please resolve all validation errors before sending.', 'error');
+      showToast?.('Please ensure all required fields are valid.', 'error');
+      setCurrentStep(1);
       return;
     }
 
@@ -297,7 +394,7 @@ export default function SequentialSingleOfferForm({
     return {
       candidateName: formData.fullName || 'Candidate Name',
       role: formData.role || 'Web Developer Intern',
-      internId: formData.internId || 'INT-2026-00001',
+      internId: formData.internId || 'SF-WD-2026-001',
       startDate: formData.joiningDate || '2026-06-01',
       endDate: formData.endDate || '2026-08-31',
       duration: formData.duration || '3 Months',
@@ -360,9 +457,27 @@ www.shortfundly.com`;
         </div>
       </div>
 
-      {/* --- STEP 1: STRICT SEQUENTIAL CANDIDATE DETAILS --- */}
+      {/* --- STEP 1: SEQUENTIAL CANDIDATE DETAILS --- */}
       {currentStep === 1 && (
         <div>
+          {/* Friendly Guidance Indicator Banner */}
+          {!formData.fullName.trim() ? (
+            <div className={`${styles.guidanceBanner} ${styles.guidanceBannerAlert}`}>
+              <Info size={16} />
+              <span>💡 <strong>Next Step:</strong> Please enter the Candidate's Name below before proceeding with the remaining details.</span>
+            </div>
+          ) : !formData.email.trim() ? (
+            <div className={`${styles.guidanceBanner} ${styles.guidanceBannerAlert}`}>
+              <Info size={16} />
+              <span>💡 <strong>Candidate name set ({formData.fullName}):</strong> Enter candidate email address to link offer response link.</span>
+            </div>
+          ) : (
+            <div className={`${styles.guidanceBanner} ${styles.guidanceBannerSuccess}`}>
+              <CheckCircle2 size={16} />
+              <span>✓ <strong>Candidate details ready:</strong> All details are editable. Configure role, stipend, and calendar dates below.</span>
+            </div>
+          )}
+
           <div className={styles.modeToggleRow}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Users size={16} color="#a855f7" />
@@ -392,7 +507,7 @@ www.shortfundly.com`;
             <div className={styles.fieldGroup} style={{ marginBottom: '20px' }}>
               <label className={styles.fieldLabel}>
                 <span>Select Candidate Record <span className={styles.requiredStar}>*</span></span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Auto-populates candidate details & unique Intern ID</span>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Auto-populates details & readable Intern ID</span>
               </label>
               <select
                 value={selectedCandidateId}
@@ -409,7 +524,7 @@ www.shortfundly.com`;
             </div>
           )}
 
-          {/* Sequential Fields Grid */}
+          {/* Sequential Fields Grid (Fully Visible & Editable, no harsh locking) */}
           <div className={styles.fieldGrid}>
             {/* Field 0: Full Name */}
             <div className={styles.fieldGroup}>
@@ -418,7 +533,7 @@ www.shortfundly.com`;
               </label>
               <input
                 type="text"
-                placeholder="e.g. Akash Kumar (letters only)"
+                placeholder="e.g. Akash Kumar"
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 className={`${styles.inputField} ${formData.fullName && validationErrors.fullName ? styles.inputError : formData.fullName ? styles.inputValid : ''}`}
@@ -431,35 +546,33 @@ www.shortfundly.com`;
               )}
             </div>
 
-            {/* Field 1: Gemma 2B Generated Intern ID (Customizable by HR) */}
+            {/* Field 1: Intern ID (Keyword-based e.g. SF-WD-2026-001) */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
-                <span>Gemma 2B Unique Intern ID <span className={styles.requiredStar}>*</span></span>
+                <span>Intern ID <span className={styles.requiredStar}>*</span></span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10.5px', color: '#c084fc' }}>
-                  <Sparkles size={11} /> AI Guaranteed Unique
+                  <Sparkles size={11} /> Readable Keyword ID
                 </span>
               </label>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <input
                   type="text"
-                  disabled={isFieldLocked('internId')}
-                  placeholder="INT-2026-00001"
+                  placeholder="SF-WD-2026-001"
                   value={formData.internId}
                   onChange={(e) => setFormData({ ...formData, internId: e.target.value.toUpperCase() })}
-                  className={`${styles.inputField} ${isFieldLocked('internId') ? styles.inputLocked : ''} ${formData.internId && validationErrors.internId ? styles.inputError : formData.internId ? styles.inputValid : ''}`}
+                  className={`${styles.inputField} ${formData.internId && validationErrors.internId ? styles.inputError : formData.internId ? styles.inputValid : ''}`}
                   style={{ fontFamily: 'monospace' }}
                 />
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, internId: generateNewGemmaId() })}
-                  disabled={isFieldLocked('internId')}
+                  onClick={() => setFormData({ ...formData, internId: generateReadableInternId(formData.role) })}
                   style={{ padding: '0 12px', background: '#141417', border: '1px solid #27272a', borderRadius: '6px', color: '#c084fc', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                  title="Generate New Unique Intern ID"
+                  title="Generate New Readable Intern ID"
                 >
                   Regenerate
                 </button>
               </div>
-              {!isFieldLocked('internId') && formData.internId && validationErrors.internId && (
+              {formData.internId && validationErrors.internId && (
                 <div className={styles.fieldError}>
                   <AlertCircle size={12} />
                   <span>{validationErrors.internId}</span>
@@ -522,29 +635,23 @@ www.shortfundly.com`;
                   Expires: <strong>{formData.deadline ? new Date(formData.deadline).toLocaleString() : 'Not Set'}</strong>
                 </div>
               </div>
-
-              <p style={{ margin: '6px 0 0 0', fontSize: '11.5px', color: '#94a3b8' }}>
-                &bull; Secure Vercel link dispatched in email. The candidate reviews terms and provides digital signature or uploads photo of signature in Cloudinary before expiration.
-              </p>
             </div>
 
-            {/* Field 2: Email ID (Locked until Intern ID valid) */}
+            {/* Field 2: Email ID */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 <span>Candidate Email ID <span className={styles.requiredStar}>*</span></span>
-                {isFieldLocked('email') && <span className={styles.lockedBadge}>Locked</span>}
               </label>
               <input
                 type="email"
                 autoComplete="off"
-                disabled={isFieldLocked('email')}
                 placeholder="candidate@gmail.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value.toLowerCase() })}
-                className={`${styles.inputField} ${isFieldLocked('email') ? styles.inputLocked : ''} ${formData.email && validationErrors.email ? styles.inputError : formData.email ? styles.inputValid : ''}`}
-                style={{ backgroundColor: '#09090b', color: '#f8fafc' }}
+                className={`${styles.inputField} ${formData.email && validationErrors.email ? styles.inputError : formData.email ? styles.inputValid : ''}`}
+                style={{ backgroundColor: '#09090b', color: '#ffffff' }}
               />
-              {!isFieldLocked('email') && formData.email && validationErrors.email && (
+              {formData.email && validationErrors.email && (
                 <div className={styles.fieldError}>
                   <AlertCircle size={12} />
                   <span>{validationErrors.email}</span>
@@ -552,21 +659,19 @@ www.shortfundly.com`;
               )}
             </div>
 
-            {/* Field 3: Phone (Locked until Email valid) */}
+            {/* Field 3: Phone */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 <span>Phone Number <span className={styles.requiredStar}>*</span></span>
-                {isFieldLocked('phone') && <span className={styles.lockedBadge}>Locked</span>}
               </label>
               <input
                 type="text"
-                disabled={isFieldLocked('phone')}
-                placeholder="+919876543210 (digits and + only)"
+                placeholder="+91 9876543210"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className={`${styles.inputField} ${isFieldLocked('phone') ? styles.inputLocked : ''} ${formData.phone && validationErrors.phone ? styles.inputError : formData.phone ? styles.inputValid : ''}`}
+                className={`${styles.inputField} ${formData.phone && validationErrors.phone ? styles.inputError : formData.phone ? styles.inputValid : ''}`}
               />
-              {!isFieldLocked('phone') && formData.phone && validationErrors.phone && (
+              {formData.phone && validationErrors.phone && (
                 <div className={styles.fieldError}>
                   <AlertCircle size={12} />
                   <span>{validationErrors.phone}</span>
@@ -574,169 +679,211 @@ www.shortfundly.com`;
               )}
             </div>
 
-            {/* Field 4: Degree (Locked until Phone valid) */}
+            {/* Field 4: Degree */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 <span>Degree / Program <span className={styles.requiredStar}>*</span></span>
-                {isFieldLocked('degree') && <span className={styles.lockedBadge}>Locked</span>}
               </label>
               <input
                 type="text"
-                disabled={isFieldLocked('degree')}
-                placeholder="e.g. B.Tech / B.E. Computer Science"
+                placeholder="e.g. B.Tech Computer Science"
                 value={formData.degree}
                 onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-                className={`${styles.inputField} ${isFieldLocked('degree') ? styles.inputLocked : ''} ${formData.degree && validationErrors.degree ? styles.inputError : formData.degree ? styles.inputValid : ''}`}
+                className={`${styles.inputField} ${formData.degree && validationErrors.degree ? styles.inputError : formData.degree ? styles.inputValid : ''}`}
               />
-              {!isFieldLocked('degree') && formData.degree && validationErrors.degree && (
-                <div className={styles.fieldError}>
-                  <AlertCircle size={12} />
-                  <span>{validationErrors.degree}</span>
-                </div>
-              )}
             </div>
 
-            {/* Field 5: College Name (Locked until Degree valid) */}
+            {/* Field 5: College Name */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 <span>College / University <span className={styles.requiredStar}>*</span></span>
-                {isFieldLocked('collegeName') && <span className={styles.lockedBadge}>Locked</span>}
               </label>
               <input
                 type="text"
-                disabled={isFieldLocked('collegeName')}
                 placeholder="e.g. Anna University, Chennai"
                 value={formData.collegeName}
                 onChange={(e) => setFormData({ ...formData, collegeName: e.target.value })}
-                className={`${styles.inputField} ${isFieldLocked('collegeName') ? styles.inputLocked : ''} ${formData.collegeName && validationErrors.collegeName ? styles.inputError : formData.collegeName ? styles.inputValid : ''}`}
+                className={`${styles.inputField} ${formData.collegeName && validationErrors.collegeName ? styles.inputError : formData.collegeName ? styles.inputValid : ''}`}
               />
-              {!isFieldLocked('collegeName') && formData.collegeName && validationErrors.collegeName && (
-                <div className={styles.fieldError}>
-                  <AlertCircle size={12} />
-                  <span>{validationErrors.collegeName}</span>
-                </div>
-              )}
             </div>
 
-            {/* Field 6: Designation / Role (Locked until College valid) */}
+            {/* Field 6: Designation / Role */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
-                <span>Designation / Internship Role <span className={styles.requiredStar}>*</span></span>
-                {isFieldLocked('role') && <span className={styles.lockedBadge}>Locked</span>}
+                <span>Designation / Role <span className={styles.requiredStar}>*</span></span>
               </label>
               <input
                 type="text"
-                disabled={isFieldLocked('role')}
                 placeholder="e.g. Web Developer Intern"
                 value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className={`${styles.inputField} ${isFieldLocked('role') ? styles.inputLocked : ''}`}
+                onChange={(e) => handleRoleChange(e.target.value)}
+                className={styles.inputField}
               />
             </div>
 
-            {/* Field 7: Stipend Amount (Locked until Role valid) */}
+            {/* Field 7: Stipend with 10k, 15k, 20k suggestions + stepper */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 <span>Monthly Stipend (INR) <span className={styles.requiredStar}>*</span></span>
-                {isFieldLocked('stipend') && <span className={styles.lockedBadge}>Locked</span>}
               </label>
-              <input
-                type="number"
-                disabled={isFieldLocked('stipend')}
-                placeholder="10000"
-                value={formData.stipend}
-                onChange={(e) => setFormData({ ...formData, stipend: e.target.value })}
-                className={`${styles.inputField} ${isFieldLocked('stipend') ? styles.inputLocked : ''} ${formData.stipend && validationErrors.stipend ? styles.inputError : ''}`}
-              />
-              {!isFieldLocked('stipend') && formData.stipend && validationErrors.stipend && (
-                <div className={styles.fieldError}>
-                  <AlertCircle size={12} />
-                  <span>{validationErrors.stipend}</span>
-                </div>
-              )}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="number"
+                  placeholder="10000"
+                  value={formData.stipend}
+                  onChange={(e) => setFormData({ ...formData, stipend: e.target.value })}
+                  className={`${styles.inputField} ${formData.stipend && validationErrors.stipend ? styles.inputError : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleAdjustStipend(50)}
+                  className={styles.stepperBtn}
+                  title="Increase by ₹50"
+                >
+                  +50
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAdjustStipend(-50)}
+                  className={styles.stepperBtn}
+                  title="Decrease by ₹50"
+                >
+                  -50
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAdjustStipend(500)}
+                  className={styles.stepperBtn}
+                  title="Increase by ₹500"
+                >
+                  +500
+                </button>
+              </div>
+
+              {/* Stipend Quick Suggestions */}
+              <div className={styles.stipendPillsRow}>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Suggestions:</span>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, stipend: '10000' })}
+                  className={styles.stipendPill}
+                >
+                  10k (₹10,000)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, stipend: '15000' })}
+                  className={styles.stipendPill}
+                >
+                  15k (₹15,000)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, stipend: '20000' })}
+                  className={styles.stipendPill}
+                >
+                  20k (₹20,000)
+                </button>
+              </div>
             </div>
 
-            {/* Field 8: Joining Date (Auto-associates Batch) */}
+            {/* Field 8: Joining Date (Calendar with past dates disabled) */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
-                <span>Joining Date <span className={styles.requiredStar}>*</span></span>
-                {isFieldLocked('logistics') && <span className={styles.lockedBadge}>Locked</span>}
+                <span>Joining Date (Calendar) <span className={styles.requiredStar}>*</span></span>
               </label>
               <input
                 type="date"
-                disabled={isFieldLocked('logistics')}
+                min={todayStr}
                 value={formData.joiningDate}
                 onChange={(e) => handleJoiningDateChange(e.target.value)}
-                className={`${styles.inputField} ${isFieldLocked('logistics') ? styles.inputLocked : ''}`}
+                className={styles.inputField}
               />
+              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Past dates not allowed (Min: {todayStr})</span>
             </div>
 
-            {/* Field 9: End Date */}
+            {/* Field 9: End Date (Calendar with past dates disabled) */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
-                <span>Internship End Date <span className={styles.requiredStar}>*</span></span>
-                {isFieldLocked('logistics') && <span className={styles.lockedBadge}>Locked</span>}
+                <span>End Date (Calendar) <span className={styles.requiredStar}>*</span></span>
               </label>
               <input
                 type="date"
-                disabled={isFieldLocked('logistics')}
+                min={formData.joiningDate || todayStr}
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className={`${styles.inputField} ${isFieldLocked('logistics') ? styles.inputLocked : ''}`}
+                className={styles.inputField}
               />
+              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Must be on or after joining date</span>
             </div>
 
-            {/* Field 10: Common Link Expiration Deadline (HR controlled) */}
+            {/* Field 10: Expiry Date (Calendar with past dates disabled) */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
-                <span>Offer Portal Expiration Deadline <span className={styles.requiredStar}>*</span></span>
+                <span>Offer Expiry Deadline (Calendar) <span className={styles.requiredStar}>*</span></span>
                 <Clock size={13} color="#c084fc" />
               </label>
               <input
                 type="datetime-local"
+                min={todayDateTimeStr}
                 value={formData.deadline}
                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                 className={styles.inputField}
               />
-              <div className={styles.deadlinePresets}>
-                <span style={{ fontSize: '11px', color: '#94a3b8', alignSelf: 'center' }}>Presets:</span>
-                <button type="button" onClick={() => setDeadlinePreset(24)} className={styles.btnDeadlinePreset}>+24 Hours</button>
-                <button type="button" onClick={() => setDeadlinePreset(48)} className={styles.btnDeadlinePreset}>+48 Hours</button>
-                <button type="button" onClick={() => setDeadlinePreset(72)} className={styles.btnDeadlinePreset}>+3 Days</button>
-                <button type="button" onClick={() => setDeadlinePreset(168)} className={styles.btnDeadlinePreset}>+7 Days</button>
-              </div>
-              <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
-                Unique offer link will automatically expire at this date/time.
-              </span>
+              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Link automatically locks after this date/time</span>
             </div>
 
-            {/* Field 11: Hiring Batch (Auto-assigned based on Joining Date) */}
+            {/* Field 11: Assigned Batch with Add New Option and Solo Intern */}
             <div className={styles.fieldGroup}>
-              <label className={styles.fieldLabel}>
-                <span>Assigned Batch (Auto-Grouped)</span>
-              </label>
-              <select
-                value={formData.batch}
-                onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
-                className={styles.inputField}
-              >
-                {batches.length > 0 ? (
-                  batches.map((b) => <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>)
-                ) : (
-                  <>
-                    <option value="Batch A">Batch A</option>
-                    <option value="Batch B">Batch B</option>
-                    <option value="Batch C">Batch C</option>
-                  </>
-                )}
-              </select>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label className={styles.fieldLabel} style={{ margin: 0 }}>
+                  <span>Assigned Batch / Solo Intern</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsAddingNewBatch(!isAddingNewBatch)}
+                  style={{ background: 'transparent', border: 'none', color: '#c084fc', fontSize: '11px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
+                >
+                  <Plus size={12} />
+                  <span>{isAddingNewBatch ? 'Cancel' : '+ Add New Batch'}</span>
+                </button>
+              </div>
+
+              {isAddingNewBatch ? (
+                <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
+                  <input
+                    type="text"
+                    placeholder="Enter new batch name (e.g. Batch D - AI Track)"
+                    value={newBatchName}
+                    onChange={(e) => setNewBatchName(e.target.value)}
+                    className={styles.inputField}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveNewBatch}
+                    style={{ padding: '0 14px', background: '#7c3aed', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  >
+                    Save
+                  </button>
+                </div>
+              ) : (
+                <select
+                  value={formData.batch}
+                  onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
+                  className={styles.inputField}
+                >
+                  {batchOptions.map((b) => (
+                    <option key={b} value={b}>{b}</option>
+                  ))}
+                </select>
+              )}
             </div>
           </div>
 
           {/* Stepper Navigation */}
           <div className={styles.actionStepRow}>
             <div style={{ fontSize: '12px', color: '#94a3b8' }}>
-              Sequential validation: all fields marked with <span className={styles.requiredStar}>*</span> must be valid to unlock next step.
+              Sequential validation: complete all required fields (<span className={styles.requiredStar}>*</span>) to unlock next step.
             </div>
 
             <button
@@ -856,7 +1003,7 @@ www.shortfundly.com`;
       {/* --- STEP 3: PREVIEW EMAIL & PDF -> SEND --- */}
       {currentStep === 3 && (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
             <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Eye size={18} color="#a855f7" />
               <span>Preview Personalized Offer & Confirm Send</span>
@@ -872,10 +1019,13 @@ www.shortfundly.com`;
               </button>
               <button
                 type="button"
-                onClick={() => setPreviewTab('pdf')}
+                onClick={() => {
+                  setPreviewTab('pdf');
+                  loadPdfPreview();
+                }}
                 className={`${styles.previewTab} ${previewTab === 'pdf' ? styles.previewTabActive : ''}`}
               >
-                PDF Offer Letter
+                PDF Offer Letter Preview
               </button>
             </div>
           </div>
@@ -887,7 +1037,7 @@ www.shortfundly.com`;
                   <div><strong>To:</strong> {formData.email} ({formData.fullName})</div>
                   {formData.cc && <div><strong>CC:</strong> {formData.cc}</div>}
                   <div><strong>Subject:</strong> {renderJinja(formData.customSubject || activeTemplate?.subject || 'Official Internship Offer from Shortfundly - {{candidateName}}', previewContext)}</div>
-                  <div><strong>Unique Intern ID:</strong> <code style={{ color: '#c084fc' }}>{formData.internId}</code></div>
+                  <div><strong>Intern ID:</strong> <code style={{ color: '#c084fc' }}>{formData.internId}</code></div>
                   <div><strong>Expiration Deadline:</strong> {new Date(formData.deadline).toLocaleString()}</div>
                   <div style={{ marginTop: '4px', wordBreak: 'break-all', color: '#94a3b8', fontSize: '11.5px' }}>
                     <Link2 size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
@@ -903,14 +1053,66 @@ www.shortfundly.com`;
                 />
               </div>
             ) : (
+              /* LIVE PDF OFFER LETTER PREVIEW */
               <div>
-                <div style={{ textAlign: 'center', color: '#94a3b8', padding: '20px' }}>
-                  <FileText size={40} color="#a855f7" style={{ margin: '0 auto 10px auto' }} />
-                  <h4 style={{ color: '#ffffff' }}>Playwright Single-Page A4 Corporate Template</h4>
-                  <p style={{ fontSize: '13px' }}>
-                    Personalized with {formData.fullName}, Intern ID: {formData.internId}, {formData.role}, stipend Rs. {formData.stipend}, tenure {formData.joiningDate} to {formData.endDate}.
-                  </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                    A4 Corporate Single-Page Offer Letter PDF Preview for <strong>{formData.fullName}</strong> ({formData.internId})
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={loadPdfPreview}
+                      disabled={pdfLoading}
+                      style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', color: '#c084fc', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      <RefreshCw size={12} className={pdfLoading ? 'animate-spin' : ''} />
+                      <span>{pdfLoading ? 'Rendering...' : 'Refresh PDF'}</span>
+                    </button>
+                    {pdfPreviewHtml && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const w = window.open('', '_blank');
+                          w?.document.write(pdfPreviewHtml);
+                          w?.document.close();
+                        }}
+                        style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', color: '#38bdf8', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <Printer size={12} />
+                        <span>Open / Print PDF</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {pdfLoading ? (
+                  <div style={{ textAlign: 'center', padding: '48px', color: '#a855f7' }}>
+                    <Sparkles size={24} style={{ margin: '0 auto 8px auto', display: 'block' }} />
+                    <span>Rendering corporate offer letter preview...</span>
+                  </div>
+                ) : pdfPreviewHtml ? (
+                  <div className={styles.pdfIframeWrapper}>
+                    <iframe
+                      title="Offer Letter PDF Preview"
+                      srcDoc={pdfPreviewHtml}
+                      className={styles.pdfIframe}
+                    />
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', color: '#94a3b8', padding: '36px' }}>
+                    <FileText size={36} color="#a855f7" style={{ margin: '0 auto 10px auto' }} />
+                    <p style={{ color: '#ffffff', margin: '0 0 6px 0' }}>Offer Letter PDF ready to render</p>
+                    <button
+                      type="button"
+                      onClick={loadPdfPreview}
+                      className={styles.btnPrimary}
+                      style={{ padding: '6px 16px', fontSize: '12px', marginTop: '8px' }}
+                    >
+                      Load Live PDF Preview
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>

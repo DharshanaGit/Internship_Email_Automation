@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
+import { sendEmail } from '@/lib/mailer.js';
+import { jinjaTextToEmailHtml } from '@/lib/jinjaEngine.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +33,6 @@ export async function GET(request) {
     // Determine deadline
     let deadline = task.deadline;
     if (!deadline) {
-      // Default to 7 days from creation if not explicitly set
       deadline = new Date(new Date(task.createdAt).getTime() + 7 * 24 * 60 * 60 * 1000);
     }
 
@@ -135,6 +136,7 @@ export async function POST(request) {
       },
     });
 
+    // Move candidate to 'Under Review' status
     await prisma.candidate.update({
       where: { id: task.candidateId },
       data: {
@@ -143,9 +145,43 @@ export async function POST(request) {
       },
     });
 
+    // Send confirmation & review notification email to candidate
+    try {
+      const emailSubject = `Project Deliverables Received & In Review: ${task.title || 'Milestone Task'} | Shortfundly`;
+      const jinjaBody = `Dear ${task.candidate.fullName},
+
+Congratulations! Your project deliverables have been successfully received and placed into the **Review Queue**.
+
+**Submission Summary:**
+- **Intern ID:** ${task.candidate.internId || task.candidate.candidateId}
+- **Milestone:** ${task.title || 'Internship Task'}
+- **Project Demo Link:** ${projectUrl || 'Not provided'}
+- **GitHub Repository Link:** ${githubUrl || 'Not provided'}
+- **Submission Time:** ${now.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+
+**Next Steps:**
+Our engineering mentorship and HR team have been notified. Your formal milestone evaluation will be scheduled and you will receive a calendar invite with the Google Meet link.
+
+Best regards,
+**Hiring & Engineering Mentorship Operations**
+Shortfundly Media Technologies Pvt. Ltd.`;
+
+      await sendEmail({
+        candidateId: task.candidate.id,
+        to: task.candidate.email,
+        recipientName: task.candidate.fullName,
+        subject: emailSubject,
+        html: jinjaTextToEmailHtml(jinjaBody),
+        text: jinjaBody,
+        emailType: 'TASK_SUBMISSION_CONFIRMATION',
+      });
+    } catch (mailErr) {
+      console.warn('Non-blocking error dispatching submission confirmation email:', mailErr?.message);
+    }
+
     return NextResponse.json({
       success: true,
-      message: 'Project and repository deliverables submitted successfully. Your submission is now queued for milestone review.',
+      message: 'Project and repository deliverables submitted successfully. Your submission is now queued for milestone review and a notification email has been dispatched.',
       task: updatedTask,
     });
   } catch (error) {

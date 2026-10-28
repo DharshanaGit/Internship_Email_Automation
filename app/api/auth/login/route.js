@@ -7,8 +7,8 @@ import { verifyCaptcha, verifyGoogleRecaptcha } from '@/lib/captcha';
 export const dynamic = 'force-dynamic';
 
 const loginSchema = z.object({
-  email: z.string().regex(/^[a-z]+@gmail\.com$/, 'Email address must contain only lowercase letters (no numbers, no uppercase) and end with @gmail.com'),
-  password: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+=-])[A-Za-z\d@$!%*?&#^()_+=-]{8,}$/, 'Password must be at least 8 characters long and include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(1, 'Password is required'),
   role: z.string().optional(),
   captchaAnswer: z.string().optional(),
   captchaToken: z.string().optional(),

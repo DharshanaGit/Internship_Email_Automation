@@ -447,27 +447,36 @@ export default function DashboardPage() {
   const [offerRoleFilter, setOfferRoleFilter] = useState('ALL');
   const [offerSearchFilter, setOfferSearchFilter] = useState('');
 
+  const safeFetchJson = async (url, options = {}) => {
+    try {
+      const res = await fetch(url, options);
+      const text = await res.text();
+      if (!text || !text.trim()) return { success: false, error: 'Empty response' };
+      return JSON.parse(text);
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
   const loadTemplates = async () => {
     try {
-      const res = await fetch('/api/templates');
-      const data = await res.json();
-      if (data.success && data.templates) {
+      const data = await safeFetchJson('/api/templates');
+      if (data?.success && data?.templates) {
         setTemplates(data.templates);
       }
     } catch (err) {
-      console.error('Failed to load templates:', err);
+      console.warn('Failed to load templates:', err.message);
     }
   };
 
   const loadBatches = async () => {
     try {
-      const res = await fetch('/api/batches');
-      const data = await res.json();
-      if (data.success && data.batches) {
+      const data = await safeFetchJson('/api/batches');
+      if (data?.success && data?.batches) {
         setBatches(data.batches);
       }
     } catch (err) {
-      console.error('Failed to load batches:', err);
+      console.warn('Failed to load batches:', err.message);
     }
   };
 
@@ -661,37 +670,34 @@ export default function DashboardPage() {
 
   const loadStats = async () => {
     try {
-      const res = await fetch('/api/overview/stats');
-      const data = await res.json();
-      if (data.success) {
+      const data = await safeFetchJson('/api/overview/stats');
+      if (data?.success && data?.data) {
         setStats(data.data);
       }
     } catch (err) {
-      console.error('Error loading stats:', err);
+      console.warn('Error loading stats:', err.message);
     }
   };
 
   const loadCandidates = async () => {
     try {
-      const res = await fetch(`/api/candidates?limit=200`);
-      const data = await res.json();
-      if (data.success) {
+      const data = await safeFetchJson('/api/candidates?limit=200');
+      if (data?.success && data?.data) {
         setCandidates(data.data);
       }
     } catch (err) {
-      console.error('Error loading candidates:', err);
+      console.warn('Error loading candidates:', err.message);
     }
   };
 
   const loadEmails = async () => {
     try {
-      const res = await fetch('/api/emails?limit=100');
-      const data = await res.json();
-      if (data.success) {
+      const data = await safeFetchJson('/api/emails?limit=100');
+      if (data?.success && data?.data) {
         setEmailLogs(data.data);
       }
     } catch (err) {
-      console.error('Error loading email logs:', err);
+      console.warn('Error loading email logs:', err.message);
     }
   };
 
@@ -1787,7 +1793,7 @@ export default function DashboardPage() {
                   </div>
 
                   <div style={{ background: '#09090b', border: '1px solid #232328', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: '#cbd5e1', lineHeight: 1.6 }}>
-                    <strong style={{ color: '#c084fc' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#e9d5ff' }}>Name, Email, Phone, Role, Degree, College, JoiningDate, Duration, Stipend</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Gemma 2B Intern IDs & Expiring URLs</strong>.
+                    <strong style={{ color: '#c084fc' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#e9d5ff' }}>Name, Email, Phone, Role, Degree, College, JoiningDate, Duration, Stipend</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Intern IDs & Expiring URLs</strong>.
                   </div>
 
                   {bulkValidationReport ? (
@@ -1876,7 +1882,7 @@ export default function DashboardPage() {
                         <thead>
                           <tr>
                             <th style={{ width: '40px', textAlign: 'center' }}>#</th>
-                            <th>Gemma 2B Intern ID</th>
+                            <th>Intern ID</th>
                             <th>Candidate Name</th>
                             <th>Mail Id</th>
                             <th>Designation</th>

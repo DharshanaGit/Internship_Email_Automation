@@ -3,52 +3,88 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 20px;
-  background-color: #000000;
+  padding: 40px 20px;
+  background-color: #06050a;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.08) 0%, transparent 60%);
+    radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.18) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
 }
 
 .loginCard {
   width: 100%;
-  max-width: 460px;
-  background: #0d0d10;
-  border: 1px solid #232328;
-  border-radius: 14px;
+  max-width: 480px;
+  background: #0f0e17;
+  border: 1px solid #262438;
+  border-radius: 16px;
   padding: 36px 32px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(168, 85, 247, 0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(168, 85, 247, 0.2);
 }
 
 .brandHeader {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .brandIcon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(124, 58, 237, 0.35));
-  border: 1px solid rgba(168, 85, 247, 0.4);
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.3), rgba(124, 58, 237, 0.45));
+  border: 1px solid rgba(168, 85, 247, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #c084fc;
-  margin: 0 auto 14px auto;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.3);
+  margin: 0 auto 12px auto;
+  box-shadow: 0 0 24px rgba(168, 85, 247, 0.4);
 }
 
 .brandTitle {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.02em;
-  margin-bottom: 4px;
+  margin: 0 0 4px 0;
 }
 
 .brandSubtitle {
   font-size: 13px;
+  color: #a1a1aa;
+  margin: 0;
+}
+
+/* Tabs: Sign In / Create New Account */
+.tabContainer {
+  display: flex;
+  background: #151421;
+  border: 1px solid #2c2a40;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+  gap: 4px;
+}
+
+.tabButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
   color: #94a3b8;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tabButtonActive {
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(147, 51, 234, 0.35);
 }
 
 .errorBanner {
@@ -56,10 +92,24 @@
   align-items: flex-start;
   gap: 10px;
   padding: 12px 14px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
   border-radius: 8px;
-  color: #f87171;
+  color: #fca5a5;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.successBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 8px;
+  color: #6ee7b7;
   font-size: 13px;
   line-height: 1.4;
   margin-bottom: 20px;
@@ -78,23 +128,31 @@
 }
 
 .label {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
-  color: #cbd5e1;
-  letter-spacing: 0.03em;
+  color: #e2e8f0;
+  letter-spacing: 0.02em;
 }
 
-.roleHint {
-  font-size: 11px;
-  color: #a855f7;
-  margin-top: 2px;
+.requiredMark {
+  color: #ec4899;
 }
 
-.roleHint code {
-  color: #e9d5ff;
-  background: rgba(168, 85, 247, 0.15);
-  padding: 1px 5px;
+.quickFillPill {
+  font-size: 10.5px;
+  padding: 2px 7px;
+  background: #1f1d2e;
+  border: 1px solid #37344f;
+  color: #c084fc;
   border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quickFillPill:hover {
+  background: #2a273f;
+  border-color: #a855f7;
+  color: #ffffff;
 }
 
 .inputWrapper {
@@ -106,198 +164,170 @@
 .inputIcon {
   position: absolute;
   left: 14px;
-  color: #71717a;
+  color: #a1a1aa;
   pointer-events: none;
+  z-index: 1;
 }
 
 .input {
   width: 100%;
-  height: 44px;
-  background-color: #09090b !important;
-  border: 1px solid #27272a;
-  border-radius: 8px;
+  height: 46px;
+  background-color: #151421 !important;
+  border: 1px solid #323048;
+  border-radius: 9px;
   padding: 0 14px 0 42px;
-  color: #f4f4f5 !important;
-  -webkit-text-fill-color: #f4f4f5 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
   font-size: 14px;
+  font-weight: 500;
   outline: none;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+}
+
+.input::placeholder {
+  color: #71717a !important;
+  -webkit-text-fill-color: #71717a !important;
+  opacity: 1;
 }
 
 .input:focus {
   border-color: #a855f7 !important;
-  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
-  background-color: #0e0d16 !important;
-  color: #f4f4f5 !important;
-  -webkit-text-fill-color: #f4f4f5 !important;
+  background-color: #1b192b !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25) !important;
 }
 
 .input:-webkit-autofill,
 .input:-webkit-autofill:hover, 
 .input:-webkit-autofill:focus, 
 .input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #09090b inset !important;
-  box-shadow: 0 0 0 1000px #09090b inset !important;
-  -webkit-text-fill-color: #f4f4f5 !important;
-  color: #f4f4f5 !important;
+  -webkit-box-shadow: 0 0 0 1000px #151421 inset !important;
+  box-shadow: 0 0 0 1000px #151421 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
   caret-color: #c084fc !important;
   transition: background-color 5000s ease-in-out 0s;
-}
-
-.inputError {
-  border-color: #ef4444 !important;
-  background-color: rgba(239, 68, 68, 0.08) !important;
-  color: #f4f4f5 !important;
-}
-
-.inputSuccess {
-  border-color: #10b981 !important;
-  background-color: rgba(16, 185, 129, 0.08) !important;
-  color: #f4f4f5 !important;
-}
-
-.input[type="password"] {
-  background-color: #09090b !important;
-  color: #f4f4f5 !important;
-  -webkit-text-fill-color: #f4f4f5 !important;
-  caret-color: #c084fc !important;
-}
-
-.input[type="password"]:focus {
-  background-color: #0e0d16 !important;
-  color: #f4f4f5 !important;
-  -webkit-text-fill-color: #f4f4f5 !important;
-  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
-}
-
-.input[type="password"]:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px #09090b inset !important;
-  box-shadow: 0 0 0 1000px #09090b inset !important;
-  -webkit-text-fill-color: #f4f4f5 !important;
-  color: #f4f4f5 !important;
-}
-
-.realtimeError {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: #f87171;
-  margin-top: 4px;
-  line-height: 1.3;
-}
-
-.realtimeSuccess {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: #34d399;
-  margin-top: 4px;
-  line-height: 1.3;
 }
 
 .togglePasswordButton {
   position: absolute;
   right: 12px;
+  background: transparent;
+  border: none;
   color: #94a3b8;
+  cursor: pointer;
   padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: color 0.15s ease;
+  border-radius: 4px;
 }
 
 .togglePasswordButton:hover {
-  color: #c084fc;
+  color: #ffffff;
 }
 
 .captchaBlock {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #09090b;
-  border: 1px solid #27272a;
+  background: #14131f;
+  border: 1px solid #2d2b40;
+  padding: 8px 12px;
   border-radius: 8px;
-  padding: 6px 12px;
 }
 
 .captchaImage {
-  height: 38px;
-  filter: invert(0.9) hue-rotate(240deg);
+  height: 44px;
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 2px 8px;
 }
 
 .refreshButton {
-  margin-left: auto;
-  width: 32px;
-  height: 32px;
+  background: #232035;
+  border: 1px solid #3d3957;
+  color: #c084fc;
+  padding: 8px 10px;
   border-radius: 6px;
-  background: #18181b;
-  color: #a855f7;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
-  border: 1px solid #27272a;
 }
 
 .refreshButton:hover {
-  background: #27272a;
-  color: #c084fc;
+  background: #2f2a47;
+  color: #ffffff;
 }
 
 .submitButton {
-  width: 100%;
-  height: 46px;
-  margin-top: 8px;
-  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
-  color: #ffffff;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: all 0.15s ease;
+  gap: 10px;
+  height: 48px;
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+  border: none;
+  border-radius: 9px;
+  color: #ffffff;
+  font-size: 14.5px;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(147, 51, 234, 0.35);
+  margin-top: 4px;
+  box-shadow: 0 4px 16px rgba(147, 51, 234, 0.4);
+  transition: all 0.2s ease;
 }
 
 .submitButton:hover:not(:disabled) {
-  opacity: 0.95;
+  background: linear-gradient(135deg, #6d28d9 0%, #7e22ce 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.45);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.5);
 }
 
 .submitButtonDisabled {
-  background: #27272a !important;
-  color: #71717a !important;
-  cursor: not-allowed !important;
-  box-shadow: none !important;
+  opacity: 0.5;
+  cursor: not-allowed;
   transform: none !important;
+  box-shadow: none !important;
 }
 
-.securityNote {
+.credentialsCard {
+  margin-top: 24px;
+  padding: 14px 16px;
+  background: #14131f;
+  border: 1px solid #2a273f;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.credRow {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 20px;
-  padding: 10px 14px;
-  background: rgba(168, 85, 247, 0.08);
-  border: 1px solid rgba(168, 85, 247, 0.2);
-  border-radius: 8px;
+  color: #94a3b8;
+  margin-top: 4px;
   font-size: 11.5px;
-  color: #cbd5e1;
-  line-height: 1.4;
+}
+
+.credRow code {
+  color: #e2e8f0;
+  background: #1e1c2e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
 }
 
 .backLink {
-  margin-top: 20px;
   text-align: center;
-  font-size: 13px;
+  margin-top: 18px;
+}
+
+.backLink a {
   color: #94a3b8;
+  font-size: 12.5px;
+  text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 .backLink a:hover {

@@ -255,11 +255,6 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
   // Dispatch Deadline Reminders
   const handleSendDeadlineReminder = async () => {
-    if (!reminderForm.submissionFormUrl) {
-      showToast?.('Google Form submission URL is required.', 'error');
-      return;
-    }
-
     try {
       setSendingReminder(true);
       const res = await fetch('/api/tasks/deadline-reminder', {
@@ -267,7 +262,6 @@ Shortfundly Media Technologies Pvt. Ltd.`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           candidateIds: selectedCandidateIds.length ? selectedCandidateIds : undefined,
-          submissionFormUrl: reminderForm.submissionFormUrl,
           submissionDeadline: reminderForm.submissionDeadline,
           customNotes: reminderForm.customNotes,
         }),
@@ -726,33 +720,55 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             <span>Automated Task Deadline Reminder Email Dispatcher</span>
           </h3>
           <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>
-            Dispatches automated reminder emails to assigned candidates containing their unique Intern ID, deadline notice, and the Google Form submission URL where candidates submit their project and GitHub links.
+            Dispatches automated reminder emails to assigned candidates containing their unique Intern ID, strict deadline notice, and their secure candidate portal website URL to submit their project and GitHub links.
           </p>
+
+          {/* Unique Website Submission Portal URL banner */}
+          <div style={{ background: '#12111a', border: '1px solid #2b2842', borderRadius: '8px', padding: '14px 18px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: '#e2e8f0' }}>
+                Unique Candidate Submission Website URL (Auto-Generated per Candidate)
+              </label>
+              <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
+                &bull; Live Vercel Production Portal
+              </span>
+            </div>
+            <div style={{ background: '#08070d', border: '1px solid #1f1d2e', padding: '8px 12px', borderRadius: '6px', fontFamily: 'monospace', fontSize: '12px', color: '#38bdf8', wordBreak: 'break-all' }}>
+              https://internship-email-automation.vercel.app/tasks/submit?token=&#123;&#123;candidate_submission_token&#125;&#125;
+            </div>
+            <div style={{ marginTop: '8px', fontSize: '11.5px', color: '#94a3b8' }}>
+              Candidate submits live project demo URL + GitHub repository link directly on the web app. Upon submission, the candidate is automatically transitioned to <strong>Under Review</strong>, an automated confirmation email is dispatched, and HR is notified to conduct the milestone review.
+            </div>
+          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '18px', marginBottom: '20px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                Google Form Submission URL <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input
-                type="url"
-                value={reminderForm.submissionFormUrl}
-                onChange={(e) => setReminderForm({ ...reminderForm, submissionFormUrl: e.target.value })}
-                className={styles.searchInput}
-                placeholder="https://docs.google.com/forms/d/e/.../viewform"
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                Strict Submission Deadline (Fixed by HR) <span style={{ color: '#ef4444' }}>*</span>
+                Strict Submission Deadline (Calendar Selection) <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
                 type="datetime-local"
+                min={new Date().toISOString().slice(0, 16)}
                 value={reminderForm.submissionDeadline}
                 onChange={(e) => setReminderForm({ ...reminderForm, submissionDeadline: e.target.value })}
                 className={styles.searchInput}
               />
+              <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px', display: 'block' }}>
+                Past dates are disabled. Candidates must submit deliverables before this timestamp.
+              </span>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                Target Recipients
+              </label>
+              <div style={{ background: '#14131e', border: '1px solid #28253d', padding: '10px 14px', borderRadius: '6px', fontSize: '12.5px', color: '#e2e8f0' }}>
+                {selectedCandidateIds.length > 0 ? (
+                  <span>Dispatching to <strong>{selectedCandidateIds.length}</strong> selected candidate(s)</span>
+                ) : (
+                  <span>Dispatching to <strong>all active assigned interns</strong> in the filtered view</span>
+                )}
+              </div>
             </div>
           </div>
 

@@ -124,7 +124,15 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { candidateIds, reviewNumber = 1, reviewDate, reviewTime = '04:00 PM', customNotes } = body;
+    const {
+      candidateIds,
+      reviewNumber = 1,
+      reviewDate,
+      reviewTime = '04:00 PM',
+      customNotes,
+      meetMode = 'BATCH', // 'BATCH' | 'INDIVIDUAL'
+      batchMeetLink = 'https://meet.google.com/sf-batch-eval',
+    } = body;
 
     if (!Array.isArray(candidateIds) || candidateIds.length === 0) {
       return NextResponse.json({ success: false, error: 'Please select candidates for review scheduling.' }, { status: 400 });
@@ -149,8 +157,16 @@ export async function POST(request) {
 
     for (const cand of candidates) {
       const activeTask = cand.tasks[0];
-      const meetLink = activeTask?.meetLink || cand.googleMeetUrl || 'https://meet.google.com/xyz-sf-review';
       const taskId = activeTask?.taskId || `TSK-INT-${cand.internId || 'DEV'}`;
+
+      // Resolve Google Meet Link based on selected mode
+      let meetLink;
+      if (meetMode === 'INDIVIDUAL') {
+        const candSlug = (cand.internId || cand.candidateId || cand.id).toLowerCase().replace(/[^a-z0-9]/g, '');
+        meetLink = `https://meet.google.com/sf-${candSlug}-eval`;
+      } else {
+        meetLink = batchMeetLink?.trim() || activeTask?.meetLink || cand.googleMeetUrl || 'https://meet.google.com/sf-batch-eval';
+      }
 
       // 1. Create or record review record
       if (activeTask) {
@@ -161,7 +177,7 @@ export async function POST(request) {
             reviewDate: scheduledDate,
             reviewTime: reviewTime,
             meetLink: meetLink,
-            feedback: customNotes || 'Review 1 scheduled. Please prepare demonstration and GitHub repository.',
+            feedback: customNotes || `Review #${reviewNumber} scheduled (${meetMode === 'BATCH' ? 'Batch-wise Session' : 'Individual 1-on-1'}). Please prepare demonstration and GitHub repository.`,
             score: 50.0,
             status: 'Scheduled',
           },
@@ -172,34 +188,37 @@ export async function POST(request) {
           data: {
             reviewDate: scheduledDate,
             reviewTime: reviewTime,
+            meetLink: meetLink,
             reviewCount: { increment: 1 },
           },
         });
       }
 
-      // Update candidate performance to 50.0% on Review 1 scheduling
+      // Update candidate performance and googleMeetUrl
       await prisma.candidate.update({
         where: { id: cand.id },
         data: {
           performancePercentage: 50.0,
+          googleMeetUrl: meetLink,
         },
       });
 
       // 2. Dispatch Review Notification Email
-      const emailSubject = `Review #${reviewNumber} Scheduled: ${activeTask?.title || taskId} | Shortfundly`;
+      const emailSubject = `Milestone Review #${reviewNumber} Scheduled: ${activeTask?.title || taskId} | Shortfundly`;
       const emailBody = `Dear ${cand.fullName},
 
-Your Milestone Review #${reviewNumber} has been officially scheduled.
+Your Milestone Review #${reviewNumber} has been officially approved and scheduled.
 
-Review Details:
+Review Session Details:
 - Intern ID: ${cand.internId || cand.candidateId}
 - Role: ${cand.role}
-- Scheduled Review Date: ${scheduledDate}
-- Scheduled Review Time: ${reviewTime} IST
+- Review Session Mode: ${meetMode === 'BATCH' ? 'Batch-Wise Shared Session' : 'Unique Individual 1-on-1 Session'}
+- Scheduled Date: ${scheduledDate}
+- Scheduled Time: ${reviewTime} IST
 - Google Meet Link: ${meetLink}
 
 ${customNotes ? `Important Guidelines:\n${customNotes}\n` : ''}
-Please ensure your code is pushed to your assigned GitHub repository prior to the call.
+Please ensure your latest code is committed and pushed to your GitHub repository prior to joining the Google Meet call.
 
 Best regards,
 Engineering & Evaluation Committee

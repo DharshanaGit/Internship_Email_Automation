@@ -7,11 +7,7 @@ import { jinjaTextToEmailHtml } from '@/lib/jinjaEngine.js';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { candidateIds, submissionFormUrl, submissionDeadline, customNotes } = body;
-
-    if (!submissionFormUrl) {
-      return NextResponse.json({ success: false, error: 'Google Form submission URL is required.' }, { status: 400 });
-    }
+    const { candidateIds, submissionDeadline, customNotes } = body;
 
     const candidates = await prisma.candidate.findMany({
       where: {
@@ -31,13 +27,19 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'No active assigned candidates found.' }, { status: 404 });
     }
 
+    const baseUrl = (process.env.APP_BASE_URL || 'https://internship-email-automation.vercel.app').replace(/\/+$/, '');
     const results = [];
-    const formattedDeadline = submissionDeadline ? new Date(submissionDeadline).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'As Scheduled';
+    const formattedDeadline = submissionDeadline
+      ? new Date(submissionDeadline).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+      : 'As Scheduled';
 
     for (const candidate of candidates) {
       const activeTask = candidate.tasks[0];
       const taskNumber = activeTask ? activeTask.taskNumber : 1;
       const taskTitle = activeTask ? activeTask.title : 'Current Milestone';
+
+      const token = activeTask?.submissionToken || activeTask?.id || candidate.id;
+      const submissionUrl = `${baseUrl}/tasks/submit?token=${token}`;
 
       const jinjaContent = `Dear ${candidate.fullName},
 
@@ -45,10 +47,13 @@ This is an official **Deadline Reminder** regarding your active Shortfundly inte
 
 **Submission Requirements:**
 - **Intern ID:** ${candidate.internId || candidate.candidateId}
+- **Role:** ${candidate.role}
 - **Official Submission Deadline:** **${formattedDeadline}**
-- **Action Required:** Submit your completed project repository link and deployed demo link using the official Google Form below:
+- **Action Required:** Submit your completed project repository link and deployed demo link using your unique candidate portal website link below:
 
-👉 **[Click Here to Access Official Google Form Submission Portal](${submissionFormUrl})**
+👉 **[Access Candidate Portal: Submit Project & GitHub Link](${submissionUrl})**
+
+Direct Submission Link: ${submissionUrl}
 
 ${customNotes ? `**Important HR Note:**\n${customNotes}\n` : ''}
 > **Policy Warning:** Failure to submit before the deadline will incur an automatic **10% performance penalty deduction** on this milestone.
@@ -58,7 +63,7 @@ Best regards,
 Shortfundly Media Technologies Pvt. Ltd.`;
 
       const htmlBody = jinjaTextToEmailHtml(jinjaContent);
-      const subject = `Urgent: Task #${taskNumber} Deadline Reminder & Google Form Submission - ${candidate.fullName}`;
+      const subject = `Urgent: Task #${taskNumber} Deadline Reminder & Deliverable Submission - ${candidate.fullName}`;
 
       const dispatch = await sendEmail({
         to: candidate.email,

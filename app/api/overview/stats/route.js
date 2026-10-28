@@ -6,8 +6,13 @@ import { startHourlyMasterSheetSync } from '@/lib/masterSheetSync';
 
 export async function GET() {
   try {
-    startQueueWorker();
-    startHourlyMasterSheetSync();
+    try {
+      startQueueWorker();
+      startHourlyMasterSheetSync();
+    } catch (bgErr) {
+      console.warn('Background worker startup non-blocking warning:', bgErr?.message);
+    }
+
     const [
       totalCandidates,
       readyOffers,
@@ -98,6 +103,7 @@ export async function GET() {
       },
     });
   } catch (error) {
+    console.error('Error in /api/overview/stats:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

@@ -43,11 +43,13 @@ export default function ReviewDashboardView({
   const [loading, setLoading] = useState(false);
   const [selectedCandidateIds, setSelectedCandidateIds] = useState([]);
 
-  // Review 1 Schedule Form
+  // Review 1 Schedule Form with Dual Google Meet Modes
   const [r1ScheduleForm, setR1ScheduleForm] = useState({
     reviewDate: '',
     reviewTime: '04:00 PM',
     customNotes: 'Please ensure your code is pushed to GitHub and be prepared to demonstrate your implemented features.',
+    meetMode: 'BATCH', // 'BATCH' = batch-wise shared link, 'INDIVIDUAL' = unique candidate link
+    batchMeetLink: 'https://meet.google.com/sf-batch-eval',
   });
   const [schedulingR1, setSchedulingR1] = useState(false);
 
@@ -149,6 +151,8 @@ export default function ReviewDashboardView({
           reviewDate: r1ScheduleForm.reviewDate,
           reviewTime: r1ScheduleForm.reviewTime,
           customNotes: r1ScheduleForm.customNotes,
+          meetMode: r1ScheduleForm.meetMode,
+          batchMeetLink: r1ScheduleForm.batchMeetLink,
         }),
       });
 
@@ -420,6 +424,46 @@ export default function ReviewDashboardView({
       {/* --- SUBTAB 1: REVIEW QUEUE TABLE --- */}
       {subTab === 'review-queue' && (
         <div className={styles.tableCard}>
+          {/* Notification banner for submitted deliverables awaiting HR review approval */}
+          {filteredCandidates.filter(c => c.activeTask?.submissionStatus === 'SUBMITTED' || c.taskStatus === 'Under Review').length > 0 && (
+            <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.35)', borderRadius: '10px', padding: '12px 18px', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckCircle2 size={18} color="#10b981" />
+                <span style={{ fontSize: '13px', color: '#6ee7b7', fontWeight: 600 }}>
+                  {filteredCandidates.filter(c => c.activeTask?.submissionStatus === 'SUBMITTED' || c.taskStatus === 'Under Review').length} Intern(s) have submitted project deliverables & awaiting HR review approval!
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const submittedIds = filteredCandidates
+                      .filter(c => c.activeTask?.submissionStatus === 'SUBMITTED' || c.taskStatus === 'Under Review')
+                      .map(c => c.id);
+                    setSelectedCandidateIds(submittedIds);
+                    showToast?.(`Selected ${submittedIds.length} submitted candidates for review scheduling!`, 'info');
+                  }}
+                  style={{ background: '#064e3b', border: '1px solid #059669', color: '#a7f3d0', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Select All Submitted ({filteredCandidates.filter(c => c.activeTask?.submissionStatus === 'SUBMITTED' || c.taskStatus === 'Under Review').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const submittedIds = filteredCandidates
+                      .filter(c => c.activeTask?.submissionStatus === 'SUBMITTED' || c.taskStatus === 'Under Review')
+                      .map(c => c.id);
+                    setSelectedCandidateIds(submittedIds);
+                    setSubTab('schedule-r1');
+                  }}
+                  style={{ background: '#10b981', border: 'none', color: '#ffffff', padding: '6px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Approve & Schedule Review Mail &rarr;
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className={styles.tableHeaderRow}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <input
@@ -540,6 +584,7 @@ export default function ReviewDashboardView({
               </label>
               <input
                 type="date"
+                min={new Date().toISOString().split('T')[0]}
                 value={r1ScheduleForm.reviewDate}
                 onChange={(e) => setR1ScheduleForm({ ...r1ScheduleForm, reviewDate: e.target.value })}
                 className={styles.searchInput}
@@ -561,6 +606,102 @@ export default function ReviewDashboardView({
                 placeholder="04:00 PM"
               />
             </div>
+          </div>
+
+          {/* DUAL GOOGLE MEET LINK OPTIONS (BATCH-WISE vs UNIQUE CANDIDATE LINK) */}
+          <div style={{ background: '#12111b', border: '1px solid #2b2840', borderRadius: '10px', padding: '16px 20px', marginBottom: '20px' }}>
+            <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
+              Google Meet Link Mode for Candidate Evaluation Mails <span style={{ color: '#ec4899' }}>*</span>
+            </label>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setR1ScheduleForm({ ...r1ScheduleForm, meetMode: 'BATCH' })}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  border: r1ScheduleForm.meetMode === 'BATCH' ? '1px solid #a855f7' : '1px solid #2d2a44',
+                  background: r1ScheduleForm.meetMode === 'BATCH' ? 'rgba(168, 85, 247, 0.18)' : '#181625',
+                  color: r1ScheduleForm.meetMode === 'BATCH' ? '#ffffff' : '#94a3b8',
+                  fontWeight: 600,
+                  fontSize: '12.5px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <Video size={16} color={r1ScheduleForm.meetMode === 'BATCH' ? '#c084fc' : '#94a3b8'} />
+                <div>
+                  <div style={{ color: r1ScheduleForm.meetMode === 'BATCH' ? '#ffffff' : '#e2e8f0' }}>Batch-Wise Shared Google Meet Link</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>Send same Meet link to all candidates in batch</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setR1ScheduleForm({ ...r1ScheduleForm, meetMode: 'INDIVIDUAL' })}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  border: r1ScheduleForm.meetMode === 'INDIVIDUAL' ? '1px solid #a855f7' : '1px solid #2d2a44',
+                  background: r1ScheduleForm.meetMode === 'INDIVIDUAL' ? 'rgba(168, 85, 247, 0.18)' : '#181625',
+                  color: r1ScheduleForm.meetMode === 'INDIVIDUAL' ? '#ffffff' : '#94a3b8',
+                  fontWeight: 600,
+                  fontSize: '12.5px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <Sparkles size={16} color={r1ScheduleForm.meetMode === 'INDIVIDUAL' ? '#c084fc' : '#94a3b8'} />
+                <div>
+                  <div style={{ color: r1ScheduleForm.meetMode === 'INDIVIDUAL' ? '#ffffff' : '#e2e8f0' }}>Unique Google Meet Link per Candidate</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>Auto-generate dedicated 1-on-1 Meet room per student</div>
+                </div>
+              </button>
+            </div>
+
+            {r1ScheduleForm.meetMode === 'BATCH' ? (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '11.5px', color: '#cbd5e1', fontWeight: 600 }}>
+                    Batch Google Meet Room URL (Sent to all {selectedCandidateIds.length} candidate(s)):
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const code = Math.random().toString(36).substring(2, 5) + '-' + Math.random().toString(36).substring(2, 6) + '-' + Math.random().toString(36).substring(2, 5);
+                      setR1ScheduleForm({ ...r1ScheduleForm, batchMeetLink: `https://meet.google.com/${code}` });
+                      showToast?.('Regenerated batch Google Meet link!', 'info');
+                    }}
+                    style={{ background: '#221f33', border: '1px solid #3d3957', color: '#c084fc', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', cursor: 'pointer' }}
+                  >
+                    Regenerate Meet Link
+                  </button>
+                </div>
+                <input
+                  type="url"
+                  value={r1ScheduleForm.batchMeetLink}
+                  onChange={(e) => setR1ScheduleForm({ ...r1ScheduleForm, batchMeetLink: e.target.value })}
+                  className={styles.searchInput}
+                  placeholder="https://meet.google.com/xyz-sf-batch"
+                />
+              </div>
+            ) : (
+              <div style={{ background: '#08070d', border: '1px solid #1f1d2e', padding: '10px 14px', borderRadius: '6px', fontSize: '12px', color: '#38bdf8' }}>
+                <div style={{ fontWeight: 600, marginBottom: '2px' }}>Dedicated Individual Google Meet Room:</div>
+                <code style={{ color: '#c084fc' }}>https://meet.google.com/sf-[internId]-eval</code>
+                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
+                  A unique, secure room is generated for each candidate based on their Intern ID and delivered in their individual review email.
+                </div>
+              </div>
+            )}
           </div>
 
           <div style={{ marginBottom: '20px' }}>

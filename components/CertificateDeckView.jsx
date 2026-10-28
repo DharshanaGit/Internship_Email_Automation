@@ -37,12 +37,14 @@ export default function CertificateDeckView({
       if (selectedRole !== 'ALL') url.searchParams.set('role', selectedRole);
 
       const res = await fetch(url.toString());
-      const data = await res.json();
-      if (data.success) {
+      const text = await res.text();
+      if (!text || !text.trim()) return;
+      const data = JSON.parse(text);
+      if (data.success && Array.isArray(data.candidates)) {
         setCandidates(data.candidates);
       }
     } catch (err) {
-      console.error('Error fetching certification candidates:', err);
+      console.warn('Error fetching certification candidates:', err.message);
     } finally {
       setLoading(false);
     }
