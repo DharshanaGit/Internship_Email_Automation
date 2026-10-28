@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
 import { sendEmail } from '@/lib/mailer.js';
 import { jinjaTextToEmailHtml } from '@/lib/jinjaEngine.js';
+import { generateValidGoogleMeetUrl } from '@/lib/googleMeet.js';
 
 /**
  * Calculates default review date (e.g. next day; if Sunday, advances to Monday)
@@ -159,13 +160,14 @@ export async function POST(request) {
       const activeTask = cand.tasks[0];
       const taskId = activeTask?.taskId || `TSK-INT-${cand.internId || 'DEV'}`;
 
-      // Resolve Google Meet Link based on selected mode
+      // Resolve Google Meet Link based on selected mode (Original Google Meet format: https://meet.google.com/xxx-yyyy-zzz)
       let meetLink;
       if (meetMode === 'INDIVIDUAL') {
-        const candSlug = (cand.internId || cand.candidateId || cand.id).toLowerCase().replace(/[^a-z0-9]/g, '');
-        meetLink = `https://meet.google.com/sf-${candSlug}-eval`;
+        meetLink = generateValidGoogleMeetUrl();
       } else {
-        meetLink = batchMeetLink?.trim() || activeTask?.meetLink || cand.googleMeetUrl || 'https://meet.google.com/sf-batch-eval';
+        meetLink = (batchMeetLink && batchMeetLink.includes('meet.google.com'))
+          ? batchMeetLink.trim()
+          : generateValidGoogleMeetUrl();
       }
 
       // 1. Create or record review record

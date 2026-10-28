@@ -102,7 +102,7 @@ www.shortfundly.com`;
       name: '',
       subject: 'Official Internship Offer from Shortfundly - {{candidateName}}',
       emailBody: defaultJinjaText,
-      pdfTemplate: templates[0]?.pdfTemplate || '',
+      pdfTemplate: templates[0]?.pdfTemplate || '<!DOCTYPE html><html><body>Corporate Offer Letter</body></html>',
       isDefault: false,
     });
   };

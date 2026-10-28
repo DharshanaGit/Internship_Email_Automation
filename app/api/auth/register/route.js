@@ -10,17 +10,13 @@ const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z
     .string()
-    .min(8, 'Password must be at least 8 characters long')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/\d/, 'Password must contain at least one number')
-    .regex(/[@$!%*?&#^()_+=-]/, 'Password must contain at least one special character'),
+    .min(8, 'Password must be at least 8 characters long'),
   role: z.enum(['ADMIN', 'HR', 'CEO']).optional().default('HR'),
 });
 
 export async function POST(request) {
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const parseResult = registerSchema.safeParse(body);
 
     if (!parseResult.success) {
@@ -35,6 +31,14 @@ export async function POST(request) {
 
     const { name, email, password, role } = parseResult.data;
     const normalizedEmail = email.toLowerCase().trim();
+
+    // Check if email contains uppercase
+    if (/[A-Z]/.test(email)) {
+      return NextResponse.json(
+        { success: false, error: 'Email address cannot contain capital letters (lowercase only).' },
+        { status: 400 }
+      );
+    }
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -92,7 +96,9 @@ export async function POST(request) {
     const isProduction = process.env.NODE_ENV === 'production';
     const host = request.headers.get('host') || '';
     const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
-    const isHttps = request.nextUrl.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https';
+    const isHttps =
+      request.headers.get('x-forwarded-proto') === 'https' ||
+      (typeof request.nextUrl !== 'undefined' && request.nextUrl?.protocol === 'https:');
     const secureCookie = isProduction && !isLocal && isHttps;
 
     response.cookies.set(COOKIE_NAME, sessionToken, {

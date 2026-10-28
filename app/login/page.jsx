@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import styles from './login.module.css';
-import { Mail, Lock, Shield, RotateCw, ArrowRight, AlertCircle, CheckCircle2, UserCheck, Eye, EyeOff, UserPlus, LogIn, Sparkles } from 'lucide-react';
+import { Mail, Lock, Shield, RotateCw, ArrowRight, AlertCircle, CheckCircle2, UserCheck, Eye, EyeOff, UserPlus, LogIn } from 'lucide-react';
 
 export default function LoginPage() {
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
@@ -23,19 +23,13 @@ export default function LoginPage() {
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [regRole, setRegRole] = useState('HR');
   const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
   
   // Common states
   const [loading, setLoading] = useState(false);
   const [captchaLoading, setCaptchaLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
-  // Authorized default credentials mapping
-  const expectedCredentials = {
-    ADMIN: { email: 'admin@gmail.com', pass: 'Shortfundly@Pass2026!' },
-    HR: { email: 'hr@gmail.com', pass: 'Shortfundly@Pass2026!' },
-    CEO: { email: 'ceo@gmail.com', pass: 'Shortfundly@Pass2026!' },
-  };
 
   const fetchCaptcha = async () => {
     try {
@@ -57,28 +51,60 @@ export default function LoginPage() {
     fetchCaptcha();
   }, []);
 
-  const handleQuickFill = (targetRole) => {
-    const cred = expectedCredentials[targetRole];
-    if (cred) {
-      setRole(targetRole);
-      setEmail(cred.email);
-      setPassword(cred.pass);
-      setSubmitError('');
+  // Real-time validations for Sign In
+  const loginEmailError = useMemo(() => {
+    if (!email) return null;
+    if (/[A-Z]/.test(email)) {
+      return 'Email address cannot contain capital letters (lowercase only).';
     }
-  };
+    return null;
+  }, [email]);
+
+  const loginPasswordError = useMemo(() => {
+    if (!password) return null;
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long.';
+    }
+    return null;
+  }, [password]);
+
+  // Real-time validations for Create Account
+  const regEmailError = useMemo(() => {
+    if (!regEmail) return null;
+    if (/[A-Z]/.test(regEmail)) {
+      return 'Email address cannot contain capital letters (lowercase only).';
+    }
+    return null;
+  }, [regEmail]);
+
+  const regPasswordError = useMemo(() => {
+    if (!regPassword) return null;
+    if (regPassword.length < 8) {
+      return 'Password must be at least 8 characters long.';
+    }
+    return null;
+  }, [regPassword]);
+
+  const regConfirmError = useMemo(() => {
+    if (!regConfirmPassword) return null;
+    if (regConfirmPassword !== regPassword) {
+      return 'Confirm password does not match password.';
+    }
+    return null;
+  }, [regConfirmPassword, regPassword]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setSubmitError('');
     setSuccessMessage('');
 
-    if (!email || !email.trim()) {
-      setSubmitError('Please enter your email address.');
+    if (loginEmailError) {
+      setSubmitError(loginEmailError);
       return;
     }
 
-    if (!password) {
-      setSubmitError('Please enter your password.');
+    if (loginPasswordError) {
+      setSubmitError(loginPasswordError);
       return;
     }
 
@@ -132,13 +158,13 @@ export default function LoginPage() {
       return;
     }
 
-    if (!regEmail.trim()) {
-      setSubmitError('Please enter your email address.');
+    if (regEmailError) {
+      setSubmitError(regEmailError);
       return;
     }
 
-    if (!regPassword) {
-      setSubmitError('Please enter a password.');
+    if (regPasswordError) {
+      setSubmitError(regPasswordError);
       return;
     }
 
@@ -257,43 +283,15 @@ export default function LoginPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label className={styles.label}>
-                  Email Address <span className={styles.requiredMark}>*</span>
-                </label>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('ADMIN')}
-                    className={styles.quickFillPill}
-                    title="Fill Admin credentials"
-                  >
-                    Admin
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('HR')}
-                    className={styles.quickFillPill}
-                    title="Fill HR credentials"
-                  >
-                    HR
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('CEO')}
-                    className={styles.quickFillPill}
-                    title="Fill CEO credentials"
-                  >
-                    CEO
-                  </button>
-                </div>
-              </div>
+              <label className={styles.label}>
+                Email Address <span className={styles.requiredMark}>*</span>
+              </label>
               <div className={styles.inputWrapper}>
                 <Mail className={styles.inputIcon} size={18} />
                 <input
                   type="email"
                   required
-                  className={styles.input}
+                  className={`${styles.input} ${loginEmailError ? styles.inputError : ''}`}
                   placeholder="Enter email address (e.g. admin@gmail.com)"
                   value={email}
                   onChange={(e) => {
@@ -303,6 +301,12 @@ export default function LoginPage() {
                   autoComplete="email"
                 />
               </div>
+              {loginEmailError && (
+                <div className={styles.fieldError}>
+                  <AlertCircle size={12} />
+                  <span>{loginEmailError}</span>
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>
@@ -314,8 +318,8 @@ export default function LoginPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
-                  className={styles.input}
-                  placeholder="Enter password (e.g. Shortfundly@Pass2026!)"
+                  className={`${styles.input} ${loginPasswordError ? styles.inputError : ''}`}
+                  placeholder="Enter password (min 8 characters)"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -333,6 +337,12 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {loginPasswordError && (
+                <div className={styles.fieldError}>
+                  <AlertCircle size={12} />
+                  <span>{loginPasswordError}</span>
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>
@@ -376,8 +386,8 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading || !email || !password || captchaAnswer.length < 4}
-              className={`${styles.submitButton} ${(loading || !email || !password || captchaAnswer.length < 4) ? styles.submitButtonDisabled : ''}`}
+              disabled={loading || !email || !password || !!loginEmailError || !!loginPasswordError || captchaAnswer.length < 4}
+              className={`${styles.submitButton} ${(loading || !email || !password || !!loginEmailError || !!loginPasswordError || captchaAnswer.length < 4) ? styles.submitButtonDisabled : ''}`}
             >
               <span>{loading ? 'Authenticating...' : `Sign In as ${role}`}</span>
               <ArrowRight size={16} />
@@ -416,8 +426,8 @@ export default function LoginPage() {
                 <input
                   type="email"
                   required
-                  className={styles.input}
-                  placeholder="Enter email address (e.g. user@gmail.com)"
+                  className={`${styles.input} ${regEmailError ? styles.inputError : ''}`}
+                  placeholder="Enter email address (lowercase only)"
                   value={regEmail}
                   onChange={(e) => {
                     setRegEmail(e.target.value);
@@ -426,6 +436,12 @@ export default function LoginPage() {
                   autoComplete="email"
                 />
               </div>
+              {regEmailError && (
+                <div className={styles.fieldError}>
+                  <AlertCircle size={12} />
+                  <span>{regEmailError}</span>
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>
@@ -456,8 +472,8 @@ export default function LoginPage() {
                 <input
                   type={showRegPassword ? 'text' : 'password'}
                   required
-                  className={styles.input}
-                  placeholder="Create password (min 8 chars, 1 uppercase, 1 symbol)"
+                  className={`${styles.input} ${regPasswordError ? styles.inputError : ''}`}
+                  placeholder="Create password (min 8 characters)"
                   value={regPassword}
                   onChange={(e) => {
                     setRegPassword(e.target.value);
@@ -475,6 +491,12 @@ export default function LoginPage() {
                   {showRegPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {regPasswordError && (
+                <div className={styles.fieldError}>
+                  <AlertCircle size={12} />
+                  <span>{regPasswordError}</span>
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>
@@ -484,9 +506,9 @@ export default function LoginPage() {
               <div className={styles.inputWrapper}>
                 <Lock className={styles.inputIcon} size={18} />
                 <input
-                  type={showRegPassword ? 'text' : 'password'}
+                  type={showRegConfirmPassword ? 'text' : 'password'}
                   required
-                  className={styles.input}
+                  className={`${styles.input} ${regConfirmError ? styles.inputError : ''}`}
                   placeholder="Re-enter password to confirm"
                   value={regConfirmPassword}
                   onChange={(e) => {
@@ -494,40 +516,35 @@ export default function LoginPage() {
                     setSubmitError('');
                   }}
                   autoComplete="new-password"
+                  style={{ paddingRight: '42px' }}
                 />
+                <button
+                  type="button"
+                  className={styles.togglePasswordButton}
+                  onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)}
+                  title={showRegConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showRegConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
+              {regConfirmError && (
+                <div className={styles.fieldError}>
+                  <AlertCircle size={12} />
+                  <span>{regConfirmError}</span>
+                </div>
+              )}
             </div>
 
             <button
               type="submit"
-              disabled={loading || !regName || !regEmail || !regPassword || !regConfirmPassword}
-              className={`${styles.submitButton} ${(loading || !regName || !regEmail || !regPassword || !regConfirmPassword) ? styles.submitButtonDisabled : ''}`}
+              disabled={loading || !regName || !regEmail || !regPassword || !regConfirmPassword || !!regEmailError || !!regPasswordError || !!regConfirmError}
+              className={`${styles.submitButton} ${(loading || !regName || !regEmail || !regPassword || !regConfirmPassword || !!regEmailError || !!regPasswordError || !!regConfirmError) ? styles.submitButtonDisabled : ''}`}
             >
               <span>{loading ? 'Creating Account...' : 'Create Account & Sign In'}</span>
               <ArrowRight size={16} />
             </button>
           </form>
         )}
-
-        {/* Default credentials reference card */}
-        <div className={styles.credentialsCard}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', color: '#c084fc', fontWeight: 600, fontSize: '12px' }}>
-            <Sparkles size={13} />
-            <span>Configured Operational Credentials:</span>
-          </div>
-          <div className={styles.credRow}>
-            <span>Admin:</span>
-            <code>admin@gmail.com</code> &bull; <code>Shortfundly@Pass2026!</code>
-          </div>
-          <div className={styles.credRow}>
-            <span>HR:</span>
-            <code>hr@gmail.com</code> &bull; <code>Shortfundly@Pass2026!</code>
-          </div>
-          <div className={styles.credRow}>
-            <span>CEO:</span>
-            <code>ceo@gmail.com</code> &bull; <code>Shortfundly@Pass2026!</code>
-          </div>
-        </div>
 
         <div className={styles.backLink}>
           <Link href="/">&larr; Return to Landing Page</Link>

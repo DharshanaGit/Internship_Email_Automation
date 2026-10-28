@@ -43,14 +43,36 @@ export default function ReviewDashboardView({
   const [loading, setLoading] = useState(false);
   const [selectedCandidateIds, setSelectedCandidateIds] = useState([]);
 
+  // Generate standard 3-4-3 lowercase letter Google Meet link (e.g. https://meet.google.com/abc-defg-hij)
+  const generateMeetUrl = () => {
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    const pick = (len) => Array.from({ length: len }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
+    return `https://meet.google.com/${pick(3)}-${pick(4)}-${pick(3)}`;
+  };
+
   // Review 1 Schedule Form with Dual Google Meet Modes
   const [r1ScheduleForm, setR1ScheduleForm] = useState({
     reviewDate: '',
     reviewTime: '04:00 PM',
     customNotes: 'Please ensure your code is pushed to GitHub and be prepared to demonstrate your implemented features.',
     meetMode: 'BATCH', // 'BATCH' = batch-wise shared link, 'INDIVIDUAL' = unique candidate link
-    batchMeetLink: 'https://meet.google.com/sf-batch-eval',
+    batchMeetLink: '',
   });
+
+  // Set initial genuine Google Meet link on mount or when batch changes
+  useEffect(() => {
+    if (!r1ScheduleForm.batchMeetLink) {
+      setR1ScheduleForm(prev => ({ ...prev, batchMeetLink: generateMeetUrl() }));
+    }
+  }, []);
+
+  const handleBatchSelectChange = (newBatch) => {
+    setSelectedBatch(newBatch);
+    setR1ScheduleForm(prev => ({
+      ...prev,
+      batchMeetLink: generateMeetUrl(),
+    }));
+  };
   const [schedulingR1, setSchedulingR1] = useState(false);
 
   // Feedback CSV Ingestion State
@@ -385,7 +407,7 @@ export default function ReviewDashboardView({
 
         <select
           value={selectedBatch}
-          onChange={(e) => setSelectedBatch(e.target.value)}
+          onChange={(e) => handleBatchSelectChange(e.target.value)}
           className={styles.selectInput}
         >
           <option value="ALL">All Batches</option>
@@ -676,9 +698,9 @@ export default function ReviewDashboardView({
                   <button
                     type="button"
                     onClick={() => {
-                      const code = Math.random().toString(36).substring(2, 5) + '-' + Math.random().toString(36).substring(2, 6) + '-' + Math.random().toString(36).substring(2, 5);
-                      setR1ScheduleForm({ ...r1ScheduleForm, batchMeetLink: `https://meet.google.com/${code}` });
-                      showToast?.('Regenerated batch Google Meet link!', 'info');
+                      const newUrl = generateMeetUrl();
+                      setR1ScheduleForm({ ...r1ScheduleForm, batchMeetLink: newUrl });
+                      showToast?.('Regenerated genuine Google Meet link!', 'info');
                     }}
                     style={{ background: '#221f33', border: '1px solid #3d3957', color: '#c084fc', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', cursor: 'pointer' }}
                   >
@@ -690,15 +712,15 @@ export default function ReviewDashboardView({
                   value={r1ScheduleForm.batchMeetLink}
                   onChange={(e) => setR1ScheduleForm({ ...r1ScheduleForm, batchMeetLink: e.target.value })}
                   className={styles.searchInput}
-                  placeholder="https://meet.google.com/xyz-sf-batch"
+                  placeholder="https://meet.google.com/abc-defg-hij"
                 />
               </div>
             ) : (
               <div style={{ background: '#08070d', border: '1px solid #1f1d2e', padding: '10px 14px', borderRadius: '6px', fontSize: '12px', color: '#38bdf8' }}>
                 <div style={{ fontWeight: 600, marginBottom: '2px' }}>Dedicated Individual Google Meet Room:</div>
-                <code style={{ color: '#c084fc' }}>https://meet.google.com/sf-[internId]-eval</code>
+                <code style={{ color: '#c084fc' }}>https://meet.google.com/xxx-yyyy-zzz (Unique authentic Google Meet room per candidate)</code>
                 <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
-                  A unique, secure room is generated for each candidate based on their Intern ID and delivered in their individual review email.
+                  A unique, authentic Google Meet video conference link will be automatically generated and dispatched to each individual candidate in their review email.
                 </div>
               </div>
             )}

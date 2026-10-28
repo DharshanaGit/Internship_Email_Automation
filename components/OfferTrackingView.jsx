@@ -162,62 +162,13 @@ export default function OfferTrackingView({
         </div>
       </div>
 
-      {/* 2. FILTER & SEARCH CONTROL BAR */}
-      <div className={styles.controlBar}>
-        <div className={styles.searchBox}>
-          <Search size={15} className={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder="Search candidate name, Intern ID, or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
-          />
-        </div>
-
-        <div className={styles.filtersGroup}>
-          <div className={styles.selectWrapper}>
-            <Filter size={14} className={styles.selectIcon} />
-            <select
-              value={selectedBatch}
-              onChange={(e) => setSelectedBatch(e.target.value)}
-              className={styles.selectInput}
-            >
-              <option value="ALL">All Batches ({batches.length})</option>
-              {batches.map((b) => (
-                <option key={b} value={b}>{b}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.selectWrapper}>
-            <Filter size={14} className={styles.selectIcon} />
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className={styles.selectInput}
-            >
-              <option value="ALL">All Roles ({roles.length})</option>
-              {roles.map((r) => (
-                <option key={r} value={r}>{r}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.selectWrapper}>
-            <Filter size={14} className={styles.selectIcon} />
-            <select
-              value={selectedResponseStatus}
-              onChange={(e) => setSelectedResponseStatus(e.target.value)}
-              className={styles.selectInput}
-            >
-              <option value="ALL">All Response Statuses</option>
-              <option value="Accepted">Accepted Only</option>
-              <option value="Pending">Pending Only</option>
-              <option value="Rejected">Rejected Only</option>
-              <option value="Expired">Expired Only</option>
-            </select>
-          </div>
+      {/* 2. CANDIDATES DECISION TELEMETRY TABLE (Filter & Search removed as requested) */}
+      <div className={styles.tableCard}>
+        <div className={styles.tableHeaderRow} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 className={styles.tableTitle} style={{ margin: 0 }}>
+            <UserCheck size={16} color="#a855f7" />
+            <span>Candidate Offer & Decision Records ({candidates.length})</span>
+          </h3>
 
           <button
             type="button"
@@ -229,16 +180,6 @@ export default function OfferTrackingView({
             <RotateCw size={14} className={auditing ? styles.spin : ''} />
             <span>Audit Deadlines</span>
           </button>
-        </div>
-      </div>
-
-      {/* 3. CANDIDATES DECISION TELEMETRY TABLE */}
-      <div className={styles.tableCard}>
-        <div className={styles.tableHeaderRow}>
-          <h3 className={styles.tableTitle}>
-            <UserCheck size={16} color="#a855f7" />
-            <span>Candidate Offer & Decision Records ({filteredCandidates.length})</span>
-          </h3>
         </div>
 
         <div className={styles.tableResponsive}>

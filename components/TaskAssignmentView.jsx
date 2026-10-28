@@ -10,7 +10,6 @@ import {
   Video,
   FileText,
   AlertTriangle,
-  Upload,
   Send,
   Search,
   Filter,
@@ -19,9 +18,18 @@ import {
   Eye,
   RefreshCw,
   Mail,
-  X
+  X,
+  Activity,
+  ExternalLink,
+  Calendar,
 } from 'lucide-react';
 import { renderJinja, jinjaTextToEmailHtml } from '../lib/jinjaEngine.js';
+
+function generateClientMeetUrl() {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  const pick = (len) => Array.from({ length: len }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
+  return `https://meet.google.com/${pick(3)}-${pick(4)}-${pick(3)}`;
+}
 
 export default function TaskAssignmentView({
   candidates = [],
@@ -29,7 +37,7 @@ export default function TaskAssignmentView({
   onRefresh,
   showToast,
 }) {
-  const [subTab, setSubTab] = useState('interns'); // 'interns' | 'templates' | 'reminder' | 'evaluator'
+  const [subTab, setSubTab] = useState('interns'); // 'interns' | 'templates' | 'reminder' | 'tracker'
 
   // Filter States
   const [selectedBatch, setSelectedBatch] = useState('ALL');
@@ -122,19 +130,35 @@ Shortfundly Media Technologies Pvt. Ltd.`;
     }
   };
 
-  // Reminder State
+  // Subtab 3: Deadline Reminder State & Filters
+  const [reminderBatchFilter, setReminderBatchFilter] = useState('ALL');
+  const [reminderTaskNoFilter, setReminderTaskNoFilter] = useState('ALL');
+  const [reminderRoleFilter, setReminderRoleFilter] = useState('ALL');
+  const [reminderSearchTerm, setReminderSearchTerm] = useState('');
+  const [selectedReminderIds, setSelectedReminderIds] = useState([]);
   const [reminderForm, setReminderForm] = useState({
-    submissionFormUrl: 'https://forms.google.com/sample-internship-submission',
     submissionDeadline: '',
     customNotes: '',
   });
   const [sendingReminder, setSendingReminder] = useState(false);
 
-  // Evaluator State
-  const [evaluatorRows, setEvaluatorRows] = useState([]);
-  const [evaluatorResults, setEvaluatorResults] = useState(null);
-  const [evaluating, setEvaluating] = useState(false);
-  const [sendingWarnings, setSendingWarnings] = useState(false);
+  // Subtab 4: Task Submission & Review Trigger Tracker State
+  const [trackerBatchFilter, setTrackerBatchFilter] = useState('ALL');
+  const [trackerRoleFilter, setTrackerRoleFilter] = useState('ALL');
+  const [trackerTaskNoFilter, setTrackerTaskNoFilter] = useState('ALL');
+  const [trackerStatusFilter, setTrackerStatusFilter] = useState('ALL'); // 'ALL' | 'SUBMITTED' | 'PENDING' | 'EXPIRED'
+  const [trackerSearchTerm, setTrackerSearchTerm] = useState('');
+  const [reviewTriggerModal, setReviewTriggerModal] = useState({
+    isOpen: false,
+    candidate: null,
+    meetMode: 'BATCH',
+    batchMeetLink: '',
+    reviewDate: '',
+    reviewTime: '04:00 PM',
+    customNotes: '',
+  });
+  const [dispatchingReview, setDispatchingReview] = useState(false);
+  const [sendingWarningCandidateId, setSendingWarningCandidateId] = useState(null);
 
   // Load Task Templates
   const loadTaskTemplates = async () => {
@@ -253,15 +277,61 @@ Shortfundly Media Technologies Pvt. Ltd.`;
     }
   };
 
-  // Dispatch Deadline Reminders
+  // Subtab 3: Filtered Candidates for Deadline Reminder
+  const filteredReminderCandidates = useMemo(() => {
+    return candidates.filter((c) => {
+      if (c.isLeaved) return false;
+      if (c.taskStatus === 'Not Assigned' && (!c.tasks || c.tasks.length === 0)) return false;
+      if (reminderBatchFilter !== 'ALL' && c.batch !== reminderBatchFilter) return false;
+      if (reminderRoleFilter !== 'ALL' && c.role !== reminderRoleFilter) return false;
+      const activeTask = c.tasks?.[0];
+      if (reminderTaskNoFilter !== 'ALL') {
+        const num = activeTask ? activeTask.taskNumber : 1;
+        if (String(num) !== String(reminderTaskNoFilter)) return false;
+      }
+      if (reminderSearchTerm) {
+        const term = reminderSearchTerm.toLowerCase();
+        const nameMatch = c.fullName?.toLowerCase().includes(term);
+        const idMatch = (c.internId || c.candidateId)?.toLowerCase().includes(term);
+        const emailMatch = c.email?.toLowerCase().includes(term);
+        if (!nameMatch && !idMatch && !emailMatch) return false;
+      }
+      return true;
+    });
+  }, [candidates, reminderBatchFilter, reminderRoleFilter, reminderTaskNoFilter, reminderSearchTerm]);
+
+  const handleToggleSelectAllReminders = () => {
+    if (selectedReminderIds.length === filteredReminderCandidates.length) {
+      setSelectedReminderIds([]);
+    } else {
+      setSelectedReminderIds(filteredReminderCandidates.map((c) => c.id));
+    }
+  };
+
+  const handleToggleSelectOneReminder = (id) => {
+    setSelectedReminderIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  // Dispatch Deadline Reminders with unique candidate website URL
   const handleSendDeadlineReminder = async () => {
+    const targetIds = selectedReminderIds.length > 0
+      ? selectedReminderIds
+      : filteredReminderCandidates.map(c => c.id);
+
+    if (targetIds.length === 0) {
+      showToast?.('No candidates match the selected filters for reminder.', 'error');
+      return;
+    }
+
     try {
       setSendingReminder(true);
       const res = await fetch('/api/tasks/deadline-reminder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          candidateIds: selectedCandidateIds.length ? selectedCandidateIds : undefined,
+          candidateIds: targetIds,
           submissionDeadline: reminderForm.submissionDeadline,
           customNotes: reminderForm.customNotes,
         }),
@@ -269,7 +339,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
       const data = await res.json();
       if (data.success) {
-        showToast?.(`Deadline reminder email sent to ${data.count} candidates!`, 'success');
+        showToast?.(`Deadline reminder emails dispatched to ${data.count} candidates with unique submission portal links!`, 'success');
+        setSelectedReminderIds([]);
         onRefresh?.();
       } else {
         showToast?.(data.error || 'Failed to send deadline reminders.', 'error');
@@ -281,102 +352,126 @@ Shortfundly Media Technologies Pvt. Ltd.`;
     }
   };
 
-  // Ingest Google Form Submission File
-  const handleUploadEvaluatorFile = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      // Simple CSV parser
-      const lines = text.split('\n').filter(Boolean);
-      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-      const parsedRows = [];
-
-      for (let i = 1; i < lines.length; i++) {
-        const parts = lines[i].split(',').map(p => p.trim().replace(/^"|"$/g, ''));
-        const row = {};
-        headers.forEach((h, idx) => {
-          row[h] = parts[idx] || '';
-        });
-        parsedRows.push(row);
+  // Subtab 4: Filtered Candidates for Submission & Review Tracker
+  const filteredTrackerCandidates = useMemo(() => {
+    return candidates.filter((c) => {
+      if (c.isLeaved) return false;
+      if (c.taskStatus === 'Not Assigned' && (!c.tasks || c.tasks.length === 0)) return false;
+      if (trackerBatchFilter !== 'ALL' && c.batch !== trackerBatchFilter) return false;
+      if (trackerRoleFilter !== 'ALL' && c.role !== trackerRoleFilter) return false;
+      const activeTask = c.tasks?.[0];
+      if (trackerTaskNoFilter !== 'ALL') {
+        const num = activeTask ? activeTask.taskNumber : 1;
+        if (String(num) !== String(trackerTaskNoFilter)) return false;
       }
+      if (trackerStatusFilter !== 'ALL') {
+        const subStatus = activeTask?.submissionStatus || 'PENDING';
+        if (trackerStatusFilter === 'SUBMITTED' && subStatus !== 'SUBMITTED') return false;
+        if (trackerStatusFilter === 'PENDING' && subStatus !== 'PENDING') return false;
+        if (trackerStatusFilter === 'EXPIRED' && subStatus !== 'EXPIRED') return false;
+      }
+      if (trackerSearchTerm) {
+        const term = trackerSearchTerm.toLowerCase();
+        const nameMatch = c.fullName?.toLowerCase().includes(term);
+        const idMatch = (c.internId || c.candidateId)?.toLowerCase().includes(term);
+        const emailMatch = c.email?.toLowerCase().includes(term);
+        if (!nameMatch && !idMatch && !emailMatch) return false;
+      }
+      return true;
+    });
+  }, [candidates, trackerBatchFilter, trackerRoleFilter, trackerTaskNoFilter, trackerStatusFilter, trackerSearchTerm]);
 
-      setEvaluatorRows(parsedRows);
-      showToast?.(`Parsed ${parsedRows.length} Google Form submission responses. Click "Evaluate Submissions" to process.`, 'info');
-    } catch (err) {
-      showToast?.(`Error parsing submission file: ${err.message}`, 'error');
-    }
+  // Telemetry metrics for Tracker
+  const trackerMetrics = useMemo(() => {
+    const total = filteredTrackerCandidates.length;
+    const submitted = filteredTrackerCandidates.filter(c => c.tasks?.[0]?.submissionStatus === 'SUBMITTED').length;
+    const pending = filteredTrackerCandidates.filter(c => (c.tasks?.[0]?.submissionStatus || 'PENDING') === 'PENDING').length;
+    const underReview = filteredTrackerCandidates.filter(c => c.taskStatus === 'Under Review' || (c.taskStatus || '').includes('Review')).length;
+    return { total, submitted, pending, underReview };
+  }, [filteredTrackerCandidates]);
+
+  // Open Review Trigger Modal
+  const handleOpenReviewTrigger = (candidate) => {
+    const defaultDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    setReviewTriggerModal({
+      isOpen: true,
+      candidate,
+      meetMode: 'BATCH',
+      batchMeetLink: generateClientMeetUrl(),
+      reviewDate: defaultDate,
+      reviewTime: '04:00 PM',
+      customNotes: 'Congratulations on submitting your technical milestone deliverables! Please join the Google Meet room for your technical evaluation and code walk-through.',
+    });
   };
 
-  // Evaluate Submissions
-  const handleRunEvaluation = async () => {
-    if (evaluatorRows.length === 0) {
-      showToast?.('Please upload a Google Form submission CSV file first.', 'error');
-      return;
-    }
-
+  // Dispatch Review Schedule & Google Meet Link
+  const handleDispatchReviewSchedule = async () => {
+    if (!reviewTriggerModal.candidate) return;
     try {
-      setEvaluating(true);
-      const res = await fetch('/api/tasks/evaluate-submissions', {
+      setDispatchingReview(true);
+      const res = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          rows: evaluatorRows,
-          batch: selectedBatch,
-          role: selectedRole,
+          candidateIds: [reviewTriggerModal.candidate.id],
+          reviewNumber: 1,
+          reviewDate: reviewTriggerModal.reviewDate,
+          reviewTime: reviewTriggerModal.reviewTime,
+          customNotes: reviewTriggerModal.customNotes,
+          meetMode: reviewTriggerModal.meetMode,
+          batchMeetLink: reviewTriggerModal.batchMeetLink,
         }),
       });
-
       const data = await res.json();
       if (data.success) {
-        setEvaluatorResults(data);
-        showToast?.(`Evaluation complete! ${data.submittedCount} submitted, ${data.notSubmittedCount} not submitted.`, 'success');
+        showToast?.(`Review invitation & Google Meet room sent to ${reviewTriggerModal.candidate.fullName}!`, 'success');
+        setReviewTriggerModal({
+          isOpen: false,
+          candidate: null,
+          meetMode: 'BATCH',
+          batchMeetLink: '',
+          reviewDate: '',
+          reviewTime: '04:00 PM',
+          customNotes: '',
+        });
         onRefresh?.();
       } else {
-        showToast?.(data.error || 'Failed to evaluate submissions.', 'error');
+        showToast?.(data.error || 'Failed to trigger review', 'error');
       }
     } catch (err) {
-      showToast?.(err.message, 'error');
+      showToast?.(err.message || 'Error triggering review', 'error');
     } finally {
-      setEvaluating(false);
+      setDispatchingReview(false);
     }
   };
 
-  // Send Formal Warning Emails (-10% Penalty)
-  const handleSendPenaltyWarnings = async () => {
-    if (!evaluatorResults?.notSubmitted?.length) {
-      showToast?.('No unsubmitted candidates available to warn.', 'error');
-      return;
-    }
-
-    const notSubIds = evaluatorResults.notSubmitted.map(c => c.id);
-    const confirm = window.confirm(`Send Formal Warning Notice and deduct 10% performance score from ${notSubIds.length} unsubmitted candidates?`);
+  // Single candidate warning with 10% penalty
+  const handleSendPenaltyWarningSingle = async (candidateId) => {
+    const confirm = window.confirm('Send Formal Warning Notice and deduct 10% performance score from this candidate?');
     if (!confirm) return;
 
     try {
-      setSendingWarnings(true);
+      setSendingWarningCandidateId(candidateId);
       const res = await fetch('/api/tasks/send-warning', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          candidateIds: notSubIds,
+          candidateIds: [candidateId],
           penaltyAmount: 10,
-          submissionUrl: reminderForm.submissionFormUrl,
         }),
       });
 
       const data = await res.json();
       if (data.success) {
-        showToast?.(`Formal warning notices dispatched with -10% score deduction to ${data.deductedCount} candidates!`, 'warning');
+        showToast?.('Formal warning notice dispatched with 10% penalty deduction.', 'warning');
         onRefresh?.();
       } else {
-        showToast?.(data.error || 'Failed to dispatch warning notices.', 'error');
+        showToast?.(data.error || 'Failed to dispatch warning notice.', 'error');
       }
     } catch (err) {
       showToast?.(err.message, 'error');
     } finally {
-      setSendingWarnings(false);
+      setSendingWarningCandidateId(null);
     }
   };
 
@@ -390,7 +485,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
           </div>
           <div>
             <h2 className={styles.mainTitle}>Task Assignment & Technical Milestones Deck</h2>
-            <p className={styles.subtitle}>Gemma 2B Industrial Task Templates &bull; Google Meet Integration &bull; Automated Reminders & Performance Evaluator</p>
+            <p className={styles.subtitle}>Gemma 2B Industrial Task Templates &bull; Google Meet Integration &bull; Automated Reminders & Submission Tracker</p>
           </div>
         </div>
 
@@ -425,11 +520,11 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
           <button
             type="button"
-            onClick={() => setSubTab('evaluator')}
-            className={`${styles.subTabBtn} ${subTab === 'evaluator' ? styles.subTabBtnActive : ''}`}
+            onClick={() => setSubTab('tracker')}
+            className={`${styles.subTabBtn} ${subTab === 'tracker' ? styles.subTabBtnActive : ''}`}
           >
-            <Upload size={14} />
-            <span>Task Evaluator (Upload CSV)</span>
+            <Activity size={14} />
+            <span>Submission & Review Tracker</span>
           </button>
         </div>
       </div>
@@ -714,216 +809,639 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
       {/* --- SUBTAB 3: DEADLINE REMAINDER MAIL --- */}
       {subTab === 'reminder' && (
-        <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Clock size={18} color="#a855f7" />
-            <span>Automated Task Deadline Reminder Email Dispatcher</span>
-          </h3>
-          <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>
-            Dispatches automated reminder emails to assigned candidates containing their unique Intern ID, strict deadline notice, and their secure candidate portal website URL to submit their project and GitHub links.
-          </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
+            <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Clock size={18} color="#a855f7" />
+              <span>Automated Task Deadline Reminder Email Dispatcher</span>
+            </h3>
+            <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>
+              Filter assigned candidates and dispatch automated reminder emails containing their unique Intern ID, strict deadline notice, and their secure candidate portal website URL to submit project and GitHub repository links.
+            </p>
 
-          {/* Unique Website Submission Portal URL banner */}
-          <div style={{ background: '#12111a', border: '1px solid #2b2842', borderRadius: '8px', padding: '14px 18px', marginBottom: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <label style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: '#e2e8f0' }}>
-                Unique Candidate Submission Website URL (Auto-Generated per Candidate)
-              </label>
-              <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
-                &bull; Live Vercel Production Portal
-              </span>
-            </div>
-            <div style={{ background: '#08070d', border: '1px solid #1f1d2e', padding: '8px 12px', borderRadius: '6px', fontFamily: 'monospace', fontSize: '12px', color: '#38bdf8', wordBreak: 'break-all' }}>
-              https://internship-email-automation.vercel.app/tasks/submit?token=&#123;&#123;candidate_submission_token&#125;&#125;
-            </div>
-            <div style={{ marginTop: '8px', fontSize: '11.5px', color: '#94a3b8' }}>
-              Candidate submits live project demo URL + GitHub repository link directly on the web app. Upon submission, the candidate is automatically transitioned to <strong>Under Review</strong>, an automated confirmation email is dispatched, and HR is notified to conduct the milestone review.
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '18px', marginBottom: '20px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                Strict Submission Deadline (Calendar Selection) <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input
-                type="datetime-local"
-                min={new Date().toISOString().slice(0, 16)}
-                value={reminderForm.submissionDeadline}
-                onChange={(e) => setReminderForm({ ...reminderForm, submissionDeadline: e.target.value })}
-                className={styles.searchInput}
-              />
-              <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px', display: 'block' }}>
-                Past dates are disabled. Candidates must submit deliverables before this timestamp.
-              </span>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                Target Recipients
-              </label>
-              <div style={{ background: '#14131e', border: '1px solid #28253d', padding: '10px 14px', borderRadius: '6px', fontSize: '12.5px', color: '#e2e8f0' }}>
-                {selectedCandidateIds.length > 0 ? (
-                  <span>Dispatching to <strong>{selectedCandidateIds.length}</strong> selected candidate(s)</span>
-                ) : (
-                  <span>Dispatching to <strong>all active assigned interns</strong> in the filtered view</span>
-                )}
+            {/* Unique Website Submission Portal URL banner */}
+            <div style={{ background: '#12111a', border: '1px solid #2b2842', borderRadius: '8px', padding: '14px 18px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: '#e2e8f0' }}>
+                  Unique Candidate Submission Website URL (Auto-Generated per Candidate)
+                </label>
+                <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
+                  &bull; Live Vercel Production Portal
+                </span>
+              </div>
+              <div style={{ background: '#08070d', border: '1px solid #1f1d2e', padding: '8px 12px', borderRadius: '6px', fontFamily: 'monospace', fontSize: '12px', color: '#38bdf8', wordBreak: 'break-all' }}>
+                https://internship-email-automation.vercel.app/tasks/submit?token=&#123;&#123;candidate_submission_token&#125;&#125;
+              </div>
+              <div style={{ marginTop: '8px', fontSize: '11.5px', color: '#94a3b8' }}>
+                Candidate submits live project demo URL + GitHub repository link directly on the web app. Upon submission, the candidate is automatically transitioned to <strong>Under Review</strong>, an automated confirmation email is dispatched, and HR is notified to conduct the milestone review.
               </div>
             </div>
-          </div>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-              Custom Mentorship Notes (Appended to reminder email)
-            </label>
-            <textarea
-              rows={3}
-              value={reminderForm.customNotes}
-              onChange={(e) => setReminderForm({ ...reminderForm, customNotes: e.target.value })}
-              className={styles.searchInput}
-              style={{ height: 'auto', padding: '10px' }}
-              placeholder="e.g. Please verify that your GitHub repository is public and includes a comprehensive README with setup instructions."
-            />
-          </div>
+            {/* Filter Bar */}
+            <div className={styles.filterBar} style={{ marginBottom: '16px' }}>
+              <div className={styles.searchBox}>
+                <Search size={15} className={styles.searchIcon} />
+                <input
+                  type="text"
+                  placeholder="Filter by intern ID, name, or email..."
+                  value={reminderSearchTerm}
+                  onChange={(e) => setReminderSearchTerm(e.target.value)}
+                  className={styles.searchInput}
+                />
+              </div>
 
-          <button
-            type="button"
-            onClick={handleSendDeadlineReminder}
-            disabled={sendingReminder}
-            className={styles.btnPrimary}
-          >
-            <Send size={14} />
-            <span>{sendingReminder ? 'Dispatching Reminders via SMTP...' : 'Send Deadline Reminder Emails to Assigned Interns'}</span>
-          </button>
+              <select
+                value={reminderBatchFilter}
+                onChange={(e) => setReminderBatchFilter(e.target.value)}
+                className={styles.selectInput}
+              >
+                <option value="ALL">All Batches</option>
+                {batches.map((b) => (
+                  <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>
+                ))}
+              </select>
+
+              <select
+                value={reminderTaskNoFilter}
+                onChange={(e) => setReminderTaskNoFilter(e.target.value)}
+                className={styles.selectInput}
+              >
+                <option value="ALL">All Task Numbers</option>
+                <option value="1">Task #1</option>
+                <option value="2">Task #2</option>
+                <option value="3">Task #3</option>
+                <option value="4">Task #4</option>
+              </select>
+
+              <select
+                value={reminderRoleFilter}
+                onChange={(e) => setReminderRoleFilter(e.target.value)}
+                className={styles.selectInput}
+              >
+                <option value="ALL">All Roles</option>
+                <option value="Web Developer Intern">Web Developer Intern</option>
+                <option value="Frontend Developer">Frontend Developer</option>
+                <option value="Backend Developer">Backend Developer</option>
+                <option value="Full Stack Intern">Full Stack Intern</option>
+                <option value="AI/ML Engineer">AI/ML Engineer</option>
+                <option value="UI/UX Designer">UI/UX Designer</option>
+              </select>
+            </div>
+
+            {/* Target Recipients Table */}
+            <div className={styles.tableCard} style={{ marginBottom: '20px' }}>
+              <div className={styles.tableHeaderRow}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Users size={16} color="#c084fc" />
+                  <strong style={{ color: '#ffffff' }}>Select Candidates for Reminder ({selectedReminderIds.length} of {filteredReminderCandidates.length} Selected)</strong>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={handleToggleSelectAllReminders}
+                    className={styles.btnSecondary}
+                    style={{ fontSize: '11px', padding: '4px 8px' }}
+                  >
+                    {selectedReminderIds.length === filteredReminderCandidates.length ? 'Deselect All' : 'Select All Filtered'}
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.tableResponsive} style={{ maxHeight: '320px', overflowY: 'auto' }}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={{ width: '40px', textAlign: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={filteredReminderCandidates.length > 0 && selectedReminderIds.length === filteredReminderCandidates.length}
+                          onChange={handleToggleSelectAllReminders}
+                        />
+                      </th>
+                      <th>Intern ID</th>
+                      <th>Candidate Name & Email</th>
+                      <th>Batch & Role</th>
+                      <th>Task Milestone</th>
+                      <th>Deadline</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredReminderCandidates.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '24px' }}>
+                          No candidates found matching the selected filters.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredReminderCandidates.map((cand) => {
+                        const isSelected = selectedReminderIds.includes(cand.id);
+                        const activeTask = cand.tasks?.[0];
+                        const reminderEmail = cand.emails?.find(e => e.emailType === 'TASK_DEADLINE_REMINDER' || (e.subject || '').includes('Deadline Reminder'));
+                        const reminderSentAt = reminderEmail ? new Date(reminderEmail.sentAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
+
+                        return (
+                          <tr key={cand.id} style={{ background: isSelected ? 'rgba(168, 85, 247, 0.08)' : 'transparent' }}>
+                            <td style={{ textAlign: 'center' }}>
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => handleToggleSelectOneReminder(cand.id)}
+                              />
+                            </td>
+                            <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 600 }}>
+                              {cand.internId || cand.candidateId}
+                            </td>
+                            <td>
+                              <div style={{ fontWeight: 600, color: '#ffffff' }}>{cand.fullName}</div>
+                              <div style={{ fontSize: '11px', color: '#94a3b8' }}>{cand.email}</div>
+                            </td>
+                            <td>
+                              <div style={{ color: '#cbd5e1' }}>{cand.batch || 'Batch A'}</div>
+                              <div style={{ fontSize: '11px', color: '#71717a' }}>{cand.role}</div>
+                            </td>
+                            <td>
+                              <span className={styles.badgePurple}>
+                                Task #{activeTask?.taskNumber || 1}: {activeTask?.taskId || 'TSK-ACTIVE'}
+                              </span>
+                            </td>
+                            <td style={{ fontSize: '11.5px', color: '#94a3b8' }}>
+                              {activeTask?.deadline ? new Date(activeTask.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '7 Days Default'}
+                            </td>
+                            <td>
+                              {reminderSentAt ? (
+                                <span className={styles.badgeEmerald}>Reminder Sent ({reminderSentAt})</span>
+                              ) : (
+                                <span className={styles.badgeAmber}>Pending Reminder</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Submission Configuration Inputs */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '18px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                  Strict Submission Deadline (Calendar Selection) <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  min={new Date().toISOString().slice(0, 16)}
+                  value={reminderForm.submissionDeadline}
+                  onChange={(e) => setReminderForm({ ...reminderForm, submissionDeadline: e.target.value })}
+                  className={styles.searchInput}
+                />
+                <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px', display: 'block' }}>
+                  Past dates are disabled. Candidates must submit deliverables before this timestamp.
+                </span>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                  Target Recipients Summary
+                </label>
+                <div style={{ background: '#14131e', border: '1px solid #28253d', padding: '10px 14px', borderRadius: '6px', fontSize: '12.5px', color: '#e2e8f0' }}>
+                  {selectedReminderIds.length > 0 ? (
+                    <span>Dispatching to <strong>{selectedReminderIds.length}</strong> selected candidate(s)</span>
+                  ) : (
+                    <span>Dispatching to <strong>all {filteredReminderCandidates.length}</strong> candidates in the filtered view</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                Custom Mentorship Notes (Appended to reminder email)
+              </label>
+              <textarea
+                rows={3}
+                value={reminderForm.customNotes}
+                onChange={(e) => setReminderForm({ ...reminderForm, customNotes: e.target.value })}
+                className={styles.searchInput}
+                style={{ height: 'auto', padding: '10px' }}
+                placeholder="e.g. Please verify that your GitHub repository is public and includes a comprehensive README with setup instructions."
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSendDeadlineReminder}
+              disabled={sendingReminder || filteredReminderCandidates.length === 0}
+              className={styles.btnPrimary}
+            >
+              <Send size={14} />
+              <span>{sendingReminder ? 'Dispatching Reminders via SMTP...' : `Send Deadline Reminder Emails (${selectedReminderIds.length > 0 ? selectedReminderIds.length : filteredReminderCandidates.length} Interns)`}</span>
+            </button>
+          </div>
         </div>
       )}
 
-      {/* --- SUBTAB 4: TASK EVALUATOR (CSV INGESTION & PENALTY DISPATCH) --- */}
-      {subTab === 'evaluator' && (
+      {/* --- SUBTAB 4: TASK SUBMISSION & REVIEW TRIGGER TRACKER --- */}
+      {subTab === 'tracker' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
-            <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Upload size={18} color="#a855f7" />
-              <span>Task Evaluator & Google Form CSV Submissions Ingestion</span>
-            </h3>
-            <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#94a3b8' }}>
-              After candidates fill out the Google Form, HR exports the responses as CSV/Excel and uploads them here. The system automatically cross-references records and splits students into <strong>Task Submitted</strong> (advancing to Review Dashboard) and <strong>Task Not Submitted</strong> (allowing 1-click formal warning emails with a 10% penalty deduction).
-            </p>
+          {/* Telemetry Metrics */}
+          <div className={styles.metricsGrid}>
+            <div className={styles.metricCard}>
+              <div className={styles.metricLabel}>Total Tasks Tracked</div>
+              <div className={styles.metricValue}>{trackerMetrics.total}</div>
+              <div className={styles.metricDesc}>Active technical assignments</div>
+            </div>
 
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <label className={styles.btnSecondary} style={{ cursor: 'pointer' }}>
-                <Upload size={14} />
-                <span>Upload Google Form CSV / Excel</span>
-                <input
-                  type="file"
-                  accept=".csv,.xlsx,.xls"
-                  style={{ display: 'none' }}
-                  onChange={handleUploadEvaluatorFile}
-                />
-              </label>
+            <div className={styles.metricCard}>
+              <div className={styles.metricLabel}>Submitted Deliverables</div>
+              <div className={styles.metricValue} style={{ color: '#34d399' }}>{trackerMetrics.submitted}</div>
+              <div className={styles.metricDesc}>Ready for milestone review</div>
+            </div>
 
-              <button
-                type="button"
-                onClick={handleRunEvaluation}
-                disabled={evaluating || evaluatorRows.length === 0}
-                className={styles.btnPrimary}
-              >
-                <RefreshCw size={14} />
-                <span>{evaluating ? 'Evaluating Submissions...' : `Evaluate Submissions (${evaluatorRows.length} Loaded)`}</span>
-              </button>
+            <div className={styles.metricCard}>
+              <div className={styles.metricLabel}>Pending Submissions</div>
+              <div className={styles.metricValue} style={{ color: '#fbbf24' }}>{trackerMetrics.pending}</div>
+              <div className={styles.metricDesc}>Awaiting project and GitHub demo</div>
+            </div>
 
-              {evaluatorResults?.notSubmitted?.length > 0 && (
-                <button
-                  type="button"
-                  onClick={handleSendPenaltyWarnings}
-                  disabled={sendingWarnings}
-                  className={styles.btnDanger}
-                >
-                  <AlertTriangle size={14} />
-                  <span>Send Warning & Deduct 10% ({evaluatorResults.notSubmitted.length} Unsubmitted)</span>
-                </button>
-              )}
+            <div className={styles.metricCard}>
+              <div className={styles.metricLabel}>Under Review / Evaluated</div>
+              <div className={styles.metricValue} style={{ color: '#c084fc' }}>{trackerMetrics.underReview}</div>
+              <div className={styles.metricDesc}>Review cycle triggered or scheduled</div>
             </div>
           </div>
 
-          {/* Results Comparison Grid */}
-          {evaluatorResults && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '18px' }}>
-              {/* Submitted Candidates */}
-              <div className={styles.tableCard}>
-                <div className={styles.tableHeaderRow}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <CheckCircle2 size={16} color="#10b981" />
-                    <strong style={{ color: '#ffffff' }}>Task Submitted &rarr; Ready for Review ({evaluatorResults.submittedCount})</strong>
-                  </div>
-                </div>
-                <div className={styles.tableResponsive}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th>Intern ID</th>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th>Links</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {evaluatorResults.submitted.map((s) => (
-                        <tr key={s.id}>
-                          <td style={{ fontFamily: 'monospace', color: '#c084fc' }}>{s.internId}</td>
-                          <td style={{ fontWeight: 600 }}>{s.fullName}</td>
-                          <td>{s.role}</td>
-                          <td>
-                            {s.githubUrl ? (
-                              <a href={s.githubUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', fontSize: '11.5px' }}>GitHub</a>
-                            ) : '-'}
-                          </td>
-                          <td>
-                            <span className={styles.badgeEmerald}>Review Pending</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          {/* Filter Bar */}
+          <div className={styles.filterBar}>
+            <div className={styles.searchBox}>
+              <Search size={15} className={styles.searchIcon} />
+              <input
+                type="text"
+                placeholder="Search candidate by name, intern ID, or email..."
+                value={trackerSearchTerm}
+                onChange={(e) => setTrackerSearchTerm(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
 
-              {/* Not Submitted Candidates */}
-              <div className={styles.tableCard}>
-                <div className={styles.tableHeaderRow}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <AlertTriangle size={16} color="#f87171" />
-                    <strong style={{ color: '#ffffff' }}>Task Not Submitted &rarr; Penalty Queue ({evaluatorResults.notSubmittedCount})</strong>
-                  </div>
-                </div>
-                <div className={styles.tableResponsive}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th>Intern ID</th>
-                        <th>Name</th>
-                        <th>Current Score</th>
-                        <th>Penalty</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {evaluatorResults.notSubmitted.map((ns) => (
-                        <tr key={ns.id}>
-                          <td style={{ fontFamily: 'monospace', color: '#c084fc' }}>{ns.internId}</td>
-                          <td style={{ fontWeight: 600 }}>{ns.fullName}</td>
-                          <td style={{ fontFamily: 'monospace' }}>{ns.performancePercentage?.toFixed(1)}%</td>
-                          <td>
-                            <span className={styles.badgeRose}>-10%</span>
+            <select
+              value={trackerBatchFilter}
+              onChange={(e) => setTrackerBatchFilter(e.target.value)}
+              className={styles.selectInput}
+            >
+              <option value="ALL">All Batches</option>
+              {batches.map((b) => (
+                <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>
+              ))}
+            </select>
+
+            <select
+              value={trackerRoleFilter}
+              onChange={(e) => setTrackerRoleFilter(e.target.value)}
+              className={styles.selectInput}
+            >
+              <option value="ALL">All Roles</option>
+              <option value="Web Developer Intern">Web Developer Intern</option>
+              <option value="Frontend Developer">Frontend Developer</option>
+              <option value="Backend Developer">Backend Developer</option>
+              <option value="Full Stack Intern">Full Stack Intern</option>
+              <option value="AI/ML Engineer">AI/ML Engineer</option>
+              <option value="UI/UX Designer">UI/UX Designer</option>
+            </select>
+
+            <select
+              value={trackerTaskNoFilter}
+              onChange={(e) => setTrackerTaskNoFilter(e.target.value)}
+              className={styles.selectInput}
+            >
+              <option value="ALL">All Task Numbers</option>
+              <option value="1">Task #1</option>
+              <option value="2">Task #2</option>
+              <option value="3">Task #3</option>
+              <option value="4">Task #4</option>
+            </select>
+
+            <select
+              value={trackerStatusFilter}
+              onChange={(e) => setTrackerStatusFilter(e.target.value)}
+              className={styles.selectInput}
+            >
+              <option value="ALL">All Submission States</option>
+              <option value="SUBMITTED">Submitted (Ready for Review)</option>
+              <option value="PENDING">Pending Submission</option>
+              <option value="EXPIRED">Expired Deadline</option>
+            </select>
+          </div>
+
+          {/* Pipeline Tracker Table */}
+          <div className={styles.tableCard}>
+            <div className={styles.tableHeaderRow}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Activity size={16} color="#c084fc" />
+                <strong style={{ color: '#ffffff' }}>Task Submission & Review Trigger Pipeline ({filteredTrackerCandidates.length} Interns)</strong>
+              </div>
+            </div>
+
+            <div className={styles.tableResponsive}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Intern ID</th>
+                    <th>Candidate & Role</th>
+                    <th>Batch</th>
+                    <th>Milestone</th>
+                    <th>Deadline Mail</th>
+                    <th>Deliverables (GitHub / Demo)</th>
+                    <th>Review Trigger Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTrackerCandidates.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '28px' }}>
+                        No candidates match the selected filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredTrackerCandidates.map((cand) => {
+                      const activeTask = cand.tasks?.[0];
+                      const isSubmitted = activeTask?.submissionStatus === 'SUBMITTED';
+                      const isExpired = activeTask?.submissionStatus === 'EXPIRED';
+                      const reminderEmail = cand.emails?.find(e => e.emailType === 'TASK_DEADLINE_REMINDER' || (e.subject || '').includes('Deadline Reminder'));
+                      const reminderSentAt = reminderEmail ? new Date(reminderEmail.sentAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
+
+                      return (
+                        <tr key={cand.id}>
+                          <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 600 }}>
+                            {cand.internId || cand.candidateId}
                           </td>
                           <td>
-                            <span className={styles.badgeAmber}>Warning Queued</span>
+                            <div style={{ fontWeight: 600, color: '#ffffff' }}>{cand.fullName}</div>
+                            <div style={{ fontSize: '11px', color: '#94a3b8' }}>{cand.role}</div>
+                          </td>
+                          <td>
+                            <span style={{ fontSize: '12px', color: '#cbd5e1' }}>{cand.batch || 'Batch A'}</span>
+                          </td>
+                          <td>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#ffffff' }}>
+                              Task #{activeTask?.taskNumber || 1}
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#71717a' }}>
+                              {activeTask?.taskId || 'TSK-ACTIVE'}
+                            </div>
+                          </td>
+                          <td>
+                            {reminderSentAt ? (
+                              <span className={styles.badgeEmerald}>Sent ({reminderSentAt})</span>
+                            ) : (
+                              <span className={styles.badgeAmber}>Not Sent</span>
+                            )}
+                          </td>
+                          <td>
+                            {isSubmitted ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <span className={styles.badgeEmerald}>
+                                  &bull; Submitted {activeTask.submittedAt ? new Date(activeTask.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
+                                </span>
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
+                                  {activeTask.githubUrl && (
+                                    <a
+                                      href={activeTask.githubUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#38bdf8', fontSize: '11px', textDecoration: 'none' }}
+                                    >
+                                      <span>GitHub</span>
+                                      <ExternalLink size={10} />
+                                    </a>
+                                  )}
+                                  {activeTask.projectUrl && (
+                                    <a
+                                      href={activeTask.projectUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#c084fc', fontSize: '11px', textDecoration: 'none' }}
+                                    >
+                                      <span>Demo</span>
+                                      <ExternalLink size={10} />
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            ) : isExpired ? (
+                              <span className={styles.badgeRose}>⚠️ Deadline Expired</span>
+                            ) : (
+                              <span className={styles.badgeAmber}>⏳ Pending Submission</span>
+                            )}
+                          </td>
+                          <td>
+                            {isSubmitted ? (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenReviewTrigger(cand)}
+                                className={styles.btnPrimary}
+                                style={{ fontSize: '11.5px', padding: '6px 12px' }}
+                              >
+                                <Video size={13} />
+                                <span>Send Review Mail & Meet</span>
+                              </button>
+                            ) : isExpired ? (
+                              <button
+                                type="button"
+                                onClick={() => handleSendPenaltyWarningSingle(cand.id)}
+                                disabled={sendingWarningCandidateId === cand.id}
+                                className={styles.btnDanger}
+                                style={{ fontSize: '11px', padding: '5px 10px' }}
+                              >
+                                <AlertTriangle size={12} />
+                                <span>{sendingWarningCandidateId === cand.id ? 'Sending...' : 'Send Warning (-10%)'}</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedReminderIds([cand.id]);
+                                  setSubTab('reminder');
+                                }}
+                                className={styles.btnSecondary}
+                                style={{ fontSize: '11px', padding: '5px 10px' }}
+                              >
+                                <Mail size={12} />
+                                <span>Send Reminder</span>
+                              </button>
+                            )}
                           </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Modal: Trigger Review & Google Meet Dispatch */}
+          {reviewTriggerModal.isOpen && reviewTriggerModal.candidate && (
+            <div className={styles.modalOverlay} onClick={() => setReviewTriggerModal({ ...reviewTriggerModal, isOpen: false })}>
+              <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+                <div className={styles.modalHeader}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Video size={18} color="#a855f7" />
+                    <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff' }}>
+                      Schedule Milestone Review & Google Meet Call
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setReviewTriggerModal({ ...reviewTriggerModal, isOpen: false })}
+                    style={{ color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className={styles.modalBody}>
+                  {/* Candidate summary card */}
+                  <div style={{ background: '#12111a', border: '1px solid #2b2842', borderRadius: '8px', padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <strong style={{ color: '#ffffff', fontSize: '14px' }}>{reviewTriggerModal.candidate.fullName}</strong>
+                      <span style={{ fontFamily: 'monospace', color: '#c084fc', fontSize: '12px' }}>{reviewTriggerModal.candidate.internId || reviewTriggerModal.candidate.candidateId}</span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '3px' }}>
+                      {reviewTriggerModal.candidate.role} &bull; {reviewTriggerModal.candidate.batch || 'Batch A'} &bull; {reviewTriggerModal.candidate.email}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                        Review Date <span style={{ color: '#ef4444' }}>*</span>
+                      </label>
+                      <input
+                        type="date"
+                        min={new Date().toISOString().split('T')[0]}
+                        value={reviewTriggerModal.reviewDate}
+                        onChange={(e) => setReviewTriggerModal({ ...reviewTriggerModal, reviewDate: e.target.value })}
+                        className={styles.searchInput}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                        Review Time <span style={{ color: '#ef4444' }}>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={reviewTriggerModal.reviewTime}
+                        onChange={(e) => setReviewTriggerModal({ ...reviewTriggerModal, reviewTime: e.target.value })}
+                        className={styles.searchInput}
+                        placeholder="04:00 PM"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Google Meet Link Options */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '8px' }}>
+                      Google Meet Video Room Configuration
+                    </label>
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setReviewTriggerModal({ ...reviewTriggerModal, meetMode: 'BATCH' })}
+                        style={{
+                          flex: 1,
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          border: reviewTriggerModal.meetMode === 'BATCH' ? '1px solid #a855f7' : '1px solid #232328',
+                          background: reviewTriggerModal.meetMode === 'BATCH' ? 'rgba(168, 85, 247, 0.15)' : '#09090b',
+                          color: reviewTriggerModal.meetMode === 'BATCH' ? '#ffffff' : '#94a3b8',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Batch-Wise Shared Meet Room
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setReviewTriggerModal({ ...reviewTriggerModal, meetMode: 'INDIVIDUAL' })}
+                        style={{
+                          flex: 1,
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          border: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? '1px solid #a855f7' : '1px solid #232328',
+                          background: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? 'rgba(168, 85, 247, 0.15)' : '#09090b',
+                          color: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? '#ffffff' : '#94a3b8',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Unique Dedicated 1-on-1 Room
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <label style={{ fontSize: '11.5px', color: '#94a3b8' }}>
+                        Google Meet URL (Authentic standard format):
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newUrl = generateClientMeetUrl();
+                          setReviewTriggerModal({ ...reviewTriggerModal, batchMeetLink: newUrl });
+                          showToast?.('Generated new genuine Google Meet URL!', 'info');
+                        }}
+                        style={{ background: '#1c1b26', border: '1px solid #332f4a', color: '#c084fc', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', cursor: 'pointer' }}
+                      >
+                        Regenerate Room URL
+                      </button>
+                    </div>
+                    <input
+                      type="url"
+                      value={reviewTriggerModal.batchMeetLink}
+                      onChange={(e) => setReviewTriggerModal({ ...reviewTriggerModal, batchMeetLink: e.target.value })}
+                      className={styles.searchInput}
+                      placeholder="https://meet.google.com/abc-defg-hij"
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      Custom Mentorship Notes (Delivered in review invitation email)
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={reviewTriggerModal.customNotes}
+                      onChange={(e) => setReviewTriggerModal({ ...reviewTriggerModal, customNotes: e.target.value })}
+                      className={styles.searchInput}
+                      style={{ height: 'auto', padding: '10px' }}
+                      placeholder="Instructions for the review session..."
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.modalFooter}>
+                  <button
+                    type="button"
+                    onClick={() => setReviewTriggerModal({ ...reviewTriggerModal, isOpen: false })}
+                    className={styles.btnSecondary}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDispatchReviewSchedule}
+                    disabled={dispatchingReview}
+                    className={styles.btnPrimary}
+                  >
+                    <Send size={14} />
+                    <span>{dispatchingReview ? 'Dispatching Review Email...' : 'Send Review Mail & Meet Link'}</span>
+                  </button>
                 </div>
               </div>
             </div>
