@@ -40,10 +40,19 @@ export async function POST(request) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
-    });
+    // Check if user already exists (with retry)
+    let existingUser = null;
+    try {
+      existingUser = await prisma.user.findUnique({
+        where: { email: normalizedEmail },
+      });
+    } catch (dbErr) {
+      console.warn('Register findUnique retry triggered:', dbErr.message);
+      await new Promise((r) => setTimeout(r, 300));
+      existingUser = await prisma.user.findUnique({
+        where: { email: normalizedEmail },
+      });
+    }
 
     if (existingUser) {
       return NextResponse.json(
@@ -57,14 +66,28 @@ export async function POST(request) {
 
     const passwordHash = await hashPassword(password);
 
-    const user = await prisma.user.create({
-      data: {
-        name: name.trim(),
-        email: normalizedEmail,
-        passwordHash,
-        role: role || 'HR',
-      },
-    });
+    let user = null;
+    try {
+      user = await prisma.user.create({
+        data: {
+          name: name.trim(),
+          email: normalizedEmail,
+          passwordHash,
+          role: role || 'HR',
+        },
+      });
+    } catch (createErr) {
+      console.warn('Register user create retry triggered:', createErr.message);
+      await new Promise((r) => setTimeout(r, 300));
+      user = await prisma.user.create({
+        data: {
+          name: name.trim(),
+          email: normalizedEmail,
+          passwordHash,
+          role: role || 'HR',
+        },
+      });
+    }
 
     // Create session token
     const sessionToken = signToken({

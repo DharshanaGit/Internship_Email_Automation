@@ -139,7 +139,9 @@ export default function LoginPage() {
       const searchParams = new URLSearchParams(window.location.search);
       const returnTo = searchParams.get('returnTo');
       const targetUrl = (returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//')) ? returnTo : '/dashboard';
-      window.location.href = targetUrl;
+      setTimeout(() => {
+        window.location.href = targetUrl;
+      }, 400);
     } catch (err) {
       setSubmitError(err.message || 'An unexpected authentication error occurred.');
       fetchCaptcha();
