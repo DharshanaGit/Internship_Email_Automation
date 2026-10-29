@@ -1236,8 +1236,8 @@ export default function DashboardPage() {
         body: formData,
       });
 
-      const data = await res.json();
-      if (data.success) {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success && data.report) {
         setBulkValidationReport(data.report);
         const autoSelected = new Set(
           data.report.rows
@@ -1245,12 +1245,12 @@ export default function DashboardPage() {
             .map((r) => r.candidateId)
         );
         setSelectedCandidateKeys(autoSelected);
-        showToast(`Parsed ${data.report.validCount} valid candidates from uploaded file!`, 'success');
+        showToast(`Parsed ${data.report.validCount} valid candidates from ${file.name}!`, 'success');
       } else {
-        showToast(data.error || 'File validation failed', 'error');
+        showToast(data.error || `File upload failed (${res.status || 'Error'})`, 'error');
       }
     } catch (err) {
-      showToast('Error parsing file', 'error');
+      showToast(err.message || 'Error parsing file', 'error');
     } finally {
       if (e.target) {
         e.target.value = '';

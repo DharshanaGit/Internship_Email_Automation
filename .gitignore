@@ -41,6 +41,10 @@ yarn-error.log*
 storage/offer_letters/*.pdf
 storage/certificates/*.pdf
 storage/excel_exports/*.xlsx
+*.xlsx
+*.xls
+*.csv
+~$*
 
 # OS & Editor files
 .DS_Store
