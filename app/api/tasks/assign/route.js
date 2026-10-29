@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma.js';
 import { generateGemmaTask } from '@/lib/gemmaEngine.js';
 import { getExplanationSchedule, getReviewOneSchedule } from '@/lib/dateUtils.js';
 import { createIcsCalendarInvite } from '@/lib/googleCalendar.js';
-import { getOrCreateCandidateMeetLink } from '@/lib/googleMeet.js';
+import { getOrCreateCandidateMeetLink, generateValidGoogleMeetUrl } from '@/lib/googleMeet.js';
 import { sendEmail } from '@/lib/mailer.js';
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'https://internship-email-automation.vercel.app').replace(/\/+$/, '');
@@ -95,9 +95,16 @@ export async function POST(request) {
     const finalExpTime = explanationTime || expSchedule.timeStr;
     const rev1Schedule = getReviewOneSchedule(finalExpDate);
 
-    const finalDeadline = deadline
-      ? new Date(deadline)
-      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    let finalDeadline = null;
+    if (deadline) {
+      const parsed = new Date(deadline);
+      if (!isNaN(parsed.getTime())) {
+        finalDeadline = parsed;
+      }
+    }
+    if (!finalDeadline) {
+      finalDeadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    }
 
     const baseTaskId = customTaskId || `TSK-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 
@@ -151,7 +158,15 @@ export async function POST(request) {
       // Google Meet Link
       let meetLink = customMeetLink;
       if (!meetLink) {
-        meetLink = await getOrCreateCandidateMeetLink(cand, finalExpDate);
+        try {
+          meetLink = await getOrCreateCandidateMeetLink(cand, finalExpDate);
+        } catch (meetErr) {
+          console.warn('[Task Assign] Google Meet generation notice, using compliant Meet URL:', meetErr?.message);
+          meetLink = cand.googleMeetUrl || generateValidGoogleMeetUrl();
+        }
+      }
+      if (!meetLink) {
+        meetLink = generateValidGoogleMeetUrl();
       }
 
       // Email subject & body formatting
@@ -271,24 +286,28 @@ export async function POST(request) {
       });
 
       // Dispatch Email
-      await sendEmail({
-        candidateId: cand.id,
-        to: cand.email,
-        recipientName: cand.fullName,
-        cc: cc || undefined,
-        subject: emailSubject,
-        html: emailHtml,
-        text: `Dear ${cand.fullName}, your task [${assignedTaskId}] for ${candidateRole} has been assigned. Explanation date: ${finalExpDate} at ${finalExpTime}. Meet link: ${meetLink}. Submit deliverables before ${finalDeadline.toLocaleString()} at: ${submissionUrl}`,
-        emailType: 'TASK_ASSIGNMENT',
-        meetLink,
-        attachments: [
-          {
-            filename: 'task_explanation_invite.ics',
-            content: icsInvite,
-            contentType: 'text/calendar; charset=utf-8; method=REQUEST',
-          },
-        ],
-      });
+      try {
+        await sendEmail({
+          candidateId: cand.id,
+          to: cand.email,
+          recipientName: cand.fullName,
+          cc: cc || undefined,
+          subject: emailSubject,
+          html: emailHtml,
+          text: `Dear ${cand.fullName}, your task [${assignedTaskId}] for ${candidateRole} has been assigned. Explanation date: ${finalExpDate} at ${finalExpTime}. Meet link: ${meetLink}. Submit deliverables before ${finalDeadline.toLocaleString()} at: ${submissionUrl}`,
+          emailType: 'TASK_ASSIGNMENT',
+          meetLink,
+          attachments: [
+            {
+              filename: 'task_explanation_invite.ics',
+              content: icsInvite,
+              contentType: 'text/calendar; charset=utf-8; method=REQUEST',
+            },
+          ],
+        });
+      } catch (sendErr) {
+        console.error(`[Task Assign Mail Error for ${cand.email}]:`, sendErr.message);
+      }
 
       // Update Candidate status to 'Assigned' and initial performance percentage
       await prisma.candidate.update({
