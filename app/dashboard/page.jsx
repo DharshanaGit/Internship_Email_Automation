@@ -757,7 +757,10 @@ export default function DashboardPage() {
       const res = await fetch('/api/settings');
       const data = await res.json();
       if (data.success) {
-        setSysSettings(data.data);
+        setSysSettings({
+          ...data.data,
+          smtpPassword: data.data.hasPassword ? (data.data.maskedPassword || '••••••••••••••••') : '',
+        });
       }
     } catch (err) {}
   };
@@ -4696,13 +4699,24 @@ export default function DashboardPage() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Google App Password</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label className={styles.label} style={{ margin: 0 }}>Google App Password</label>
+                    {sysSettings.hasPassword && (
+                      <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
+                        ✓ Saved &amp; Encrypted
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="password"
                     className={styles.inputField}
                     placeholder="16-character Google App Password"
+                    value={sysSettings.smtpPassword || ''}
                     onChange={(e) => setSysSettings({ ...sysSettings, smtpPassword: e.target.value })}
                   />
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '3px', display: 'block' }}>
+                    Your password is permanently saved &amp; secured. Never exposed in plain text.
+                  </span>
                 </div>
 
                 <div className={styles.formGroup}>
@@ -4770,11 +4784,15 @@ export default function DashboardPage() {
                       const res = await fetch('/api/settings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(sysSettings),
+                        body: JSON.stringify({
+                          ...sysSettings,
+                          smtpPass: sysSettings.smtpPassword,
+                        }),
                       });
                       const data = await res.json();
                       if (data.success) {
                         showToast('Settings saved successfully!', 'success');
+                        loadSettings();
                       }
                     } catch (e) {
                       showToast('Error saving settings', 'error');

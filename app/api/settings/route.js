@@ -10,7 +10,16 @@ export async function GET() {
 
     if (!settings) {
       settings = await prisma.systemSetting.create({
-        data: { id: 'default' },
+        data: {
+          id: 'default',
+          smtpHost: 'smtp.gmail.com',
+          smtpPort: 465,
+          smtpSecure: true,
+          smtpUser: 'dharshana.shortfundly@gmail.com',
+          senderEmail: 'dharshana.shortfundly@gmail.com',
+          senderName: 'Shortfundly Media Technologies',
+          simulationMode: false,
+        },
       });
     }
 
@@ -19,14 +28,15 @@ export async function GET() {
       data: {
         smtpHost: settings.smtpHost || 'smtp.gmail.com',
         smtpPort: settings.smtpPort || 465,
-        smtpSecure: settings.smtpSecure,
-        smtpUser: settings.smtpUser || 'hr@shortfundly.com',
-        hasPassword: !!settings.smtpPass,
-        senderEmail: settings.senderEmail || 'hr@shortfundly.com',
-        senderName: settings.senderName || 'Shortfundly HR Team',
+        smtpSecure: settings.smtpSecure !== undefined ? settings.smtpSecure : true,
+        smtpUser: settings.smtpUser || 'dharshana.shortfundly@gmail.com',
+        hasPassword: Boolean(settings.smtpPass),
+        maskedPassword: settings.smtpPass ? '••••••••••••••••' : '',
+        senderEmail: settings.senderEmail || settings.smtpUser || 'dharshana.shortfundly@gmail.com',
+        senderName: settings.senderName || 'Shortfundly Media Technologies',
         googleCalendarConnected: settings.googleCalendarConnected,
         defaultMeetLinkPrefix: settings.defaultMeetLinkPrefix || 'https://meet.google.com',
-        simulationMode: settings.simulationMode,
+        simulationMode: Boolean(settings.simulationMode),
       },
     });
   } catch (error) {
@@ -43,9 +53,18 @@ export async function POST(request) {
     if (body.smtpPort !== undefined) updateData.smtpPort = parseInt(body.smtpPort, 10);
     if (body.smtpSecure !== undefined) updateData.smtpSecure = Boolean(body.smtpSecure);
     if (body.smtpUser !== undefined) updateData.smtpUser = body.smtpUser;
-    if (body.smtpPass !== undefined && body.smtpPass.trim() !== '') {
-      updateData.smtpPass = body.smtpPass.trim();
+
+    // Safely accept both smtpPass and smtpPassword without overwriting with mask
+    const submittedPassword = body.smtpPass || body.smtpPassword;
+    if (
+      submittedPassword !== undefined &&
+      typeof submittedPassword === 'string' &&
+      submittedPassword.trim() !== '' &&
+      !submittedPassword.includes('••••')
+    ) {
+      updateData.smtpPass = submittedPassword.trim();
     }
+
     if (body.senderEmail !== undefined) updateData.senderEmail = body.senderEmail;
     if (body.senderName !== undefined) updateData.senderName = body.senderName;
     if (body.googleCalendarConnected !== undefined) updateData.googleCalendarConnected = Boolean(body.googleCalendarConnected);
@@ -66,7 +85,8 @@ export async function POST(request) {
         smtpPort: updated.smtpPort,
         smtpSecure: updated.smtpSecure,
         smtpUser: updated.smtpUser,
-        hasPassword: !!updated.smtpPass,
+        hasPassword: Boolean(updated.smtpPass),
+        maskedPassword: updated.smtpPass ? '••••••••••••••••' : '',
         senderEmail: updated.senderEmail,
         senderName: updated.senderName,
         googleCalendarConnected: updated.googleCalendarConnected,
