@@ -4,16 +4,24 @@ import { prisma } from '@/lib/prisma.js';
 import { sendEmail } from '@/lib/mailer.js';
 import { jinjaTextToEmailHtml } from '@/lib/jinjaEngine.js';
 
-export async function POST(request) {
+export async function GET(request) {
   try {
-    const body = await request.json();
-    const { candidateIds, submissionDeadline, customNotes } = body;
+    const now = new Date();
+    const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
+    // Find candidates whose tasks are pending submission and deadline is within 24 hours
     const candidates = await prisma.candidate.findMany({
       where: {
-        id: { in: candidateIds?.length ? candidateIds : undefined },
         isLeaved: false,
         taskStatus: { not: 'Not Assigned' },
+        tasks: {
+          some: {
+            submissionStatus: 'PENDING',
+            deadline: {
+              lte: in24h,
+            },
+          },
+        },
       },
       include: {
         tasks: {
@@ -23,8 +31,60 @@ export async function POST(request) {
       },
     });
 
+    return NextResponse.json({
+      success: true,
+      dueCount: candidates.length,
+      candidates: candidates.map(c => ({
+        id: c.id,
+        internId: c.internId || c.candidateId,
+        fullName: c.fullName,
+        email: c.email,
+        deadline: c.tasks[0]?.deadline,
+      })),
+    });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { candidateIds, submissionDeadline, customNotes, auto24hOnly = false } = body;
+
+    const now = new Date();
+    const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+    let whereClause = {
+      isLeaved: false,
+      taskStatus: { not: 'Not Assigned' },
+    };
+
+    if (auto24hOnly) {
+      whereClause.tasks = {
+        some: {
+          submissionStatus: 'PENDING',
+          deadline: {
+            lte: in24h,
+          },
+        },
+      };
+    } else if (candidateIds?.length) {
+      whereClause.id = { in: candidateIds };
+    }
+
+    const candidates = await prisma.candidate.findMany({
+      where: whereClause,
+      include: {
+        tasks: {
+          orderBy: { taskNumber: 'desc' },
+          take: 1,
+        },
+      },
+    });
+
     if (candidates.length === 0) {
-      return NextResponse.json({ success: false, error: 'No active assigned candidates found.' }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'No active assigned candidates found matching the criteria.' }, { status: 404 });
     }
 
     const baseUrl = (process.env.APP_BASE_URL || 'https://internship-email-automation.vercel.app').replace(/\/+$/, '');

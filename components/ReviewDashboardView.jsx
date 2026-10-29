@@ -50,8 +50,9 @@ export default function ReviewDashboardView({
     return `https://meet.google.com/${pick(3)}-${pick(4)}-${pick(3)}`;
   };
 
-  // Review 1 Schedule Form with Dual Google Meet Modes
+  // Review Schedule Form with Multi-Session & Dual Google Meet Modes
   const [r1ScheduleForm, setR1ScheduleForm] = useState({
+    reviewNumber: 1,
     reviewDate: '',
     reviewTime: '04:00 PM',
     customNotes: 'Please ensure your code is pushed to GitHub and be prepared to demonstrate your implemented features.',
@@ -155,21 +156,22 @@ export default function ReviewDashboardView({
     );
   };
 
-  // Schedule Review 1
+  // Schedule Milestone Review Session (Review 1, 2, 3, etc.)
   const handleScheduleReview1 = async () => {
     if (selectedCandidateIds.length === 0) {
-      showToast?.('Please select at least one candidate for Review 1.', 'error');
+      showToast?.('Please select at least one candidate for Review.', 'error');
       return;
     }
 
     try {
       setSchedulingR1(true);
+      const revNum = Number(r1ScheduleForm.reviewNumber || 1);
       const res = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           candidateIds: selectedCandidateIds,
-          reviewNumber: 1,
+          reviewNumber: revNum,
           reviewDate: r1ScheduleForm.reviewDate,
           reviewTime: r1ScheduleForm.reviewTime,
           customNotes: r1ScheduleForm.customNotes,
@@ -180,7 +182,7 @@ export default function ReviewDashboardView({
 
       const data = await res.json();
       if (data.success) {
-        showToast?.(`Review 1 successfully scheduled for ${data.count} candidates on ${data.scheduledDate}!`, 'success');
+        showToast?.(`Review #${revNum} successfully scheduled for ${data.count} candidates on ${data.scheduledDate}!`, 'success');
         setSelectedCandidateIds([]);
         loadReviewData();
         onRefresh?.();
@@ -360,7 +362,7 @@ export default function ReviewDashboardView({
             className={`${styles.subTabBtn} ${subTab === 'schedule-r1' ? styles.subTabBtnActive : ''}`}
           >
             <Clock size={14} />
-            <span>Schedule Review 1 (Automated Date)</span>
+            <span>Schedule Milestone Review (HR Decided)</span>
           </button>
 
           <button
@@ -593,16 +595,32 @@ export default function ReviewDashboardView({
         <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Clock size={18} color="#a855f7" />
-            <span>Automated Review 1 Notification & Schedule Dispatcher</span>
+            <span>Milestone Review Scheduling & Google Meet Dispatcher</span>
           </h3>
           <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>
-            Automatically calculates the next review date following task deadline submission (automatically skips Sundays to Monday morning). HR can also freely override and customize the date and time. Uses the same Google Meet room created during task assignment.
+            HR and Admin decide the review date and session time for selected interns. Dispatches official review invitations with Google Meet video links, automatically skipping non-working days or conforming to HR calendar preferences.
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '18px', marginBottom: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1fr', gap: '16px', marginBottom: '20px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                Review 1 Scheduled Date (Auto-skips Sundays to Monday)
+                Review Milestone Session <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <select
+                value={r1ScheduleForm.reviewNumber || 1}
+                onChange={(e) => setR1ScheduleForm({ ...r1ScheduleForm, reviewNumber: parseInt(e.target.value) || 1 })}
+                className={styles.searchInput}
+              >
+                <option value="1">Review #1 (Initial Sprint Architecture & Code Review)</option>
+                <option value="2">Review #2 (Mid-Sprint Code Walkthrough & Evaluation)</option>
+                <option value="3">Review #3 (Final QA, Documentation & Signoff)</option>
+                <option value="4">Review #4 (Advanced Milestone Evaluation)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                Review Scheduled Date (HR Decided) <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
                 type="date"
@@ -612,13 +630,13 @@ export default function ReviewDashboardView({
                 className={styles.searchInput}
               />
               <span style={{ fontSize: '11px', color: '#34d399', marginTop: '4px', display: 'block' }}>
-                Calculated Next Business Day: {suggestedReviewDate}
+                Suggested Next Business Day: {suggestedReviewDate}
               </span>
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                Scheduled Review Session Time
+                Scheduled Review Time
               </label>
               <input
                 type="text"
@@ -751,7 +769,7 @@ export default function ReviewDashboardView({
               className={styles.btnPrimary}
             >
               <Send size={14} />
-              <span>{schedulingR1 ? 'Scheduling & Dispatching...' : `Confirm & Send Review 1 Emails (${selectedCandidateIds.length})`}</span>
+              <span>{schedulingR1 ? 'Scheduling & Dispatching...' : `Confirm & Send Review #${r1ScheduleForm.reviewNumber || 1} Emails (${selectedCandidateIds.length})`}</span>
             </button>
           </div>
         </div>
@@ -921,7 +939,7 @@ export default function ReviewDashboardView({
             className={styles.btnPrimary}
           >
             <CheckCircle2 size={14} />
-            <span>{completingTask ? 'Completing Milestones...' : `Approve & Mark Task Completed for ${selectedCandidateIds.length} Interns`}</span>
+            <span>{completingTask ? 'Dispatching Task Completion Certificates & Mails...' : `Approve & Send Task Completion Mail (${selectedCandidateIds.length} Interns)`}</span>
           </button>
         </div>
       )}

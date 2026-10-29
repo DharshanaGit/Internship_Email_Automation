@@ -179,6 +179,37 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       console.warn('Non-blocking error dispatching submission confirmation email:', mailErr?.message);
     }
 
+    // Trigger HR notification alert email
+    try {
+      const hrEmail = process.env.HR_EMAIL || process.env.SMTP_USER || 'hr@shortfundly.com';
+      const hrSubject = `[Milestone Submission Alert] ${task.candidate.fullName} submitted ${task.title || 'Milestone Task'}`;
+      const hrContent = `Dear HR & Mentorship Team,
+
+Intern ${task.candidate.fullName} (${task.candidate.internId || task.candidate.candidateId}, Role: ${task.candidate.role}, Batch: ${task.candidate.batch || 'Batch A'}) has just submitted deliverables for their assigned milestone task: ${task.title || task.taskId}.
+
+Submission Summary:
+- Candidate Name: ${task.candidate.fullName} (${task.candidate.email})
+- Milestone Task: ${task.title || task.taskId}
+- Project Demo URL: ${projectUrl || 'Not provided'}
+- GitHub Repo URL: ${githubUrl || 'Not provided'}
+- Submitted At: ${now.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+
+Candidate has automatically transitioned to "Under Review" and has been moved to the Review Queue. You can now schedule their review session and generate their Google Meet call in the Review dashboard.
+
+Best regards,
+Shortfundly Automated Submission Engine`;
+
+      await sendEmail({
+        to: hrEmail,
+        subject: hrSubject,
+        html: jinjaTextToEmailHtml(hrContent),
+        text: hrContent,
+        emailType: 'HR_SUBMISSION_ALERT',
+      });
+    } catch (hrMailErr) {
+      console.warn('Non-blocking error dispatching HR submission alert email:', hrMailErr?.message);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Project and repository deliverables submitted successfully. Your submission is now queued for milestone review and a notification email has been dispatched.',

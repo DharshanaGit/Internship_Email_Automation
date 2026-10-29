@@ -50,8 +50,12 @@ export default function TaskAssignmentView({
   const [taskTemplates, setTaskTemplates] = useState([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
 
-  // Assignment Modal
+  // Assignment Modal & Dual Assignment Modes
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [assignMode, setAssignMode] = useState('BULK'); // 'BULK' (same task for batch) | 'INDIVIDUAL' (custom per student)
+  const [individualFormMap, setIndividualFormMap] = useState({});
+  const [due24hCount, setDue24hCount] = useState(0);
+  const [checking24h, setChecking24h] = useState(false);
   const [assignForm, setAssignForm] = useState({
     taskNumber: 1,
     taskId: '',
@@ -179,8 +183,50 @@ Shortfundly Media Technologies Pvt. Ltd.`;
     }
   };
 
+  const check24hDeadlines = async () => {
+    try {
+      setChecking24h(true);
+      const res = await fetch('/api/tasks/deadline-reminder');
+      const data = await res.json();
+      if (data.success) {
+        setDue24hCount(data.dueCount || 0);
+      }
+    } catch (err) {
+      console.warn('Error checking 24h deadlines:', err);
+    } finally {
+      setChecking24h(false);
+    }
+  };
+
+  const handleAutoSend24hReminders = async () => {
+    try {
+      setSendingReminder(true);
+      const res = await fetch('/api/tasks/deadline-reminder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          auto24hOnly: true,
+          customNotes: reminderForm.customNotes || 'Official reminder: Your task deadline is within 24 hours. Please complete your deliverable submission promptly.',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast?.(`24-Hour deadline reminders dispatched to ${data.count} candidates!`, 'success');
+        check24hDeadlines();
+        onRefresh?.();
+      } else {
+        showToast?.(data.error || 'No candidates currently pending submission within 24 hours.', 'info');
+      }
+    } catch (err) {
+      showToast?.(err.message, 'error');
+    } finally {
+      setSendingReminder(false);
+    }
+  };
+
   useEffect(() => {
     loadTaskTemplates();
+    check24hDeadlines();
     const defaultDeadline = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 16);
     const defaultExpDate = new Date().toISOString().split('T')[0];
     setAssignForm(prev => ({ ...prev, deadline: defaultDeadline, explanationDate: defaultExpDate }));
@@ -243,7 +289,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
     );
   };
 
-  // Open Assign Modal
+  // Open Assign Modal with Dual Mode Support
   const handleOpenAssignModal = () => {
     if (selectedCandidateIds.length === 0) {
       showToast?.('Please select at least one candidate.', 'error');
@@ -263,33 +309,72 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       deadline: prev.deadline || defaultDeadline,
       customJinja: template?.jinjaBody || defaultTaskJinjaBody,
     }));
+
+    // Initialize individual customization map for each selected intern
+    const indMap = {};
+    selectedCandidateIds.forEach(id => {
+      const c = cleanCandidates.find(cand => cand.id === id);
+      const roleMatch = taskTemplates.find(t => t.role?.toLowerCase() === c?.role?.toLowerCase()) || template;
+      indMap[id] = {
+        candidateId: id,
+        candidateName: c?.fullName || 'Intern',
+        internId: c?.internId || c?.candidateId || id,
+        role: c?.role || 'Intern',
+        batch: c?.batch || 'Batch A',
+        templateId: roleMatch?.id || selectedTemplateId,
+        taskId: roleMatch?.taskId || `TSK-${randSeq}`,
+        taskTitle: roleMatch?.title || 'Core Milestone Implementation',
+        objective: roleMatch?.objective || 'Deliver core technical requirements.',
+        deadline: defaultDeadline,
+        explanationDate: defaultExpDate,
+        explanationTime: '04:00 PM',
+      };
+    });
+    setIndividualFormMap(indMap);
+
     setIsAssignModalOpen(true);
   };
 
-  // Dispatch Tasks
+  // Dispatch Tasks (Bulk or Individual Mode)
   const handleDispatchTasks = async () => {
     try {
       setDispatching(true);
+
+      const payload = assignMode === 'INDIVIDUAL'
+        ? {
+            individualAssignments: selectedCandidateIds.map(id => individualFormMap[id] || {
+              candidateId: id,
+              taskId: assignForm.taskId,
+              title: assignForm.title,
+              deadline: assignForm.deadline,
+              explanationDate: assignForm.explanationDate,
+              explanationTime: assignForm.explanationTime,
+            }),
+          }
+        : {
+            candidateIds: selectedCandidateIds,
+            taskNumber: assignForm.taskNumber,
+            taskId: assignForm.taskId,
+            title: assignForm.title,
+            deadline: assignForm.deadline,
+            explanationDate: assignForm.explanationDate,
+            explanationTime: assignForm.explanationTime,
+            customJinja: assignForm.customJinja,
+          };
+
       const res = await fetch('/api/tasks/assign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          candidateIds: selectedCandidateIds,
-          taskNumber: assignForm.taskNumber,
-          taskId: assignForm.taskId,
-          title: assignForm.title,
-          deadline: assignForm.deadline,
-          explanationDate: assignForm.explanationDate,
-          explanationTime: assignForm.explanationTime,
-          customJinja: assignForm.customJinja,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
       if (data.success) {
-        showToast?.(`Task successfully assigned to ${selectedCandidateIds.length} interns!`, 'success');
+        showToast?.(`Task successfully assigned to ${selectedCandidateIds.length} interns! Navigating to Deadline Reminder Mail...`, 'success');
         setIsAssignModalOpen(false);
         setSelectedCandidateIds([]);
+        setSubTab('reminder'); // Automatically move candidates to deadline reminder mail section!
+        check24hDeadlines();
         onRefresh?.();
       } else {
         showToast?.(data.error || 'Failed to dispatch task assignments.', 'error');
@@ -594,19 +679,39 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               <option value="UI/UX Designer">UI/UX Designer</option>
             </select>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <select
-                value={selectedTemplateId}
-                onChange={(e) => setSelectedTemplateId(e.target.value)}
-                className={styles.selectInput}
-                style={{ maxWidth: '200px' }}
-              >
-                {taskTemplates.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    [{t.level}] {t.title.slice(0, 24)}...
-                  </option>
-                ))}
-              </select>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <select
+                  value={selectedTemplateId}
+                  onChange={(e) => setSelectedTemplateId(e.target.value)}
+                  className={styles.selectInput}
+                  style={{ minWidth: '220px', maxWidth: '340px' }}
+                  title="Choose from Gemma 2B industrial task templates"
+                >
+                  {taskTemplates.map((t) => (
+                    <option key={t.id} value={t.id} title={t.title}>
+                      [{t.level}] {t.taskId}: {t.title}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const template = taskTemplates.find(t => t.id === selectedTemplateId);
+                    if (template) {
+                      setEditingTemplate({ ...template });
+                      setTemplateModalTab('preview');
+                    }
+                  }}
+                  className={styles.btnSecondary}
+                  style={{ padding: '7px 11px', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  title="Preview full task specifications and objective"
+                >
+                  <Eye size={13} />
+                  <span>View Task</span>
+                </button>
+              </div>
 
               <button
                 type="button"
@@ -858,6 +963,51 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               </div>
               <div style={{ marginTop: '8px', fontSize: '11.5px', color: '#94a3b8' }}>
                 Candidate submits live project demo URL + GitHub repository link directly on the web app. Upon submission, the candidate is automatically transitioned to <strong>Under Review</strong>, an automated confirmation email is dispatched, and HR is notified to conduct the milestone review.
+              </div>
+            </div>
+
+            {/* Automated 24-Hour Pre-Deadline Reminders Card */}
+            <div style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%)', border: '1px solid rgba(168, 85, 247, 0.35)', borderRadius: '10px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '8px', background: 'rgba(168, 85, 247, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Clock size={20} color="#c084fc" />
+                </div>
+                <div>
+                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>Automated 24-Hour Pre-Deadline Reminder Dispatcher</span>
+                    <span className={due24hCount > 0 ? styles.badgeRose : styles.badgeEmerald} style={{ fontSize: '11px' }}>
+                      {due24hCount} Intern{due24hCount === 1 ? '' : 's'} Due Within 24h
+                    </span>
+                  </div>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                    Automated scan detects candidates with tasks expiring within 24 hours who haven't submitted yet, and sends official submission portal reminders.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={check24hDeadlines}
+                  disabled={checking24h}
+                  className={styles.btnSecondary}
+                  style={{ fontSize: '12px', padding: '7px 12px' }}
+                  title="Scan database for tasks expiring in 24 hours"
+                >
+                  <RefreshCw size={13} className={checking24h ? styles.spin : ''} />
+                  <span>Scan 24h Status</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleAutoSend24hReminders}
+                  disabled={sendingReminder || due24hCount === 0}
+                  className={styles.btnPrimary}
+                  style={{ fontSize: '12px', padding: '7px 16px' }}
+                >
+                  <Send size={13} />
+                  <span>{sendingReminder ? 'Dispatching...' : `Auto-Send 24H Reminders (${due24hCount})`}</span>
+                </button>
               </div>
             </div>
 
@@ -1476,103 +1626,337 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       {/* --- MODAL: ASSIGN TASK FORM --- */}
       {isAssignModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsAssignModalOpen(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} style={{ maxWidth: assignMode === 'INDIVIDUAL' ? '820px' : '650px', maxHeight: '90vh', overflowY: 'auto' }}>
             <div className={styles.modalHeader}>
-              <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff' }}>
-                Assign Task to {selectedCandidateIds.length} Selected Candidates
-              </h3>
-              <button type="button" onClick={() => setIsAssignModalOpen(false)} style={{ color: '#94a3b8', cursor: 'pointer' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Briefcase size={18} color="#a855f7" />
+                  <span>Assign Sprint Tasks ({selectedCandidateIds.length} Interns Selected)</span>
+                </h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                  Select whether to assign the same task in bulk or customize individual tasks and deadlines per student.
+                </p>
+              </div>
+              <button type="button" onClick={() => setIsAssignModalOpen(false)} style={{ color: '#94a3b8', cursor: 'pointer', background: 'transparent', border: 'none' }}>
                 <X size={18} />
               </button>
             </div>
 
+            {/* Mode Switcher */}
+            <div style={{ display: 'flex', gap: '8px', padding: '12px 24px', background: '#09090b', borderBottom: '1px solid #232328' }}>
+              <button
+                type="button"
+                onClick={() => setAssignMode('BULK')}
+                style={{
+                  flex: 1,
+                  padding: '9px 14px',
+                  borderRadius: '6px',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: assignMode === 'BULK' ? '1px solid #a855f7' : '1px solid #27272a',
+                  background: assignMode === 'BULK' ? 'rgba(168, 85, 247, 0.18)' : '#0c0c0e',
+                  color: assignMode === 'BULK' ? '#ffffff' : '#94a3b8',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '7px',
+                }}
+              >
+                <Users size={14} color={assignMode === 'BULK' ? '#c084fc' : '#71717a'} />
+                <span>1. Bulk Assign (Same Task for Batch)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAssignMode('INDIVIDUAL')}
+                style={{
+                  flex: 1,
+                  padding: '9px 14px',
+                  borderRadius: '6px',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: assignMode === 'INDIVIDUAL' ? '1px solid #a855f7' : '1px solid #27272a',
+                  background: assignMode === 'INDIVIDUAL' ? 'rgba(168, 85, 247, 0.18)' : '#0c0c0e',
+                  color: assignMode === 'INDIVIDUAL' ? '#ffffff' : '#94a3b8',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '7px',
+                }}
+              >
+                <Sparkles size={14} color={assignMode === 'INDIVIDUAL' ? '#c084fc' : '#71717a'} />
+                <span>2. Assign Individual Tasks (Per-Intern Customization)</span>
+              </button>
+            </div>
+
             <div className={styles.modalBody}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
-                    Task Number
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={assignForm.taskNumber}
-                    onChange={(e) => setAssignForm({ ...assignForm, taskNumber: parseInt(e.target.value) || 1 })}
-                    className={styles.searchInput}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
-                    Task ID
-                  </label>
-                  <input
-                    type="text"
-                    value={assignForm.taskId}
-                    onChange={(e) => setAssignForm({ ...assignForm, taskId: e.target.value })}
-                    className={styles.searchInput}
-                  />
-                </div>
-              </div>
+              {assignMode === 'BULK' ? (
+                /* --- MODE 1: BULK ASSIGN --- */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ background: '#12111a', border: '1px solid #2b2842', borderRadius: '8px', padding: '12px 16px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#c084fc', marginBottom: '6px' }}>
+                      Selected Industrial Task Template:
+                    </div>
+                    <select
+                      value={selectedTemplateId}
+                      onChange={(e) => {
+                        const newId = e.target.value;
+                        setSelectedTemplateId(newId);
+                        const tmpl = taskTemplates.find(t => t.id === newId);
+                        if (tmpl) {
+                          setAssignForm(prev => ({
+                            ...prev,
+                            taskId: tmpl.taskId,
+                            title: tmpl.title,
+                            customJinja: tmpl.jinjaBody || defaultTaskJinjaBody,
+                          }));
+                        }
+                      }}
+                      className={styles.searchInput}
+                      style={{ marginBottom: '8px' }}
+                    >
+                      {taskTemplates.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          [{t.level}] {t.taskId}: {t.title} ({t.role})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
-                  Task Title
-                </label>
-                <input
-                  type="text"
-                  value={assignForm.title}
-                  onChange={(e) => setAssignForm({ ...assignForm, title: e.target.value })}
-                  className={styles.searchInput}
-                />
-              </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                        Task Milestone Number
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={assignForm.taskNumber}
+                        onChange={(e) => setAssignForm({ ...assignForm, taskNumber: parseInt(e.target.value) || 1 })}
+                        className={styles.searchInput}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                        Task ID
+                      </label>
+                      <input
+                        type="text"
+                        value={assignForm.taskId}
+                        onChange={(e) => setAssignForm({ ...assignForm, taskId: e.target.value })}
+                        className={styles.searchInput}
+                      />
+                    </div>
+                  </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
-                    Explanation Call Date
-                  </label>
-                  <input
-                    type="date"
-                    value={assignForm.explanationDate}
-                    onChange={(e) => setAssignForm({ ...assignForm, explanationDate: e.target.value })}
-                    className={styles.searchInput}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
-                    Explanation Time
-                  </label>
-                  <input
-                    type="text"
-                    value={assignForm.explanationTime}
-                    onChange={(e) => setAssignForm({ ...assignForm, explanationTime: e.target.value })}
-                    className={styles.searchInput}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
-                    Task Deadline
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={assignForm.deadline}
-                    onChange={(e) => setAssignForm({ ...assignForm, deadline: e.target.value })}
-                    className={styles.searchInput}
-                  />
-                </div>
-              </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      Task Title
+                    </label>
+                    <input
+                      type="text"
+                      value={assignForm.title}
+                      onChange={(e) => setAssignForm({ ...assignForm, title: e.target.value })}
+                      className={styles.searchInput}
+                    />
+                  </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
-                  Task Email Body (Jinja Text Format)
-                </label>
-                <textarea
-                  rows={8}
-                  value={assignForm.customJinja}
-                  onChange={(e) => setAssignForm({ ...assignForm, customJinja: e.target.value })}
-                  className={styles.searchInput}
-                  style={{ height: 'auto', fontFamily: 'monospace', fontSize: '12px', lineHeight: 1.6 }}
-                />
-              </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                        Explanation Call Date
+                      </label>
+                      <input
+                        type="date"
+                        value={assignForm.explanationDate}
+                        onChange={(e) => setAssignForm({ ...assignForm, explanationDate: e.target.value })}
+                        className={styles.searchInput}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                        Explanation Time
+                      </label>
+                      <input
+                        type="text"
+                        value={assignForm.explanationTime}
+                        onChange={(e) => setAssignForm({ ...assignForm, explanationTime: e.target.value })}
+                        className={styles.searchInput}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                        Shared Batch Task Deadline <span style={{ color: '#ef4444' }}>*</span>
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={assignForm.deadline}
+                        onChange={(e) => setAssignForm({ ...assignForm, deadline: e.target.value })}
+                        className={styles.searchInput}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      Task Email Body (Jinja Text Format)
+                    </label>
+                    <textarea
+                      rows={6}
+                      value={assignForm.customJinja}
+                      onChange={(e) => setAssignForm({ ...assignForm, customJinja: e.target.value })}
+                      className={styles.searchInput}
+                      style={{ height: 'auto', fontFamily: 'monospace', fontSize: '12px', lineHeight: 1.6 }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                /* --- MODE 2: ASSIGN INDIVIDUAL TASKS --- */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '8px', padding: '12px 16px', fontSize: '12.5px', color: '#d8b4fe' }}>
+                    <strong>Individual Task Customization Mode Active:</strong> You can select a distinct technical sprint task, customize the task title, and set an individual deadline for each intern below.
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '55vh', overflowY: 'auto', paddingRight: '4px' }}>
+                    {selectedCandidateIds.map((cId) => {
+                      const cand = cleanCandidates.find(c => c.id === cId);
+                      const currentForm = individualFormMap[cId] || {};
+
+                      const handleUpdateIndividual = (field, val) => {
+                        setIndividualFormMap(prev => ({
+                          ...prev,
+                          [cId]: {
+                            ...prev[cId],
+                            [field]: val,
+                          },
+                        }));
+                      };
+
+                      const handleTemplateChange = (tmplId) => {
+                        const tmpl = taskTemplates.find(t => t.id === tmplId);
+                        if (tmpl) {
+                          setIndividualFormMap(prev => ({
+                            ...prev,
+                            [cId]: {
+                              ...prev[cId],
+                              templateId: tmplId,
+                              taskId: tmpl.taskId,
+                              taskTitle: tmpl.title,
+                              objective: tmpl.objective,
+                            },
+                          }));
+                        }
+                      };
+
+                      return (
+                        <div
+                          key={cId}
+                          style={{
+                            background: '#0c0c0e',
+                            border: '1px solid #232328',
+                            borderRadius: '10px',
+                            padding: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
+                          }}
+                        >
+                          {/* Candidate Identity Header */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1c1c21', paddingBottom: '8px' }}>
+                            <div>
+                              <strong style={{ color: '#ffffff', fontSize: '13.5px' }}>{cand?.fullName || 'Intern'}</strong>
+                              <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '8px' }}>
+                                &bull; {cand?.role || 'Intern'} &bull; {cand?.batch || 'Batch A'}
+                              </span>
+                            </div>
+                            <span style={{ fontFamily: 'monospace', fontSize: '11px', color: '#c084fc', fontWeight: 700 }}>
+                              {cand?.internId || cand?.candidateId}
+                            </span>
+                          </div>
+
+                          {/* Task Selection for this Candidate */}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.6fr', gap: '10px' }}>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
+                                Select Task Template
+                              </label>
+                              <select
+                                value={currentForm.templateId || ''}
+                                onChange={(e) => handleTemplateChange(e.target.value)}
+                                className={styles.searchInput}
+                                style={{ fontSize: '12px' }}
+                              >
+                                {taskTemplates.map((t) => (
+                                  <option key={t.id} value={t.id}>
+                                    [{t.level}] {t.taskId}: {t.title}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
+                                Task Title
+                              </label>
+                              <input
+                                type="text"
+                                value={currentForm.taskTitle || ''}
+                                onChange={(e) => handleUpdateIndividual('taskTitle', e.target.value)}
+                                className={styles.searchInput}
+                                style={{ fontSize: '12px' }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Individual Deadline & Explanation Call Details */}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '10px' }}>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#38bdf8', marginBottom: '4px' }}>
+                                Individual Task Deadline <span style={{ color: '#ef4444' }}>*</span>
+                              </label>
+                              <input
+                                type="datetime-local"
+                                value={currentForm.deadline || ''}
+                                onChange={(e) => handleUpdateIndividual('deadline', e.target.value)}
+                                className={styles.searchInput}
+                                style={{ fontSize: '12px' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
+                                Explanation Date
+                              </label>
+                              <input
+                                type="date"
+                                value={currentForm.explanationDate || ''}
+                                onChange={(e) => handleUpdateIndividual('explanationDate', e.target.value)}
+                                className={styles.searchInput}
+                                style={{ fontSize: '12px' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
+                                Explanation Time
+                              </label>
+                              <input
+                                type="text"
+                                value={currentForm.explanationTime || '04:00 PM'}
+                                onChange={(e) => handleUpdateIndividual('explanationTime', e.target.value)}
+                                className={styles.searchInput}
+                                style={{ fontSize: '12px' }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className={styles.modalFooter}>
@@ -1590,7 +1974,13 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 className={styles.btnPrimary}
               >
                 <Send size={14} />
-                <span>{dispatching ? 'Dispatching Task Emails & Meet Links...' : 'Confirm & Dispatch Task'}</span>
+                <span>
+                  {dispatching
+                    ? 'Dispatching Task Emails & Meet Links...'
+                    : assignMode === 'INDIVIDUAL'
+                    ? `Confirm & Dispatch Individual Tasks (${selectedCandidateIds.length})`
+                    : `Confirm & Bulk Dispatch Tasks (${selectedCandidateIds.length})`}
+                </span>
               </button>
             </div>
           </div>

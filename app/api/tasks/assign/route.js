@@ -37,11 +37,17 @@ export async function POST(request) {
       customJinja,
       cc,
       previewOnly = false,
+      individualAssignments = [],
     } = body;
+
+    // Check if individual assignments mode is requested
+    const isIndividualMode = Array.isArray(individualAssignments) && individualAssignments.length > 0;
 
     // 1. Resolve candidates list
     let targetCandidateIds = [];
-    if (Array.isArray(candidateIds) && candidateIds.length > 0) {
+    if (isIndividualMode) {
+      targetCandidateIds = individualAssignments.map(ia => ia.candidateId).filter(Boolean);
+    } else if (Array.isArray(candidateIds) && candidateIds.length > 0) {
       targetCandidateIds = candidateIds;
     } else if (candidateId) {
       targetCandidateIds = [candidateId];
@@ -145,11 +151,25 @@ export async function POST(request) {
 
     // Loop through each candidate and assign task with auto-populated details
     for (const cand of candidates) {
+      const indConfig = isIndividualMode ? individualAssignments.find(ia => ia.candidateId === cand.id) : null;
       const candidateRole = cand.role || role || 'Web Developer Intern';
       const gemmaTask = generateGemmaTask(candidateRole, cand.tasksCompleted || 0);
-      const taskTitle = customTaskName || title || gemmaTask.title;
-      const taskDesc = objective || description || gemmaTask.description;
-      const assignedTaskId = `${baseTaskId}-${cand.internId ? cand.internId.slice(-4) : Math.floor(100 + Math.random() * 900)}`;
+      
+      const taskTitle = indConfig?.title || indConfig?.taskTitle || customTaskName || title || gemmaTask.title;
+      const taskDesc = indConfig?.objective || indConfig?.description || objective || description || gemmaTask.description;
+      const candTaskId = indConfig?.taskId || baseTaskId;
+      const assignedTaskId = `${candTaskId}-${cand.internId ? cand.internId.slice(-4) : Math.floor(100 + Math.random() * 900)}`;
+
+      let candDeadline = finalDeadline;
+      if (indConfig?.deadline) {
+        const parsed = new Date(indConfig.deadline);
+        if (!isNaN(parsed.getTime())) {
+          candDeadline = parsed;
+        }
+      }
+
+      const candExpDate = indConfig?.explanationDate || finalExpDate;
+      const candExpTime = indConfig?.explanationTime || finalExpTime;
 
       // Expiring submission token
       const submissionToken = crypto.randomBytes(24).toString('hex');
@@ -159,7 +179,7 @@ export async function POST(request) {
       let meetLink = customMeetLink;
       if (!meetLink) {
         try {
-          meetLink = await getOrCreateCandidateMeetLink(cand, finalExpDate);
+          meetLink = await getOrCreateCandidateMeetLink(cand, candExpDate);
         } catch (meetErr) {
           console.warn('[Task Assign] Google Meet generation notice, using compliant Meet URL:', meetErr?.message);
           meetLink = cand.googleMeetUrl || generateValidGoogleMeetUrl();
@@ -180,7 +200,7 @@ export async function POST(request) {
             .replace(/\{\{task_title\}\}/g, taskTitle)
         : `Internship Sprint Task Assignment - ${assignedTaskId} | Shortfundly`;
 
-      const rawTemplate = customJinja || customBody;
+      const rawTemplate = indConfig?.customJinja || customJinja || customBody;
       const parsedBody = rawTemplate
         ? rawTemplate
             .replace(/\{\{candidate_name\}\}/g, cand.fullName)
@@ -194,14 +214,14 @@ export async function POST(request) {
             .replace(/\{\{taskNumber\}\}/g, String((cand.tasksCompleted || 0) + 1))
             .replace(/\{\{task_content\}\}/g, taskDesc.replace(/\n/g, '<br>'))
             .replace(/\{\{task_description\}\}/g, taskDesc.replace(/\n/g, '<br>'))
-            .replace(/\{\{explanationDate\}\}/g, finalExpDate)
-            .replace(/\{\{explanation_date\}\}/g, finalExpDate)
-            .replace(/\{\{explanationTime\}\}/g, finalExpTime)
-            .replace(/\{\{time\}\}/g, finalExpTime)
+            .replace(/\{\{explanationDate\}\}/g, candExpDate)
+            .replace(/\{\{explanation_date\}\}/g, candExpDate)
+            .replace(/\{\{explanationTime\}\}/g, candExpTime)
+            .replace(/\{\{time\}\}/g, candExpTime)
             .replace(/\{\{meetLink\}\}/g, meetLink)
             .replace(/\{\{meet_link\}\}/g, meetLink)
             .replace(/\{\{submission_link\}\}/g, submissionUrl)
-            .replace(/\{\{deadline\}\}/g, finalDeadline.toLocaleString())
+            .replace(/\{\{deadline\}\}/g, candDeadline.toLocaleString())
         : null;
 
       const emailHtml = parsedBody
@@ -257,12 +277,12 @@ export async function POST(request) {
           clientRequirements: clientRequirements || null,
           description: taskDesc,
           role: candidateRole,
-          explanationDate: finalExpDate,
-          explanationTime: finalExpTime,
+          explanationDate: candExpDate,
+          explanationTime: candExpTime,
           meetLink,
           reviewDate: rev1Schedule.callDateStr,
           reviewTime: rev1Schedule.timeStr,
-          deadline: finalDeadline,
+          deadline: candDeadline,
           scheduledSendAt: scheduledSendAt ? new Date(scheduledSendAt) : null,
           isSent: true,
           submissionToken,
@@ -294,7 +314,7 @@ export async function POST(request) {
           cc: cc || undefined,
           subject: emailSubject,
           html: emailHtml,
-          text: `Dear ${cand.fullName}, your task [${assignedTaskId}] for ${candidateRole} has been assigned. Explanation date: ${finalExpDate} at ${finalExpTime}. Meet link: ${meetLink}. Submit deliverables before ${finalDeadline.toLocaleString()} at: ${submissionUrl}`,
+          text: `Dear ${cand.fullName}, your task [${assignedTaskId}] for ${candidateRole} has been assigned. Explanation date: ${candExpDate} at ${candExpTime}. Meet link: ${meetLink}. Submit deliverables before ${candDeadline.toLocaleString()} at: ${submissionUrl}`,
           emailType: 'TASK_ASSIGNMENT',
           meetLink,
           attachments: [

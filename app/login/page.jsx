@@ -292,15 +292,17 @@ export default function LoginPage() {
                 <Mail className={styles.inputIcon} size={18} />
                 <input
                   type="email"
+                  name="shortfundly_access_id"
+                  id="shortfundly_access_id"
                   required
                   className={`${styles.input} ${loginEmailError ? styles.inputError : ''}`}
-                  placeholder="Enter email address (e.g. admin@gmail.com)"
+                  placeholder="admin@shortfundly.com or admin@gmail.com"
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
                     setSubmitError('');
                   }}
-                  autoComplete="email"
+                  autoComplete="off"
                 />
               </div>
               {loginEmailError && (
@@ -319,6 +321,8 @@ export default function LoginPage() {
                 <Lock className={styles.inputIcon} size={18} />
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  name="shortfundly_auth_secret"
+                  id="shortfundly_auth_secret"
                   required
                   className={`${styles.input} ${loginPasswordError ? styles.inputError : ''}`}
                   placeholder="Enter password (min 8 characters)"
@@ -327,7 +331,7 @@ export default function LoginPage() {
                     setPassword(e.target.value);
                     setSubmitError('');
                   }}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   style={{ paddingRight: '42px' }}
                 />
                 <button
@@ -394,6 +398,10 @@ export default function LoginPage() {
               <span>{loading ? 'Authenticating...' : `Sign In as ${role}`}</span>
               <ArrowRight size={16} />
             </button>
+
+            <div style={{ marginTop: '14px', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: '8px', padding: '10px 14px', fontSize: '11.5px', color: '#93c5fd', lineHeight: 1.5 }}>
+              <strong>Chrome Safety Tip:</strong> If Google Chrome displays <em>&ldquo;You just entered your password on a deceptive site&rdquo;</em> when signing in with a personal <code>@gmail.com</code> address, click <strong>&ldquo;Site is legitimate&rdquo;</strong> to proceed.
+            </div>
           </form>
         ) : (
           /* --- CREATE NEW ACCOUNT FORM --- */
@@ -427,6 +435,8 @@ export default function LoginPage() {
                 <Mail className={styles.inputIcon} size={18} />
                 <input
                   type="email"
+                  name="shortfundly_reg_email"
+                  id="shortfundly_reg_email"
                   required
                   className={`${styles.input} ${regEmailError ? styles.inputError : ''}`}
                   placeholder="Enter email address (lowercase only)"
@@ -435,7 +445,7 @@ export default function LoginPage() {
                     setRegEmail(e.target.value);
                     setSubmitError('');
                   }}
-                  autoComplete="email"
+                  autoComplete="off"
                 />
               </div>
               {regEmailError && (
@@ -473,6 +483,8 @@ export default function LoginPage() {
                 <Lock className={styles.inputIcon} size={18} />
                 <input
                   type={showRegPassword ? 'text' : 'password'}
+                  name="shortfundly_reg_secret"
+                  id="shortfundly_reg_secret"
                   required
                   className={`${styles.input} ${regPasswordError ? styles.inputError : ''}`}
                   placeholder="Create password (min 8 characters)"
@@ -509,6 +521,8 @@ export default function LoginPage() {
                 <Lock className={styles.inputIcon} size={18} />
                 <input
                   type={showRegConfirmPassword ? 'text' : 'password'}
+                  name="shortfundly_reg_confirm_secret"
+                  id="shortfundly_reg_confirm_secret"
                   required
                   className={`${styles.input} ${regConfirmError ? styles.inputError : ''}`}
                   placeholder="Re-enter password to confirm"
