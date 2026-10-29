@@ -8,7 +8,10 @@ export async function POST(request) {
     const file = formData.get('file');
 
     if (!file) {
-      return NextResponse.json({ success: false, error: 'No spreadsheet file provided. Please select an Excel or CSV file.' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'No spreadsheet file provided. Please select an Excel or CSV file.' },
+        { status: 400 }
+      );
     }
 
     // Check file size (max 15MB)
@@ -37,8 +40,25 @@ export async function POST(request) {
       buffer = Buffer.from(file);
     }
 
-    // Parse and validate with ExcelJS and Zod
+    if (!buffer || buffer.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'The uploaded file is empty.' },
+        { status: 400 }
+      );
+    }
+
+    // Parse and validate using SheetJS and Zod
     const report = await parseCandidateExcelFile(buffer, filename);
+
+    if (!report || report.totalRows === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'No data rows found in the uploaded file. Please make sure the sheet includes "Name" and "Email ID" columns.',
+        },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
@@ -46,6 +66,9 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error('Validation error in /api/candidates/validate-excel:', error);
-    return NextResponse.json({ success: false, error: error.message || 'Validation failed' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Validation failed. Please verify your spreadsheet format.' },
+      { status: 400 }
+    );
   }
 }
