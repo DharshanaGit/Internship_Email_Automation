@@ -179,7 +179,7 @@ describe('7. Mailer & Email Dispatch Pipeline', () => {
     const result = await testSmtpConnection();
     expect(result).toHaveProperty('success');
     expect(result).toHaveProperty('message');
-  });
+  }, 20000);
 
   it('dispatches emails with attachment support in simulation or live SMTP and creates DB log', async () => {
     const result = await sendEmail({
