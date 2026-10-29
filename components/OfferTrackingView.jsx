@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import styles from './offerTracking.module.css';
 import {
   CheckCircle2,
@@ -31,19 +31,43 @@ export default function OfferTrackingView({
   const [activePdfModal, setActivePdfModal] = useState(null);
   const [auditing, setAuditing] = useState(false);
 
+  // 1. Strict deduplication & mock data purge filter
+  const uniqueCandidates = useMemo(() => {
+    const map = new Map();
+    (candidates || []).forEach((c) => {
+      if (!c) return;
+      const isMock =
+        (c.fullName && (c.fullName.includes('Meet Integration') || c.fullName.includes('Test Candidate'))) ||
+        (c.candidateId && (c.candidateId.startsWith('SF-MEET-') || c.candidateId.startsWith('SF-LOAD-') || c.candidateId.startsWith('TEST-'))) ||
+        (c.email && c.email.includes('shortfundly.com') && c.email.includes('candidate.'));
+      if (isMock) return;
+
+      const key = (c.email ? c.email.toLowerCase().trim() : '') || c.candidateId || c.id;
+      if (!map.has(key)) {
+        map.set(key, c);
+      } else {
+        const existing = map.get(key);
+        if (c.offerLetterStatus === 'Accepted' || (c.offerLetterStatus === 'Sent' && existing.offerLetterStatus !== 'Accepted')) {
+          map.set(key, c);
+        }
+      }
+    });
+    return Array.from(map.values());
+  }, [candidates]);
+
   // Compute unique batches and roles for filters
-  const batches = Array.from(new Set(candidates.map((c) => c.batch).filter(Boolean)));
-  const roles = Array.from(new Set(candidates.map((c) => c.role).filter(Boolean)));
+  const batches = Array.from(new Set(uniqueCandidates.map((c) => c.batch).filter(Boolean)));
+  const roles = Array.from(new Set(uniqueCandidates.map((c) => c.role).filter(Boolean)));
 
   // Telemetry counts
-  const totalOffers = candidates.filter((c) => c.offerLetterStatus !== 'Not Assigned');
-  const acceptedCount = candidates.filter((c) => c.offerLetterStatus === 'Accepted').length;
-  const rejectedCount = candidates.filter((c) => c.offerLetterStatus?.startsWith('Rejected') || (c.offerLetterStatus === 'Sent' && isDeadlineExpired(c.offerDeadline))).length;
-  const pendingCount = candidates.filter((c) => c.offerLetterStatus === 'Sent' && !isDeadlineExpired(c.offerDeadline)).length;
-  const deliveredEmailCount = candidates.filter((c) => c.offerDeliveryStatus === 'Delivered').length;
+  const totalOffers = uniqueCandidates.filter((c) => c.offerLetterStatus !== 'Not Assigned');
+  const acceptedCount = uniqueCandidates.filter((c) => c.offerLetterStatus === 'Accepted').length;
+  const rejectedCount = uniqueCandidates.filter((c) => c.offerLetterStatus?.startsWith('Rejected') || (c.offerLetterStatus === 'Sent' && isDeadlineExpired(c.offerDeadline))).length;
+  const pendingCount = uniqueCandidates.filter((c) => c.offerLetterStatus === 'Sent' && !isDeadlineExpired(c.offerDeadline)).length;
+  const deliveredEmailCount = uniqueCandidates.filter((c) => c.offerDeliveryStatus === 'Delivered').length;
 
   // Filter logic
-  const filteredCandidates = candidates.filter((cand) => {
+  const filteredCandidates = uniqueCandidates.filter((cand) => {
     const term = searchTerm.toLowerCase().trim();
     const matchSearch =
       !term ||
@@ -167,7 +191,7 @@ export default function OfferTrackingView({
         <div className={styles.tableHeaderRow} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 className={styles.tableTitle} style={{ margin: 0 }}>
             <UserCheck size={16} color="#a855f7" />
-            <span>Candidate Offer & Decision Records ({candidates.length})</span>
+            <span>Candidate Offer & Decision Records ({uniqueCandidates.length})</span>
           </h3>
 
           <button

@@ -534,7 +534,7 @@ export default function DashboardPage() {
   const [bulkTableSearch, setBulkTableSearch] = useState('');
   const [bulkTableRoleFilter, setBulkTableRoleFilter] = useState('ALL');
   const [selectedCandidateKeys, setSelectedCandidateKeys] = useState(new Set());
-  const [skipAlreadySent, setSkipAlreadySent] = useState(true);
+  const [skipAlreadySent, setSkipAlreadySent] = useState(false);
   const [bulkCustomSubject, setBulkCustomSubject] = useState('');
   const [bulkCustomBody, setBulkCustomBody] = useState('');
   const [bulkCustomCc, setBulkCustomCc] = useState('');
@@ -1503,6 +1503,7 @@ export default function DashboardPage() {
           deadline: bulkOfferDeadline,
           commonDeadline: bulkOfferDeadline,
           forceResend: !skipAlreadySent,
+          skipAlreadySent: skipAlreadySent,
           additionalAttachments: bulkAttachments,
           bannerImageUrl: bulkBannerImage,
         }),
@@ -1512,12 +1513,20 @@ export default function DashboardPage() {
       if (data.success) {
         setBulkDispatchResults(data);
         showToast(
-          `Batch complete: ${data.summary.sent} dispatched, ${data.summary.skipped} skipped, ${data.summary.failed} failed.`,
+          `🚀 Dispatched ${data.summary.sent} offer letter(s) to candidate email inboxes! Candidates moved to Task Assignment.`,
           data.summary.failed > 0 ? 'warning' : 'success'
         );
-        loadStats();
-        loadCandidates();
-        loadEmails();
+
+        // Clear bulk upload dataset upon successful dispatch
+        setBulkValidationReport(null);
+        setBulkFile(null);
+        setSelectedCandidateKeys(new Set());
+
+        // Refresh stats, candidates and dispatches
+        await Promise.all([loadStats(), loadCandidates(), loadEmails()]);
+
+        // Smoothly transition to Module 2: Task Assignment Deck
+        setActiveTab('tasks');
       } else {
         showToast(data.error || 'Bulk dispatch failed', 'error');
       }

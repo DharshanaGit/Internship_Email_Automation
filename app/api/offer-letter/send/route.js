@@ -23,7 +23,8 @@ export async function POST(request) {
       cc,
       deadline,
       commonDeadline,
-      forceResend = false,
+      forceResend = true,
+      skipAlreadySent = false,
       directDispatch = true,
       additionalAttachments = [],
       bannerImageUrl = null,
@@ -186,7 +187,8 @@ export async function POST(request) {
     let failedCount = 0;
 
     for (const candidate of targets) {
-      if (candidate.offerLetterStatus === 'Sent' && !forceResend) {
+      const shouldSkip = Boolean(skipAlreadySent) && !forceResend && candidate.offerLetterStatus === 'Sent';
+      if (shouldSkip) {
         skippedCount++;
         results.push({
           candidateId: candidate.id,

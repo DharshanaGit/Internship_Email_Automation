@@ -187,9 +187,33 @@ Shortfundly Media Technologies Pvt. Ltd.`;
     setReminderForm(prev => ({ ...prev, submissionDeadline: defaultDeadline }));
   }, []);
 
+  // 1. Strict deduplication & mock data purge filter
+  const cleanCandidates = useMemo(() => {
+    const map = new Map();
+    (candidates || []).forEach((c) => {
+      if (!c || c.isLeaved) return;
+      const isMock =
+        (c.fullName && (c.fullName.includes('Meet Integration') || c.fullName.includes('Test Candidate'))) ||
+        (c.candidateId && (c.candidateId.startsWith('SF-MEET-') || c.candidateId.startsWith('SF-LOAD-') || c.candidateId.startsWith('TEST-'))) ||
+        (c.email && c.email.includes('shortfundly.com') && c.email.includes('candidate.'));
+      if (isMock) return;
+
+      const key = (c.email ? c.email.toLowerCase().trim() : '') || c.candidateId || c.id;
+      if (!map.has(key)) {
+        map.set(key, c);
+      } else {
+        const existing = map.get(key);
+        if (c.taskStatus !== 'Not Assigned' || c.offerLetterStatus === 'Accepted') {
+          map.set(key, c);
+        }
+      }
+    });
+    return Array.from(map.values());
+  }, [candidates]);
+
   // Filter candidates
   const filteredCandidates = useMemo(() => {
-    return candidates.filter((c) => {
+    return cleanCandidates.filter((c) => {
       if (c.isLeaved) return false;
       if (selectedBatch !== 'ALL' && c.batch !== selectedBatch) return false;
       if (selectedRole !== 'ALL' && c.role !== selectedRole) return false;
@@ -202,7 +226,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       }
       return true;
     });
-  }, [candidates, selectedBatch, selectedRole, searchTerm]);
+  }, [cleanCandidates, selectedBatch, selectedRole, searchTerm]);
 
   // Handle Select All / Deselect All
   const handleToggleSelectAll = () => {
@@ -279,7 +303,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
   // Subtab 3: Filtered Candidates for Deadline Reminder
   const filteredReminderCandidates = useMemo(() => {
-    return candidates.filter((c) => {
+    return cleanCandidates.filter((c) => {
       if (c.isLeaved) return false;
       if (c.taskStatus === 'Not Assigned' && (!c.tasks || c.tasks.length === 0)) return false;
       if (reminderBatchFilter !== 'ALL' && c.batch !== reminderBatchFilter) return false;
@@ -298,7 +322,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       }
       return true;
     });
-  }, [candidates, reminderBatchFilter, reminderRoleFilter, reminderTaskNoFilter, reminderSearchTerm]);
+  }, [cleanCandidates, reminderBatchFilter, reminderRoleFilter, reminderTaskNoFilter, reminderSearchTerm]);
 
   const handleToggleSelectAllReminders = () => {
     if (selectedReminderIds.length === filteredReminderCandidates.length) {
@@ -354,7 +378,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
   // Subtab 4: Filtered Candidates for Submission & Review Tracker
   const filteredTrackerCandidates = useMemo(() => {
-    return candidates.filter((c) => {
+    return cleanCandidates.filter((c) => {
       if (c.isLeaved) return false;
       if (c.taskStatus === 'Not Assigned' && (!c.tasks || c.tasks.length === 0)) return false;
       if (trackerBatchFilter !== 'ALL' && c.batch !== trackerBatchFilter) return false;
@@ -379,7 +403,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       }
       return true;
     });
-  }, [candidates, trackerBatchFilter, trackerRoleFilter, trackerTaskNoFilter, trackerStatusFilter, trackerSearchTerm]);
+  }, [cleanCandidates, trackerBatchFilter, trackerRoleFilter, trackerTaskNoFilter, trackerStatusFilter, trackerSearchTerm]);
 
   // Telemetry metrics for Tracker
   const trackerMetrics = useMemo(() => {

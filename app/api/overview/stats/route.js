@@ -13,6 +13,15 @@ export async function GET() {
       console.warn('Background worker startup non-blocking warning:', bgErr?.message);
     }
 
+    const baseCandWhere = {
+      NOT: [
+        { candidateId: { startsWith: 'SF-MEET-' } },
+        { candidateId: { startsWith: 'SF-LOAD-' } },
+        { candidateId: { startsWith: 'TEST-' } },
+        { email: { contains: 'candidate.1793' } },
+      ],
+    };
+
     const [
       totalCandidates,
       readyOffers,
@@ -32,14 +41,14 @@ export async function GET() {
       certEmailsCount,
       recentEmailLogs,
     ] = await Promise.all([
-      prisma.candidate.count(),
-      prisma.candidate.count({ where: { offerLetterStatus: 'Ready to Send' } }),
-      prisma.candidate.count({ where: { offerLetterStatus: 'Sent' } }),
-      prisma.candidate.count({ where: { offerLetterStatus: { in: ['Accepted', 'ACCEPTED'] } } }),
-      prisma.candidate.count({ where: { taskStatus: 'Not Assigned' } }),
-      prisma.candidate.count({ where: { taskStatus: 'In Progress' } }),
-      prisma.candidate.count({ where: { taskStatus: 'Under Review' } }),
-      prisma.candidate.count({ where: { taskStatus: { in: ['Completed', 'Milestone Completed'] } } }),
+      prisma.candidate.count({ where: baseCandWhere }),
+      prisma.candidate.count({ where: { ...baseCandWhere, offerLetterStatus: 'Ready to Send' } }),
+      prisma.candidate.count({ where: { ...baseCandWhere, offerLetterStatus: 'Sent' } }),
+      prisma.candidate.count({ where: { ...baseCandWhere, offerLetterStatus: { in: ['Accepted', 'ACCEPTED'] } } }),
+      prisma.candidate.count({ where: { ...baseCandWhere, taskStatus: 'Not Assigned' } }),
+      prisma.candidate.count({ where: { ...baseCandWhere, taskStatus: 'In Progress' } }),
+      prisma.candidate.count({ where: { ...baseCandWhere, taskStatus: 'Under Review' } }),
+      prisma.candidate.count({ where: { ...baseCandWhere, taskStatus: { in: ['Completed', 'Milestone Completed'] } } }),
       prisma.emailLog.count(),
       prisma.emailLog.count({ where: { status: 'Delivered' } }),
       prisma.emailLog.count({ where: { status: 'Failed' } }),

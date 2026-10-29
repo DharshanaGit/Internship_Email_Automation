@@ -55,6 +55,13 @@ export async function GET(request) {
       where.taskStatus = taskStatus;
     }
 
+    where.NOT = [
+      { candidateId: { startsWith: 'SF-MEET-' } },
+      { candidateId: { startsWith: 'SF-LOAD-' } },
+      { candidateId: { startsWith: 'TEST-' } },
+      { email: { contains: 'candidate.1793' } },
+    ];
+
     const [total, candidates] = await Promise.all([
       prisma.candidate.count({ where }),
       prisma.candidate.findMany({
