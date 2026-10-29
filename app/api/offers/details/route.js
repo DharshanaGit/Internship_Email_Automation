@@ -35,10 +35,10 @@ export async function GET(request) {
 
     let deadline = candidate.offerDeadline;
     if (!deadline) {
-      deadline = new Date(new Date(candidate.createdAt).getTime() + 5 * 24 * 60 * 60 * 1000);
+      deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     }
 
-    const isExpired = Date.now() > new Date(deadline).getTime();
+    const isExpired = Boolean(candidate.offerDeadline && Date.now() > new Date(candidate.offerDeadline).getTime());
     const alreadyResponded = candidate.offerLetterStatus === 'Accepted' || candidate.offerLetterStatus.startsWith('Rejected');
 
     return NextResponse.json({

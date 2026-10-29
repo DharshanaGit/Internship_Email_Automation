@@ -48,13 +48,13 @@ export async function POST(request) {
       }, { status: 409 });
     }
 
-    // Verify deadline
+    // Verify deadline - strictly expires only after deadline timestamp
     let deadline = candidate.offerDeadline;
     if (!deadline) {
-      deadline = new Date(new Date(candidate.createdAt).getTime() + 5 * 24 * 60 * 60 * 1000);
+      deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     }
 
-    if (Date.now() > new Date(deadline).getTime()) {
+    if (candidate.offerDeadline && Date.now() > new Date(candidate.offerDeadline).getTime()) {
       return NextResponse.json({
         success: false,
         error: 'The decision deadline for this internship offer has expired. Please contact Shortfundly HR (hr@shortfundly.com) for assistance.',

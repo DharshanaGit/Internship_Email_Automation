@@ -34,6 +34,7 @@ import {
   Sliders,
   FileText,
   Trash2,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { generateGemmaTask, generateGemmaFeedback } from '@/lib/gemmaEngine';
 import { formatToDdMmYy, getRandomIstTime, getExplanationSchedule } from '@/lib/dateUtils';
@@ -49,6 +50,16 @@ import UnifiedEmailTracker from '@/components/UnifiedEmailTracker';
 import BatchDragDropManager from '@/components/BatchDragDropManager';
 import { Layers } from 'lucide-react';
 import { jinjaTextToEmailHtml, renderJinja } from '@/lib/jinjaEngine.js';
+
+const DEFAULT_OFFER_PDF_TEXT = `We are pleased to offer you an internship at Shortfundly Media Technologies Pvt. Ltd. as {{role}} in the {{department}} department.
+
+Tenure & Location:
+Your internship will commence on {{joining_date}} and conclude on {{end_date}} (Duration: {{duration}}). The mode of engagement will be {{work_mode}}.
+
+Stipend & Mentorship:
+You will receive a monthly stipend of {{stipend}}. You will be reporting to {{reporting_manager}} and mentored by {{assigned_mentor}}.
+
+Please review and confirm your acceptance through your unique candidate portal response link before {{deadline}}. We look forward to welcoming you to Shortfundly.`;
 
 // ============================================================================
 // FULL-MAIL COMPLETE EMAIL TEMPLATES FOR ALL MODULES (100% CUSTOMIZABLE)
@@ -533,6 +544,14 @@ export default function DashboardPage() {
   const [bulkSending, setBulkSending] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0, status: '' });
   const [bulkDispatchResults, setBulkDispatchResults] = useState(null);
+  const [bulkCustomPdfTemplate, setBulkCustomPdfTemplate] = useState('');
+  const [bulkAttachments, setBulkAttachments] = useState([]);
+  const [bulkBannerImage, setBulkBannerImage] = useState('');
+  const [availableBatches, setAvailableBatches] = useState(['Batch A', 'Batch B', 'Batch C', 'Batch D', 'Solo Interns']);
+  const [selectedBulkBatchTarget, setSelectedBulkBatchTarget] = useState('Batch A');
+  const [newBatchNameInput, setNewBatchNameInput] = useState('');
+  const [pdfEditorModalOpen, setPdfEditorModalOpen] = useState(false);
+  const [tempPdfEditorContent, setTempPdfEditorContent] = useState('');
 
   // --- PREVIEW MODAL STATE (GMAIL STYLE SPLIT EMAIL & PDF) ---
   const [previewModal, setPreviewModal] = useState({
@@ -872,18 +891,7 @@ export default function DashboardPage() {
   };
 
   // --- MODULE 1: PREVIEW TRIGGER ---
-  const triggerOfferPreview = async (candidateData, customSub = '', customBdy = '') => {
-    if (
-      !candidateData.fullName?.trim() ||
-      !candidateData.email?.trim() ||
-      !candidateData.role?.trim() ||
-      !candidateData.joiningDate ||
-      !candidateData.endDate
-    ) {
-      showToast('Validation Error: Candidate Name, Designation, Joining Date, Ending Date, and Mail ID are required before preview.', 'error');
-      return;
-    }
-
+  const triggerOfferPreview = async (candidateData, customSub = '', customBdy = '', customPdf = '') => {
     try {
       setPreviewModal({
         open: true,
@@ -891,6 +899,7 @@ export default function DashboardPage() {
         subject: 'Generating preview...',
         emailHtml: '<div style="padding: 20px; color: #64748b;">Rendering live preview...</div>',
         letterHtml: '<div style="padding: 20px; color: #64748b;">Rendering A4 PDF document preview...</div>',
+        attachments: [],
         loading: true,
       });
 
@@ -899,23 +908,31 @@ export default function DashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           candidateData,
-          customSubject: customSub || singleOfferForm.subject,
-          customBody: customBdy || singleOfferForm.body,
+          customSubject: customSub || bulkCustomSubject || singleOfferForm.subject,
+          customBody: customBdy || bulkCustomBody || singleOfferForm.body,
+          customPdfTemplate: customPdf || bulkCustomPdfTemplate || null,
         }),
       });
 
       const data = await res.json();
       if (data.success) {
+        const extraAttachments = (bulkAttachments || []).map((att) => ({
+          name: att.filename,
+          type: att.contentType,
+          size: att.size,
+        }));
+
         setPreviewModal({
           open: true,
           candidate: data.candidate,
           to: `${data.candidate.fullName} <${data.candidate.email}>`,
-          cc: candidateData.cc || '',
+          cc: candidateData.cc || bulkCustomCc || '',
           subject: data.subject,
           emailHtml: data.emailBodyHtml,
           letterHtml: data.letterHtml,
           attachments: [
             { name: `Offer_Letter_${data.candidate.candidateId || 'SF-2026'}.pdf`, type: 'application/pdf', size: 'A4 Document' },
+            ...extraAttachments,
           ],
           loading: false,
         });
@@ -1345,6 +1362,120 @@ export default function DashboardPage() {
     setSelectedCandidateKeys(newSet);
   };
 
+  const handleAddNewBatch = () => {
+    if (!newBatchNameInput.trim()) {
+      showToast('Please enter a batch name.', 'warning');
+      return;
+    }
+    const clean = newBatchNameInput.trim();
+    if (availableBatches.includes(clean)) {
+      showToast(`Batch "${clean}" already exists.`, 'info');
+      setSelectedBulkBatchTarget(clean);
+      setNewBatchNameInput('');
+      return;
+    }
+    setAvailableBatches((prev) => [...prev, clean]);
+    setSelectedBulkBatchTarget(clean);
+    setNewBatchNameInput('');
+    showToast(`Created new batch "${clean}". You can now assign candidates to it.`, 'success');
+  };
+
+  const handleUpdateCandidateBatch = (candidateId, newBatch) => {
+    if (!bulkValidationReport || !bulkValidationReport.rows) return;
+    const updatedRows = bulkValidationReport.rows.map((r) => {
+      if (r.candidateId === candidateId) {
+        return {
+          ...r,
+          batch: newBatch,
+          raw: { ...(r.raw || {}), batch: newBatch },
+        };
+      }
+      return r;
+    });
+    setBulkValidationReport((prev) => ({
+      ...prev,
+      rows: updatedRows,
+    }));
+    showToast(`Updated candidate batch to "${newBatch}"`, 'info');
+  };
+
+  const handleApplyBatchToSelected = (targetBatch) => {
+    if (!targetBatch || !targetBatch.trim()) {
+      showToast('Select or enter a valid batch name.', 'warning');
+      return;
+    }
+    if (selectedCandidateKeys.size === 0) {
+      showToast('Select at least one candidate record first.', 'warning');
+      return;
+    }
+    const cleanBatch = targetBatch.trim();
+    const updatedRows = bulkValidationReport.rows.map((r) => {
+      if (selectedCandidateKeys.has(r.candidateId)) {
+        return {
+          ...r,
+          batch: cleanBatch,
+          raw: { ...(r.raw || {}), batch: cleanBatch },
+        };
+      }
+      return r;
+    });
+    setBulkValidationReport((prev) => ({
+      ...prev,
+      rows: updatedRows,
+    }));
+    if (!availableBatches.includes(cleanBatch)) {
+      setAvailableBatches((prev) => [...prev, cleanBatch]);
+    }
+    showToast(`Assigned ${selectedCandidateKeys.size} candidate(s) to "${cleanBatch}"!`, 'success');
+  };
+
+  const handleAddBulkAttachment = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    const newAttachments = [];
+    for (const file of files) {
+      if (file.size > 10 * 1024 * 1024) {
+        showToast(`File "${file.name}" exceeds 10MB limit.`, 'error');
+        continue;
+      }
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve) => {
+        reader.onload = () => {
+          const resStr = String(reader.result || '');
+          const base64 = resStr.includes(',') ? resStr.split(',')[1] : resStr;
+          resolve(base64);
+        };
+      });
+      reader.readAsDataURL(file);
+      const base64Data = await base64Promise;
+      newAttachments.push({
+        filename: file.name,
+        content: base64Data,
+        size: `${(file.size / 1024).toFixed(1)} KB`,
+        contentType: file.type || 'application/octet-stream',
+      });
+    }
+    setBulkAttachments((prev) => [...prev, ...newAttachments]);
+    showToast(`Added ${newAttachments.length} additional document attachment(s).`, 'success');
+    e.target.value = '';
+  };
+
+  const handleAddBulkBannerImage = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file (PNG, JPG, SVG).', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setBulkBannerImage(String(reader.result || ''));
+      showToast('Company banner image attached successfully!', 'success');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
   // --- MODULE 1: BULK DISPATCH EXECUTION ---
   const handleExecuteBulkOfferSend = async () => {
     if (selectedCandidateKeys.size === 0) {
@@ -1358,7 +1489,7 @@ export default function DashboardPage() {
 
       const selectedRecords = bulkValidationReport.rows
         .filter((r) => selectedCandidateKeys.has(r.candidateId))
-        .map((r) => r.raw || r);
+        .map((r) => ({ ...(r.raw || {}), ...r, batch: r.batch || r.raw?.batch || 'Batch A' }));
 
       const res = await fetch('/api/offer-letter/send', {
         method: 'POST',
@@ -1367,10 +1498,13 @@ export default function DashboardPage() {
           candidateRecords: selectedRecords,
           customSubject: bulkCustomSubject,
           customBody: bulkCustomBody,
+          customPdfTemplate: bulkCustomPdfTemplate,
           cc: bulkCustomCc,
           deadline: bulkOfferDeadline,
           commonDeadline: bulkOfferDeadline,
           forceResend: !skipAlreadySent,
+          additionalAttachments: bulkAttachments,
+          bannerImageUrl: bulkBannerImage,
         }),
       });
 
@@ -1877,6 +2011,86 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
+                    {/* Batch Customization & Re-assignment Control */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '10px',
+                      padding: '10px 16px',
+                      background: '#121217',
+                      borderTop: '1px solid #232328',
+                      borderBottom: '1px solid #232328',
+                      fontSize: '12px',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span style={{ color: '#c084fc', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <Users size={14} /> Batch Assignment:
+                        </span>
+                        <select
+                          value={selectedBulkBatchTarget}
+                          onChange={(e) => setSelectedBulkBatchTarget(e.target.value)}
+                          style={{
+                            background: '#18181b',
+                            border: '1px solid #7c3aed',
+                            borderRadius: '6px',
+                            color: '#ffffff',
+                            padding: '5px 10px',
+                            fontSize: '12px',
+                            outline: 'none',
+                          }}
+                        >
+                          {availableBatches.map(b => (
+                            <option key={b} value={b}>{b}</option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => handleApplyBatchToSelected(selectedBulkBatchTarget)}
+                          className={styles.btnAction}
+                          style={{ fontSize: '11.5px', padding: '5px 12px', borderColor: '#7c3aed', color: '#c084fc' }}
+                          disabled={selectedCandidateKeys.size === 0}
+                          title="Assign selected batch to all checked candidates"
+                        >
+                          Apply to Selected ({selectedCandidateKeys.size})
+                        </button>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                          type="text"
+                          placeholder="New Batch (e.g. Batch E, Solo)"
+                          value={newBatchNameInput}
+                          onChange={(e) => setNewBatchNameInput(e.target.value)}
+                          style={{
+                            background: '#18181b',
+                            border: '1px solid #3f3f46',
+                            borderRadius: '6px',
+                            color: '#ffffff',
+                            padding: '5px 10px',
+                            fontSize: '12px',
+                            outline: 'none',
+                            width: '180px',
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddNewBatch();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddNewBatch}
+                          className={styles.btnAction}
+                          style={{ fontSize: '11.5px', padding: '5px 10px' }}
+                        >
+                          + Create Batch
+                        </button>
+                      </div>
+                    </div>
+
                     <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                       <table className={styles.dataTable}>
                         <thead>
@@ -1923,7 +2137,34 @@ export default function DashboardPage() {
                                 <td><strong>{fullName}</strong></td>
                                 <td>{email}</td>
                                 <td>{role}</td>
-                                <td><span style={{ color: '#a855f7', fontWeight: 600 }}>{batchName}</span></td>
+                                <td>
+                                  <select
+                                    value={row.batch || row.raw?.batch || 'Batch A'}
+                                    onChange={(e) => handleUpdateCandidateBatch(row.candidateId, e.target.value)}
+                                    style={{
+                                      background: '#141417',
+                                      border: '1px solid #7c3aed',
+                                      borderRadius: '4px',
+                                      color: '#c084fc',
+                                      padding: '3px 8px',
+                                      fontSize: '11px',
+                                      fontWeight: 600,
+                                      cursor: 'pointer',
+                                      outline: 'none',
+                                    }}
+                                  >
+                                    {availableBatches.map(b => (
+                                      <option key={b} value={b} style={{ background: '#1c1c21', color: '#ffffff' }}>
+                                        {b}
+                                      </option>
+                                    ))}
+                                    {row.batch && !availableBatches.includes(row.batch) && (
+                                      <option value={row.batch} style={{ background: '#1c1c21', color: '#ffffff' }}>
+                                        {row.batch}
+                                      </option>
+                                    )}
+                                  </select>
+                                </td>
                                 <td>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <span style={{ fontFamily: 'monospace', fontSize: '11px', color: '#94a3b8' }}>
@@ -1950,7 +2191,7 @@ export default function DashboardPage() {
                                 <td style={{ textAlign: 'right' }}>
                                   <button
                                     type="button"
-                                    onClick={() => triggerOfferPreview({ ...row.raw, ...row }, bulkCustomSubject, bulkCustomBody)}
+                                    onClick={() => triggerOfferPreview({ ...row.raw, ...row }, bulkCustomSubject, bulkCustomBody, bulkCustomPdfTemplate)}
                                     className={styles.btnAction}
                                     style={{ fontSize: '11px', padding: '3px 8px' }}
                                   >
@@ -2037,6 +2278,105 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
+                      {/* Additional Attachments & Company Welcome Banner Upload Area */}
+                      <div style={{
+                        background: '#0d0d11',
+                        padding: '14px 18px',
+                        borderRadius: '8px',
+                        border: '1px solid #27272a',
+                        marginBottom: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px',
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontWeight: 700, fontSize: '13px' }}>
+                            <Paperclip size={15} />
+                            <span>Attach Documents & Company Welcome Banner Image</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '10px' }}>
+                            <label style={{
+                              background: '#1c1c24',
+                              border: '1px solid #3b82f6',
+                              color: '#60a5fa',
+                              padding: '5px 12px',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                            }}>
+                              <Upload size={13} />
+                              <span>+ Add Document (PDF, DOCX)</span>
+                              <input
+                                type="file"
+                                multiple
+                                onChange={handleAddBulkAttachment}
+                                style={{ display: 'none' }}
+                              />
+                            </label>
+
+                            <label style={{
+                              background: '#1c1c24',
+                              border: '1px solid #10b981',
+                              color: '#34d399',
+                              padding: '5px 12px',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                            }}>
+                              <ImageIcon size={13} />
+                              <span>+ Add Company Image / Banner</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleAddBulkBannerImage}
+                                style={{ display: 'none' }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Display Attached Files & Banner */}
+                        {(bulkAttachments.length > 0 || bulkBannerImage) && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', paddingTop: '8px', borderTop: '1px dashed #27272a' }}>
+                            {bulkBannerImage && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#18271e', border: '1px solid #059669', padding: '4px 10px', borderRadius: '6px', fontSize: '11.5px', color: '#6ee7b7' }}>
+                                <ImageIcon size={13} />
+                                <span>Company Banner Attached</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setBulkBannerImage('')}
+                                  style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', padding: '0 2px' }}
+                                  title="Remove Banner"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            )}
+
+                            {bulkAttachments.map((att, idx) => (
+                              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#1e2430', border: '1px solid #2563eb', padding: '4px 10px', borderRadius: '6px', fontSize: '11.5px', color: '#93c5fd' }}>
+                                <FileText size={13} />
+                                <span>{att.filename} ({att.size})</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setBulkAttachments(prev => prev.filter((_, i) => i !== idx))}
+                                  style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', padding: '0 2px' }}
+                                  title="Remove Attachment"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px' }}>
                           <input
@@ -2047,7 +2387,7 @@ export default function DashboardPage() {
                           <span>Skip candidates with already sent offer letters (Duplicate Protection)</span>
                         </label>
 
-                        <div style={{ display: 'flex', gap: '10px' }}>
+                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                           <button
                             type="button"
                             onClick={() => openTemplateEditor('offer-bulk')}
@@ -2061,6 +2401,20 @@ export default function DashboardPage() {
 
                           <button
                             type="button"
+                            onClick={() => {
+                              setTempPdfEditorContent(bulkCustomPdfTemplate || DEFAULT_OFFER_PDF_TEXT);
+                              setPdfEditorModalOpen(true);
+                            }}
+                            className={styles.btnAction}
+                            style={{ borderColor: '#7c3aed', color: '#c084fc' }}
+                            title="Customize formal PDF offer letter clauses and text content"
+                          >
+                            <FileText size={14} style={{ color: '#c084fc' }} />
+                            <span>Customize PDF Content</span>
+                          </button>
+
+                          <button
+                            type="button"
                             disabled={selectedCandidateKeys.size === 0}
                             onClick={() => {
                               const firstKey = Array.from(selectedCandidateKeys)[0];
@@ -2069,7 +2423,8 @@ export default function DashboardPage() {
                                 triggerOfferPreview(
                                   { ...row.raw, ...row, cc: bulkCustomCc },
                                   bulkCustomSubject,
-                                  bulkCustomBody
+                                  bulkCustomBody,
+                                  bulkCustomPdfTemplate
                                 );
                               } else {
                                 showToast('Select at least one candidate to preview.', 'warning');
@@ -4721,6 +5076,126 @@ export default function DashboardPage() {
               >
                 Close Preview
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* FORMAL OFFER LETTER PDF CONTENT CUSTOMIZATION MODAL           */}
+      {/* ============================================================== */}
+      {pdfEditorModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalCard} style={{ maxWidth: '850px', maxHeight: '92vh' }}>
+            <div className={styles.modalHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'rgba(124, 58, 237, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c084fc' }}>
+                  <FileText size={18} />
+                </div>
+                <div>
+                  <h3 className={styles.modalTitle} style={{ margin: 0, fontSize: '17px' }}>
+                    Customize Formal Offer Letter PDF Content
+                  </h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: 'var(--text-muted)' }}>
+                    Edit the clauses, paragraphs, and terms that appear in the candidate's downloadable A4 PDF.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPdfEditorModalOpen(false)}
+                className={styles.modalClose}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className={styles.modalBody} style={{ padding: '20px 24px' }}>
+              <div style={{ marginBottom: '14px' }}>
+                <label className={styles.label}>Insert Template Dynamic Variables</label>
+                <div className={styles.tagPillsBar}>
+                  {[
+                    { label: 'Candidate Name', val: '{{candidate_name}}' },
+                    { label: 'Role / Designation', val: '{{role}}' },
+                    { label: 'Department', val: '{{department}}' },
+                    { label: 'Joining Date', val: '{{joining_date}}' },
+                    { label: 'Ending Date', val: '{{end_date}}' },
+                    { label: 'Duration', val: '{{duration}}' },
+                    { label: 'Monthly Stipend', val: '{{stipend}}' },
+                    { label: 'Work Mode', val: '{{work_mode}}' },
+                    { label: 'Reporting Manager', val: '{{reporting_manager}}' },
+                    { label: 'Mentor', val: '{{assigned_mentor}}' },
+                    { label: 'Expiry Deadline', val: '{{deadline}}' },
+                  ].map((tag) => (
+                    <button
+                      key={tag.val}
+                      type="button"
+                      className={styles.tagPill}
+                      onClick={() => setTempPdfEditorContent(prev => `${prev} ${tag.val}`)}
+                    >
+                      + {tag.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className={styles.label}>PDF Document Body Text (Paragraphs & Clauses)</label>
+                <textarea
+                  rows={12}
+                  style={{
+                    width: '100%',
+                    fontFamily: 'monospace',
+                    fontSize: '13px',
+                    lineHeight: '1.6',
+                    background: '#09090b',
+                    color: '#f8fafc',
+                    border: '1px solid #27272a',
+                    borderRadius: '8px',
+                    padding: '14px',
+                  }}
+                  value={tempPdfEditorContent}
+                  onChange={(e) => setTempPdfEditorContent(e.target.value)}
+                  placeholder="Enter customized paragraphs for the formal Offer Letter PDF..."
+                />
+                <p style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '6px' }}>
+                  &bull; Separate paragraphs with blank lines. Standard Shortfundly letterhead, Ref ID, Date, and Signature blocks are automatically integrated.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.modalFooter} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px' }}>
+              <button
+                type="button"
+                onClick={() => setTempPdfEditorContent(DEFAULT_OFFER_PDF_TEXT)}
+                className={styles.btnAction}
+              >
+                <RefreshCw size={13} />
+                <span>Reset to Default Content</span>
+              </button>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setPdfEditorModalOpen(false)}
+                  className={styles.btnAction}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBulkCustomPdfTemplate(tempPdfEditorContent);
+                    setPdfEditorModalOpen(false);
+                    showToast('Customized Offer Letter PDF content saved!', 'success');
+                  }}
+                  className={styles.btnPrimaryAction}
+                >
+                  <CheckSquare size={14} />
+                  <span>Save PDF Content</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
