@@ -62,11 +62,30 @@ export async function POST(request) {
       const resolvedTaskTitle = taskTitle || activeTask?.title || activeTask?.taskName || 'Core Technical Milestone';
       const resolvedTaskId = taskId || activeTask?.taskId || `TSK-INT-${(candidate.internId || 'DEV').slice(-4)}`;
 
-      // Record feedback review in DB
-      if (activeTask) {
+      // Ensure task assignment exists
+      let currentTask = activeTask;
+      if (!currentTask) {
+        currentTask = await prisma.taskAssignment.create({
+          data: {
+            candidateId: candidate.id,
+            taskNumber: taskNumber || 1,
+            taskId: resolvedTaskId,
+            title: resolvedTaskTitle,
+            description: 'Core industrial task milestone',
+            meetLink,
+            deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            status: `Review ${reviewNumber} Completed`,
+            submissionStatus: 'SUBMITTED',
+            performanceScore: score,
+            feedback,
+          },
+        });
+      }
+
+      if (currentTask) {
         await prisma.taskReview.create({
           data: {
-            taskAssignmentId: activeTask.id,
+            taskAssignmentId: currentTask.id,
             reviewNumber,
             reviewDate: scheduledDate,
             reviewTime,
@@ -78,7 +97,7 @@ export async function POST(request) {
         });
 
         await prisma.taskAssignment.update({
-          where: { id: activeTask.id },
+          where: { id: currentTask.id },
           data: {
             performanceScore: score,
             feedback,

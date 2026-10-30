@@ -33,7 +33,7 @@ export default function UnifiedEmailTracker({
       const res = await fetch('/api/emails');
       const data = await res.json();
       if (data.success) {
-        setEmails(data.emails || []);
+        setEmails(data.data || data.emails || []);
       }
     } catch (err) {
       console.error('Error loading email logs:', err);

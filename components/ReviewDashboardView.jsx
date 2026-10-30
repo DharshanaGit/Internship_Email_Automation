@@ -581,6 +581,7 @@ export default function ReviewDashboardView({
                   <th style={{ width: '40px' }}>Select</th>
                   <th>Intern ID</th>
                   <th>Candidate Name</th>
+                  <th>Email ID</th>
                   <th>Batch</th>
                   <th>Task No.</th>
                   <th>Task Title</th>
@@ -613,6 +614,7 @@ export default function ReviewDashboardView({
                         </td>
                         <td><code style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', color: '#c084fc', border: '1px solid var(--border-hairline)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{c.internId}</code></td>
                         <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
+                        <td style={{ fontSize: '12px', color: '#94a3b8' }}>{c.email}</td>
                         <td><span className={styles.badgePurple}>{c.batch}</span></td>
                         <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>#{task?.taskNumber || 1}</td>
                         <td>{task?.title || 'Milestone Task'}</td>
@@ -845,6 +847,100 @@ export default function ReviewDashboardView({
               <span>{schedulingR1 ? 'Scheduling & Dispatching...' : `Confirm & Send Review #${r1ScheduleForm.reviewNumber || 1} Emails (${selectedCandidateIds.length})`}</span>
             </button>
           </div>
+
+          {/* Candidates Selection Table in Schedule Milestone Review */}
+          <div style={{ marginTop: '24px', borderTop: '1px solid #232328', paddingTop: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <h4 style={{ margin: '0 0 4px 0', fontSize: '14.5px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Users size={16} color="#c084fc" />
+                  <span>Select Candidates for Review Scheduling ({selectedCandidateIds.length} of {filteredCandidates.length} Selected)</span>
+                </h4>
+                <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
+                  Check candidate(s) below who will receive Review #{r1ScheduleForm.reviewNumber || 1} emails on {r1ScheduleForm.reviewDate || 'the scheduled date'}.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={handleToggleSelectAll}
+                  style={{ background: '#1c1c24', border: '1px solid #32323c', color: '#e2e8f0', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                >
+                  {selectedCandidateIds.length === filteredCandidates.length && filteredCandidates.length > 0 ? 'Deselect All' : 'Select All'}
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.tableResponsive}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={{ width: '40px' }}>Select</th>
+                    <th>Intern ID</th>
+                    <th>Candidate Name</th>
+                    <th>Email ID</th>
+                    <th>Role</th>
+                    <th>Batch</th>
+                    <th>Task No.</th>
+                    <th>Current Stage</th>
+                    <th>Score (%)</th>
+                    <th>Google Meet Room</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCandidates.length === 0 ? (
+                    <tr>
+                      <td colSpan={10} style={{ textAlign: 'center', padding: '30px', color: '#71717a' }}>
+                        No candidates found for review scheduling.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredCandidates.map((c) => {
+                      const isSelected = selectedCandidateIds.includes(c.id);
+                      const task = c.activeTask;
+                      return (
+                        <tr key={c.id}>
+                          <td>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleToggleSelectOne(c.id)}
+                              style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
+                            />
+                          </td>
+                          <td><code style={{ fontFamily: 'var(--font-mono)', color: '#c084fc', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{c.internId}</code></td>
+                          <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
+                          <td style={{ fontSize: '12px', color: '#94a3b8' }}>{c.email}</td>
+                          <td style={{ fontSize: '12px', color: '#cbd5e1' }}>{c.role}</td>
+                          <td><span className={styles.badgePurple}>{c.batch}</span></td>
+                          <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>#{task?.taskNumber || 1}</td>
+                          <td>
+                            <span className={
+                              c.reviewStage === 'Checkpoint Ready' ? styles.badgeEmerald :
+                              c.reviewStage === 'Review 2 Pending' ? styles.badgePurple : styles.badgeAmber
+                            }>
+                              {c.reviewStage || 'Review 1 Pending'}
+                            </span>
+                          </td>
+                          <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
+                            {c.performancePercentage?.toFixed(1)}%
+                          </td>
+                          <td>
+                            {r1ScheduleForm.meetMode === 'BATCH' ? (
+                              <span style={{ fontSize: '11.5px', color: '#c084fc' }}>Batch Shared Link</span>
+                            ) : (
+                              <span style={{ fontSize: '11.5px', color: '#38bdf8' }}>Individual Auto-Link</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 
@@ -960,6 +1056,188 @@ export default function ReviewDashboardView({
               <span>{uploadingFeedback ? 'Processing & Dispatching...' : `Confirm & Dispatch Feedback Mails (${feedbackRows.length} Loaded)`}</span>
             </button>
           </div>
+
+          {/* UPLOADED EXCEL/CSV INTERNS DETAILS PREVIEW TABLE */}
+          {feedbackRows.length > 0 && (
+            <div style={{ marginTop: '24px', borderTop: '1px solid #232328', paddingTop: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '14.5px', color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle2 size={16} color="#10b981" />
+                    <span>Uploaded Interns List ({feedbackRows.length} Records Loaded from File)</span>
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
+                    Review each intern\'s feedback and scores below before confirming dispatch.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFeedbackRows([]);
+                      showToast?.('Cleared uploaded file records.', 'info');
+                    }}
+                    style={{ background: '#27272a', border: '1px solid #3f3f46', color: '#f87171', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                  >
+                    Clear / Re-upload
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSendFeedbackMails}
+                    disabled={uploadingFeedback}
+                    className={styles.btnPrimary}
+                    style={{ padding: '6px 14px', fontSize: '12px' }}
+                  >
+                    <Send size={13} />
+                    <span>{uploadingFeedback ? 'Dispatching...' : `Dispatch Feedback Mails (${feedbackRows.length})`}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.tableResponsive}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={{ width: '30px' }}>#</th>
+                      <th>Intern ID</th>
+                      <th>Candidate Name</th>
+                      <th>Email ID</th>
+                      <th>Batch</th>
+                      <th>Role</th>
+                      <th>Task ID</th>
+                      <th>Task Title</th>
+                      <th>Review #</th>
+                      <th>Score</th>
+                      <th>Feedback Evaluation</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {feedbackRows.map((row, idx) => {
+                      const internId = row['Intern ID'] || row.internId || row.InternId || row['Candidate ID'] || row.candidateId || `INT-ROW-${idx + 1}`;
+                      const name = row['Name'] || row.name || row['Candidate Name'] || row.candidateName || 'Candidate';
+                      const email = row['Email ID'] || row['Email'] || row.email || row.EmailId || row['Email Address'] || '-';
+                      const taskId = row['Task ID'] || row.taskId || row.TaskId || 'TSK-001';
+                      const taskNum = row['Task Number'] || row.taskNumber || 1;
+                      const taskTitle = row['Task Title'] || row['Task Name'] || row.taskTitle || row.title || 'Technical Milestone';
+                      const batch = row['batch'] || row['Batch'] || row.batch || 'Batch A';
+                      const role = row['role'] || row['Role'] || row.role || 'Intern';
+                      const reviewNum = row['Review Number'] || row.reviewNumber || 2;
+                      const feedback = row['Feedback'] || row.feedback || row['Notes'] || 'Evaluation verified';
+                      const score = row['Performance Score'] || row['Performance Percentage'] || row.performancePercentage || row.score || 90;
+
+                      return (
+                        <tr key={idx}>
+                          <td style={{ color: '#71717a', fontSize: '11px' }}>{idx + 1}</td>
+                          <td><code style={{ fontFamily: 'var(--font-mono)', color: '#c084fc', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{internId}</code></td>
+                          <td style={{ fontWeight: 600, color: '#ffffff' }}>{name}</td>
+                          <td style={{ fontSize: '12px', color: '#94a3b8' }}>{email}</td>
+                          <td><span className={styles.badgePurple}>{batch}</span></td>
+                          <td style={{ fontSize: '12px', color: '#cbd5e1' }}>{role}</td>
+                          <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>{taskId} (#{taskNum})</td>
+                          <td style={{ maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{taskTitle}</td>
+                          <td><span className={styles.badgeAmber}>Review #{reviewNum}</span></td>
+                          <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>{score}%</td>
+                          <td style={{ maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '12px', color: '#e2e8f0' }} title={feedback}>
+                            {feedback}
+                          </td>
+                          <td>
+                            <span className={styles.badgeEmerald}>
+                              <CheckCircle2 size={11} />
+                              <span>Ready</span>
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* When no file is uploaded yet: Show current platform candidates table */}
+          {feedbackRows.length === 0 && (
+            <div style={{ marginTop: '24px', borderTop: '1px solid #232328', paddingTop: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '14.5px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Users size={16} color="#c084fc" />
+                    <span>Eligible Interns in System ({filteredCandidates.length} Candidates Available)</span>
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
+                    Upload an Excel or CSV file above to submit bulk evaluation feedback, or download a template pre-filled with these candidates.
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.tableResponsive}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Intern ID</th>
+                      <th>Candidate Name</th>
+                      <th>Email ID</th>
+                      <th>Role</th>
+                      <th>Batch</th>
+                      <th>Active Task</th>
+                      <th>Current Stage</th>
+                      <th>Performance Score</th>
+                      <th>Assigned Meet Link</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCandidates.length === 0 ? (
+                      <tr>
+                        <td colSpan={9} style={{ textAlign: 'center', padding: '30px', color: '#71717a' }}>
+                          No candidates found matching criteria.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredCandidates.map((c) => {
+                        const task = c.activeTask;
+                        return (
+                          <tr key={c.id}>
+                            <td><code style={{ fontFamily: 'var(--font-mono)', color: '#c084fc', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{c.internId}</code></td>
+                            <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
+                            <td style={{ fontSize: '12px', color: '#94a3b8' }}>{c.email}</td>
+                            <td style={{ fontSize: '12px', color: '#cbd5e1' }}>{c.role}</td>
+                            <td><span className={styles.badgePurple}>{c.batch}</span></td>
+                            <td>
+                              <span style={{ fontWeight: 600 }}>{task?.taskId || 'TSK-DEV-001'}</span>
+                              <div style={{ fontSize: '11px', color: '#94a3b8' }}>{task?.title || 'Technical Milestone'}</div>
+                            </td>
+                            <td>
+                              <span className={
+                                c.reviewStage === 'Checkpoint Ready' ? styles.badgeEmerald :
+                                c.reviewStage === 'Review 2 Pending' ? styles.badgePurple : styles.badgeAmber
+                              }>
+                                {c.reviewStage || 'Review 1 Pending'}
+                              </span>
+                            </td>
+                            <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
+                              {c.performancePercentage?.toFixed(1)}%
+                            </td>
+                            <td>
+                              {task?.meetLink ? (
+                                <a href={task.meetLink} target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                  <Video size={12} />
+                                  <span>View Meet</span>
+                                </a>
+                              ) : (
+                                <span style={{ color: '#71717a', fontSize: '11px' }}>Auto-Generates</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

@@ -45,6 +45,8 @@ export async function GET(request) {
               fullName: true,
               role: true,
               department: true,
+              internId: true,
+              batch: true,
             },
           },
         },

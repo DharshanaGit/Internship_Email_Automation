@@ -1883,7 +1883,7 @@ export default function DashboardPage() {
                 candidates={filteredOfferCandidates}
                 templates={templates}
                 batches={batches}
-                onOfferSent={() => { loadCandidates(); loadStats(); }}
+                onOfferSent={() => { loadCandidates(); loadStats(); loadEmails(); }}
                 showToast={showToast}
               />
             )}

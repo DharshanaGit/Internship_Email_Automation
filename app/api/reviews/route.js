@@ -27,9 +27,12 @@ export async function GET(request) {
     // ONLY fetch candidates who have had task mail dispatched (taskStatus !== 'Not Assigned' or tasks exist)
     const where = {
       isLeaved: false,
-      OR: [
-        { taskStatus: { not: 'Not Assigned' } },
-        { tasks: { some: {} } },
+      NOT: [
+        { candidateId: { startsWith: 'SF-MEET-' } },
+        { candidateId: { startsWith: 'SF-LOAD-' } },
+        { candidateId: { startsWith: 'TEST-' } },
+        { email: { contains: 'candidate.1793' } },
+        { fullName: { contains: 'Meet Integration Candidate' } },
       ],
     };
 
@@ -107,7 +110,19 @@ export async function GET(request) {
           githubUrl: activeTask.githubUrl,
           projectUrl: activeTask.projectUrl,
           reviews: activeTask.reviews,
-        } : null,
+        } : {
+          id: null,
+          taskNumber: 1,
+          taskId: 'TSK-' + (c.role || 'DEV').substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'DEV') + '-001',
+          title: (c.role || 'Technical') + ' Milestone Implementation',
+          meetLink: c.googleMeetUrl || 'Auto-Generates on Schedule',
+          deadline: null,
+          status: c.taskStatus || 'Not Assigned',
+          submissionStatus: 'PENDING',
+          githubUrl: null,
+          projectUrl: null,
+          reviews: [],
+        },
       };
     });
 
@@ -157,8 +172,23 @@ export async function POST(request) {
     const scheduled = [];
 
     for (const cand of candidates) {
-      const activeTask = cand.tasks[0];
-      const taskId = activeTask?.taskId || `TSK-INT-${cand.internId || 'DEV'}`;
+      let activeTask = cand.tasks[0];
+      if (!activeTask) {
+        activeTask = await prisma.taskAssignment.create({
+          data: {
+            candidateId: cand.id,
+            taskNumber: 1,
+            taskId: 'TSK-' + (cand.role || 'DEV').substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'DEV') + '-001',
+            title: (cand.role || 'Technical') + ' Milestone Implementation',
+            description: 'Core industrial task implementation and technical evaluation milestone.',
+            meetLink: 'https://meet.google.com/new',
+            deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            status: 'Assigned',
+            submissionStatus: 'PENDING',
+          },
+        });
+      }
+      const taskId = activeTask.taskId;
 
       // Resolve Google Meet Link based on selected mode (Original Google Meet format: https://meet.google.com/xxx-yyyy-zzz)
       let meetLink;
