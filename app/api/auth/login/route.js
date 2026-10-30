@@ -57,6 +57,34 @@ export async function POST(request) {
     }
 
     const { email, password, role: requestedRole, captchaAnswer, captchaToken, recaptchaToken } = parseResult.data;
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Validate email rules: no capital letters, must have '@', must end with .com or .in
+    if (/[A-Z]/.test(email)) {
+      return NextResponse.json(
+        { success: false, error: 'Email address cannot contain capital letters (lowercase only).' },
+        { status: 400 }
+      );
+    }
+    if (!email.includes('@')) {
+      return NextResponse.json(
+        { success: false, error: "Email address must contain an '@' symbol." },
+        { status: 400 }
+      );
+    }
+    if (!/\.(com|in)$/.test(normalizedEmail)) {
+      return NextResponse.json(
+        { success: false, error: "Email must end with '.com' or '.in' (e.g. name@gmail.com)." },
+        { status: 400 }
+      );
+    }
+    const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in)$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      return NextResponse.json(
+        { success: false, error: "Please enter a valid lowercase email ending with '.com' or '.in'." },
+        { status: 400 }
+      );
+    }
 
     // Verify reCAPTCHA or internal visual Captcha
     if (recaptchaToken) {
@@ -89,7 +117,6 @@ export async function POST(request) {
     }
 
     // Find user via Prisma ORM with retry and resilient fallback
-    const normalizedEmail = email.toLowerCase().trim();
     let user = null;
     try {
       user = await prisma.user.findUnique({

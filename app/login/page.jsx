@@ -5,6 +5,57 @@ import Link from 'next/link';
 import styles from './login.module.css';
 import { Mail, Lock, Shield, RotateCw, ArrowRight, AlertCircle, CheckCircle2, UserCheck, Eye, EyeOff, UserPlus, LogIn } from 'lucide-react';
 
+// Validation helpers
+const validateName = (val) => {
+  if (!val) return null;
+  if (/\d/.test(val)) {
+    return 'Full name cannot contain numbers (letters only).';
+  }
+  return null;
+};
+
+const validateEmail = (val) => {
+  if (!val) return null;
+  if (/[A-Z]/.test(val)) {
+    return 'Email address cannot contain capital letters (lowercase only).';
+  }
+  if (!val.includes('@')) {
+    return "Email must contain an '@' symbol.";
+  }
+  if (!/\.(com|in)$/.test(val.trim())) {
+    return "Email must end with '.com' or '.in' (e.g. name@gmail.com).";
+  }
+  const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in)$/;
+  if (!emailRegex.test(val.trim())) {
+    return "Please enter a valid lowercase email ending with '.com' or '.in'.";
+  }
+  return null;
+};
+
+const getPasswordCriteria = (val) => ({
+  length: (val || '').length >= 8,
+  lower: /[a-z]/.test(val || ''),
+  upper: /[A-Z]/.test(val || ''),
+  number: /[0-9]/.test(val || ''),
+  symbol: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(val || ''),
+});
+
+const validateStrongPassword = (val) => {
+  if (!val) return null;
+  const crit = getPasswordCriteria(val);
+  const missing = [];
+  if (!crit.length) missing.push('min 8 characters');
+  if (!crit.lower) missing.push('small letter (a-z)');
+  if (!crit.upper) missing.push('caps letter (A-Z)');
+  if (!crit.number) missing.push('number (0-9)');
+  if (!crit.symbol) missing.push('special symbol (!@#$...)');
+
+  if (missing.length > 0) {
+    return `Password must include: ${missing.join(', ')}.`;
+  }
+  return null;
+};
+
 export default function LoginPage() {
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
   
@@ -52,39 +103,15 @@ export default function LoginPage() {
   }, []);
 
   // Real-time validations for Sign In
-  const loginEmailError = useMemo(() => {
-    if (!email) return null;
-    if (/[A-Z]/.test(email)) {
-      return 'Email address cannot contain capital letters (lowercase only).';
-    }
-    return null;
-  }, [email]);
-
-  const loginPasswordError = useMemo(() => {
-    if (!password) return null;
-    if (password.length < 8) {
-      return 'Password must be at least 8 characters long.';
-    }
-    return null;
-  }, [password]);
+  const loginEmailError = useMemo(() => validateEmail(email), [email]);
+  const loginPasswordError = useMemo(() => validateStrongPassword(password), [password]);
+  const loginPasswordCriteria = useMemo(() => getPasswordCriteria(password), [password]);
 
   // Real-time validations for Create Account
-  const regEmailError = useMemo(() => {
-    if (!regEmail) return null;
-    if (/[A-Z]/.test(regEmail)) {
-      return 'Email address cannot contain capital letters (lowercase only).';
-    }
-    return null;
-  }, [regEmail]);
-
-  const regPasswordError = useMemo(() => {
-    if (!regPassword) return null;
-    if (regPassword.length < 8) {
-      return 'Password must be at least 8 characters long.';
-    }
-    return null;
-  }, [regPassword]);
-
+  const regNameError = useMemo(() => validateName(regName), [regName]);
+  const regEmailError = useMemo(() => validateEmail(regEmail), [regEmail]);
+  const regPasswordError = useMemo(() => validateStrongPassword(regPassword), [regPassword]);
+  const regPasswordCriteria = useMemo(() => getPasswordCriteria(regPassword), [regPassword]);
   const regConfirmError = useMemo(() => {
     if (!regConfirmPassword) return null;
     if (regConfirmPassword !== regPassword) {
@@ -92,6 +119,29 @@ export default function LoginPage() {
     }
     return null;
   }, [regConfirmPassword, regPassword]);
+
+  const renderPasswordCriteria = (criteria, currentPassword) => {
+    if (!currentPassword) return null;
+    return (
+      <div className={styles.passwordRulesGrid}>
+        <span className={`${styles.passwordRuleItem} ${criteria.length ? styles.passwordRuleMet : ''}`}>
+          {criteria.length ? '✓' : '○'} 8+ characters
+        </span>
+        <span className={`${styles.passwordRuleItem} ${criteria.lower ? styles.passwordRuleMet : ''}`}>
+          {criteria.lower ? '✓' : '○'} Small letter (a-z)
+        </span>
+        <span className={`${styles.passwordRuleItem} ${criteria.upper ? styles.passwordRuleMet : ''}`}>
+          {criteria.upper ? '✓' : '○'} Caps letter (A-Z)
+        </span>
+        <span className={`${styles.passwordRuleItem} ${criteria.number ? styles.passwordRuleMet : ''}`}>
+          {criteria.number ? '✓' : '○'} Number (0-9)
+        </span>
+        <span className={`${styles.passwordRuleItem} ${criteria.symbol ? styles.passwordRuleMet : ''}`}>
+          {criteria.symbol ? '✓' : '○'} Special symbol (!@#$)
+        </span>
+      </div>
+    );
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -157,6 +207,11 @@ export default function LoginPage() {
 
     if (!regName.trim()) {
       setSubmitError('Please enter your full name.');
+      return;
+    }
+
+    if (regNameError) {
+      setSubmitError(regNameError);
       return;
     }
 
@@ -349,6 +404,7 @@ export default function LoginPage() {
                   <span>{loginPasswordError}</span>
                 </div>
               )}
+              {renderPasswordCriteria(loginPasswordCriteria, password)}
             </div>
 
             <div className={styles.formGroup}>
@@ -415,8 +471,8 @@ export default function LoginPage() {
                 <input
                   type="text"
                   required
-                  className={styles.input}
-                  placeholder="Enter full name (e.g. John Doe)"
+                  className={`${styles.input} ${regNameError ? styles.inputError : ''}`}
+                  placeholder="Enter full name (letters only, e.g. John Doe)"
                   value={regName}
                   onChange={(e) => {
                     setRegName(e.target.value);
@@ -425,6 +481,12 @@ export default function LoginPage() {
                   autoComplete="name"
                 />
               </div>
+              {regNameError && (
+                <div className={styles.fieldError}>
+                  <AlertCircle size={12} />
+                  <span>{regNameError}</span>
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>
@@ -439,7 +501,7 @@ export default function LoginPage() {
                   id="shortfundly_reg_email"
                   required
                   className={`${styles.input} ${regEmailError ? styles.inputError : ''}`}
-                  placeholder="Enter email address (lowercase only)"
+                  placeholder="Enter email address (lowercase only, ending with .com or .in)"
                   value={regEmail}
                   onChange={(e) => {
                     setRegEmail(e.target.value);
@@ -487,7 +549,7 @@ export default function LoginPage() {
                   id="shortfundly_reg_secret"
                   required
                   className={`${styles.input} ${regPasswordError ? styles.inputError : ''}`}
-                  placeholder="Create password (min 8 characters)"
+                  placeholder="Create strong password"
                   value={regPassword}
                   onChange={(e) => {
                     setRegPassword(e.target.value);
@@ -511,6 +573,7 @@ export default function LoginPage() {
                   <span>{regPasswordError}</span>
                 </div>
               )}
+              {renderPasswordCriteria(regPasswordCriteria, regPassword)}
             </div>
 
             <div className={styles.formGroup}>
@@ -553,8 +616,8 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading || !regName || !regEmail || !regPassword || !regConfirmPassword || !!regEmailError || !!regPasswordError || !!regConfirmError}
-              className={`${styles.submitButton} ${(loading || !regName || !regEmail || !regPassword || !regConfirmPassword || !!regEmailError || !!regPasswordError || !!regConfirmError) ? styles.submitButtonDisabled : ''}`}
+              disabled={loading || !regName || !regEmail || !regPassword || !regConfirmPassword || !!regNameError || !!regEmailError || !!regPasswordError || !!regConfirmError}
+              className={`${styles.submitButton} ${(loading || !regName || !regEmail || !regPassword || !regConfirmPassword || !!regNameError || !!regEmailError || !!regPasswordError || !!regConfirmError) ? styles.submitButtonDisabled : ''}`}
             >
               <span>{loading ? 'Creating Account...' : 'Create Account & Sign In'}</span>
               <ArrowRight size={16} />
