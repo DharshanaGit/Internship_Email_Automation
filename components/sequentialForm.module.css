@@ -142,7 +142,7 @@
   border: 1px solid #282639;
   border-radius: 8px;
   padding: 0 14px;
-  color: #828896 !important; /* Dull before entering field */
+  color: #828896 !important; /* Dull muted when empty */
   -webkit-text-fill-color: #828896 !important;
   font-size: 13.5px;
   outline: none;
@@ -154,14 +154,38 @@
   -webkit-text-fill-color: #555866 !important;
 }
 
+/* When focused or active */
 .inputField:focus,
-.inputField:hover,
 .inputField:active {
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
-  border-color: #a855f7;
+  border-color: #a855f7 !important;
   background-color: #141320 !important;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.28);
+}
+
+/* When field is filled (identified with bright white text & distinct border even when blurred) */
+.inputFilled {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+  border-color: #3f3b5c !important;
+  background-color: #12101e !important;
+}
+
+.inputValid {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+  border-color: #10b981 !important;
+  background-color: #0d1714 !important;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25);
+}
+
+/* When moving to next, a filled valid field stays clearly bright with subtle positive confirmation */
+.inputValid:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35) !important;
 }
 
 /* Make calendar picker icon clearly visible and viewable */
@@ -190,11 +214,9 @@
 
 .inputError {
   border-color: #ef4444 !important;
-  background-color: rgba(239, 68, 68, 0.05) !important;
-}
-
-.inputValid {
-  border-color: #10b981 !important;
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .fieldError {

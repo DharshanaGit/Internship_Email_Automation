@@ -638,7 +638,6 @@ www.shortfundly.com`;
                 onFocus={() => checkPrerequisite('email')}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value.toLowerCase() })}
                 className={`${styles.inputField} ${formData.email && validationErrors.email ? styles.inputError : formData.email ? styles.inputValid : ''}`}
-                style={{ backgroundColor: '#09090b', color: '#ffffff' }}
               />
               {formData.email && validationErrors.email && (
                 <div className={styles.fieldError}>
@@ -710,7 +709,7 @@ www.shortfundly.com`;
                 value={formData.role}
                 onFocus={() => checkPrerequisite('role')}
                 onChange={(e) => handleRoleChange(e.target.value)}
-                className={styles.inputField}
+                className={`${styles.inputField} ${formData.role ? styles.inputValid : ''}`}
               />
             </div>
 
@@ -726,7 +725,7 @@ www.shortfundly.com`;
                   value={formData.stipend}
                   onFocus={() => checkPrerequisite('stipend')}
                   onChange={(e) => setFormData({ ...formData, stipend: e.target.value })}
-                  className={`${styles.inputField} ${formData.stipend && validationErrors.stipend ? styles.inputError : ''}`}
+                  className={`${styles.inputField} ${formData.stipend && validationErrors.stipend ? styles.inputError : formData.stipend ? styles.inputValid : ''}`}
                 />
                 <button
                   type="button"
@@ -792,7 +791,7 @@ www.shortfundly.com`;
                 value={formData.joiningDate}
                 onFocus={() => checkPrerequisite('joiningDate')}
                 onChange={(e) => handleJoiningDateChange(e.target.value)}
-                className={styles.inputField}
+                className={`${styles.inputField} ${formData.joiningDate ? styles.inputValid : ''}`}
               />
               <span style={{ fontSize: '11px', color: '#94a3b8' }}>Past dates not allowed (Min: {todayStr})</span>
             </div>
@@ -808,7 +807,7 @@ www.shortfundly.com`;
                 value={formData.endDate}
                 onFocus={() => checkPrerequisite('endDate')}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className={styles.inputField}
+                className={`${styles.inputField} ${formData.endDate ? styles.inputValid : ''}`}
               />
               <span style={{ fontSize: '11px', color: '#94a3b8' }}>Must be on or after joining date</span>
             </div>
@@ -825,7 +824,7 @@ www.shortfundly.com`;
                 value={formData.deadline}
                 onFocus={() => checkPrerequisite('deadline')}
                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                className={styles.inputField}
+                className={`${styles.inputField} ${formData.deadline ? styles.inputValid : ''}`}
               />
               <span style={{ fontSize: '11px', color: '#94a3b8' }}>Link automatically locks after this date/time</span>
             </div>
