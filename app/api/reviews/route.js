@@ -174,14 +174,14 @@ export async function POST(request) {
       if (activeTask) {
         await prisma.taskReview.create({
           data: {
-            taskId: activeTask.id,
+            taskAssignmentId: activeTask.id,
             reviewNumber: Number(reviewNumber),
             reviewDate: scheduledDate,
             reviewTime: reviewTime,
             meetLink: meetLink,
             feedback: customNotes || `Review #${reviewNumber} scheduled (${meetMode === 'BATCH' ? 'Batch-wise Session' : 'Individual 1-on-1'}). Please prepare demonstration and GitHub repository.`,
-            score: 50.0,
-            status: 'Scheduled',
+            scoreAwarded: 50.0,
+            sentAt: new Date(),
           },
         });
 

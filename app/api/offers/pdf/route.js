@@ -23,6 +23,8 @@ export async function GET(request) {
           { offerAcceptanceToken: token },
           { offerAcceptanceTokenHash: tokenHash },
           { id: token },
+          { candidateId: token },
+          { internId: token },
         ],
       },
     });

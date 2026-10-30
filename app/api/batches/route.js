@@ -4,43 +4,70 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request) {
   try {
+    const defaultRoles = [
+      'Web Developer Intern',
+      'AI Engineer',
+      'Frontend Developer',
+      'Backend Developer',
+      'Full Stack Intern',
+      'UI/UX Designer',
+      'Data Science Intern',
+    ];
+
+    // Standard default batches
+    const standardBatchNames = ['Batch A', 'Batch B', 'Batch C', 'Batch D', 'Batch E', 'Solo Interns'];
+
+    // Discover any custom batches assigned to candidates in DB
+    const candidateBatches = await prisma.candidate.findMany({
+      where: { batch: { not: null } },
+      select: { batch: true },
+      distinct: ['batch'],
+    });
+
+    const discoveredNames = candidateBatches.map(c => c.batch).filter(Boolean);
+    const allBatchNamesToEnsure = Array.from(new Set([...standardBatchNames, ...discoveredNames]));
+
+    // Fetch existing batches from DB
+    const existingBatches = await prisma.internshipBatch.findMany({
+      include: {
+        _count: {
+          select: { candidates: true },
+        },
+      },
+    });
+
+    const existingNames = new Set(existingBatches.map(b => b.batchName));
+
+    // Auto-create any missing standard or discovered candidate batches
+    for (const bName of allBatchNamesToEnsure) {
+      if (!existingNames.has(bName)) {
+        try {
+          await prisma.internshipBatch.create({
+            data: {
+              batchName: bName,
+              roles: JSON.stringify(defaultRoles),
+              stipend: 'Rs. 10,000',
+              joiningDate: new Date().toISOString().split('T')[0],
+              endDate: new Date(Date.now() + 90 * 86400000).toISOString().split('T')[0],
+              duration: '3 Months',
+              status: 'Active',
+            },
+          });
+        } catch (createErr) {
+          // Ignore unique collision if created concurrently
+        }
+      }
+    }
+
+    // Return all consolidated batches sorted
     const batches = await prisma.internshipBatch.findMany({
       include: {
         _count: {
           select: { candidates: true },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { batchName: 'asc' },
     });
-
-    if (batches.length === 0) {
-      const defaultRoles = [
-        'Web Developer Intern',
-        'AI Engineer Intern',
-        'UI/UX Designer Intern',
-        'Data Science Intern',
-        'Backend Engineer Intern',
-        'Full Stack Intern',
-        'Digital Marketing Intern',
-      ];
-      const batchA = await prisma.internshipBatch.create({
-        data: {
-          batchName: 'Batch A',
-          roles: JSON.stringify(defaultRoles),
-          stipend: 'Rs. 10,000',
-          joiningDate: '2026-06-01',
-          endDate: '2026-08-31',
-          duration: '3 Months',
-          status: 'Active',
-        },
-        include: {
-          _count: {
-            select: { candidates: true },
-          },
-        },
-      });
-      return NextResponse.json({ success: true, batches: [batchA] });
-    }
 
     return NextResponse.json({ success: true, batches });
   } catch (error) {
@@ -138,6 +165,25 @@ export async function PUT(request) {
     return NextResponse.json({ success: true, batch });
   } catch (error) {
     console.error('Error updating batch:', error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const batchName = searchParams.get('batchName');
+
+    if (!id && !batchName) {
+      return NextResponse.json({ success: false, error: 'Batch ID or Batch Name is required.' }, { status: 400 });
+    }
+
+    const where = id ? { id } : { batchName };
+    await prisma.internshipBatch.delete({ where });
+
+    return NextResponse.json({ success: true, message: 'Batch removed successfully.' });
+  } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

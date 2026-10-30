@@ -22,7 +22,10 @@ import {
   Activity,
   ExternalLink,
   Calendar,
+  FileSpreadsheet,
+  Download,
 } from 'lucide-react';
+import * as xlsx from 'xlsx';
 import { renderJinja, jinjaTextToEmailHtml } from '../lib/jinjaEngine.js';
 
 function generateClientMeetUrl() {
@@ -42,6 +45,7 @@ export default function TaskAssignmentView({
   // Filter States
   const [selectedBatch, setSelectedBatch] = useState('ALL');
   const [selectedRole, setSelectedRole] = useState('ALL');
+  const [selectedTaskNumberFilter, setSelectedTaskNumberFilter] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Interns Selection
@@ -49,6 +53,17 @@ export default function TaskAssignmentView({
   const [selectedTemplateId, setSelectedTemplateId] = useState('');
   const [taskTemplates, setTaskTemplates] = useState([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
+
+  // Consolidated dynamic batches (A, B, C, D, E, Solo Interns, and custom batches)
+  const allBatches = useMemo(() => {
+    const set = new Set();
+    ['Batch A', 'Batch B', 'Batch C', 'Batch D', 'Batch E', 'Solo Interns'].forEach(b => set.add(b));
+    batches.forEach(b => set.add(typeof b === 'string' ? b : b.batchName));
+    candidates.forEach(c => {
+      if (c.batch) set.add(c.batch);
+    });
+    return Array.from(set).filter(Boolean).sort();
+  }, [batches, candidates]);
 
   // Assignment Modal & Dual Assignment Modes
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -263,6 +278,11 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       if (c.isLeaved) return false;
       if (selectedBatch !== 'ALL' && c.batch !== selectedBatch) return false;
       if (selectedRole !== 'ALL' && c.role !== selectedRole) return false;
+      if (selectedTaskNumberFilter !== 'ALL') {
+        const activeTask = c.tasks?.[0];
+        const num = activeTask ? activeTask.taskNumber : ((c.tasksCompleted || 0) + 1);
+        if (String(num) !== String(selectedTaskNumberFilter)) return false;
+      }
       if (searchTerm) {
         const term = searchTerm.toLowerCase();
         const nameMatch = c.fullName?.toLowerCase().includes(term);
@@ -272,7 +292,65 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       }
       return true;
     });
-  }, [cleanCandidates, selectedBatch, selectedRole, searchTerm]);
+  }, [cleanCandidates, selectedBatch, selectedRole, selectedTaskNumberFilter, searchTerm]);
+
+  // Export task milestones as Excel / CSV with exact columns:
+  // Intern ID, Name, Email ID, Task ID, Task Number, Task Title, batch, role, Review Number, Feedback, Performance Score
+  const handleExportTaskReviewTemplate = (format = 'xlsx') => {
+    const targets = selectedCandidateIds.length > 0
+      ? filteredCandidates.filter(c => selectedCandidateIds.includes(c.id))
+      : filteredCandidates;
+
+    if (targets.length === 0) {
+      showToast?.('No candidate task records found matching selected filters.', 'warning');
+      return;
+    }
+
+    try {
+      const currentTemplate = taskTemplates.find(t => t.id === selectedTemplateId) || taskTemplates[0];
+
+      const rows = targets.map((c) => {
+        const activeTask = c.tasks?.[0];
+        const taskNum = activeTask ? activeTask.taskNumber : ((c.tasksCompleted || 0) + 1);
+        const taskId = activeTask?.taskId || currentTemplate?.taskId || `TSK-INT-${(c.internId || '001').slice(-4)}`;
+        const taskTitle = activeTask?.title || activeTask?.taskName || currentTemplate?.title || 'Core Technical Milestone';
+        const nextReviewNum = (activeTask?.reviews?.length || 0) >= 1 ? (activeTask.reviews.length + 1) : 2;
+
+        return {
+          'Intern ID': c.internId || c.candidateId,
+          'Name': c.fullName,
+          'Email ID': c.email,
+          'Task ID': taskId,
+          'Task Number': taskNum,
+          'Task Title': taskTitle,
+          'batch': c.batch || 'Batch A',
+          'role': c.role,
+          'Review Number': nextReviewNum,
+          'Feedback': 'Sprint deliverables reviewed. Architecture and test execution verified.',
+          'Performance Score': 85.0,
+        };
+      });
+
+      const worksheet = xlsx.utils.json_to_sheet(rows);
+      const workbook = xlsx.utils.book_new();
+      xlsx.utils.book_append_sheet(workbook, worksheet, 'Review_Feedback_Template');
+
+      const batchSlug = selectedBatch === 'ALL' ? 'AllBatches' : selectedBatch.replace(/[^a-zA-Z0-9]/g, '_');
+      const roleSlug = selectedRole === 'ALL' ? 'AllRoles' : selectedRole.replace(/[^a-zA-Z0-9]/g, '_');
+      const taskSlug = selectedTaskNumberFilter === 'ALL' ? 'AllTasks' : `Task${selectedTaskNumberFilter}`;
+      const fileName = `Shortfundly_Tasks_${batchSlug}_${roleSlug}_${taskSlug}_${new Date().toISOString().split('T')[0]}.${format}`;
+
+      if (format === 'csv') {
+        xlsx.writeFile(workbook, fileName, { bookType: 'csv' });
+      } else {
+        xlsx.writeFile(workbook, fileName, { bookType: 'xlsx' });
+      }
+      showToast?.(`Exported review feedback template with ${targets.length} interns! Ready to edit & upload in Reviews.`, 'success');
+    } catch (err) {
+      console.error('Export error:', err);
+      showToast?.(`Failed to export review template: ${err.message}`, 'error');
+    }
+  };
 
   // Handle Select All / Deselect All
   const handleToggleSelectAll = () => {
@@ -660,8 +738,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               className={styles.selectInput}
             >
               <option value="ALL">All Batches</option>
-              {batches.map((b) => (
-                <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>
+              {allBatches.map((bName) => (
+                <option key={bName} value={bName}>{bName}</option>
               ))}
             </select>
 
@@ -677,6 +755,18 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               <option value="Full Stack Intern">Full Stack Intern</option>
               <option value="AI/ML Engineer">AI/ML Engineer</option>
               <option value="UI/UX Designer">UI/UX Designer</option>
+            </select>
+
+            <select
+              value={selectedTaskNumberFilter}
+              onChange={(e) => setSelectedTaskNumberFilter(e.target.value)}
+              className={styles.selectInput}
+            >
+              <option value="ALL">All Task Numbers</option>
+              <option value="1">Task #1</option>
+              <option value="2">Task #2</option>
+              <option value="3">Task #3</option>
+              <option value="4">Task #4</option>
             </select>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -712,6 +802,18 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   <span>View Task</span>
                 </button>
               </div>
+
+              <button
+                type="button"
+                onClick={() => handleExportTaskReviewTemplate('xlsx')}
+                disabled={filteredCandidates.length === 0}
+                className={styles.btnSecondary}
+                style={{ fontSize: '12px', padding: '7px 13px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                title="Export tasks with columns: Intern ID, Name, Email ID, Task ID, Task Number, Task Title, batch, role, Review Number, Feedback, Score"
+              >
+                <FileSpreadsheet size={13} color="#34d399" />
+                <span>Export Review Template ({filteredCandidates.length})</span>
+              </button>
 
               <button
                 type="button"
@@ -1030,8 +1132,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 className={styles.selectInput}
               >
                 <option value="ALL">All Batches</option>
-                {batches.map((b) => (
-                  <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>
+                {allBatches.map((bName) => (
+                  <option key={bName} value={bName}>{bName}</option>
                 ))}
               </select>
 
@@ -1266,8 +1368,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               className={styles.selectInput}
             >
               <option value="ALL">All Batches</option>
-              {batches.map((b) => (
-                <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>
+              {allBatches.map((bName) => (
+                <option key={bName} value={bName}>{bName}</option>
               ))}
             </select>
 

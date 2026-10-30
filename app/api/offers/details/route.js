@@ -5,6 +5,24 @@ import { prisma } from '@/lib/prisma.js';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+function parseFlexibleDate(input) {
+  if (!input) return null;
+  if (input instanceof Date) return isNaN(input.getTime()) ? null : input;
+  const str = String(input).trim();
+  const dmyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if (dmyMatch) {
+    const day = parseInt(dmyMatch[1], 10);
+    const month = parseInt(dmyMatch[2], 10) - 1;
+    const year = parseInt(dmyMatch[3], 10);
+    const hours = dmyMatch[4] ? parseInt(dmyMatch[4], 10) : 23;
+    const minutes = dmyMatch[5] ? parseInt(dmyMatch[5], 10) : 59;
+    const d = new Date(year, month, day, hours, minutes);
+    if (!isNaN(d.getTime())) return d;
+  }
+  const parsed = new Date(str);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -22,6 +40,8 @@ export async function GET(request) {
           { offerAcceptanceToken: token },
           { offerAcceptanceTokenHash: tokenHash },
           { id: token },
+          { candidateId: token },
+          { internId: token },
         ],
       },
       include: {
@@ -33,12 +53,12 @@ export async function GET(request) {
       return NextResponse.json({ success: false, error: 'Invalid or expired offer link.' }, { status: 404 });
     }
 
-    let deadline = candidate.offerDeadline;
+    let deadline = candidate.offerDeadline ? parseFlexibleDate(candidate.offerDeadline) : null;
     if (!deadline) {
       deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     }
 
-    const isExpired = Boolean(candidate.offerDeadline && Date.now() > new Date(candidate.offerDeadline).getTime());
+    const isExpired = Boolean(deadline && Date.now() > deadline.getTime());
     const alreadyResponded = candidate.offerLetterStatus === 'Accepted' || candidate.offerLetterStatus.startsWith('Rejected');
 
     return NextResponse.json({

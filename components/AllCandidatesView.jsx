@@ -17,8 +17,12 @@ import {
   RotateCcw,
   X,
   Trash2,
-  Undo2
+  Undo2,
+  Download,
+  FileSpreadsheet,
+  Plus
 } from 'lucide-react';
+import * as xlsx from 'xlsx';
 
 export default function AllCandidatesView({
   candidates = [],
@@ -30,6 +34,18 @@ export default function AllCandidatesView({
   const [selectedRole, setSelectedRole] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL'); // 'ALL' | 'ACTIVE' | 'LEAVED'
   const [searchTerm, setSearchTerm] = useState('');
+  const [exporting, setExporting] = useState(false);
+
+  // Consolidated dynamic batches (A, B, C, D, E, Solo Interns, and custom candidate batches)
+  const allBatches = useMemo(() => {
+    const set = new Set();
+    ['Batch A', 'Batch B', 'Batch C', 'Batch D', 'Batch E', 'Solo Interns'].forEach(b => set.add(b));
+    batches.forEach(b => set.add(typeof b === 'string' ? b : b.batchName));
+    candidates.forEach(c => {
+      if (c.batch) set.add(c.batch);
+    });
+    return Array.from(set).filter(Boolean).sort();
+  }, [batches, candidates]);
 
   // Departure Modal
   const [leavingCandidate, setLeavingCandidate] = useState(null);
@@ -69,6 +85,91 @@ export default function AllCandidatesView({
       return true;
     });
   }, [candidates, selectedBatch, selectedRole, selectedStatus, searchTerm, hiddenCandidateIds]);
+
+  // Export filtered candidates to Excel (.xlsx) or CSV with ALL intern details
+  const handleExportCandidates = (format = 'xlsx') => {
+    if (filteredCandidates.length === 0) {
+      showToast?.('No candidates match the active filters to export.', 'warning');
+      return;
+    }
+
+    try {
+      setExporting(true);
+      const rows = filteredCandidates.map((c) => ({
+        'Intern ID': c.internId || c.candidateId,
+        'Candidate Name': c.fullName,
+        'Email Address': c.email,
+        'Phone Number': c.phone || '',
+        'Role / Designation': c.role,
+        'College Name': c.collegeName || '',
+        'Degree': c.degree || '',
+        'Department': c.department || 'Engineering',
+        'Batch': c.batch || 'Batch A',
+        'Tenure Start Date': c.joiningDate || '',
+        'Tenure End Date': c.endDate || '',
+        'Internship Duration': c.duration || '3 Months',
+        'Monthly Stipend': c.stipend || 'Rs. 10,000',
+        'Work Mode': c.workMode || 'Virtual / Remote',
+        'Reporting Manager': c.reportingManager || 'Priyanka Nair',
+        'Assigned Mentor': c.assignedMentor || 'Rahul Kapoor',
+        'Offer Letter Status': c.offerLetterStatus || 'Accepted',
+        'Task Status': c.taskStatus || 'Not Assigned',
+        'Tasks Completed': c.tasksCompleted || 0,
+        'Performance Score (%)': `${(c.performancePercentage ?? 100).toFixed(1)}%`,
+        'Internship Status': c.isLeaved ? 'Leaved' : 'Active',
+        'Departure Date': c.leavedAt ? new Date(c.leavedAt).toLocaleDateString() : '',
+        'Departure Reason': c.leaveReason || '',
+        'Google Meet Link': c.googleMeetUrl || '',
+      }));
+
+      const worksheet = xlsx.utils.json_to_sheet(rows);
+      const workbook = xlsx.utils.book_new();
+      xlsx.utils.book_append_sheet(workbook, worksheet, 'Interns_Directory');
+
+      const batchSlug = selectedBatch === 'ALL' ? 'AllBatches' : selectedBatch.replace(/[^a-zA-Z0-9]/g, '_');
+      const roleSlug = selectedRole === 'ALL' ? 'AllRoles' : selectedRole.replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = `Shortfundly_Interns_${batchSlug}_${roleSlug}_${new Date().toISOString().split('T')[0]}.${format}`;
+
+      if (format === 'csv') {
+        xlsx.writeFile(workbook, fileName, { bookType: 'csv' });
+      } else {
+        xlsx.writeFile(workbook, fileName, { bookType: 'xlsx' });
+      }
+      showToast?.(`Successfully exported ${filteredCandidates.length} candidate(s) to ${fileName}!`, 'success');
+    } catch (err) {
+      console.error('Export error:', err);
+      showToast?.(`Failed to export candidates: ${err.message}`, 'error');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // Inline Batch Customization / Edit
+  const handleChangeCandidateBatch = async (candidateId, targetBatchName) => {
+    let finalBatch = targetBatchName;
+    if (targetBatchName === '__NEW__') {
+      const customName = window.prompt('Enter new custom batch name (e.g. Batch E, Solo Interns):');
+      if (!customName || !customName.trim()) return;
+      finalBatch = customName.trim();
+    }
+
+    try {
+      const res = await fetch('/api/candidates/reorganize-batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ candidateId, targetBatchName: finalBatch }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast?.(`Candidate assigned to "${finalBatch}" successfully!`, 'success');
+        onRefresh?.();
+      } else {
+        showToast?.(data.error || 'Failed to update batch.', 'error');
+      }
+    } catch (err) {
+      showToast?.(err.message, 'error');
+    }
+  };
 
   // Open Leave Modal
   const handleOpenLeaveModal = (cand) => {
@@ -237,8 +338,8 @@ export default function AllCandidatesView({
           className={styles.selectInput}
         >
           <option value="ALL">All Batches</option>
-          {batches.map((b) => (
-            <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>
+          {allBatches.map((bName) => (
+            <option key={bName} value={bName}>{bName}</option>
           ))}
         </select>
 
@@ -269,10 +370,36 @@ export default function AllCandidatesView({
 
       {/* Candidate Ledger Table */}
       <div className={styles.tableCard}>
-        <div className={styles.tableHeaderRow}>
+        <div className={styles.tableHeaderRow} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           <strong style={{ color: '#ffffff', fontSize: '14px' }}>
-            Showing {filteredCandidates.length} Candidates
+            Showing {filteredCandidates.length} Candidates {selectedBatch !== 'ALL' ? `(${selectedBatch})` : ''} {selectedRole !== 'ALL' ? `• ${selectedRole}` : ''}
           </strong>
+
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => handleExportCandidates('xlsx')}
+              disabled={exporting || filteredCandidates.length === 0}
+              className={styles.btnSecondary}
+              style={{ fontSize: '12px', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              title="Export filtered candidates to Excel with all intern details"
+            >
+              <FileSpreadsheet size={14} color="#34d399" />
+              <span>Export Excel ({filteredCandidates.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleExportCandidates('csv')}
+              disabled={exporting || filteredCandidates.length === 0}
+              className={styles.btnSecondary}
+              style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              title="Export filtered candidates to CSV with all intern details"
+            >
+              <Download size={14} color="#38bdf8" />
+              <span>Export CSV</span>
+            </button>
+          </div>
         </div>
 
         <div className={styles.tableResponsive}>
@@ -316,7 +443,26 @@ export default function AllCandidatesView({
                       <div style={{ fontSize: '11px', color: '#71717a' }}>{c.phone || '-'}</div>
                     </td>
                     <td>
-                      <span className={styles.badgePurple}>{c.batch || 'Batch A'}</span>
+                      <select
+                        value={c.batch || 'Batch A'}
+                        onChange={(e) => handleChangeCandidateBatch(c.id, e.target.value)}
+                        style={{
+                          background: '#12111a',
+                          border: '1px solid #3b335c',
+                          color: '#c084fc',
+                          borderRadius: '6px',
+                          padding: '3px 8px',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                        title="Click to change or customize batch for this intern"
+                      >
+                        {allBatches.map(bName => (
+                          <option key={bName} value={bName}>{bName}</option>
+                        ))}
+                        <option value="__NEW__">+ Custom Batch...</option>
+                      </select>
                     </td>
                     <td style={{ fontSize: '11.5px', color: '#94a3b8' }}>
                       <div>{c.joiningDate}</div>

@@ -485,6 +485,10 @@ export default function DashboardPage() {
       const data = await safeFetchJson('/api/batches');
       if (data?.success && data?.batches) {
         setBatches(data.batches);
+        const names = data.batches.map(b => b.batchName || b).filter(Boolean);
+        if (names.length > 0) {
+          setAvailableBatches((prev) => Array.from(new Set([...prev, ...names])));
+        }
       }
     } catch (err) {
       console.warn('Failed to load batches:', err.message);
@@ -703,6 +707,10 @@ export default function DashboardPage() {
       const data = await safeFetchJson('/api/candidates?limit=200');
       if (data?.success && data?.data) {
         setCandidates(data.data);
+        const candBatches = data.data.map(c => c.batch).filter(Boolean);
+        if (candBatches.length > 0) {
+          setAvailableBatches((prev) => Array.from(new Set([...prev, ...candBatches])));
+        }
       }
     } catch (err) {
       console.warn('Error loading candidates:', err.message);
@@ -1371,26 +1379,34 @@ export default function DashboardPage() {
       return;
     }
     const clean = newBatchNameInput.trim();
-    if (availableBatches.includes(clean)) {
-      showToast(`Batch "${clean}" already exists.`, 'info');
-      setSelectedBulkBatchTarget(clean);
-      setNewBatchNameInput('');
-      return;
+    if (!availableBatches.includes(clean)) {
+      setAvailableBatches((prev) => [...prev, clean]);
     }
-    setAvailableBatches((prev) => [...prev, clean]);
     setSelectedBulkBatchTarget(clean);
     setNewBatchNameInput('');
-    showToast(`Created new batch "${clean}". You can now assign candidates to it.`, 'success');
+    if (selectedCandidateKeys.size > 0) {
+      handleApplyBatchToSelected(clean);
+      showToast(`Created new batch "${clean}" and assigned to ${selectedCandidateKeys.size} selected candidate(s)!`, 'success');
+    } else {
+      showToast(`Created new batch "${clean}". You can now assign candidates to it.`, 'success');
+    }
   };
 
   const handleUpdateCandidateBatch = (candidateId, newBatch) => {
+    let finalBatch = newBatch;
+    if (newBatch === '__NEW_CUSTOM_BATCH__') {
+      const custom = window.prompt('Enter new custom batch name (e.g. Batch C, Batch D, Solo Interns):');
+      if (!custom || !custom.trim()) return;
+      finalBatch = custom.trim();
+      setAvailableBatches((prev) => Array.from(new Set([...prev, finalBatch])));
+    }
     if (!bulkValidationReport || !bulkValidationReport.rows) return;
     const updatedRows = bulkValidationReport.rows.map((r) => {
       if (r.candidateId === candidateId) {
         return {
           ...r,
-          batch: newBatch,
-          raw: { ...(r.raw || {}), batch: newBatch },
+          batch: finalBatch,
+          raw: { ...(r.raw || {}), batch: finalBatch },
         };
       }
       return r;
@@ -1399,7 +1415,7 @@ export default function DashboardPage() {
       ...prev,
       rows: updatedRows,
     }));
-    showToast(`Updated candidate batch to "${newBatch}"`, 'info');
+    showToast(`Updated candidate batch to "${finalBatch}"`, 'info');
   };
 
   const handleApplyBatchToSelected = (targetBatch) => {
@@ -2175,6 +2191,9 @@ export default function DashboardPage() {
                                         {row.batch}
                                       </option>
                                     )}
+                                    <option value="__NEW_CUSTOM_BATCH__" style={{ background: '#2e1065', color: '#c084fc', fontWeight: 'bold' }}>
+                                      + Create / Custom Batch...
+                                    </option>
                                   </select>
                                 </td>
                                 <td>

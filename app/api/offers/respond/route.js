@@ -6,6 +6,24 @@ import { sendEmail } from '@/lib/mailer.js';
 
 export const dynamic = 'force-dynamic';
 
+function parseFlexibleDate(input) {
+  if (!input) return null;
+  if (input instanceof Date) return isNaN(input.getTime()) ? null : input;
+  const str = String(input).trim();
+  const dmyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if (dmyMatch) {
+    const day = parseInt(dmyMatch[1], 10);
+    const month = parseInt(dmyMatch[2], 10) - 1;
+    const year = parseInt(dmyMatch[3], 10);
+    const hours = dmyMatch[4] ? parseInt(dmyMatch[4], 10) : 23;
+    const minutes = dmyMatch[5] ? parseInt(dmyMatch[5], 10) : 59;
+    const d = new Date(year, month, day, hours, minutes);
+    if (!isNaN(d.getTime())) return d;
+  }
+  const parsed = new Date(str);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -30,6 +48,8 @@ export async function POST(request) {
           { offerAcceptanceToken: token },
           { offerAcceptanceTokenHash: tokenHash },
           { id: token },
+          { candidateId: token },
+          { internId: token },
         ],
       },
     });
@@ -49,12 +69,12 @@ export async function POST(request) {
     }
 
     // Verify deadline - strictly expires only after deadline timestamp
-    let deadline = candidate.offerDeadline;
+    let deadline = candidate.offerDeadline ? parseFlexibleDate(candidate.offerDeadline) : null;
     if (!deadline) {
       deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     }
 
-    if (candidate.offerDeadline && Date.now() > new Date(candidate.offerDeadline).getTime()) {
+    if (deadline && Date.now() > deadline.getTime()) {
       return NextResponse.json({
         success: false,
         error: 'The decision deadline for this internship offer has expired. Please contact Shortfundly HR (hr@shortfundly.com) for assistance.',

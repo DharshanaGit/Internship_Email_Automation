@@ -10,6 +10,24 @@ import {
   buildCandidateResponseUrl,
 } from '@/lib/offerService';
 
+function parseFlexibleDate(input) {
+  if (!input) return null;
+  if (input instanceof Date) return isNaN(input.getTime()) ? null : input;
+  const str = String(input).trim();
+  const dmyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if (dmyMatch) {
+    const day = parseInt(dmyMatch[1], 10);
+    const month = parseInt(dmyMatch[2], 10) - 1;
+    const year = parseInt(dmyMatch[3], 10);
+    const hours = dmyMatch[4] ? parseInt(dmyMatch[4], 10) : 23;
+    const minutes = dmyMatch[5] ? parseInt(dmyMatch[5], 10) : 59;
+    const d = new Date(year, month, day, hours, minutes);
+    if (!isNaN(d.getTime())) return d;
+  }
+  const parsed = new Date(str);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -149,7 +167,7 @@ export async function POST(request) {
     const deadlineInput = deadline || commonDeadline;
     let deadlineDate = null;
     if (deadlineInput) {
-      const parsed = new Date(deadlineInput);
+      const parsed = parseFlexibleDate(deadlineInput);
       if (!isNaN(parsed.getTime()) && parsed.getTime() > Date.now()) {
         deadlineDate = parsed;
       }

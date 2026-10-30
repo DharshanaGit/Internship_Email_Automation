@@ -78,6 +78,17 @@ export default function UnifiedEmailTracker({
     });
   }, [emails, selectedCategory, selectedBatch, searchTerm]);
 
+  // Consolidated dynamic batches (ensuring A, B, C, D, E, Solo Interns, and any custom batches are included)
+  const allBatches = useMemo(() => {
+    const set = new Set();
+    ['Batch A', 'Batch B', 'Batch C', 'Batch D', 'Batch E', 'Solo Interns'].forEach(b => set.add(b));
+    batches.forEach(b => set.add(typeof b === 'string' ? b : b.batchName));
+    emails.forEach(e => {
+      if (e.candidate?.batch) set.add(e.candidate.batch);
+    });
+    return Array.from(set).filter(Boolean).sort();
+  }, [batches, emails]);
+
   // Telemetry metric counts
   const offerCount = emails.filter(e => (e.emailType || '').includes('OFFER')).length;
   const taskCount = emails.filter(e => (e.emailType || '').includes('TASK') && !(e.emailType || '').includes('WARNING')).length;
@@ -178,8 +189,8 @@ export default function UnifiedEmailTracker({
           className={styles.selectInput}
         >
           <option value="ALL">All Batches</option>
-          {batches.map((b) => (
-            <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>
+          {allBatches.map((bName) => (
+            <option key={bName} value={bName}>{bName}</option>
           ))}
         </select>
       </div>

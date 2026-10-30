@@ -19,23 +19,31 @@ export async function POST(request) {
     for (const row of rows) {
       const internId = (row['Intern ID'] || row.internId || row.InternId || row['Candidate ID'] || row.candidateId || '').toString().trim();
       const name = (row['Name'] || row.name || row['Candidate Name'] || row.candidateName || '').toString().trim();
+      const email = (row['Email ID'] || row['Email'] || row.email || row.EmailId || row['Email Address'] || '').toString().trim();
       const taskId = (row['Task ID'] || row.taskId || row.TaskId || '').toString().trim();
       const taskNumber = parseInt(row['Task Number'] || row.taskNumber || 1, 10);
-      const reviewNumber = parseInt(row['Review Number'] || row.reviewNumber || 1, 10);
+      const taskTitle = (row['Task Title'] || row['Task Name'] || row.taskTitle || row.title || '').toString().trim();
+      const batch = (row['batch'] || row['Batch'] || row.batch || '').toString().trim();
+      const role = (row['role'] || row['Role'] || row.role || '').toString().trim();
+      const reviewNumber = parseInt(row['Review Number'] || row.reviewNumber || 2, 10);
       const feedback = (row['Feedback'] || row.feedback || row['Notes'] || '').toString().trim();
       const rawScore = parseFloat(row['Performance Score'] || row['Performance Percentage'] || row.performancePercentage || row.score || 100);
       const score = isNaN(rawScore) ? 100 : Math.min(100, Math.max(0, rawScore));
 
-      if (!internId) continue;
+      if (!internId && !email) continue;
 
-      // Find candidate
+      // Find candidate by internId, candidateId, or email
+      const candidateWhere = [];
+      if (internId) {
+        candidateWhere.push({ internId });
+        candidateWhere.push({ candidateId: internId });
+      }
+      if (email) {
+        candidateWhere.push({ email: { equals: email, mode: 'insensitive' } });
+      }
+
       const candidate = await prisma.candidate.findFirst({
-        where: {
-          OR: [
-            { internId },
-            { candidateId: internId },
-          ],
-        },
+        where: { OR: candidateWhere },
         include: {
           tasks: {
             orderBy: { taskNumber: 'desc' },
@@ -45,12 +53,14 @@ export async function POST(request) {
       });
 
       if (!candidate) {
-        results.push({ internId, name, success: false, error: 'Candidate not found in database.' });
+        results.push({ internId: internId || email, name, success: false, error: 'Candidate not found in database.' });
         continue;
       }
 
       const activeTask = candidate.tasks[0];
       const meetLink = activeTask?.meetLink || candidate.googleMeetUrl || 'https://meet.google.com/new';
+      const resolvedTaskTitle = taskTitle || activeTask?.title || activeTask?.taskName || 'Core Technical Milestone';
+      const resolvedTaskId = taskId || activeTask?.taskId || `TSK-INT-${(candidate.internId || 'DEV').slice(-4)}`;
 
       // Record feedback review in DB
       if (activeTask) {
@@ -73,15 +83,17 @@ export async function POST(request) {
             performanceScore: score,
             feedback,
             status: `Review ${reviewNumber} Completed`,
+            title: resolvedTaskTitle,
           },
         });
       }
 
-      // Update candidate cumulative performance score
+      // Update candidate cumulative performance score and batch if provided
       await prisma.candidate.update({
         where: { id: candidate.id },
         data: {
           performancePercentage: score,
+          ...(batch ? { batch } : {}),
         },
       });
 
@@ -89,9 +101,11 @@ export async function POST(request) {
         ? customJinjaTemplate
             .replace(/\{\{\s*candidateName\s*\}\}/g, candidate.fullName)
             .replace(/\{\{\s*internId\s*\}\}/g, candidate.internId || candidate.candidateId)
-            .replace(/\{\{\s*role\s*\}\}/g, candidate.role)
+            .replace(/\{\{\s*role\s*\}\}/g, role || candidate.role)
+            .replace(/\{\{\s*batch\s*\}\}/g, batch || candidate.batch || 'Batch A')
             .replace(/\{\{\s*taskNumber\s*\}\}/g, String(taskNumber))
-            .replace(/\{\{\s*taskId\s*\}\}/g, taskId || activeTask?.taskId || 'TSK-ACTIVE')
+            .replace(/\{\{\s*taskId\s*\}\}/g, resolvedTaskId)
+            .replace(/\{\{\s*taskTitle\s*\}\}/g, resolvedTaskTitle)
             .replace(/\{\{\s*reviewNumber\s*\}\}/g, String(reviewNumber))
             .replace(/\{\{\s*reviewDate\s*\}\}/g, scheduledDate)
             .replace(/\{\{\s*reviewTime\s*\}\}/g, reviewTime)
@@ -100,12 +114,14 @@ export async function POST(request) {
             .replace(/\{\{\s*meetLink\s*\}\}/g, meetLink)
         : `Dear ${candidate.fullName},
 
-Your evaluation feedback for **Milestone Review #${reviewNumber}** (Task #${taskNumber}) has been finalized.
+Your evaluation feedback for **Milestone Review #${reviewNumber}** (Task #${taskNumber}: ${resolvedTaskTitle}) has been finalized.
 
 **Evaluation & Review Summary:**
 - **Intern ID:** ${candidate.internId || candidate.candidateId}
 - **Assigned Role:** ${candidate.role}
-- **Task ID:** ${taskId || activeTask?.taskId || 'TSK-ACTIVE'}
+- **Batch:** ${batch || candidate.batch || 'Batch A'}
+- **Task ID:** ${resolvedTaskId}
+- **Task Title:** ${resolvedTaskTitle}
 - **Review Session Date:** **${scheduledDate}** at **${reviewTime}**
 - **Awarded Milestone Score:** **${score.toFixed(1)}%**
 - **Assigned Google Meet Link:** [${meetLink}](${meetLink})
@@ -118,7 +134,7 @@ Warm regards,
 Shortfundly Media Technologies Pvt. Ltd.`;
 
       const htmlBody = jinjaTextToEmailHtml(jinjaContent);
-      const subject = `Review #${reviewNumber} Evaluation & Feedback - Task #${taskNumber} | ${candidate.fullName}`;
+      const subject = `Review #${reviewNumber} Evaluation & Feedback - Task #${taskNumber} (${resolvedTaskTitle}) | ${candidate.fullName}`;
 
       const dispatch = await sendEmail({
         to: candidate.email,

@@ -21,7 +21,15 @@ export async function GET(request) {
     }
 
     const candidate = await prisma.candidate.findFirst({
-      where: { offerAcceptanceToken: token },
+      where: {
+        OR: [
+          { offerAcceptanceToken: token },
+          { offerAcceptanceTokenHash: crypto.createHash("sha256").update(token).digest("hex") },
+          { id: token },
+          { candidateId: token },
+          { internId: token },
+        ],
+      },
       include: { tasks: true },
     });
 

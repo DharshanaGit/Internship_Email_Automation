@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './web3Deck.module.css';
 import {
   Users,
@@ -20,8 +20,12 @@ import {
   RefreshCw,
   Mail,
   X,
-  Award
+  Award,
+  Calendar,
+  Download,
+  FileSpreadsheet
 } from 'lucide-react';
+import * as xlsx from 'xlsx';
 import { renderJinja, jinjaTextToEmailHtml } from '../lib/jinjaEngine.js';
 
 export default function ReviewDashboardView({
@@ -30,6 +34,10 @@ export default function ReviewDashboardView({
   showToast,
 }) {
   const [subTab, setSubTab] = useState('review-queue'); // 'review-queue' | 'schedule-r1' | 'feedback-upload' | 'checkpoint' | 'warning'
+
+  // Refs for visible date pickers
+  const scheduleDateRef = useRef(null);
+  const feedbackDateRef = useRef(null);
 
   // Filter States
   const [selectedBatch, setSelectedBatch] = useState('ALL');
@@ -42,6 +50,15 @@ export default function ReviewDashboardView({
   const [suggestedReviewDate, setSuggestedReviewDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedCandidateIds, setSelectedCandidateIds] = useState([]);
+
+  // Consolidated dynamic batches (A, B, C, D, E, Solo Interns, and candidate batches)
+  const allBatches = useMemo(() => {
+    const set = new Set();
+    ['Batch A', 'Batch B', 'Batch C', 'Batch D', 'Batch E', 'Solo Interns'].forEach(b => set.add(b));
+    batches.forEach(b => set.add(typeof b === 'string' ? b : b.batchName));
+    candidates.forEach(c => { if (c.batch) set.add(c.batch); });
+    return Array.from(set).filter(Boolean).sort();
+  }, [batches, candidates]);
 
   // Generate standard 3-4-3 lowercase letter Google Meet link (e.g. https://meet.google.com/abc-defg-hij)
   const generateMeetUrl = () => {
@@ -196,30 +213,74 @@ export default function ReviewDashboardView({
     }
   };
 
-  // Ingest Feedback CSV
+  // Download Sample Feedback Template with exact columns requested:
+  // Intern ID, Name, Email ID, Task ID, Task Number, Task Title, batch, role, Review Number, Feedback, Performance Score
+  const handleDownloadFeedbackTemplate = (format = 'xlsx') => {
+    const sampleRows = candidates.length > 0
+      ? candidates.slice(0, 10).map((c, i) => ({
+          'Intern ID': c.internId || c.candidateId,
+          'Name': c.fullName,
+          'Email ID': c.email,
+          'Task ID': c.activeTask?.taskId || `TSK-DEV-00${i + 1}`,
+          'Task Number': c.activeTask?.taskNumber || 1,
+          'Task Title': c.activeTask?.title || 'Core Technical Milestone',
+          'batch': c.batch || 'Batch A',
+          'role': c.role,
+          'Review Number': (c.activeTask?.reviews?.length || 0) >= 1 ? (c.activeTask.reviews.length + 1) : 2,
+          'Feedback': 'Sprint code evaluated. Clean architecture, modular components, and test coverage verified.',
+          'Performance Score': 88.0,
+        }))
+      : [
+          {
+            'Intern ID': 'INT-2026-00001',
+            'Name': 'Dharshana',
+            'Email ID': 'dachudharshana17@gmail.com',
+            'Task ID': 'TSK-DEV-001',
+            'Task Number': 1,
+            'Task Title': 'Core Milestone Implementation',
+            'batch': 'Batch A',
+            'role': 'AI Engineer',
+            'Review Number': 2,
+            'Feedback': 'Sprint deliverables reviewed. Architecture and test execution approved.',
+            'Performance Score': 90.0,
+          },
+        ];
+
+    const worksheet = xlsx.utils.json_to_sheet(sampleRows);
+    const workbook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Review_Feedback_Template');
+    const fileName = `Shortfundly_Review_Feedback_Template.${format}`;
+
+    if (format === 'csv') {
+      xlsx.writeFile(workbook, fileName, { bookType: 'csv' });
+    } else {
+      xlsx.writeFile(workbook, fileName, { bookType: 'xlsx' });
+    }
+    showToast?.(`Downloaded review feedback template (${format.toUpperCase()})!`, 'success');
+  };
+
+  // Ingest Feedback CSV or Excel (.xlsx, .xls)
   const handleFeedbackFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
-      const text = await file.text();
-      const lines = text.split('\n').filter(Boolean);
-      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-      const parsed = [];
+      const buffer = await file.arrayBuffer();
+      const workbook = xlsx.read(buffer, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const parsed = xlsx.utils.sheet_to_json(worksheet, { defval: '' });
 
-      for (let i = 1; i < lines.length; i++) {
-        const parts = lines[i].split(',').map(p => p.trim().replace(/^"|"$/g, ''));
-        const row = {};
-        headers.forEach((h, idx) => {
-          row[h] = parts[idx] || '';
-        });
-        parsed.push(row);
+      if (!parsed || parsed.length === 0) {
+        showToast?.('The selected file contains no readable data rows.', 'warning');
+        return;
       }
 
       setFeedbackRows(parsed);
-      showToast?.(`Loaded ${parsed.length} feedback rows from CSV. Ready to send feedback emails.`, 'info');
+      showToast?.(`Loaded ${parsed.length} review feedback row(s) from ${file.name}. Ready to dispatch feedback emails!`, 'info');
     } catch (err) {
-      showToast?.(`Error parsing feedback CSV: ${err.message}`, 'error');
+      console.error('Error parsing feedback file:', err);
+      showToast?.(`Error parsing feedback file: ${err.message}`, 'error');
     }
   };
 
@@ -409,12 +470,12 @@ export default function ReviewDashboardView({
 
         <select
           value={selectedBatch}
-          onChange={(e) => handleBatchSelectChange(e.target.value)}
+          onChange={(e) => setSelectedBatch(e.target.value)}
           className={styles.selectInput}
         >
           <option value="ALL">All Batches</option>
-          {batches.map((b) => (
-            <option key={b.id || b.batchName} value={b.batchName}>{b.batchName}</option>
+          {allBatches.map((bName) => (
+            <option key={bName} value={bName}>{bName}</option>
           ))}
         </select>
 
@@ -622,13 +683,25 @@ export default function ReviewDashboardView({
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
                 Review Scheduled Date (HR Decided) <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <input
-                type="date"
-                min={new Date().toISOString().split('T')[0]}
-                value={r1ScheduleForm.reviewDate}
-                onChange={(e) => setR1ScheduleForm({ ...r1ScheduleForm, reviewDate: e.target.value })}
-                className={styles.searchInput}
-              />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  ref={scheduleDateRef}
+                  type="date"
+                  min={new Date().toISOString().split('T')[0]}
+                  value={r1ScheduleForm.reviewDate}
+                  onChange={(e) => setR1ScheduleForm({ ...r1ScheduleForm, reviewDate: e.target.value })}
+                  className={styles.searchInput}
+                  style={{ colorScheme: 'dark', paddingRight: '36px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => scheduleDateRef.current?.showPicker?.()}
+                  style={{ position: 'absolute', right: '10px', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                  title="Open Calendar"
+                >
+                  <Calendar size={16} color="#c084fc" />
+                </button>
+              </div>
               <span style={{ fontSize: '11px', color: '#34d399', marginTop: '4px', display: 'block' }}>
                 Suggested Next Business Day: {suggestedReviewDate}
               </span>
@@ -775,15 +848,42 @@ export default function ReviewDashboardView({
         </div>
       )}
 
-      {/* --- SUBTAB 3: UPLOAD FEEDBACK CSV (SUBSEQUENT REVIEWS) --- */}
+      {/* --- SUBTAB 3: UPLOAD FEEDBACK CSV / EXCEL (SUBSEQUENT REVIEWS) --- */}
       {subTab === 'feedback-upload' && (
         <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Upload size={18} color="#a855f7" />
-            <span>Upload Multi-Session Review Feedback (CSV / Excel)</span>
-          </h3>
-          <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#94a3b8' }}>
-            Upload evaluation feedback for Review 2, Review 3, etc. Expected CSV columns: <code>Intern ID, Name, Task ID, Task Number, Review Number, Feedback, Performance Score</code>. Uses the same Google Meet link assigned to each candidate and dispatches professional Jinja-formatted feedback emails.
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '8px' }}>
+            <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Upload size={18} color="#a855f7" />
+              <span>Upload Multi-Session Review Feedback (CSV / Excel)</span>
+            </h3>
+
+            {/* 1-Click Template Downloads */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => handleDownloadFeedbackTemplate('xlsx')}
+                className={styles.btnSecondary}
+                style={{ padding: '5px 12px', fontSize: '12px' }}
+                title="Download ready-to-fill Excel template with prefilled intern records"
+              >
+                <FileSpreadsheet size={13} color="#10b981" />
+                <span>Download Template (.xlsx)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDownloadFeedbackTemplate('csv')}
+                className={styles.btnSecondary}
+                style={{ padding: '5px 12px', fontSize: '12px' }}
+                title="Download CSV format template"
+              >
+                <Download size={13} color="#38bdf8" />
+                <span>Download Template (.csv)</span>
+              </button>
+            </div>
+          </div>
+
+          <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#94a3b8', lineHeight: '1.6' }}>
+            Upload evaluation feedback for Review 2, Review 3, etc. Expected CSV / Excel columns: <code style={{ color: '#c084fc', background: '#1c1c24', padding: '2px 6px', borderRadius: '4px' }}>Intern ID, Name, Email ID, Task ID, Task Number, Task Title, batch, role, Review Number, Feedback, Performance Score</code>. Uses the same Google Meet link assigned to each candidate and dispatches professional Jinja-formatted feedback emails.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '18px' }}>
@@ -791,12 +891,24 @@ export default function ReviewDashboardView({
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
                 Review Date
               </label>
-              <input
-                type="date"
-                value={feedbackMeta.reviewDate}
-                onChange={(e) => setFeedbackMeta({ ...feedbackMeta, reviewDate: e.target.value })}
-                className={styles.searchInput}
-              />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  ref={feedbackDateRef}
+                  type="date"
+                  value={feedbackMeta.reviewDate}
+                  onChange={(e) => setFeedbackMeta({ ...feedbackMeta, reviewDate: e.target.value })}
+                  className={styles.searchInput}
+                  style={{ colorScheme: 'dark', paddingRight: '36px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => feedbackDateRef.current?.showPicker?.()}
+                  style={{ position: 'absolute', right: '10px', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                  title="Open Calendar"
+                >
+                  <Calendar size={16} color="#c084fc" />
+                </button>
+              </div>
             </div>
 
             <div>
@@ -826,10 +938,10 @@ export default function ReviewDashboardView({
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '14px' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '14px', flexWrap: 'wrap' }}>
             <label className={styles.btnSecondary} style={{ cursor: 'pointer' }}>
               <Upload size={14} />
-              <span>Select Feedback CSV File</span>
+              <span>Select Feedback CSV / Excel File (.xlsx, .csv)</span>
               <input
                 type="file"
                 accept=".csv,.xlsx,.xls"

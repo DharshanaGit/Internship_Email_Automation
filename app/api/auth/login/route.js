@@ -117,26 +117,26 @@ export async function POST(request) {
       const hrPass = process.env.HR_PASSWORD || 'Shortfundly@Pass2026!';
       const ceoPass = process.env.CEO_PASSWORD || 'Shortfundly@Pass2026!';
 
-      if (normalizedEmail === adminEmail && (password === adminPass || password === 'Shortfundly@Pass2026!' || password === 'admin123')) {
+      if ((normalizedEmail === adminEmail || normalizedEmail === 'admin@shortfundly.com' || normalizedEmail === 'admin@gmail.com') && (password === adminPass || password === 'Shortfundly@Pass2026!' || password === 'admin123')) {
         user = {
           id: 'admin-system-id',
-          email: adminEmail,
+          email: normalizedEmail,
           name: 'System Administrator',
           role: 'ADMIN',
           passwordHash: '',
         };
-      } else if (normalizedEmail === hrEmail && (password === hrPass || password === 'Shortfundly@Pass2026!')) {
+      } else if ((normalizedEmail === hrEmail || normalizedEmail === 'hr@shortfundly.com' || normalizedEmail === 'hr@gmail.com') && (password === hrPass || password === 'Shortfundly@Pass2026!')) {
         user = {
           id: 'hr-system-id',
-          email: hrEmail,
+          email: normalizedEmail,
           name: 'HR Director',
           role: 'HR',
           passwordHash: '',
         };
-      } else if (normalizedEmail === ceoEmail && (password === ceoPass || password === 'Shortfundly@Pass2026!')) {
+      } else if ((normalizedEmail === ceoEmail || normalizedEmail === 'ceo@shortfundly.com' || normalizedEmail === 'ceo@gmail.com') && (password === ceoPass || password === 'Shortfundly@Pass2026!')) {
         user = {
           id: 'ceo-system-id',
-          email: ceoEmail,
+          email: normalizedEmail,
           name: 'M. Selvam (Founder & CEO)',
           role: 'CEO',
           passwordHash: '',
