@@ -28,12 +28,12 @@
   width: 44px;
   height: 44px;
   border-radius: var(--radius-sm);
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-hairline);
+  background: rgba(124, 58, 237, 0.16);
+  border: 1px solid rgba(168, 85, 247, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-primary);
+  color: var(--accent-purple-light);
   margin: 0 auto 12px auto;
 }
 
@@ -84,9 +84,9 @@
 }
 
 .tabButtonActive {
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-hairline);
-  color: var(--text-primary);
+  background: rgba(124, 58, 237, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  color: #ffffff;
 }
 
 .errorBanner {
@@ -279,7 +279,7 @@
   justify-content: center;
   gap: 8px;
   height: 42px;
-  background: var(--accent-primary);
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
   color: #ffffff;
@@ -291,7 +291,7 @@
 }
 
 .submitButton:hover:not(:disabled) {
-  background: var(--accent-primary-hover);
+  background: linear-gradient(135deg, #6d28d9 0%, #7e22ce 100%);
 }
 
 .submitButtonDisabled {

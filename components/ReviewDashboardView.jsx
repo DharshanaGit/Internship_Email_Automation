@@ -611,7 +611,7 @@ export default function ReviewDashboardView({
                             style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                           />
                         </td>
-                        <td><code style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-hairline)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{c.internId}</code></td>
+                        <td><code style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', color: '#c084fc', border: '1px solid var(--border-hairline)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{c.internId}</code></td>
                         <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
                         <td><span className={styles.badgePurple}>{c.batch}</span></td>
                         <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>#{task?.taskNumber || 1}</td>

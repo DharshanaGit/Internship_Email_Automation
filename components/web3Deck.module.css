@@ -1,4 +1,4 @@
-/* Modern Web3 Enterprise Operations UI - Inspired by Linear & Kraken (DESIGN.md) */
+/* Shortfundly Web3 Operations UI: Black with Purple (DESIGN.md) */
 
 .container {
   display: flex;
@@ -9,7 +9,7 @@
 /* 1. Header Card */
 .headerCard {
   background: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 20px 24px;
   display: flex;
@@ -30,18 +30,18 @@
   width: 38px;
   height: 38px;
   border-radius: var(--radius-sm);
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-hairline);
+  background: rgba(124, 58, 237, 0.16);
+  border: 1px solid rgba(168, 85, 247, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-primary);
+  color: var(--accent-purple-light);
 }
 
 .mainTitle {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 16.5px;
+  font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.01em;
 }
@@ -58,7 +58,7 @@
   display: flex;
   gap: 6px;
   background: var(--bg-input);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-subtle);
   padding: 4px;
   border-radius: var(--radius-md);
   overflow-x: auto;
@@ -87,7 +87,7 @@
 
 .subTabBtnActive {
   background: var(--bg-surface-elevated) !important;
-  border-color: var(--border-hairline) !important;
+  border-color: rgba(168, 85, 247, 0.4) !important;
   color: var(--text-primary) !important;
 }
 
@@ -106,15 +106,28 @@
 
 .metricCard {
   background: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 18px 20px;
   box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
   transition: border-color 0.15s ease;
 }
 
+.metricCard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #7c3aed, #c084fc);
+  opacity: 0.6;
+}
+
 .metricCard:hover {
-  border-color: var(--border-subtle);
+  border-color: var(--border-medium);
 }
 
 .metricLabel {
@@ -148,7 +161,7 @@
   gap: 12px;
   flex-wrap: wrap;
   background: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 12px 16px;
 }
@@ -181,7 +194,8 @@
 }
 
 .searchInput:focus {
-  border-color: var(--accent-primary);
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 2px var(--border-focus-ring);
 }
 
 .selectInput {
@@ -198,13 +212,13 @@
 }
 
 .selectInput:focus {
-  border-color: var(--accent-primary);
+  border-color: var(--accent-purple);
 }
 
 /* Data Table Card */
 .tableCard {
   background: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
@@ -212,7 +226,7 @@
 
 .tableHeaderRow {
   padding: 14px 20px;
-  border-bottom: 1px solid var(--border-hairline);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -241,19 +255,19 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border-hairline);
+  border-bottom: 1px solid var(--border-subtle);
   white-space: nowrap;
 }
 
 .table td {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border-hairline);
+  border-bottom: 1px solid #1c1a2c;
   color: var(--text-secondary);
   vertical-align: middle;
 }
 
 .table tr:hover {
-  background: var(--bg-surface-elevated);
+  background: rgba(168, 85, 247, 0.04);
 }
 
 /* Buttons */
@@ -262,24 +276,26 @@
   align-items: center;
   gap: 7px;
   padding: 8px 16px;
-  background: var(--accent-primary);
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
   color: #ffffff;
   border-radius: var(--radius-sm);
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   transition: all 0.15s ease;
   white-space: nowrap;
 }
 
 .btnPrimary:hover:not(:disabled) {
-  background: var(--accent-primary-hover);
+  background: linear-gradient(135deg, #6d28d9 0%, #7e22ce 100%);
+  transform: translateY(-1px);
 }
 
 .btnPrimary:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btnSecondary {
@@ -288,7 +304,7 @@
   gap: 6px;
   padding: 8px 14px;
   background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid #2e2a47;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 12.5px;
@@ -300,7 +316,7 @@
 
 .btnSecondary:hover {
   background: var(--bg-surface-hover);
-  border-color: var(--border-medium);
+  border-color: rgba(168, 85, 247, 0.4);
   color: var(--text-primary);
 }
 
@@ -320,13 +336,13 @@
 }
 
 .btnDanger:hover {
-  background: rgba(239, 68, 68, 0.18);
+  background: rgba(239, 68, 68, 0.2);
 }
 
 /* Badges */
 .badgePurple {
   background: var(--bg-badge);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  border: 1px solid rgba(168, 85, 247, 0.35);
   color: var(--accent-purple-light);
   font-size: 11px;
   font-weight: 600;
@@ -394,7 +410,7 @@
   max-width: 680px;
   max-height: 90vh;
   background: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
@@ -404,7 +420,7 @@
 
 .modalHeader {
   padding: 16px 22px;
-  border-bottom: 1px solid var(--border-hairline);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -420,7 +436,7 @@
 
 .modalFooter {
   padding: 14px 22px;
-  border-top: 1px solid var(--border-hairline);
+  border-top: 1px solid var(--border-subtle);
   display: flex;
   justify-content: flex-end;
   gap: 10px;
