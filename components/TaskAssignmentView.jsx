@@ -770,38 +770,19 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             </select>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <select
-                  value={selectedTemplateId}
-                  onChange={(e) => setSelectedTemplateId(e.target.value)}
-                  className={styles.selectInput}
-                  style={{ minWidth: '220px', maxWidth: '340px' }}
-                  title="Choose from Gemma 2B industrial task templates"
-                >
-                  {taskTemplates.map((t) => (
-                    <option key={t.id} value={t.id} title={t.title}>
-                      [{t.level}] {t.taskId}: {t.title}
-                    </option>
-                  ))}
-                </select>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const template = taskTemplates.find(t => t.id === selectedTemplateId);
-                    if (template) {
-                      setEditingTemplate({ ...template });
-                      setTemplateModalTab('preview');
-                    }
-                  }}
-                  className={styles.btnSecondary}
-                  style={{ padding: '7px 11px', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                  title="Preview full task specifications and objective"
-                >
-                  <Eye size={13} />
-                  <span>View Task</span>
-                </button>
-              </div>
+              <select
+                value={selectedTemplateId}
+                onChange={(e) => setSelectedTemplateId(e.target.value)}
+                className={styles.selectInput}
+                style={{ minWidth: '300px', maxWidth: '440px', fontWeight: 600 }}
+                title="Choose from Gemma 2B industrial task templates"
+              >
+                {taskTemplates.map((t) => (
+                  <option key={t.id} value={t.id} title={t.title}>
+                    [{t.level}] {t.taskId}: {t.title}
+                  </option>
+                ))}
+              </select>
 
               <button
                 type="button"
