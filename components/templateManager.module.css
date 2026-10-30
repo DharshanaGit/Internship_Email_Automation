@@ -2,7 +2,7 @@
   background: #0c0c0e;
   border: 1px solid #232328;
   border-radius: 12px;
-  padding: 24px 28px;
+  padding: 16px 20px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 
@@ -10,7 +10,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 14px;
   padding-bottom: 16px;
   border-bottom: 1px solid #232328;
 }
@@ -28,11 +28,11 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 18px;
+  padding: 6px 13px;
   background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
   color: #ffffff;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
@@ -42,7 +42,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 @media (max-width: 900px) {
@@ -55,7 +55,7 @@
   background: #09090b;
   border: 1px solid #27272a;
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -233,12 +233,12 @@
 }
 
 .btnCancel {
-  padding: 8px 18px;
+  padding: 6px 13px;
   background: #141417;
   border: 1px solid #27272a;
   border-radius: 6px;
   color: #cbd5e1;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -248,7 +248,7 @@
   background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
   color: #ffffff;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }

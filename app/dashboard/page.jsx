@@ -1824,9 +1824,9 @@ export default function DashboardPage() {
 
             {/* LIVE TELEMETRY COUNTER BANNER: Sent, Failed, Waiting */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '22px' }}>
-              <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #10b981', background: 'rgba(14, 20, 34, 0.85)' }}>
+              <div className={styles.metricCard} style={{ padding: '12px 14px', borderLeft: '3px solid #7c3aed', background: 'rgba(14, 20, 34, 0.85)' }}>
                 <div className={styles.metricTitle} style={{ color: '#34d399', fontWeight: 700 }}>OFFER LETTERS SENT</div>
-                <div className={styles.metricValue} style={{ fontSize: '28px', color: '#ffffff', fontWeight: 800 }}>
+                <div className={styles.metricValue} style={{ fontSize: '21px', color: '#ffffff', fontWeight: 700 }}>
                   {stats.offerLetters?.sent || 0}
                 </div>
                 <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Delivered to Inboxes</div>
@@ -1834,7 +1834,7 @@ export default function DashboardPage() {
 
               <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #f43f5e', background: 'rgba(14, 20, 34, 0.85)' }}>
                 <div className={styles.metricTitle} style={{ color: '#fb7185', fontWeight: 700 }}>FAILED EMAILS</div>
-                <div className={styles.metricValue} style={{ fontSize: '28px', color: '#ffffff', fontWeight: 800 }}>
+                <div className={styles.metricValue} style={{ fontSize: '21px', color: '#ffffff', fontWeight: 700 }}>
                   {stats.offerLetters?.failed || 0}
                 </div>
                 <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Need Attention</div>
@@ -1842,7 +1842,7 @@ export default function DashboardPage() {
 
               <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #f59e0b', background: 'rgba(14, 20, 34, 0.85)' }}>
                 <div className={styles.metricTitle} style={{ color: '#fbbf24', fontWeight: 700 }}>READY TO SEND</div>
-                <div className={styles.metricValue} style={{ fontSize: '28px', color: '#ffffff', fontWeight: 800 }}>
+                <div className={styles.metricValue} style={{ fontSize: '21px', color: '#ffffff', fontWeight: 700 }}>
                   {stats.offerLetters?.waiting || stats.offerLetters?.readyToSend || 0}
                 </div>
                 <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Waiting for Review</div>

@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   position: relative;
   flex-wrap: wrap;
   gap: 10px;
@@ -19,10 +19,10 @@
 .stepPill {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
+  gap: 7px;
+  padding: 6px 14px;
   border-radius: 9999px;
-  font-size: 13px;
+  font-size: 11.5px;
   font-weight: 700;
   background: #09090b;
   border: 1px solid #27272a;
@@ -46,11 +46,11 @@
 .guidanceBanner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 13px;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -70,8 +70,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 22px;
-  padding-bottom: 16px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #232328;
   flex-wrap: wrap;
   gap: 12px;
@@ -83,8 +83,8 @@
 }
 
 .btnMode {
-  padding: 7px 16px;
-  font-size: 12px;
+  padding: 5px 12px;
+  font-size: 11.5px;
   font-weight: 600;
   border-radius: 6px;
   background: #09090b;
@@ -103,7 +103,7 @@
 .fieldGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  gap: 12px 16px;
 }
 
 @media (max-width: 768px) {
@@ -115,12 +115,12 @@
 .fieldGroup {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   position: relative;
 }
 
 .fieldLabel {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: #cbd5e1;
   text-transform: uppercase;
@@ -137,14 +137,14 @@
 
 .inputField {
   width: 100%;
-  height: 44px;
+  height: 36px;
   background-color: #0c0b12 !important;
-  border: 1px solid #282639;
-  border-radius: 8px;
-  padding: 0 14px;
-  color: #828896 !important; /* Dull muted when empty */
-  -webkit-text-fill-color: #828896 !important;
-  font-size: 13.5px;
+  border: 1px solid #232230;
+  border-radius: 6px;
+  padding: 0 11px;
+  color: #71717a !important; /* Muted placeholder when empty */
+  -webkit-text-fill-color: #71717a !important;
+  font-size: 12.5px;
   outline: none;
   transition: all 0.2s ease;
 }
@@ -164,28 +164,24 @@
   box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.28);
 }
 
-/* When field is filled (identified with bright white text & distinct border even when blurred) */
-.inputFilled {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  font-weight: 600 !important;
-  border-color: #3f3b5c !important;
-  background-color: #12101e !important;
-}
-
+/* When field is filled: ONLY make text bright white, NO green borders */
+.inputFilled,
 .inputValid {
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
   font-weight: 600 !important;
-  border-color: #10b981 !important;
-  background-color: #0d1714 !important;
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25);
+  border-color: #2e2b3e !important;
+  background-color: #0c0b12 !important;
+  box-shadow: none !important;
 }
 
-/* When moving to next, a filled valid field stays clearly bright with subtle positive confirmation */
-.inputValid:focus {
-  border-color: #10b981 !important;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35) !important;
+.inputValid:focus,
+.inputFilled:focus {
+  border-color: #a855f7 !important;
+  background-color: #12101e !important;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Make calendar picker icon clearly visible and viewable */
@@ -320,21 +316,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 30px;
-  padding-top: 20px;
+  margin-top: 18px;
+  padding-top: 14px;
   border-top: 1px solid #1f1b2e;
 }
 
 .btnPrimary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 11px 26px;
+  gap: 7px;
+  padding: 8px 18px;
   background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
   color: #ffffff;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(147, 51, 234, 0.35);
@@ -358,12 +354,12 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 18px;
+  padding: 7px 14px;
   background: #141417;
   border: 1px solid #27272a;
-  border-radius: 8px;
+  border-radius: 6px;
   color: #cbd5e1;
-  font-size: 13.5px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -395,8 +391,8 @@
 .previewBox {
   background: #09090b;
   border: 1px solid #232328;
-  border-radius: 8px;
-  padding: 24px;
+  border-radius: 6px;
+  padding: 16px;
   max-height: 600px;
   overflow-y: auto;
 }
