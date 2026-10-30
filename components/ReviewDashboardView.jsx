@@ -401,8 +401,8 @@ export default function ReviewDashboardView({
             <UserCheck size={22} />
           </div>
           <div>
-            <h2 className={styles.mainTitle}>Milestone Review & Mentorship Audit</h2>
-            <p className={styles.subtitle}>Multi-Session Reviews &bull; Synchronized Meeting Continuity &bull; Evaluation Ledger & Finalization</p>
+            <h2 className={styles.mainTitle}>Reviews & Mentorship</h2>
+            <p className={styles.subtitle}>Schedule review meetings, share feedback, and track intern progress.</p>
           </div>
         </div>
 
@@ -423,7 +423,7 @@ export default function ReviewDashboardView({
             className={`${styles.subTabBtn} ${subTab === 'schedule-r1' ? styles.subTabBtnActive : ''}`}
           >
             <Clock size={14} />
-            <span>Schedule Milestone Review (HR Decided)</span>
+            <span>Schedule Review Meeting</span>
           </button>
 
           <button
@@ -432,7 +432,7 @@ export default function ReviewDashboardView({
             className={`${styles.subTabBtn} ${subTab === 'feedback-upload' ? styles.subTabBtnActive : ''}`}
           >
             <Upload size={14} />
-            <span>Upload Feedback CSV (Subsequent Reviews)</span>
+            <span>Upload Feedback (CSV / Excel)</span>
           </button>
 
           <button
@@ -441,7 +441,7 @@ export default function ReviewDashboardView({
             className={`${styles.subTabBtn} ${subTab === 'checkpoint' ? styles.subTabBtnActive : ''}`}
           >
             <Award size={14} />
-            <span>Task Completion Checkpoint</span>
+            <span>Mark Tasks Completed</span>
           </button>
 
           <button
@@ -450,7 +450,7 @@ export default function ReviewDashboardView({
             className={`${styles.subTabBtn} ${subTab === 'warning' ? styles.subTabBtnActive : ''}`}
           >
             <AlertTriangle size={14} />
-            <span>Formal Warning Mail</span>
+            <span>Send Warning Notice</span>
           </button>
         </div>
       </div>
@@ -658,7 +658,7 @@ export default function ReviewDashboardView({
         <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Clock size={18} color="#a855f7" />
-            <span>Milestone Review Scheduling & Google Meet Dispatcher</span>
+            <span>Schedule Review Meeting & Send Meeting Links</span>
           </h3>
           <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>
             HR and Admin decide the review date and session time for selected interns. Dispatches official review invitations with Google Meet video links, automatically skipping non-working days or conforming to HR calendar preferences.
@@ -979,7 +979,7 @@ export default function ReviewDashboardView({
           </div>
 
           <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#94a3b8', lineHeight: '1.6' }}>
-            Upload evaluation feedback for Review 2, Review 3, etc. Expected CSV / Excel columns: <code style={{ color: '#c084fc', background: '#1c1c24', padding: '2px 6px', borderRadius: '4px' }}>Intern ID, Name, Email ID, Task ID, Task Number, Task Title, batch, role, Review Number, Feedback, Performance Score</code>. Uses the same Google Meet link assigned to each candidate and dispatches professional Jinja-formatted feedback emails.
+            Upload evaluation feedback for Review 2, Review 3, etc. Expected CSV / Excel columns: Intern ID, Name, Email ID, Task ID, Task Number, Task Title, batch, role, Review Number, Feedback, Performance Score. Sends personalized feedback emails with Google Meet links.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '18px' }}>
@@ -1246,7 +1246,7 @@ export default function ReviewDashboardView({
         <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Award size={18} color="#10b981" />
-            <span>Task Completion Checkpoint & Milestone Finalization</span>
+            <span>Mark Tasks Completed</span>
           </h3>
           <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#94a3b8' }}>
             Once reviews are completed across sessions, HR marks candidates as <strong>Task Completed</strong>. The platform calculates the individual task percentage score, sends automated milestone approval emails, and approves students to proceed to their next sprint task.

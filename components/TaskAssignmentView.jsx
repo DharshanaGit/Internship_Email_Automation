@@ -671,8 +671,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             <Briefcase size={22} />
           </div>
           <div>
-            <h2 className={styles.mainTitle}>Technical Milestone & Task Governance</h2>
-            <p className={styles.subtitle}>Role-Based Engineering Specifications &bull; Video Review Continuity &bull; Automated Telemetry</p>
+            <h2 className={styles.mainTitle}>Assign Tasks & Milestones</h2>
+            <p className={styles.subtitle}>Assign role-specific tasks, create Google Meet links, and track project deadlines.</p>
           </div>
         </div>
 
@@ -684,7 +684,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             className={`${styles.subTabBtn} ${subTab === 'interns' ? styles.subTabBtnActive : ''}`}
           >
             <Users size={14} />
-            <span>Interns Directory ({filteredCandidates.length})</span>
+            <span>Interns List ({filteredCandidates.length})</span>
           </button>
 
           <button
@@ -693,7 +693,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             className={`${styles.subTabBtn} ${subTab === 'templates' ? styles.subTabBtnActive : ''}`}
           >
             <Sparkles size={14} />
-            <span>Milestone Templates</span>
+            <span>Task Templates</span>
           </button>
 
           <button
@@ -702,7 +702,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             className={`${styles.subTabBtn} ${subTab === 'reminder' ? styles.subTabBtnActive : ''}`}
           >
             <Clock size={14} />
-            <span>Deadline Reminder Mail</span>
+            <span>Deadline Reminders</span>
           </button>
 
           <button
@@ -711,7 +711,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             className={`${styles.subTabBtn} ${subTab === 'tracker' ? styles.subTabBtnActive : ''}`}
           >
             <Activity size={14} />
-            <span>Submission & Review Tracker</span>
+            <span>Submissions Tracker</span>
           </button>
         </div>
       </div>

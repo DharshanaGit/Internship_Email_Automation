@@ -42,15 +42,15 @@ export default function LandingPage() {
             </div>
             <div className={styles.brandText}>
               <span className={styles.brandName}>Shortfundly Ops</span>
-              <span className={styles.brandTagline}>Enterprise Talent Automation</span>
+              <span className={styles.brandTagline}>Internship Management Portal</span>
             </div>
           </Link>
 
           <nav className={styles.navLinks}>
             <a href="#modules" className={styles.navLink}>Modules</a>
-            <a href="#workflow" className={styles.navLink}>Lifecycle Workflow</a>
-            <a href="#architecture" className={styles.navLink}>Architecture</a>
-            <a href="#security" className={styles.navLink}>Security & RFC</a>
+            <a href="#workflow" className={styles.navLink}>How It Works</a>
+            <a href="#architecture" className={styles.navLink}>Technology</a>
+            <a href="#security" className={styles.navLink}>Reliability</a>
           </nav>
 
           <div className={styles.navActions}>
@@ -58,7 +58,7 @@ export default function LandingPage() {
               <span>Sign In</span>
             </Link>
             <Link href="/login" prefetch={true} className={styles.btnPrimary} style={{ padding: '8px 18px', fontSize: '13px' }}>
-              <span>Launch Portal</span>
+              <span>Open Portal</span>
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -71,25 +71,25 @@ export default function LandingPage() {
           <div className={styles.heroCenter}>
             <div className={styles.heroBadge}>
               <span className={styles.statusDot}></span>
-              <span className={styles.heroBadgeText}>Production Live &bull; Google SMTP &bull; Supabase PostgreSQL</span>
+              <span className={styles.heroBadgeText}>Production Ready &bull; Google Email &bull; Cloud Database</span>
             </div>
 
             <h1 className={styles.headline}>
-              Industrial Internship Operations.
-              <span className={styles.headlineGradient}> Precision Automated.</span>
+              Internship Management and Email Automation,
+              <span className={styles.headlineGradient}> Made Simple.</span>
             </h1>
 
             <p className={styles.subheading}>
-              The unified mission control for Shortfundly Media Technologies. Orchestrate single & bulk offer dispatches, Playwright A4 PDF contracts, Google Meet milestone reviews, and tamper-proof certificates in real time.
+              The all-in-one platform for Shortfundly to send personalized offer letters, assign project tasks, schedule Google Meet reviews, and issue verified completion certificates.
             </p>
 
             <div className={styles.heroActions}>
               <Link href="/login" prefetch={true} className={styles.btnPrimaryLg}>
-                <span>Enter Operations Portal</span>
+                <span>Go to Operations Portal</span>
                 <ArrowRight size={16} />
               </Link>
               <a href="#modules" className={styles.btnSecondaryLg}>
-                <span>Explore 6 Operations Modules</span>
+                <span>View Core Features</span>
               </a>
             </div>
 
@@ -97,28 +97,28 @@ export default function LandingPage() {
             <div className={styles.kpiGrid}>
               <div className={styles.kpiItem}>
                 <div className={styles.kpiValue}>100%</div>
-                <div className={styles.kpiLabel}>Primary Inbox Rate</div>
-                <div className={styles.kpiSub}>RFC 5322 &bull; Google DKIM</div>
+                <div className={styles.kpiLabel}>Inbox Delivery</div>
+                <div className={styles.kpiSub}>Direct to Primary Inbox</div>
               </div>
               <div className={styles.kpiItem}>
                 <div className={styles.kpiValue}>&lt; 1.2s</div>
-                <div className={styles.kpiLabel}>PDF Engine Latency</div>
-                <div className={styles.kpiSub}>Playwright Headless A4</div>
+                <div className={styles.kpiLabel}>PDF Generation</div>
+                <div className={styles.kpiSub}>Clean A4 Documents</div>
               </div>
               <div className={styles.kpiItem}>
                 <div className={styles.kpiValue}>15</div>
-                <div className={styles.kpiLabel}>Gemma AI Task Templates</div>
-                <div className={styles.kpiSub}>Industrial Dev Milestones</div>
+                <div className={styles.kpiLabel}>Role Task Templates</div>
+                <div className={styles.kpiSub}>Ready-to-Use Tasks</div>
               </div>
               <div className={styles.kpiItem}>
-                <div className={styles.kpiValue}>256-bit</div>
-                <div className={styles.kpiLabel}>Cryptographic Decision Tokens</div>
-                <div className={styles.kpiSub}>Zero-Collision Double-Spend Lock</div>
+                <div className={styles.kpiValue}>Secure</div>
+                <div className={styles.kpiLabel}>Candidate Decision Links</div>
+                <div className={styles.kpiSub}>Safe One-Click Acceptance</div>
               </div>
             </div>
           </div>
 
-          {/* 3. High-Fidelity Interactive Deck Mockup */}
+          {/* 3. Interactive Deck Mockup Preview */}
           <div className={styles.mockupContainer}>
             <div className={styles.mockupFrame}>
               {/* Window Header */}
@@ -127,10 +127,10 @@ export default function LandingPage() {
                   <span className={styles.windowDot} style={{ background: '#ef4444' }}></span>
                   <span className={styles.windowDot} style={{ background: '#f59e0b' }}></span>
                   <span className={styles.windowDot} style={{ background: '#10b981' }}></span>
-                  <span className={styles.windowTitle}>shortfundly-operations-portal.internal &bull; nextjs-16.4-turbopack</span>
+                  <span className={styles.windowTitle}>shortfundly-operations-portal &bull; preview</span>
                 </div>
                 <div className={styles.windowMeta}>
-                  <span className={styles.badgeLive}>● LIVE WORKSPACE</span>
+                  <span className={styles.badgeLive}>LIVE WORKSPACE</span>
                 </div>
               </div>
 
@@ -142,7 +142,7 @@ export default function LandingPage() {
                   className={`${styles.mockupNavTab} ${activePreviewTab === 'offers' ? styles.mockupNavTabActive : ''}`}
                 >
                   <Send size={13} />
-                  <span>1. Automate Offer Letter</span>
+                  <span>1. Offer Letters</span>
                 </button>
                 <button
                   type="button"
@@ -166,7 +166,7 @@ export default function LandingPage() {
                   className={`${styles.mockupNavTab} ${activePreviewTab === 'telemetry' ? styles.mockupNavTabActive : ''}`}
                 >
                   <Activity size={13} />
-                  <span>4. Email Telemetry</span>
+                  <span>4. Track Emails</span>
                 </button>
               </div>
 
@@ -177,18 +177,18 @@ export default function LandingPage() {
                     <div className={styles.mockupStatsRow}>
                       <div className={styles.mockupStatCard} style={{ borderLeft: '3px solid #10b981' }}>
                         <div className={styles.statLabel}>OFFER LETTERS SENT</div>
-                        <div className={styles.statNum}>197</div>
-                        <div className={styles.statDesc}>Successfully Dispatched</div>
+                        <div className={styles.statNum}>124</div>
+                        <div className={styles.statDesc}>Delivered to inboxes</div>
                       </div>
                       <div className={styles.mockupStatCard} style={{ borderLeft: '3px solid #f43f5e' }}>
-                        <div className={styles.statLabel}>DELIVERY FAILURES</div>
+                        <div className={styles.statLabel}>FAILED EMAILS</div>
                         <div className={styles.statNum}>0</div>
-                        <div className={styles.statDesc}>100% DKIM Verified</div>
+                        <div className={styles.statDesc}>All delivered successfully</div>
                       </div>
                       <div className={styles.mockupStatCard} style={{ borderLeft: '3px solid #f59e0b' }}>
-                        <div className={styles.statLabel}>PENDING ACCEPTANCE</div>
-                        <div className={styles.statNum}>14</div>
-                        <div className={styles.statDesc}>Cryptographic Token Locked</div>
+                        <div className={styles.statLabel}>WAITING FOR RESPONSE</div>
+                        <div className={styles.statNum}>12</div>
+                        <div className={styles.statDesc}>Awaiting candidate signature</div>
                       </div>
                     </div>
 
@@ -198,24 +198,24 @@ export default function LandingPage() {
                         <span>CANDIDATE</span>
                         <span>ROLE</span>
                         <span>BATCH</span>
-                        <span>DECISION TOKEN</span>
-                        <span>DELIVERY STATUS</span>
+                        <span>RESPONSE LINK</span>
+                        <span>STATUS</span>
                       </div>
                       <div className={styles.tableRowItem}>
-                        <code>INT-2026-00001</code>
-                        <strong>Dharshana</strong>
-                        <span>AI Engineer</span>
+                        <code>INT-2026-00101</code>
+                        <strong>Aditi Sharma</strong>
+                        <span>Frontend Developer</span>
                         <span className={styles.pillPurple}>Batch A</span>
-                        <code className={styles.tokenCode}>sf-tok_8f92a1...</code>
-                        <span className={styles.pillGreen}>Delivered (Google SMTP)</span>
+                        <span className={styles.tokenCode}>Active link generated</span>
+                        <span className={styles.pillGreen}>Delivered to Inbox</span>
                       </div>
                       <div className={styles.tableRowItem}>
-                        <code>INT-2026-00002</code>
-                        <strong>Dharshu</strong>
+                        <code>INT-2026-00102</code>
+                        <strong>Rohan Mehta</strong>
                         <span>Web Developer Intern</span>
                         <span className={styles.pillPurple}>Batch B</span>
-                        <code className={styles.tokenCode}>sf-tok_4c78d0...</code>
-                        <span className={styles.pillGreen}>Delivered (Google SMTP)</span>
+                        <span className={styles.tokenCode}>Active link generated</span>
+                        <span className={styles.pillGreen}>Delivered to Inbox</span>
                       </div>
                     </div>
                   </div>
@@ -224,8 +224,8 @@ export default function LandingPage() {
                 {activePreviewTab === 'tasks' && (
                   <div className={styles.mockupPanel}>
                     <div className={styles.mockupBar}>
-                      <span className={styles.pillPurple}>Task Assignment &bull; Gemma 2B Templates</span>
-                      <span className={styles.pillCyan}>Auto Google Meet Integration</span>
+                      <span className={styles.pillPurple}>Ready Task Templates</span>
+                      <span className={styles.pillCyan}>Auto Google Meet Rooms</span>
                     </div>
 
                     <div className={styles.mockupTableRow}>
@@ -234,22 +234,22 @@ export default function LandingPage() {
                         <span>CANDIDATE</span>
                         <span>ASSIGNED TASK</span>
                         <span>DEADLINE</span>
-                        <span>GOOGLE MEET ROOM</span>
+                        <span>MEETING LINK</span>
                         <span>STATUS</span>
                       </div>
                       <div className={styles.tableRowItem}>
-                        <code>INT-2026-00001</code>
-                        <strong>Dharshana</strong>
-                        <span>[DEV] TSK-DEV-001: Dynamic Telemetry</span>
-                        <span>2026-11-05</span>
+                        <code>INT-2026-00101</code>
+                        <strong>Aditi Sharma</strong>
+                        <span>Dashboard Components Sprint</span>
+                        <span>7 Days</span>
                         <a href="#" className={styles.meetLink}><Video size={12} /> meet.google.com/abc-defg-hij</a>
                         <span className={styles.pillGreen}>Assigned</span>
                       </div>
                       <div className={styles.tableRowItem}>
-                        <code>INT-2026-00002</code>
-                        <strong>Dharshu</strong>
-                        <span>[DEV] TSK-DEV-002: Realtime API Engine</span>
-                        <span>2026-11-07</span>
+                        <code>INT-2026-00102</code>
+                        <strong>Rohan Mehta</strong>
+                        <span>API Integration Milestone</span>
+                        <span>7 Days</span>
                         <a href="#" className={styles.meetLink}><Video size={12} /> meet.google.com/klm-nopq-rst</a>
                         <span className={styles.pillGreen}>Assigned</span>
                       </div>
@@ -260,35 +260,35 @@ export default function LandingPage() {
                 {activePreviewTab === 'reviews' && (
                   <div className={styles.mockupPanel}>
                     <div className={styles.mockupBar}>
-                      <span className={styles.pillPurple}>Review Queue (2)</span>
-                      <span className={styles.pillCyan}>Schedule Milestone (HR Decided)</span>
-                      <span className={styles.pillGreen}>Subsequent Feedback CSV Ingestion</span>
+                      <span className={styles.pillPurple}>Review Queue</span>
+                      <span className={styles.pillCyan}>Schedule Review Meetings</span>
+                      <span className={styles.pillGreen}>Upload Feedback Spreadsheets</span>
                     </div>
 
                     <div className={styles.mockupTableRow}>
                       <div className={styles.tableHeader}>
                         <span>INTERN ID</span>
                         <span>CANDIDATE</span>
-                        <span>TASK INFO</span>
+                        <span>CURRENT TASK</span>
                         <span>STAGE</span>
-                        <span>EVALUATION SCORE</span>
-                        <span>FEEDBACK SYNC</span>
+                        <span>SCORE</span>
+                        <span>UPDATE</span>
                       </div>
                       <div className={styles.tableRowItem}>
-                        <code>INT-2026-00001</code>
-                        <strong>Dharshana</strong>
-                        <span>TSK-DEV-001 (#1)</span>
-                        <span className={styles.pillAmber}>Review 2 Pending</span>
+                        <code>INT-2026-00101</code>
+                        <strong>Aditi Sharma</strong>
+                        <span>Dashboard Components</span>
+                        <span className={styles.pillAmber}>Review 2 Scheduled</span>
                         <strong>92.0%</strong>
-                        <span>Automated Jinja Email Dispatched</span>
+                        <span>Feedback email sent</span>
                       </div>
                       <div className={styles.tableRowItem}>
-                        <code>INT-2026-00002</code>
-                        <strong>Dharshu</strong>
-                        <span>TSK-DEV-002 (#1)</span>
-                        <span className={styles.pillAmber}>Review 1 Pending</span>
+                        <code>INT-2026-00102</code>
+                        <strong>Rohan Mehta</strong>
+                        <span>API Integration</span>
+                        <span className={styles.pillAmber}>Review 1 Scheduled</span>
                         <strong>88.5%</strong>
-                        <span>Evaluation Feedback Recorded</span>
+                        <span>Feedback email sent</span>
                       </div>
                     </div>
                   </div>
@@ -299,42 +299,42 @@ export default function LandingPage() {
                     <div className={styles.mockupStatsRow}>
                       <div className={styles.mockupStatCard}>
                         <div className={styles.statLabel}>OFFER LETTERS</div>
-                        <div className={styles.statNum}>197</div>
-                        <div className={styles.statDesc}>RFC 5322 Compliant</div>
+                        <div className={styles.statNum}>124</div>
+                        <div className={styles.statDesc}>Sent to candidates</div>
                       </div>
                       <div className={styles.mockupStatCard}>
-                        <div className={styles.statLabel}>TASK BRIEFINGS</div>
-                        <div className={styles.statNum}>197</div>
-                        <div className={styles.statDesc}>With Google Meet Links</div>
+                        <div className={styles.statLabel}>TASK EMAILS</div>
+                        <div className={styles.statNum}>124</div>
+                        <div className={styles.statDesc}>With meeting links</div>
                       </div>
                       <div className={styles.mockupStatCard}>
-                        <div className={styles.statLabel}>MILESTONE REVIEWS</div>
-                        <div className={styles.statNum}>182</div>
-                        <div className={styles.statDesc}>Feedback Streams</div>
+                        <div className={styles.statLabel}>REVIEW EMAILS</div>
+                        <div className={styles.statNum}>118</div>
+                        <div className={styles.statDesc}>Feedback reports sent</div>
                       </div>
                     </div>
 
                     <div className={styles.mockupTableRow}>
                       <div className={styles.tableHeader}>
-                        <span>TIMESTAMP</span>
+                        <span>TIME</span>
                         <span>RECIPIENT</span>
-                        <span>STREAM / TYPE</span>
+                        <span>TYPE</span>
                         <span>SUBJECT</span>
-                        <span>DKIM / SPF STATUS</span>
+                        <span>STATUS</span>
                       </div>
                       <div className={styles.tableRowItem}>
                         <span className={styles.timeText}>Just now</span>
-                        <strong>dharshanab32@gmail.com</strong>
+                        <strong>intern.sample1@shortfundly.com</strong>
                         <span className={styles.pillPurple}>OFFER_LETTER</span>
-                        <span>Official Internship Offer & Contract</span>
-                        <span className={styles.pillGreen}><Check size={11} /> 100% Primary Inbox</span>
+                        <span>Official Internship Offer Letter</span>
+                        <span className={styles.pillGreen}><Check size={11} /> Delivered</span>
                       </div>
                       <div className={styles.tableRowItem}>
                         <span className={styles.timeText}>2 mins ago</span>
-                        <strong>dachudharshana17@gmail.com</strong>
+                        <strong>intern.sample2@shortfundly.com</strong>
                         <span className={styles.pillPurple}>OFFER_LETTER</span>
-                        <span>Official Internship Offer & Contract</span>
-                        <span className={styles.pillGreen}><Check size={11} /> 100% Primary Inbox</span>
+                        <span>Official Internship Offer Letter</span>
+                        <span className={styles.pillGreen}><Check size={11} /> Delivered</span>
                       </div>
                     </div>
                   </div>
@@ -349,10 +349,10 @@ export default function LandingPage() {
       <section id="modules" className={styles.modulesSection}>
         <div className={styles.container}>
           <div className={styles.sectionHeading}>
-            <div className={styles.sectionBadge}>System Capabilities</div>
-            <h2 className={styles.sectionTitle}>The 6 Production Modules</h2>
+            <div className={styles.sectionBadge}>Core Platform</div>
+            <h2 className={styles.sectionTitle}>Everything You Need to Manage Interns</h2>
             <p className={styles.sectionSubtitle}>
-              Engineered end-to-end to manage candidate intake, offer dispatches, task sprints, multi-session reviews, certificates, and deliverability audit trails.
+              Handle candidate intake, offer letters, tasks, reviews, and completion certificates from a single dashboard.
             </p>
           </div>
 
@@ -365,14 +365,14 @@ export default function LandingPage() {
                 </div>
                 <span className={styles.moduleNumber}>01</span>
               </div>
-              <h3 className={styles.moduleTitle}>Automate Offer Letter</h3>
+              <h3 className={styles.moduleTitle}>Send Offer Letters</h3>
               <p className={styles.moduleDesc}>
-                Sequential single intake and bulk dataset loading (.xlsx / .csv). Generates customized single-page Playwright A4 PDF offer contracts, creates cryptographic SHA-256 decision tokens, and delivers directly via Google SMTP.
+                Add candidates one by one or upload an Excel file. Automatically create personalized PDF offer letters and send them with a secure response link.
               </p>
               <ul className={styles.moduleFeatureList}>
-                <li><Check size={13} color="#a855f7" /> Playwright headless PDF generation (&lt; 1.2s)</li>
-                <li><Check size={13} color="#a855f7" /> Cryptographic offer acceptance & sign link</li>
-                <li><Check size={13} color="#a855f7" /> Custom Jinja email templating engine</li>
+                <li><Check size={13} color="#a855f7" /> Fast PDF generation with official formatting</li>
+                <li><Check size={13} color="#a855f7" /> One-click accept or decline online links</li>
+                <li><Check size={13} color="#a855f7" /> Customizable email wording and attachments</li>
               </ul>
             </div>
 
@@ -384,14 +384,14 @@ export default function LandingPage() {
                 </div>
                 <span className={styles.moduleNumber}>02</span>
               </div>
-              <h3 className={styles.moduleTitle}>Task Allocation & Milestones</h3>
+              <h3 className={styles.moduleTitle}>Assign Tasks & Milestones</h3>
               <p className={styles.moduleDesc}>
-                Role-based sprint task allocation powered by 15 Gemma 2B industrial task templates. Seamless Google Meet conference generation, individual or batch-wise meeting rooms, and automated deadline reminders.
+                Choose ready-to-use task templates tailored to each role. Automatically attach Google Meet links and send automated reminder emails before the deadline.
               </p>
               <ul className={styles.moduleFeatureList}>
-                <li><Check size={13} color="#38bdf8" /> 15 Industrial role templates (AI, Web, UI/UX)</li>
-                <li><Check size={13} color="#38bdf8" /> Real Google Meet room URL auto-generation</li>
-                <li><Check size={13} color="#38bdf8" /> 24h deadline reminder mail automation</li>
+                <li><Check size={13} color="#38bdf8" /> 15 Role templates for Developers, AI, and Design</li>
+                <li><Check size={13} color="#38bdf8" /> Automatic Google Meet video conference links</li>
+                <li><Check size={13} color="#38bdf8" /> Automatic deadline reminders sent to students</li>
               </ul>
             </div>
 
@@ -403,14 +403,14 @@ export default function LandingPage() {
                 </div>
                 <span className={styles.moduleNumber}>03</span>
               </div>
-              <h3 className={styles.moduleTitle}>Milestone Reviews & Mentorship</h3>
+              <h3 className={styles.moduleTitle}>Reviews & Mentorship</h3>
               <p className={styles.moduleDesc}>
-                HR-decided multi-session review coordination (Review 1, Review 2, QA signoff). Upload subsequent feedback via Excel/CSV, inspect intern preview rows before sending, and dispatch evaluation summaries.
+                Set up Review 1, Review 2, and final evaluation meetings. Upload feedback spreadsheets, preview candidate scores, and send review summary emails.
               </p>
               <ul className={styles.moduleFeatureList}>
-                <li><Check size={13} color="#10b981" /> Full intern details preview in all 3 sub-tabs</li>
-                <li><Check size={13} color="#10b981" /> Subsequent feedback CSV / Excel ingestion</li>
-                <li><Check size={13} color="#10b981" /> Cumulative percentage performance scoring</li>
+                <li><Check size={13} color="#10b981" /> Preview candidate details before dispatching</li>
+                <li><Check size={13} color="#10b981" /> Upload feedback via Excel or CSV easily</li>
+                <li><Check size={13} color="#10b981" /> Automatic score calculation and tracking</li>
               </ul>
             </div>
 
@@ -422,14 +422,14 @@ export default function LandingPage() {
                 </div>
                 <span className={styles.moduleNumber}>04</span>
               </div>
-              <h3 className={styles.moduleTitle}>Unified Intern Ledger & Batches</h3>
+              <h3 className={styles.moduleTitle}>Candidate Directory & Batches</h3>
               <p className={styles.moduleDesc}>
-                Centralized registry of all candidate details with dynamic batch segregation (Batch A, B, C, D, E, Solo Interns). Quick drag-and-drop batch reassignment, lifecycle attrition tracking, and instant Excel/CSV exports.
+                Keep track of all interns in one list. Organize interns into Batch A, B, C, or custom groups, and export reports to Excel or CSV anytime.
               </p>
               <ul className={styles.moduleFeatureList}>
-                <li><Check size={13} color="#fbbf24" /> Dynamic customizable batches & roles</li>
-                <li><Check size={13} color="#fbbf24" /> 1-Click Master Excel & CSV export</li>
-                <li><Check size={13} color="#fbbf24" /> Departure, completion & attrition ledger</li>
+                <li><Check size={13} color="#fbbf24" /> Flexible batch organization and filters</li>
+                <li><Check size={13} color="#fbbf24" /> 1-Click Excel and CSV downloads</li>
+                <li><Check size={13} color="#fbbf24" /> Track active interns and completions</li>
               </ul>
             </div>
 
@@ -443,12 +443,12 @@ export default function LandingPage() {
               </div>
               <h3 className={styles.moduleTitle}>Internship Certificates</h3>
               <p className={styles.moduleDesc}>
-                Generate and dispatch officially formatted, tamper-proof completion certificates signed by Founder & CEO Selvam M. Includes cryptographic certificate ID verification and high-resolution PDF attachments.
+                Create and email verified completion certificates signed by the CEO. Each certificate includes an official ID and is attached as a clean PDF.
               </p>
               <ul className={styles.moduleFeatureList}>
-                <li><Check size={13} color="#f472b6" /> Official Founder signature & corporate seal</li>
-                <li><Check size={13} color="#f472b6" /> Automated single & batch certificate issuing</li>
-                <li><Check size={13} color="#f472b6" /> Cryptographic certificate validation token</li>
+                <li><Check size={13} color="#f472b6" /> Official CEO signature and company branding</li>
+                <li><Check size={13} color="#f472b6" /> Send certificates individually or in bulk</li>
+                <li><Check size={13} color="#f472b6" /> Unique certificate ID for easy verification</li>
               </ul>
             </div>
 
@@ -460,14 +460,14 @@ export default function LandingPage() {
                 </div>
                 <span className={styles.moduleNumber}>06</span>
               </div>
-              <h3 className={styles.moduleTitle}>Telemetry & Audit Stream</h3>
+              <h3 className={styles.moduleTitle}>Track Emails & History</h3>
               <p className={styles.moduleDesc}>
-                Real-time delivery verification across every communication channel. Guaranteed RFC 5322 compliance, Google Workspace SMTP authentication, zero-leak rate-limiting queue, and cryptographic delivery audit logs.
+                See every email sent across offer letters, tasks, and reviews. Track delivery status in real time so you know your emails reached the recipient inbox.
               </p>
               <ul className={styles.moduleFeatureList}>
-                <li><Check size={13} color="#c084fc" /> 100% DKIM / SPF Primary Inbox alignment</li>
-                <li><Check size={13} color="#c084fc" /> Full email body & recipient inspection</li>
-                <li><Check size={13} color="#c084fc" /> Batch-wise stream filtering & search</li>
+                <li><Check size={13} color="#c084fc" /> Direct delivery using your Google account</li>
+                <li><Check size={13} color="#c084fc" /> Inspect sent email text and recipients</li>
+                <li><Check size={13} color="#c084fc" /> Filter email history by batch and category</li>
               </ul>
             </div>
           </div>
@@ -478,10 +478,10 @@ export default function LandingPage() {
       <section id="workflow" className={styles.workflowSection}>
         <div className={styles.container}>
           <div className={styles.sectionHeading}>
-            <div className={styles.sectionBadge}>End-To-End Pipeline</div>
-            <h2 className={styles.sectionTitle}>The 5-Step Internship Lifecycle</h2>
+            <div className={styles.sectionBadge}>Step-by-Step Flow</div>
+            <h2 className={styles.sectionTitle}>The 5-Step Internship Process</h2>
             <p className={styles.sectionSubtitle}>
-              From prospective candidate intake to final certificate issuance, every milestone is managed with zero manual friction.
+              From prospective candidate intake to final certificate issuance, every milestone is organized and clear.
             </p>
           </div>
 
@@ -490,31 +490,31 @@ export default function LandingPage() {
               <div className={styles.stepNum}>01</div>
               <h4 className={styles.stepName}>Intake & Batching</h4>
               <p className={styles.stepInfo}>
-                HR uploads candidate roster via Excel or uses sequential intake. Interns are auto-assigned an Intern ID and grouped into Batch A, B, C, or custom cohorts.
+                Upload intern lists from Excel or enter candidates individually. Organize students into Batch A, B, or custom groups.
               </p>
             </div>
 
             <div className={styles.workflowStep}>
               <div className={styles.stepNum}>02</div>
-              <h4 className={styles.stepName}>Offer Dispatch & Signing</h4>
+              <h4 className={styles.stepName}>Offer Dispatch</h4>
               <p className={styles.stepInfo}>
-                Playwright renders customized A4 offer letters. Candidates receive email with secure SHA-256 response links to accept or sign online before deadline.
+                Generate personalized offer PDFs. Candidates receive an email with a secure link to review and sign their offer online.
               </p>
             </div>
 
             <div className={styles.workflowStep}>
               <div className={styles.stepNum}>03</div>
-              <h4 className={styles.stepName}>Task & Meet Provisioning</h4>
+              <h4 className={styles.stepName}>Task Assignment</h4>
               <p className={styles.stepInfo}>
-                HR selects Gemma 2B industrial sprint tasks. Google Meet conferencing is auto-provisioned (batch-wise or individual) with calendar invites and reminder crons.
+                Select practical tasks for each role. Meeting rooms are automatically scheduled, and deadline reminders are sent.
               </p>
             </div>
 
             <div className={styles.workflowStep}>
               <div className={styles.stepNum}>04</div>
-              <h4 className={styles.stepName}>Milestone Reviews</h4>
+              <h4 className={styles.stepName}>Review & Feedback</h4>
               <p className={styles.stepInfo}>
-                Evaluators conduct scheduled code walkthroughs. Feedback CSVs are uploaded directly, updating cumulative performance scores and triggering review emails.
+                Mentors evaluate project work, enter feedback scores, and send review emails to students after each checkpoint.
               </p>
             </div>
 
@@ -522,7 +522,7 @@ export default function LandingPage() {
               <div className={styles.stepNum}>05</div>
               <h4 className={styles.stepName}>Certification</h4>
               <p className={styles.stepInfo}>
-                Upon completing sprint deliverables, final scores are computed and official Shortfundly Completion Certificates are generated and delivered automatically.
+                Once tasks are complete, final scores are recorded and official signed completion certificates are sent automatically.
               </p>
             </div>
           </div>
@@ -535,8 +535,8 @@ export default function LandingPage() {
           <div className={styles.architectureCard}>
             <div className={styles.archHeader}>
               <div>
-                <div className={styles.sectionBadge}>Enterprise Foundation</div>
-                <h2 className={styles.archTitle}>Production Stack & Cryptographic Security</h2>
+                <div className={styles.sectionBadge}>Reliable Foundations</div>
+                <h2 className={styles.archTitle}>Fast, Secure, and Dependable Technology</h2>
               </div>
               <div className={styles.badgeLive}>VERIFIED ACTIVE</div>
             </div>
@@ -545,32 +545,32 @@ export default function LandingPage() {
               <div className={styles.archItem}>
                 <div className={styles.archIcon}><Database size={18} color="#a855f7" /></div>
                 <div>
-                  <h4 className={styles.archName}>Supabase PostgreSQL + Prisma ORM</h4>
-                  <p className={styles.archText}>Enterprise connection pooler with foreign-key referential integrity and strict relational constraints.</p>
+                  <h4 className={styles.archName}>Cloud Database Storage</h4>
+                  <p className={styles.archText}>Stores all candidates, tasks, review scores, and email history safely with automatic backups.</p>
                 </div>
               </div>
 
               <div className={styles.archItem}>
                 <div className={styles.archIcon}><Send size={18} color="#38bdf8" /></div>
                 <div>
-                  <h4 className={styles.archName}>Google SMTP Direct Transport</h4>
-                  <p className={styles.archText}>SSL/TLS port 465 with authentic DKIM & SPF canonical headers for zero-spam primary inbox delivery.</p>
+                  <h4 className={styles.archName}>Google Email Integration</h4>
+                  <p className={styles.archText}>Connects directly with your Google account using secure app passwords for dependable email delivery.</p>
                 </div>
               </div>
 
               <div className={styles.archItem}>
                 <div className={styles.archIcon}><Lock size={18} color="#10b981" /></div>
                 <div>
-                  <h4 className={styles.archName}>Cryptographic Decision Tokens</h4>
-                  <p className={styles.archText}>High-entropy 256-bit crypto tokens with atomic concurrency locking to prevent double-acceptance races.</p>
+                  <h4 className={styles.archName}>Secure Response Links</h4>
+                  <p className={styles.archText}>Each intern receives an individual link to safely accept their offer or submit their work.</p>
                 </div>
               </div>
 
               <div className={styles.archItem}>
                 <div className={styles.archIcon}><Cpu size={18} color="#fbbf24" /></div>
                 <div>
-                  <h4 className={styles.archName}>Next.js 16 + Turbopack SSR</h4>
-                  <p className={styles.archText}>High-performance server-rendered route handlers, edge caching, and sub-second cold starts.</p>
+                  <h4 className={styles.archName}>Fast Modern Architecture</h4>
+                  <p className={styles.archText}>Built with modern web technology for rapid loading, instant search, and seamless page transitions.</p>
                 </div>
               </div>
             </div>
@@ -584,15 +584,15 @@ export default function LandingPage() {
           <div className={styles.ctaCard}>
             <div className={styles.ctaBadge}>
               <Sparkles size={14} />
-              <span>Ready for Operational Deployment</span>
+              <span>Ready for Your Team</span>
             </div>
-            <h2 className={styles.ctaTitle}>Start Streamlining Internship Operations</h2>
+            <h2 className={styles.ctaTitle}>Start Managing Interns More Efficiently</h2>
             <p className={styles.ctaSubtitle}>
-              Access the Shortfundly Operations Portal to dispatch offers, track submissions, and manage candidate reviews with modern precision.
+              Open the Shortfundly Operations Portal to send offer letters, coordinate task reviews, and issue certificates in a few simple steps.
             </p>
             <div className={styles.ctaBtnGroup}>
               <Link href="/login" prefetch={true} className={styles.btnPrimaryLg}>
-                <span>Launch Operations Portal</span>
+                <span>Open Operations Portal</span>
                 <ArrowRight size={16} />
               </Link>
             </div>
@@ -612,26 +612,26 @@ export default function LandingPage() {
                 <span className={styles.brandName} style={{ fontSize: '15px' }}>Shortfundly Operations Portal</span>
               </div>
               <p className={styles.footerBrandDesc}>
-                Official Talent Acquisition & Internship Automation Infrastructure. Engineered for speed, RFC email deliverability, and verified milestone continuity.
+                Official platform for internship communication, task tracking, and milestone reviews at Shortfundly Media Technologies.
               </p>
               <div className={styles.footerLiveIndicator}>
                 <span className={styles.statusDot}></span>
-                <span>System Operational &bull; Supabase PostgreSQL &bull; Google SMTP Live</span>
+                <span>System Operational &bull; Google Mail Ready &bull; Database Connected</span>
               </div>
             </div>
 
             <div className={styles.footerLinksGrid}>
               <div className={styles.footerCol}>
-                <h5 className={styles.footerColTitle}>Navigation</h5>
-                <a href="#modules" className={styles.footerLink}>Modules</a>
-                <a href="#workflow" className={styles.footerLink}>Workflow</a>
-                <a href="#architecture" className={styles.footerLink}>Architecture</a>
-                <a href="#security" className={styles.footerLink}>Security</a>
+                <h5 className={styles.footerColTitle}>Quick Links</h5>
+                <a href="#modules" className={styles.footerLink}>Features</a>
+                <a href="#workflow" className={styles.footerLink}>How It Works</a>
+                <a href="#architecture" className={styles.footerLink}>Technology</a>
+                <a href="#modules" className={styles.footerLink}>All Modules</a>
               </div>
 
               <div className={styles.footerCol}>
-                <h5 className={styles.footerColTitle}>Portal Access</h5>
-                <Link href="/login" className={styles.footerLink}>System Admin Login</Link>
+                <h5 className={styles.footerColTitle}>Portal Roles</h5>
+                <Link href="/login" className={styles.footerLink}>Administrator Login</Link>
                 <Link href="/login" className={styles.footerLink}>HR Coordinator Access</Link>
                 <Link href="/login" className={styles.footerLink}>Technical Reviewer</Link>
               </div>
@@ -650,11 +650,11 @@ export default function LandingPage() {
               &copy; {new Date().getFullYear()} Shortfundly Media Technologies Pvt. Ltd. All rights reserved.
             </div>
             <div className={styles.footerLegal}>
-              <span>RFC 5322 Compliant</span>
+              <span>Standard Email Delivery</span>
               <span>&bull;</span>
-              <span>256-bit AES Encryption</span>
+              <span>Secure Data Storage</span>
               <span>&bull;</span>
-              <span>Playwright PDF Engine</span>
+              <span>PDF Documents</span>
             </div>
           </div>
         </div>

@@ -105,8 +105,8 @@ export default function UnifiedEmailTracker({
             <Mail size={22} />
           </div>
           <div>
-            <h2 className={styles.mainTitle}>Email Telemetry & Audit Stream</h2>
-            <p className={styles.subtitle}>Cryptographic Delivery Logs &bull; Dispatch Stream Verification &bull; RFC Compliance Tracking</p>
+            <h2 className={styles.mainTitle}>Track Emails</h2>
+            <p className={styles.subtitle}>Real-time delivery status, sent messages, and email history across all workflows.</p>
           </div>
         </div>
 
@@ -126,25 +126,25 @@ export default function UnifiedEmailTracker({
         <div className={styles.metricCard}>
           <div className={styles.metricLabel}>Offer Letters</div>
           <div className={styles.metricValue}>{offerCount}</div>
-          <div className={styles.metricDesc}>Dispatched to Inboxes</div>
+          <div className={styles.metricDesc}>Delivered to Inboxes</div>
         </div>
 
         <div className={styles.metricCard}>
           <div className={styles.metricLabel}>Task Assignments</div>
           <div className={styles.metricValue}>{taskCount}</div>
-          <div className={styles.metricDesc}>With Google Meet Links</div>
+          <div className={styles.metricDesc}>With Meeting Links</div>
         </div>
 
         <div className={styles.metricCard}>
-          <div className={styles.metricLabel}>Milestone Reviews</div>
+          <div className={styles.metricLabel}>Reviews & Feedback</div>
           <div className={styles.metricValue}>{reviewCount}</div>
-          <div className={styles.metricDesc}>Feedback & Schedule Logs</div>
+          <div className={styles.metricDesc}>Feedback Reports Sent</div>
         </div>
 
         <div className={styles.metricCard}>
-          <div className={styles.metricLabel}>Formal Warnings</div>
+          <div className={styles.metricLabel}>Warning Notices</div>
           <div className={styles.metricValue} style={{ color: '#f87171' }}>{warningCount}</div>
-          <div className={styles.metricDesc}>10% Deductions Applied</div>
+          <div className={styles.metricDesc}>Recorded Warnings</div>
         </div>
       </div>
 
@@ -164,7 +164,7 @@ export default function UnifiedEmailTracker({
         {/* Category Pills */}
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           {[
-            { id: 'ALL', label: 'All Streams' },
+            { id: 'ALL', label: 'All Emails' },
             { id: 'OFFER', label: 'Offer Letters' },
             { id: 'TASK', label: 'Tasks' },
             { id: 'REVIEW', label: 'Reviews' },
@@ -199,7 +199,7 @@ export default function UnifiedEmailTracker({
       <div className={styles.tableCard}>
         <div className={styles.tableHeaderRow}>
           <strong style={{ color: '#ffffff', fontSize: '13.5px' }}>
-            Showing {filteredEmails.length} Email Dispatch Records
+            Showing {filteredEmails.length} Sent Email Records
           </strong>
         </div>
 

@@ -313,8 +313,8 @@ export default function AllCandidatesView({
             <Users size={22} />
           </div>
           <div>
-            <h2 className={styles.mainTitle}>Candidate Directory & Attrition Ledger</h2>
-            <p className={styles.subtitle}>Unified Verification Ledger &bull; Role & Batch Filters &bull; Lifecycle Status Management</p>
+            <h2 className={styles.mainTitle}>Candidate Directory</h2>
+            <p className={styles.subtitle}>View and manage all enrolled interns, filter by batch or role, and export records.</p>
           </div>
         </div>
       </div>
@@ -385,7 +385,7 @@ export default function AllCandidatesView({
               title="Export filtered candidates to Excel with all intern details"
             >
               <FileSpreadsheet size={14} color="#34d399" />
-              <span>Export Excel ({filteredCandidates.length})</span>
+              <span>Export to Excel ({filteredCandidates.length})</span>
             </button>
 
             <button
@@ -397,7 +397,7 @@ export default function AllCandidatesView({
               title="Export filtered candidates to CSV with all intern details"
             >
               <Download size={14} color="#38bdf8" />
-              <span>Export CSV</span>
+              <span>Export to CSV</span>
             </button>
           </div>
         </div>
@@ -589,7 +589,7 @@ export default function AllCandidatesView({
             <div className={styles.modalHeader}>
               <h3 style={{ margin: 0, fontSize: '16px', color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <UserX size={18} color="#ef4444" />
-                <span>Remove Candidate &bull; Leaved Internship</span>
+                <span>Remove Intern &bull; Mark as Left Internship</span>
               </h3>
               <button type="button" onClick={() => setLeavingCandidate(null)} style={{ color: '#94a3b8', cursor: 'pointer' }}>
                 <X size={18} />

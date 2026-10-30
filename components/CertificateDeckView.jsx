@@ -125,8 +125,8 @@ export default function CertificateDeckView({
             <Award size={22} />
           </div>
           <div>
-            <h2 className={styles.mainTitle}>CEO Certificate Evaluation & Approval Deck</h2>
-            <p className={styles.subtitle}>Dynamic Cumulative Score Averaging &bull; End-of-Tenure Review &bull; Canva-Style Certificate Generation with Selvam Signature</p>
+            <h2 className={styles.mainTitle}>Certificate Approvals & Generation</h2>
+            <p className={styles.subtitle}>Review final intern scores, approve completion certificates, and send official signed credentials.</p>
           </div>
         </div>
 

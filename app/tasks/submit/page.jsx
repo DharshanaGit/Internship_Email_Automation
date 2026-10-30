@@ -89,7 +89,7 @@ export default function TaskSubmitPage() {
     return (
       <div className={styles.pageWrapper}>
         <div className={styles.container} style={{ textAlign: 'center', padding: '48px' }}>
-          <div style={{ color: 'var(--text-muted)' }}>Verifying milestone submission credentials...</div>
+          <div style={{ color: 'var(--text-muted)' }}>Loading task details...</div>
         </div>
       </div>
     );
@@ -113,7 +113,7 @@ export default function TaskSubmitPage() {
       <div className={styles.container}>
         <div className={styles.header}>
           <div className={styles.companyTitle}>SHORTFUNDLY</div>
-          <div className={styles.companySubtitle}>Shortfundly Media Technologies Pvt. Ltd. &bull; Milestone Deliverable Submission Portal</div>
+          <div className={styles.companySubtitle}>Shortfundly Media Technologies Pvt. Ltd. &bull; Task Submission Portal</div>
 
           <div className={styles.badgeBlock}>
             <div className={styles.internIdBadge}>

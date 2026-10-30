@@ -500,16 +500,16 @@ www.shortfundly.com`;
       {/* 1. PROGRESS WORKFLOW STEPPER */}
       <div className={styles.stepIndicator}>
         <div className={`${styles.stepPill} ${currentStep === 1 ? styles.stepPillActive : isStep1Valid ? styles.stepPillCompleted : ''}`}>
-          <span>1. Sequential Candidate Intake</span>
+          <span>1. Enter Candidate Details</span>
           {isStep1Valid && <CheckCircle2 size={14} color="#10b981" />}
         </div>
 
         <div className={`${styles.stepPill} ${currentStep === 2 ? styles.stepPillActive : currentStep > 2 ? styles.stepPillCompleted : ''}`}>
-          <span>2. Select Text Template & Add cc</span>
+          <span>2. Choose Email Template</span>
         </div>
 
         <div className={`${styles.stepPill} ${currentStep === 3 ? styles.stepPillActive : ''}`}>
-          <span>3. Preview Email & PDF &rarr; Send</span>
+          <span>3. Preview & Send Offer</span>
         </div>
       </div>
 
@@ -527,7 +527,7 @@ www.shortfundly.com`;
           <div className={styles.modeToggleRow}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Users size={16} color="#a855f7" />
-              <strong style={{ color: '#ffffff', fontSize: '14px' }}>Candidate Intake Mode:</strong>
+              <strong style={{ color: '#ffffff', fontSize: '14px' }}>Candidate Source:</strong>
             </div>
 
             <div className={styles.modeToggleButtons}>
@@ -833,9 +833,9 @@ www.shortfundly.com`;
             <div className={styles.fieldGroup} style={{ gridColumn: 'span 2', background: '#09090b', padding: '14px 16px', borderRadius: '8px', border: '1px solid #232328' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <label className={styles.fieldLabel} style={{ margin: 0 }}>
-                  <span style={{ color: '#ffffff', fontWeight: 700 }}>Unique Candidate Portal Response URL</span>
+                  <span style={{ color: '#ffffff', fontWeight: 700 }}>Candidate Offer Acceptance Link</span>
                   <span style={{ fontSize: '11px', color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <Sparkles size={11} /> Live Production Vercel Link
+                    <Sparkles size={11} /> Active Response Link
                   </span>
                 </label>
                 <div style={{ display: 'flex', gap: '6px' }}>

@@ -1661,7 +1661,7 @@ export default function DashboardPage() {
             className={`${styles.navTab} ${activeTab === 'offer-letter' ? styles.navTabActive : ''}`}
           >
             <FileCheck size={16} />
-            <span>Offer Dispatch</span>
+            <span>Offer Letters</span>
             <span className={styles.tabBadge}>{stats.offerLetters?.total || 0}</span>
           </button>
         )}
@@ -1672,7 +1672,7 @@ export default function DashboardPage() {
             className={`${styles.navTab} ${activeTab === 'tasks' ? styles.navTabActive : ''}`}
           >
             <Calendar size={16} />
-            <span>Task Allocation</span>
+            <span>Assign Tasks</span>
           </button>
         )}
 
@@ -1681,7 +1681,7 @@ export default function DashboardPage() {
           className={`${styles.navTab} ${activeTab === 'reviews' ? styles.navTabActive : ''}`}
         >
           <Clock size={16} />
-          <span>Reviews</span>
+          <span>Reviews & Feedback</span>
         </button>
 
         {(adminUser.role === 'ADMIN' || adminUser.role === 'HR') && (
@@ -1709,7 +1709,7 @@ export default function DashboardPage() {
           className={`${styles.navTab} ${activeTab === 'emails' ? styles.navTabActive : ''}`}
         >
           <Mail size={16} />
-          <span>Telemetry & Logs</span>
+          <span>Track Emails</span>
           <span className={styles.tabBadge}>{stats.emails?.total || 0}</span>
         </button>
 
@@ -1719,7 +1719,7 @@ export default function DashboardPage() {
             className={`${styles.navTab} ${activeTab === 'settings' ? styles.navTabActive : ''}`}
           >
             <Settings size={16} />
-            <span>Setting</span>
+            <span>Settings</span>
           </button>
         )}
       </nav>
@@ -1733,9 +1733,9 @@ export default function DashboardPage() {
           <div>
             <div className={styles.pageHeader}>
               <div className={styles.pageHeaderLeft}>
-                <h2 className={styles.pageTitle}>Offer Dispatch</h2>
+                <h2 className={styles.pageTitle}>Offer Letters</h2>
                 <p className={styles.pageSubtitle}>
-                  Personalized Playwright A4 PDF offer letter generation and dispatch with Google SMTP.
+                  Create personalized PDF offer letters and send them directly to candidates.
                 </p>
               </div>
 
@@ -1747,7 +1747,7 @@ export default function DashboardPage() {
                   className={`${styles.segmentedTab} ${offerSubTab === 'single' ? styles.segmentedTabActive : ''}`}
                 >
                   <Send size={14} />
-                  <span>Single Email Dispatcher</span>
+                  <span>Send Single Offer</span>
                 </button>
 
                 <button
@@ -1756,7 +1756,7 @@ export default function DashboardPage() {
                   className={`${styles.segmentedTab} ${offerSubTab === 'bulk' ? styles.segmentedTabActive : ''}`}
                 >
                   <FileSpreadsheet size={14} />
-                  <span>Bulk Dataset Loader (CSV / Excel)</span>
+                  <span>Send Bulk Offers (Excel / CSV)</span>
                 </button>
 
                 <button
@@ -1765,7 +1765,7 @@ export default function DashboardPage() {
                   className={`${styles.segmentedTab} ${offerSubTab === 'tracking' ? styles.segmentedTabActive : ''}`}
                 >
                   <UserCheck size={14} />
-                  <span>Decision Tracking (Accepted & Rejected)</span>
+                  <span>Track Offer Responses</span>
                 </button>
 
                 <button
@@ -1775,7 +1775,7 @@ export default function DashboardPage() {
                   title="Create new and customize offer letter templates"
                 >
                   <FileText size={14} />
-                  <span>Offer Letter Templates</span>
+                  <span>Offer Templates</span>
                 </button>
               </div>
             </div>
@@ -1829,23 +1829,23 @@ export default function DashboardPage() {
                 <div className={styles.metricValue} style={{ fontSize: '28px', color: '#ffffff', fontWeight: 800 }}>
                   {stats.offerLetters?.sent || 0}
                 </div>
-                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Successfully Dispatched</div>
+                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Delivered to Inboxes</div>
               </div>
 
               <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #f43f5e', background: 'rgba(14, 20, 34, 0.85)' }}>
-                <div className={styles.metricTitle} style={{ color: '#fb7185', fontWeight: 700 }}>OFFER LETTERS FAILED</div>
+                <div className={styles.metricTitle} style={{ color: '#fb7185', fontWeight: 700 }}>FAILED EMAILS</div>
                 <div className={styles.metricValue} style={{ fontSize: '28px', color: '#ffffff', fontWeight: 800 }}>
                   {stats.offerLetters?.failed || 0}
                 </div>
-                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Delivery Failures</div>
+                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Need Attention</div>
               </div>
 
               <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #f59e0b', background: 'rgba(14, 20, 34, 0.85)' }}>
-                <div className={styles.metricTitle} style={{ color: '#fbbf24', fontWeight: 700 }}>WAITING (READY TO SEND)</div>
+                <div className={styles.metricTitle} style={{ color: '#fbbf24', fontWeight: 700 }}>READY TO SEND</div>
                 <div className={styles.metricValue} style={{ fontSize: '28px', color: '#ffffff', fontWeight: 800 }}>
                   {stats.offerLetters?.waiting || stats.offerLetters?.readyToSend || 0}
                 </div>
-                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Pending Dispatch Confirmation</div>
+                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Waiting for Review</div>
               </div>
             </div>
 
@@ -4678,9 +4678,9 @@ export default function DashboardPage() {
           <div>
             <div className={styles.pageHeader}>
               <div className={styles.pageHeaderLeft}>
-                <h2 className={styles.pageTitle}>Setting</h2>
+                <h2 className={styles.pageTitle}>Settings</h2>
                 <p className={styles.pageSubtitle}>
-                  Configure Google SMTP authentication, production live mode, and sender identity.
+                  Configure your Google email credentials, sender details, and email preferences.
                 </p>
               </div>
             </div>
@@ -4767,10 +4767,10 @@ export default function DashboardPage() {
                     checked={sysSettings.simulationMode}
                     onChange={(e) => setSysSettings({ ...sysSettings, simulationMode: e.target.checked })}
                   />
-                  <span>Safe Mailer Simulation Mode (Unchecked = Real Production Google SMTP Sending)</span>
+                  <span>Simulation Mode (Test without sending real emails)</span>
                 </label>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px', marginLeft: '24px' }}>
-                  When unchecked, real emails are dispatched via Google SMTP using your authenticated Google App password.
+                  When unchecked, real emails will be sent directly to candidate inboxes using your Google account.
                 </div>
               </div>
 
