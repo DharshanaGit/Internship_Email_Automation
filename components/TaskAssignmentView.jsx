@@ -671,8 +671,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             <Briefcase size={22} />
           </div>
           <div>
-            <h2 className={styles.mainTitle}>Task Assignment & Technical Milestones Deck</h2>
-            <p className={styles.subtitle}>Gemma 2B Industrial Task Templates &bull; Google Meet Integration &bull; Automated Reminders & Submission Tracker</p>
+            <h2 className={styles.mainTitle}>Technical Milestone & Task Governance</h2>
+            <p className={styles.subtitle}>Role-Based Engineering Specifications &bull; Video Review Continuity &bull; Automated Telemetry</p>
           </div>
         </div>
 
@@ -693,7 +693,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             className={`${styles.subTabBtn} ${subTab === 'templates' ? styles.subTabBtnActive : ''}`}
           >
             <Sparkles size={14} />
-            <span>Task Templates (15 Gemma AI)</span>
+            <span>Milestone Templates</span>
           </button>
 
           <button
@@ -835,7 +835,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   type="checkbox"
                   checked={selectedCandidateIds.length === filteredCandidates.length && filteredCandidates.length > 0}
                   onChange={handleToggleSelectAll}
-                  style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
+                  style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                 />
                 <span style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>
                   {selectedCandidateIds.length} of {filteredCandidates.length} Selected
@@ -874,7 +874,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => handleToggleSelectOne(c.id)}
-                              style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
+                              style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                             />
                           </td>
                           <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 600 }}>
@@ -1507,7 +1507,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                 </div>
                               </div>
                             ) : isExpired ? (
-                              <span className={styles.badgeRose}>⚠️ Deadline Expired</span>
+                              <span className={styles.badgeRose}>Deadline Expired</span>
                             ) : (
                               <span className={styles.badgeAmber}>⏳ Pending Submission</span>
                             )}

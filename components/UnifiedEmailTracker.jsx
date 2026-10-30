@@ -105,8 +105,8 @@ export default function UnifiedEmailTracker({
             <Mail size={22} />
           </div>
           <div>
-            <h2 className={styles.mainTitle}>Unified Email Telemetry & Audit Stream</h2>
-            <p className={styles.subtitle}>Full Delivery Logs &bull; Filter by Stream: Offer, Task, Review, Warning, Certificate &bull; RFC Compliance Tracking</p>
+            <h2 className={styles.mainTitle}>Email Telemetry & Audit Stream</h2>
+            <p className={styles.subtitle}>Cryptographic Delivery Logs &bull; Dispatch Stream Verification &bull; RFC Compliance Tracking</p>
           </div>
         </div>
 

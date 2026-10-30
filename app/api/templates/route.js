@@ -20,7 +20,7 @@ Internship Logistics & Structure:
 Action Required: Review & Sign
 To review your formal corporate offer letter PDF and execute your digital signature, please access your secure portal using the link below:
 
-👉 Access Your Secure Offer Portal & Sign Offer:
+Access Your Secure Offer Portal & Sign Offer:
 {{responseUrl}}
 
 Important Note on Expiration: This offer and unique access link will officially expire on {{deadline}}. Please ensure you complete your response before this timestamp.

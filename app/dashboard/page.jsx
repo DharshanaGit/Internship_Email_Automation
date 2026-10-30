@@ -82,7 +82,7 @@ Work Location / Mode: {{work_mode}}
 
 Action Required: Review & Respond
 To review the full formal offer letter PDF attached to this email and record your response, please access your secure candidate portal via the unique link below:
-👉 Access Your Secure Offer Portal & Sign Offer:
+Access Your Secure Offer Portal & Sign Offer:
 {{response_url}}
 
 Important Note on Expiration: This unique link and offer will officially expire on {{deadline}}. Please ensure you complete your response before this deadline.
@@ -1532,7 +1532,7 @@ export default function DashboardPage() {
       if (data.success) {
         setBulkDispatchResults(data);
         showToast(
-          `🚀 Dispatched ${data.summary.sent} offer letter(s) to candidate email inboxes! Candidates moved to Task Assignment.`,
+          `Dispatched ${data.summary.sent} offer letter(s) to candidate email inboxes! Candidates moved to Task Assignment.`,
           data.summary.failed > 0 ? 'warning' : 'success'
         );
 
@@ -1582,8 +1582,8 @@ export default function DashboardPage() {
               <Send size={18} />
             </div>
             <div className={styles.logoInfo}>
-              <span className={styles.logoTitle}>Shortfundly Automation Portal</span>
-              <span className={styles.logoSubtitle}>Internship Operations Deck</span>
+              <span className={styles.logoTitle}>Shortfundly Operations Portal</span>
+              <span className={styles.logoSubtitle}>Enterprise Talent Operations Hub</span>
             </div>
           </div>
 
@@ -1606,7 +1606,7 @@ export default function DashboardPage() {
 
           <div className={styles.systemBadge}>
             <span className={styles.beaconDot} />
-            <span style={{ color: '#c084fc', fontWeight: 600 }}>Supabase PostgreSQL Prisma &bull; Google SMTP Production Ready</span>
+            <span style={{ color: '#c084fc', fontWeight: 600 }}>Mainnet • PostgreSQL Pooled • Google SMTP Active</span>
           </div>
 
           {/* Real-time Queue Status Indicator */}
@@ -1661,7 +1661,7 @@ export default function DashboardPage() {
             className={`${styles.navTab} ${activeTab === 'offer-letter' ? styles.navTabActive : ''}`}
           >
             <FileCheck size={16} />
-            <span>Automate Offer Letter</span>
+            <span>Offer Dispatch</span>
             <span className={styles.tabBadge}>{stats.offerLetters?.total || 0}</span>
           </button>
         )}
@@ -1672,7 +1672,7 @@ export default function DashboardPage() {
             className={`${styles.navTab} ${activeTab === 'tasks' ? styles.navTabActive : ''}`}
           >
             <Calendar size={16} />
-            <span>Assign tasks</span>
+            <span>Task Allocation</span>
           </button>
         )}
 
@@ -1690,7 +1690,7 @@ export default function DashboardPage() {
             className={`${styles.navTab} ${activeTab === 'candidates' ? styles.navTabActive : ''}`}
           >
             <Users size={16} />
-            <span>All Candidates & Attrition</span>
+            <span>Candidate Directory</span>
           </button>
         )}
 
@@ -1700,7 +1700,7 @@ export default function DashboardPage() {
             className={`${styles.navTab} ${activeTab === 'certificates' ? styles.navTabActive : ''}`}
           >
             <Award size={16} />
-            <span>Internship certificates</span>
+            <span>Certificates</span>
           </button>
         )}
 
@@ -1709,7 +1709,7 @@ export default function DashboardPage() {
           className={`${styles.navTab} ${activeTab === 'emails' ? styles.navTabActive : ''}`}
         >
           <Mail size={16} />
-          <span>Track emails</span>
+          <span>Telemetry & Logs</span>
           <span className={styles.tabBadge}>{stats.emails?.total || 0}</span>
         </button>
 
@@ -1733,7 +1733,7 @@ export default function DashboardPage() {
           <div>
             <div className={styles.pageHeader}>
               <div className={styles.pageHeaderLeft}>
-                <h2 className={styles.pageTitle}>Automate Offer Letter</h2>
+                <h2 className={styles.pageTitle}>Offer Dispatch</h2>
                 <p className={styles.pageSubtitle}>
                   Personalized Playwright A4 PDF offer letter generation and dispatch with Google SMTP.
                 </p>
@@ -2170,10 +2170,10 @@ export default function DashboardPage() {
                                     value={row.batch || row.raw?.batch || 'Batch A'}
                                     onChange={(e) => handleUpdateCandidateBatch(row.candidateId, e.target.value)}
                                     style={{
-                                      background: '#141417',
-                                      border: '1px solid #7c3aed',
-                                      borderRadius: '4px',
-                                      color: '#c084fc',
+                                      background: 'var(--bg-input)',
+                                      border: '1px solid var(--border-subtle)',
+                                      borderRadius: 'var(--radius-sm)',
+                                      color: 'var(--text-primary)',
                                       padding: '3px 8px',
                                       fontSize: '11px',
                                       fontWeight: 600,
@@ -2255,7 +2255,7 @@ export default function DashboardPage() {
                             type="datetime-local"
                             value={bulkOfferDeadline}
                             onChange={(e) => setBulkOfferDeadline(e.target.value)}
-                            style={{ background: '#141417', border: '1px solid #7c3aed', borderRadius: '6px', color: '#ffffff', padding: '6px 12px', fontSize: '12.5px', outline: 'none' }}
+                            style={{ background: '#141417', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', colorScheme: 'dark', padding: '6px 12px', fontSize: '12.5px', outline: 'none' }}
                           />
                         </div>
                       </div>
@@ -2384,8 +2384,8 @@ export default function DashboardPage() {
                                   onClick={() => setBulkBannerImage('')}
                                   style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', padding: '0 2px' }}
                                   title="Remove Banner"
-                                >
-                                  ✕
+                                 style={{ display: "inline-flex", alignItems: "center" }}>
+                                  <X size={12} />
                                 </button>
                               </div>
                             )}
@@ -2399,8 +2399,8 @@ export default function DashboardPage() {
                                   onClick={() => setBulkAttachments(prev => prev.filter((_, i) => i !== idx))}
                                   style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', padding: '0 2px' }}
                                   title="Remove Attachment"
-                                >
-                                  ✕
+                                 style={{ display: "inline-flex", alignItems: "center" }}>
+                                  <X size={12} />
                                 </button>
                               </div>
                             ))}
@@ -4722,7 +4722,7 @@ export default function DashboardPage() {
                     <label className={styles.label} style={{ margin: 0 }}>Google App Password</label>
                     {sysSettings.hasPassword && (
                       <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
-                        ✓ Saved &amp; Encrypted
+                        <CheckCircle2 size={12} style={{ display: "inline", verticalAlign: "middle", marginRight: "3px" }} /> Saved &amp; Encrypted
                       </span>
                     )}
                   </div>

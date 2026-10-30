@@ -1,51 +1,62 @@
 /* Shortfundly Web3 Enterprise Operations Design System */
-/* Inspired by awesome-design-md (Kraken, Coinbase, Linear, Vercel) */
+/* Standardized according to DESIGN.md (awesome-design-md: Linear, Kraken, Coinbase, Vercel) */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --bg-app: #06050a;
-  --bg-surface: #0e0d16;
-  --bg-surface-elevated: #151322;
-  --bg-surface-hover: #1c1a2d;
-  --bg-input: #12111d;
-  --bg-input-focus: #181627;
-  --bg-badge: rgba(168, 85, 247, 0.15);
+  /* Surfaces & Canvas */
+  --bg-app: #07080b;
+  --bg-surface: #0d1017;
+  --bg-surface-elevated: #131722;
+  --bg-surface-hover: #181d2a;
+  --bg-input: #0a0c12;
+  --bg-input-focus: #0f121a;
+  --bg-badge: rgba(99, 102, 241, 0.12);
 
-  --border-subtle: #242236;
-  --border-medium: #322f4c;
-  --border-focus: #a855f7;
-  --border-active: #c084fc;
+  /* Hairlines & Dividers */
+  --border-hairline: rgba(255, 255, 255, 0.07);
+  --border-subtle: #1c202c;
+  --border-medium: #2a3042;
+  --border-focus: #6366f1;
+  --border-active: #818cf8;
 
-  --text-primary: #ffffff;
-  --text-secondary: #e2e8f0;
-  --text-muted: #94a3b8;
-  --text-accent: #e9d5ff;
+  /* Typography */
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --text-accent: #a5b4fc;
 
-  --accent-primary: #9333ea;
-  --accent-primary-hover: #7e22ce;
-  --accent-purple: #a855f7;
-  --accent-purple-light: #c084fc;
-  --accent-purple-dark: #7c3aed;
+  /* Semantic & Brand Accents */
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-primary-active: #4338ca;
+  --accent-purple: #818cf8;
+  --accent-purple-light: #a5b4fc;
+  --accent-purple-dark: #4f46e5;
   --accent-emerald: #10b981;
   --accent-amber: #f59e0b;
   --accent-rose: #ef4444;
   --accent-blue: #3b82f6;
-  --accent-cyan: #38bdf8;
+  --accent-cyan: #06b6d4;
 
+  /* Radii Scale */
   --radius-xs: 4px;
   --radius-sm: 6px;
-  --radius-md: 9px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 9999px;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.65), 0 2px 6px -1px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 16px 32px -4px rgba(0, 0, 0, 0.8), 0 6px 12px -2px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 24px rgba(168, 85, 247, 0.35);
-  --shadow-emerald-glow: 0 0 20px rgba(16, 185, 129, 0.3);
+  /* Shadows (Subtle, matte, non-glow) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.65), 0 4px 10px -2px rgba(0, 0, 0, 0.4);
+  --shadow-glow: none;
+  --shadow-emerald-glow: none;
 }
 
 * {
@@ -59,9 +70,6 @@ body {
   width: 100%;
   min-height: 100%;
   background-color: var(--bg-app);
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.12) 0%, transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
   color: var(--text-primary);
   font-family: var(--font-sans);
   line-height: 1.5;
@@ -88,19 +96,19 @@ textarea {
 }
 
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090810;
+  background: #07080b;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2b2742;
-  border-radius: 4px;
+  background: #1c202c;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9333ea;
+  background: #2a3042;
 }

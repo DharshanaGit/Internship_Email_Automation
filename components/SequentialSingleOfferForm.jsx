@@ -475,7 +475,7 @@ Internship Details:
 Action Required: Review & Respond
 To review the full formal offer letter PDF attached to this email and record your response, please access your secure candidate portal via the unique link below:
 
-👉 Access Your Secure Offer Portal & Sign Offer:
+Access Your Secure Offer Portal & Sign Offer:
 {{responseUrl}}
 
 Important Note on Expiration: This unique link and offer will officially expire on {{deadline}}. Please ensure you complete your response before this deadline.
@@ -1123,7 +1123,7 @@ www.shortfundly.com`;
                 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
               >
                 <Mail size={14} />
-                <span>✉️ 1. Email Content Preview</span>
+                <span>1. Email Content Preview</span>
               </button>
               <button
                 type="button"
@@ -1135,7 +1135,7 @@ www.shortfundly.com`;
                 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
               >
                 <FileText size={14} />
-                <span>📄 2. Offer Letter PDF Preview</span>
+                <span>2. Offer Letter PDF Preview</span>
               </button>
             </div>
           </div>

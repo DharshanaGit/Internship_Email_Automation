@@ -313,8 +313,8 @@ export default function AllCandidatesView({
             <Users size={22} />
           </div>
           <div>
-            <h2 className={styles.mainTitle}>All Candidate Directory & Attrition Records</h2>
-            <p className={styles.subtitle}>Unified Intern Ledger &bull; Role & Batch Filters &bull; Verify Candidates & Manage Departures</p>
+            <h2 className={styles.mainTitle}>Candidate Directory & Attrition Ledger</h2>
+            <p className={styles.subtitle}>Unified Verification Ledger &bull; Role & Batch Filters &bull; Lifecycle Status Management</p>
           </div>
         </div>
       </div>

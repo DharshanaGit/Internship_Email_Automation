@@ -63,7 +63,7 @@ This is a **Formal Performance Warning Notice** regarding your non-submission of
 - **Performance Deduction Applied:** **-${penaltyAmount}%**
 - **Updated Cumulative Performance Score:** **${newScore.toFixed(1)}%** (reduced from ${currentScore.toFixed(1)}%)
 
-${submissionUrl ? `**Immediate Rectification Required:**\nYou are granted an urgent grace window to submit your project repository and deliverables via the submission link below:\n👉 [Urgent Submission Portal](${submissionUrl})\n` : ''}
+${submissionUrl ? `**Immediate Rectification Required:**\nYou are granted an urgent grace window to submit your project repository and deliverables via the submission link below:\n[Urgent Submission Portal](${submissionUrl})\n` : ''}
 ${customNote ? `**HR Directive:**\n${customNote}\n` : ''}
 
 > **Strict Notice:** Subsequent missed deadlines or failure to attend scheduled reviews will result in further compounding score deductions and potential revocation of your internship certificate eligibility.

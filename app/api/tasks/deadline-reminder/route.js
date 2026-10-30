@@ -111,7 +111,7 @@ This is an official **Deadline Reminder** regarding your active Shortfundly inte
 - **Official Submission Deadline:** **${formattedDeadline}**
 - **Action Required:** Submit your completed project repository link and deployed demo link using your unique candidate portal website link below:
 
-👉 **[Access Candidate Portal: Submit Project & GitHub Link](${submissionUrl})**
+**[Access Candidate Portal: Submit Project & GitHub Link](${submissionUrl})**
 
 Direct Submission Link: ${submissionUrl}
 

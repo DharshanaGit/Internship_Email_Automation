@@ -401,8 +401,8 @@ export default function ReviewDashboardView({
             <UserCheck size={22} />
           </div>
           <div>
-            <h2 className={styles.mainTitle}>Milestone Review & Mentorship Dashboard</h2>
-            <p className={styles.subtitle}>Multi-Session Reviews &bull; Same Google Meet Continuity &bull; Feedback CSV Ingestion & Task Completion Checkpoint</p>
+            <h2 className={styles.mainTitle}>Milestone Review & Mentorship Audit</h2>
+            <p className={styles.subtitle}>Multi-Session Reviews &bull; Synchronized Meeting Continuity &bull; Evaluation Ledger & Finalization</p>
           </div>
         </div>
 
@@ -555,7 +555,7 @@ export default function ReviewDashboardView({
                 type="checkbox"
                 checked={selectedCandidateIds.length === filteredCandidates.length && filteredCandidates.length > 0}
                 onChange={handleToggleSelectAll}
-                style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
+                style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
               />
               <span style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>
                 {selectedCandidateIds.length} of {filteredCandidates.length} Selected
@@ -608,10 +608,10 @@ export default function ReviewDashboardView({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleToggleSelectOne(c.id)}
-                            style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
+                            style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                           />
                         </td>
-                        <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 600 }}>{c.internId}</td>
+                        <td><code style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-hairline)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{c.internId}</code></td>
                         <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
                         <td><span className={styles.badgePurple}>{c.batch}</span></td>
                         <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>#{task?.taskNumber || 1}</td>
@@ -1014,7 +1014,7 @@ export default function ReviewDashboardView({
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => handleToggleSelectOne(c.id)}
-                              style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
+                              style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                             />
                           </td>
                           <td style={{ fontFamily: 'monospace', color: '#c084fc' }}>{c.internId}</td>

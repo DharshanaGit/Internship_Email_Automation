@@ -60,7 +60,7 @@ Internship Details:
 Action Required: Review & Respond
 To review the full formal offer letter PDF attached to this email and record your response, please access your secure candidate portal via the unique link below:
 
-👉 Access Your Secure Offer Portal & Sign Offer:
+Access Your Secure Offer Portal & Sign Offer:
 {{responseUrl}}
 
 Important Note on Expiration: This unique link and offer will officially expire on {{deadline}}. Please ensure you complete your response before this deadline.
