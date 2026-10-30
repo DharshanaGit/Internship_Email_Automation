@@ -65,6 +65,9 @@ export default function SequentialSingleOfferForm({
     if (r.includes('ui') || r.includes('ux') || r.includes('design')) return 'UI';
     if (r.includes('ai') || r.includes('ml') || r.includes('machine') || r.includes('data')) return 'AI';
     if (r.includes('android') || r.includes('flutter') || r.includes('mobile') || r.includes('ios')) return 'MB';
+    if (r.includes('python')) return 'PY';
+    if (r.includes('cloud') || r.includes('devops')) return 'OPS';
+    if (r.includes('qa') || r.includes('test')) return 'QA';
     return 'DEV';
   };
 
@@ -75,8 +78,50 @@ export default function SequentialSingleOfferForm({
     return `SF-${kw}-2026-${randomSeq}`;
   };
 
+  // Preset Industry Intern Roles + Dynamic Custom Roles Storage
+  const DEFAULT_ROLES = [
+    'Web Developer Intern',
+    'Frontend Developer Intern',
+    'Backend Developer Intern',
+    'Full Stack Intern',
+    'AI / ML Engineer Intern',
+    'Python Developer Intern',
+    'Data Science Intern',
+    'UI/UX Design Intern',
+    'Mobile App Developer Intern',
+    'Cloud & DevOps Intern',
+    'QA / Software Tester Intern',
+  ];
+
+  const [roleOptions, setRoleOptions] = useState(() => {
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('sf_custom_roles') : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return [...new Set([...DEFAULT_ROLES, ...parsed])];
+      }
+    } catch (e) {}
+    return DEFAULT_ROLES;
+  });
+  const [isAddingNewRole, setIsAddingNewRole] = useState(false);
+  const [newRoleInput, setNewRoleInput] = useState('');
+
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const todayDateTimeStr = useMemo(() => new Date().toISOString().slice(0, 16), []);
+
+  // Compute dynamic initial dates: start +7 days, end +97 days (~90 days), deadline +3 days at 17:00
+  const initialDates = useMemo(() => {
+    const now = new Date();
+    const join = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const end = new Date(join.getTime() + 90 * 24 * 60 * 60 * 1000);
+    const dline = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+    dline.setHours(17, 0, 0, 0);
+
+    const joinStr = join.toISOString().split('T')[0];
+    const endStr = end.toISOString().split('T')[0];
+    const dlineStr = dline.toISOString().slice(0, 16);
+    return { joinStr, endStr, dlineStr, duration: '91 Days (~3 Months)' };
+  }, []);
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -88,14 +133,14 @@ export default function SequentialSingleOfferForm({
     collegeName: '',
     role: 'Web Developer Intern',
     stipend: '10000',
-    joiningDate: '2026-06-01',
-    endDate: '2026-08-31',
-    duration: '3 Months',
+    joiningDate: initialDates.joinStr,
+    endDate: initialDates.endStr,
+    duration: initialDates.duration,
     workMode: 'Online - Remote',
     reportingManager: 'Priyanka Nair',
     assignedMentor: 'Rahul Kapoor',
     batch: 'Batch A',
-    deadline: '',
+    deadline: initialDates.dlineStr,
     cc: '',
     templateId: '',
     customSubject: '',
@@ -230,24 +275,55 @@ export default function SequentialSingleOfferForm({
     }));
   };
 
-  // Auto-associate batch based on joining date
-  const handleJoiningDateChange = (newDate) => {
-    let suggestedBatch = formData.batch || 'Batch A';
-    if (newDate) {
-      const existingBatch = batches.find((b) => b.joiningDate === newDate);
-      if (existingBatch) {
-        suggestedBatch = existingBatch.batchName;
-      } else if (newDate.startsWith('2026-07')) {
-        suggestedBatch = 'Batch B';
-      } else if (newDate.startsWith('2026-08')) {
-        suggestedBatch = 'Batch C';
+  // Accurate real-time calculation of days and months between joining date and end date
+  const updateDatesAndDuration = (newJoining, newEnd) => {
+    const jDate = newJoining !== undefined ? newJoining : formData.joiningDate;
+    const eDate = newEnd !== undefined ? newEnd : formData.endDate;
+
+    let durationLabel = formData.duration;
+    if (jDate && eDate) {
+      const start = new Date(jDate);
+      const end = new Date(eDate);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+        const diffMs = end.getTime() - start.getTime();
+        const diffDays = Math.max(1, Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1);
+        const approxMonths = Math.max(1, Math.round(diffDays / 30));
+        durationLabel = `${diffDays} Days (~${approxMonths} Month${approxMonths > 1 ? 's' : ''})`;
       }
     }
+
+    let suggestedBatch = formData.batch;
+    if (newJoining) {
+      const existingBatch = batches.find((b) => b.joiningDate === newJoining);
+      if (existingBatch) suggestedBatch = existingBatch.batchName;
+    }
+
     setFormData((prev) => ({
       ...prev,
-      joiningDate: newDate,
-      batch: suggestedBatch,
+      ...(newJoining !== undefined ? { joiningDate: newJoining, batch: suggestedBatch } : {}),
+      ...(newEnd !== undefined ? { endDate: newEnd } : {}),
+      duration: durationLabel,
     }));
+  };
+
+  // Add custom new role on the spot
+  const handleAddNewRole = () => {
+    const trimmed = newRoleInput.trim();
+    if (!trimmed) {
+      showToast?.('Please enter a role designation title.', 'error');
+      return;
+    }
+    if (!roleOptions.includes(trimmed)) {
+      const updated = [trimmed, ...roleOptions];
+      setRoleOptions(updated);
+      try {
+        localStorage.setItem('sf_custom_roles', JSON.stringify(updated.filter((r) => !DEFAULT_ROLES.includes(r))));
+      } catch (e) {}
+    }
+    handleRoleChange(trimmed);
+    setNewRoleInput('');
+    setIsAddingNewRole(false);
+    showToast?.(`New role "${trimmed}" created and selected!`, 'success');
   };
 
   // Handle Role change: update readable Intern ID keyword
@@ -711,19 +787,75 @@ www.shortfundly.com`;
               />
             </div>
 
-            {/* Field 6: Designation / Role */}
+            {/* Field 6: Designation / Role (Select dropdown with on-the-spot Add) */}
             <div className={styles.fieldGroup}>
-              <label className={styles.fieldLabel}>
-                <span>Designation / Role <span className={styles.requiredStar}>*</span></span>
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Web Developer Intern"
-                value={formData.role}
-                onFocus={() => checkPrerequisite('role')}
-                onChange={(e) => handleRoleChange(e.target.value)}
-                className={`${styles.inputField} ${formData.role ? styles.inputValid : ''}`}
-              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label className={styles.fieldLabel} style={{ margin: 0 }}>
+                  <span>Designation / Role <span className={styles.requiredStar}>*</span></span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsAddingNewRole(!isAddingNewRole)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#c084fc',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: 0,
+                  }}
+                >
+                  <Plus size={12} />
+                  <span>{isAddingNewRole ? 'Cancel' : '+ Add New Role'}</span>
+                </button>
+              </div>
+
+              {!isAddingNewRole ? (
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <select
+                    value={formData.role}
+                    onFocus={() => checkPrerequisite('role')}
+                    onChange={(e) => handleRoleChange(e.target.value)}
+                    className={`${styles.selectField} ${formData.role ? styles.inputValid : ''}`}
+                    style={{ flex: 1 }}
+                  >
+                    {roleOptions.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div style={{ background: '#12111d', border: '1px solid #7c3aed44', borderRadius: '8px', padding: '10px' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      type="text"
+                      placeholder="e.g. AI Research Intern"
+                      value={newRoleInput}
+                      onChange={(e) => setNewRoleInput(e.target.value)}
+                      className={styles.inputField}
+                      style={{ flex: 1, padding: '7px 12px', fontSize: '13px' }}
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddNewRole}
+                      className={styles.btnPrimary}
+                      style={{ padding: '7px 14px', fontSize: '12px', whiteSpace: 'nowrap' }}
+                    >
+                      Add & Select
+                    </button>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block', marginTop: '4px' }}>
+                    Adds new role immediately to dropdown and selects it.
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Field 7: Stipend with suggestions + stepper */}
@@ -803,26 +935,33 @@ www.shortfundly.com`;
                 min={todayStr}
                 value={formData.joiningDate}
                 onFocus={() => checkPrerequisite('joiningDate')}
-                onChange={(e) => handleJoiningDateChange(e.target.value)}
+                onChange={(e) => updateDatesAndDuration(e.target.value, undefined)}
                 className={`${styles.inputField} ${formData.joiningDate ? styles.inputValid : ''}`}
               />
               <span style={{ fontSize: '11px', color: '#94a3b8' }}>Past dates not allowed (Min: {todayStr})</span>
             </div>
 
-            {/* Field 9: End Date (Calendar with past dates disabled) */}
+            {/* Field 9: End Date (Calendar with accurate real-time duration badge) */}
             <div className={styles.fieldGroup}>
-              <label className={styles.fieldLabel}>
-                <span>End Date (Calendar) <span className={styles.requiredStar}>*</span></span>
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label className={styles.fieldLabel} style={{ margin: 0 }}>
+                  <span>End Date (Calendar) <span className={styles.requiredStar}>*</span></span>
+                </label>
+                {formData.duration && (
+                  <span style={{ fontSize: '11px', color: '#a855f7', fontWeight: 600, background: '#7c3aed15', padding: '2px 8px', borderRadius: '4px', border: '1px solid #7c3aed33' }}>
+                    {formData.duration}
+                  </span>
+                )}
+              </div>
               <input
                 type="date"
                 min={formData.joiningDate || todayStr}
                 value={formData.endDate}
                 onFocus={() => checkPrerequisite('endDate')}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                onChange={(e) => updateDatesAndDuration(undefined, e.target.value)}
                 className={`${styles.inputField} ${formData.endDate ? styles.inputValid : ''}`}
               />
-              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Must be on or after joining date</span>
+              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Accurate calculation of days from joining to end date</span>
             </div>
 
             {/* Field 10: Expiry Date (Calendar with past dates disabled) */}

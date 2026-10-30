@@ -53,13 +53,20 @@ export async function GET(request) {
       return NextResponse.json({ success: false, error: 'Invalid or expired offer link.' }, { status: 404 });
     }
 
+    const alreadyResponded = candidate.offerLetterStatus === 'Accepted' || candidate.offerLetterStatus.startsWith('Rejected');
+
     let deadline = candidate.offerDeadline ? parseFlexibleDate(candidate.offerDeadline) : null;
-    if (!deadline) {
-      deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    if (!deadline || (Date.now() > deadline.getTime() && !alreadyResponded)) {
+      // Auto-extend by 30 days if not responded yet — link stays active
+      const newDeadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      await prisma.candidate.update({
+        where: { id: candidate.id },
+        data: { offerDeadline: newDeadline },
+      });
+      deadline = newDeadline;
     }
 
-    const isExpired = Boolean(deadline && Date.now() > deadline.getTime());
-    const alreadyResponded = candidate.offerLetterStatus === 'Accepted' || candidate.offerLetterStatus.startsWith('Rejected');
+    const isExpired = alreadyResponded ? false : Boolean(deadline && Date.now() > deadline.getTime());
 
     return NextResponse.json({
       success: true,

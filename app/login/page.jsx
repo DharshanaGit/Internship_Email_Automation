@@ -104,8 +104,6 @@ export default function LoginPage() {
 
   // Real-time validations for Sign In
   const loginEmailError = useMemo(() => validateEmail(email), [email]);
-  const loginPasswordError = useMemo(() => validateStrongPassword(password), [password]);
-  const loginPasswordCriteria = useMemo(() => getPasswordCriteria(password), [password]);
 
   // Real-time validations for Create Account
   const regNameError = useMemo(() => validateName(regName), [regName]);
@@ -153,8 +151,8 @@ export default function LoginPage() {
       return;
     }
 
-    if (loginPasswordError) {
-      setSubmitError(loginPasswordError);
+    if (!password) {
+      setSubmitError('Please enter your password.');
       return;
     }
 
@@ -379,14 +377,14 @@ export default function LoginPage() {
                   name="shortfundly_auth_secret"
                   id="shortfundly_auth_secret"
                   required
-                  className={`${styles.input} ${loginPasswordError ? styles.inputError : ''}`}
-                  placeholder="Enter password (min 8 characters)"
+                  className={styles.input}
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     setSubmitError('');
                   }}
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                   style={{ paddingRight: '42px' }}
                 />
                 <button
@@ -398,13 +396,6 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              {loginPasswordError && (
-                <div className={styles.fieldError}>
-                  <AlertCircle size={12} />
-                  <span>{loginPasswordError}</span>
-                </div>
-              )}
-              {renderPasswordCriteria(loginPasswordCriteria, password)}
             </div>
 
             <div className={styles.formGroup}>
@@ -448,8 +439,8 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading || !email || !password || !!loginEmailError || !!loginPasswordError || captchaAnswer.length < 4}
-              className={`${styles.submitButton} ${(loading || !email || !password || !!loginEmailError || !!loginPasswordError || captchaAnswer.length < 4) ? styles.submitButtonDisabled : ''}`}
+              disabled={loading || !email || !password || !!loginEmailError || captchaAnswer.length < 4}
+              className={`${styles.submitButton} ${(loading || !email || !password || !!loginEmailError || captchaAnswer.length < 4) ? styles.submitButtonDisabled : ''}`}
             >
               <span>{loading ? 'Authenticating...' : `Sign In as ${role}`}</span>
               <ArrowRight size={16} />

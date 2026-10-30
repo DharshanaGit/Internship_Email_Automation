@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
 import { sendEmail } from '@/lib/mailer.js';
 import { jinjaTextToEmailHtml } from '@/lib/jinjaEngine.js';
+import { getAppBaseUrl } from '@/lib/offerService.js';
 
 export async function GET(request) {
   try {
@@ -87,7 +88,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'No active assigned candidates found matching the criteria.' }, { status: 404 });
     }
 
-    const baseUrl = (process.env.APP_BASE_URL || 'https://internship-email-automation.vercel.app').replace(/\/+$/, '');
+    const baseUrl = getAppBaseUrl();
     const results = [];
     const formattedDeadline = submissionDeadline
       ? new Date(submissionDeadline).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })

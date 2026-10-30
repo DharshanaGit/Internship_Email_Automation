@@ -135,18 +135,25 @@
   font-weight: 800;
 }
 
-.inputField {
+.inputField,
+.selectField {
   width: 100%;
   height: 36px;
   background-color: #0c0b12 !important;
   border: 1px solid #232230;
   border-radius: 6px;
   padding: 0 11px;
-  color: #71717a !important; /* Muted placeholder when empty */
-  -webkit-text-fill-color: #71717a !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
   font-size: 12.5px;
   outline: none;
   transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.selectField option {
+  background-color: #12111d;
+  color: #ffffff;
 }
 
 .inputField::placeholder {

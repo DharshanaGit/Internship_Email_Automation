@@ -3,12 +3,11 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma.js';
 import { generateGemmaTask } from '@/lib/gemmaEngine.js';
-import { getExplanationSchedule, getReviewOneSchedule } from '@/lib/dateUtils.js';
+import { getExplanationSchedule, getReviewOneSchedule, addWorkingDays } from '@/lib/dateUtils.js';
 import { createIcsCalendarInvite } from '@/lib/googleCalendar.js';
 import { getOrCreateCandidateMeetLink, generateValidGoogleMeetUrl } from '@/lib/googleMeet.js';
 import { sendEmail } from '@/lib/mailer.js';
-
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'https://internship-email-automation.vercel.app').replace(/\/+$/, '');
+import { getAppBaseUrl } from '@/lib/offerService.js';
 
 export async function POST(request) {
   try {
@@ -109,10 +108,12 @@ export async function POST(request) {
       }
     }
     if (!finalDeadline) {
-      finalDeadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      // 6 working days (skipping Sundays, Mon-Sat working)
+      finalDeadline = addWorkingDays(new Date(), 6);
     }
 
     const baseTaskId = customTaskId || `TSK-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    const baseUrl = getAppBaseUrl();
 
     // Preview mode: return rendered preview for the first candidate
     if (previewOnly) {
@@ -122,7 +123,7 @@ export async function POST(request) {
       const sampleTitle = customTaskName || title || sampleGemma.title;
       const sampleDesc = objective || description || sampleGemma.description;
       const sampleMeet = customMeetLink || 'https://meet.google.com/xyz-sf-briefing';
-      const sampleSubUrl = `${APP_URL}/tasks/submit?token=sample_token_${sampleCand.id}`;
+      const sampleSubUrl = `${baseUrl}/tasks/submit?token=sample_token_${sampleCand.id}`;
 
       return NextResponse.json({
         success: true,
@@ -173,7 +174,7 @@ export async function POST(request) {
 
       // Expiring submission token
       const submissionToken = crypto.randomBytes(24).toString('hex');
-      const submissionUrl = `${APP_URL}/tasks/submit?token=${submissionToken}`;
+      const submissionUrl = `${baseUrl}/tasks/submit?token=${submissionToken}`;
 
       // Google Meet Link
       let meetLink = customMeetLink;

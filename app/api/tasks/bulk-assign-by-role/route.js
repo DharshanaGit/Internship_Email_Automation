@@ -4,13 +4,12 @@ import crypto from 'crypto';
 import { prisma } from '@/lib/prisma.js';
 import { getTaskPresetForRole } from '@/lib/automationEngine.js';
 import { generateGemmaTask, getTaskByRoleAndTier } from '@/lib/gemmaEngine.js';
-import { getExplanationSchedule, getReviewOneSchedule } from '@/lib/dateUtils.js';
+import { getExplanationSchedule, getReviewOneSchedule, addWorkingDays } from '@/lib/dateUtils.js';
 import { generateGoogleMeetLink, createIcsCalendarInvite } from '@/lib/googleCalendar.js';
 import { createRealMeetLink, getOrCreateCandidateMeetLink } from '@/lib/googleMeet.js';
 import { sendEmail } from '@/lib/mailer.js';
 import { enqueueBulkTasks } from '@/lib/queueWorker.js';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3001';
+import { getAppBaseUrl } from '@/lib/offerService.js';
 
 export async function POST(request) {
   try {
@@ -95,13 +94,15 @@ export async function POST(request) {
         const finalExpTime = customExpTime || expSchedule.timeStr;
         const rev1Schedule = getReviewOneSchedule(finalExpDate);
 
+        // 6 working days (skipping Sundays, Mon-Sat working)
         const finalDeadline = customDeadline
           ? new Date(customDeadline)
-          : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+          : addWorkingDays(new Date(), 6);
 
-        // 3. Unique submission link per candidate
+        // 3. Unique public submission link per candidate
         const submissionToken = crypto.randomBytes(24).toString('hex');
-        const submissionUrl = `${APP_URL}/tasks/submit?token=${submissionToken}`;
+        const baseUrl = getAppBaseUrl();
+        const submissionUrl = `${baseUrl}/tasks/submit?token=${submissionToken}`;
 
         // 4. Backend checks Database: Does candidate have a google_meet_url?
         //    NO  --> Calls Google Calendar API (conferenceDataVersion: 1), stores in candidates.google_meet_url
