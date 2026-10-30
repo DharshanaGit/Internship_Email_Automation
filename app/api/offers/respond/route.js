@@ -68,18 +68,18 @@ export async function POST(request) {
       }, { status: 409 });
     }
 
-    // Verify deadline - strictly expires only after deadline timestamp
+    // Deadline check: ONLY for active submissions. Links never expire passively.
+    // If candidate hasn't responded yet, always allow them to respond.
     let deadline = candidate.offerDeadline ? parseFlexibleDate(candidate.offerDeadline) : null;
-    if (!deadline) {
-      deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    }
-
     if (deadline && Date.now() > deadline.getTime()) {
-      return NextResponse.json({
-        success: false,
-        error: 'The decision deadline for this internship offer has expired. Please contact Shortfundly HR (hr@shortfundly.com) for assistance.',
-        isExpired: true,
-      }, { status: 410 });
+      // Auto-extend deadline by 30 days instead of blocking — link stays active
+      const newDeadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      await prisma.candidate.update({
+        where: { id: candidate.id },
+        data: { offerDeadline: newDeadline },
+      });
+      deadline = newDeadline;
+      console.log(`[respond] Auto-extended deadline for ${candidate.fullName} to ${newDeadline.toISOString()}`);
     }
 
     const now = new Date();

@@ -60,12 +60,21 @@ export async function GET() {
       prisma.emailLog.findMany({
         take: 12,
         orderBy: { sentAt: 'desc' },
-        include: {
+        select: {
+          id: true,
+          recipientEmail: true,
+          recipientName: true,
+          subject: true,
+          status: true,
+          emailType: true,
+          sentAt: true,
+          error: true,
+          candidateId: true,
           candidate: {
             select: { candidateId: true, fullName: true, role: true },
           },
         },
-      }),
+      }).catch(() => []),
     ]);
 
     return NextResponse.json({

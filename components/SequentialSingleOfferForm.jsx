@@ -6,6 +6,7 @@ import {
   Users,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
   FileText,
   Mail,
   Send,
@@ -105,6 +106,8 @@ export default function SequentialSingleOfferForm({
   const [pdfPreviewHtml, setPdfPreviewHtml] = useState('');
   const [pdfLoading, setPdfLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(null);
+  const [sendSuccess, setSendSuccess] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [prereqNotice, setPrereqNotice] = useState('');
   const [portalToken, setPortalToken] = useState(() => Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2));
@@ -432,14 +435,24 @@ export default function SequentialSingleOfferForm({
 
       const data = await res.json();
       if (data.success) {
+        setSendError(null);
+        setSendSuccess(true);
         showToast?.(`Offer letter successfully dispatched to ${formData.fullName}!`, 'success');
         onOfferSent?.();
-        setCurrentStep(1);
+        // Auto-navigate back to step 1 after short delay
+        setTimeout(() => {
+          setSendSuccess(false);
+          setCurrentStep(1);
+        }, 2000);
       } else {
-        showToast?.(data.error || 'Failed to dispatch offer letter.', 'error');
+        const errMsg = data.error || 'Failed to dispatch offer letter. Please try again.';
+        setSendError(errMsg);
+        showToast?.(errMsg, 'error');
       }
     } catch (err) {
-      showToast?.(err.message, 'error');
+      const errMsg = err.message || 'Network error. Please check your connection.';
+      setSendError(errMsg);
+      showToast?.(errMsg, 'error');
     } finally {
       setSending(false);
     }
@@ -1244,11 +1257,52 @@ www.shortfundly.com`;
             )}
           </div>
 
+          {sendError && (
+            <div style={{
+              background: 'rgba(239,68,68,0.12)',
+              border: '1px solid rgba(239,68,68,0.4)',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              marginTop: '12px',
+              marginBottom: '4px',
+              color: '#fca5a5',
+              fontSize: '13px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '10px',
+            }}>
+              <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '1px', color: '#f87171' }} />
+              <div>
+                <div style={{ fontWeight: 600, color: '#f87171', marginBottom: '2px' }}>Send Failed</div>
+                <div>{sendError}</div>
+              </div>
+            </div>
+          )}
+          {sendSuccess && (
+            <div style={{
+              background: 'rgba(168,85,247,0.12)',
+              border: '1px solid rgba(168,85,247,0.4)',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              marginTop: '12px',
+              marginBottom: '4px',
+              color: '#d8b4fe',
+              fontSize: '13px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}>
+              <CheckCircle2 size={16} style={{ color: '#a855f7' }} />
+              <span>Offer letter dispatched successfully! Moving to next step...</span>
+            </div>
+          )}
+
           <div className={styles.actionStepRow}>
             <button
               type="button"
               onClick={() => setCurrentStep(2)}
               className={styles.btnBack}
+              disabled={sending}
             >
               <ArrowLeft size={16} />
               <span>Back to Template</span>
@@ -1257,11 +1311,25 @@ www.shortfundly.com`;
             <button
               type="button"
               onClick={handleSendOffer}
-              disabled={sending}
+              disabled={sending || sendSuccess}
               className={styles.btnPrimary}
             >
-              <Send size={16} />
-              <span>{sending ? 'Generating PDF & Dispatching...' : 'Confirm & Send Offer Letter'}</span>
+              {sending ? (
+                <>
+                  <span className={styles.spinner}></span>
+                  <span>Generating PDF & Dispatching...</span>
+                </>
+              ) : sendSuccess ? (
+                <>
+                  <CheckCircle2 size={16} />
+                  <span>Dispatched Successfully!</span>
+                </>
+              ) : (
+                <>
+                  <Send size={16} />
+                  <span>Confirm & Send Offer Letter</span>
+                </>
+              )}
             </button>
           </div>
         </div>
