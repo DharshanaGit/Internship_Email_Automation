@@ -1817,32 +1817,32 @@ export default function DashboardPage() {
                   placeholder="Search by intern ID, candidate name, or email..."
                   value={offerSearchFilter}
                   onChange={(e) => setOfferSearchFilter(e.target.value)}
-                  style={{ width: '100%', height: '36px', background: 'var(--bg-surface)', color: '#ffffff', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '0 12px 0 32px', fontSize: '12.5px', outline: 'none' }}
+                  style={{ width: '100%', height: '38px', background: '#FFFFFF', color: '#0F172A', fontWeight: 600, border: '1px solid #CBD5E1', borderRadius: '8px', padding: '0 12px 0 32px', fontSize: '13px', outline: 'none' }}
                 />
               </div>
             </div>
 
             {/* LIVE TELEMETRY COUNTER BANNER: Sent, Failed, Waiting */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '22px' }}>
-              <div className={styles.metricCard} style={{ padding: '12px 14px', borderLeft: '3px solid #7c3aed', background: 'rgba(14, 20, 34, 0.85)' }}>
+              <div className={styles.metricCard} style={{ padding: '16px 18px', borderLeft: '4px solid #7c3aed', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '10px' }}>
                 <div className={styles.metricTitle} style={{ color: '#34d399', fontWeight: 700 }}>OFFER LETTERS SENT</div>
-                <div className={styles.metricValue} style={{ fontSize: '21px', color: '#ffffff', fontWeight: 700 }}>
+                <div className={styles.metricValue} style={{ fontSize: '24px', color: '#0F172A', fontWeight: 800 }}>
                   {stats.offerLetters?.sent || 0}
                 </div>
                 <div className={styles.metricSubtitle} style={{ color: '#475569' }}>Delivered to Inboxes</div>
               </div>
 
-              <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #f43f5e', background: 'rgba(14, 20, 34, 0.85)' }}>
+              <div className={styles.metricCard} style={{ padding: '16px 18px', borderLeft: '4px solid #f43f5e', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '10px' }}>
                 <div className={styles.metricTitle} style={{ color: '#fb7185', fontWeight: 700 }}>FAILED EMAILS</div>
-                <div className={styles.metricValue} style={{ fontSize: '21px', color: '#ffffff', fontWeight: 700 }}>
+                <div className={styles.metricValue} style={{ fontSize: '24px', color: '#0F172A', fontWeight: 800 }}>
                   {stats.offerLetters?.failed || 0}
                 </div>
                 <div className={styles.metricSubtitle} style={{ color: '#475569' }}>Need Attention</div>
               </div>
 
-              <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #f59e0b', background: 'rgba(14, 20, 34, 0.85)' }}>
+              <div className={styles.metricCard} style={{ padding: '16px 18px', borderLeft: '4px solid #f59e0b', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '10px' }}>
                 <div className={styles.metricTitle} style={{ color: '#fbbf24', fontWeight: 700 }}>READY TO SEND</div>
-                <div className={styles.metricValue} style={{ fontSize: '21px', color: '#ffffff', fontWeight: 700 }}>
+                <div className={styles.metricValue} style={{ fontSize: '24px', color: '#0F172A', fontWeight: 800 }}>
                   {stats.offerLetters?.waiting || stats.offerLetters?.readyToSend || 0}
                 </div>
                 <div className={styles.metricSubtitle} style={{ color: '#475569' }}>Waiting for Review</div>
@@ -2063,7 +2063,8 @@ export default function DashboardPage() {
                             background: 'var(--bg-surface-elevated)',
                             border: '1px solid #7c3aed',
                             borderRadius: '6px',
-                            color: '#ffffff',
+                            color: '#581C87',
+                            fontWeight: 700,
                             padding: '5px 10px',
                             fontSize: '13px',
                             outline: 'none',
@@ -2095,7 +2096,8 @@ export default function DashboardPage() {
                             background: 'var(--bg-surface-elevated)',
                             border: '1px solid #3f3f46',
                             borderRadius: '6px',
-                            color: '#ffffff',
+                            color: '#581C87',
+                            fontWeight: 700,
                             padding: '5px 10px',
                             fontSize: '13px',
                             outline: 'none',
@@ -2182,12 +2184,12 @@ export default function DashboardPage() {
                                     }}
                                   >
                                     {availableBatches.map(b => (
-                                      <option key={b} value={b} style={{ background: 'var(--bg-surface-elevated)', color: '#ffffff' }}>
+                                      <option key={b} value={b} style={{ background: '#FFFFFF', color: '#0F172A', fontWeight: 600 }}>
                                         {b}
                                       </option>
                                     ))}
                                     {row.batch && !availableBatches.includes(row.batch) && (
-                                      <option value={row.batch} style={{ background: 'var(--bg-surface-elevated)', color: '#ffffff' }}>
+                                      <option value={row.batch} style={{ background: '#FFFFFF', color: '#0F172A', fontWeight: 600 }}>
                                         {row.batch}
                                       </option>
                                     )}

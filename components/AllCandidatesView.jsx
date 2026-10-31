@@ -371,7 +371,7 @@ export default function AllCandidatesView({
       {/* Candidate Ledger Table */}
       <div className={styles.tableCard}>
         <div className={styles.tableHeaderRow} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <strong style={{ color: '#ffffff', fontSize: '14px' }}>
+          <strong style={{ color: '#0F172A', fontSize: '14.5px', fontWeight: 700 }}>
             Showing {filteredCandidates.length} Candidates {selectedBatch !== 'ALL' ? `(${selectedBatch})` : ''} {selectedRole !== 'ALL' ? `• ${selectedRole}` : ''}
           </strong>
 
@@ -431,15 +431,15 @@ export default function AllCandidatesView({
                       {c.internId || c.candidateId}
                     </td>
                     <td>
-                      <div style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</div>
-                      <div style={{ fontSize: '12.5px', color: '#475569' }}>{c.degree || 'B.Tech'}</div>
+                      <div style={{ fontWeight: 700, color: '#0F172A', fontSize: '14.5px' }}>{c.fullName}</div>
+                      <div style={{ fontSize: '13px', color: '#475569', fontWeight: 500 }}>{c.degree || 'B.Tech'}</div>
                     </td>
                     <td>
-                      <div>{c.role}</div>
+                      <div style={{ color: '#0F172A', fontWeight: 600 }}>{c.role}</div>
                       <div style={{ fontSize: '12.5px', color: '#475569' }}>{c.collegeName}</div>
                     </td>
                     <td>
-                      <div style={{ fontSize: '13px' }}>{c.email}</div>
+                      <div style={{ fontSize: '13.5px', color: '#0F172A', fontWeight: 600 }}>{c.email}</div>
                       <div style={{ fontSize: '12.5px', color: '#475569' }}>{c.phone || '-'}</div>
                     </td>
                     <td>
@@ -448,7 +448,7 @@ export default function AllCandidatesView({
                         onChange={(e) => handleChangeCandidateBatch(c.id, e.target.value)}
                         style={{
                           background: 'var(--bg-surface)',
-                          border: '1px solid #3b335c',
+                          border: '1px solid #CBD5E1',
                           color: '#6D28D9',
                           borderRadius: '6px',
                           padding: '3px 8px',

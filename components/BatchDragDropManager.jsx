@@ -147,8 +147,8 @@ export default function BatchDragDropManager({
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '12px', padding: '22px 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
-            <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Layers size={18} color="#a855f7" />
+            <h3 style={{ margin: '0 0 4px 0', fontSize: '17px', color: '#0F172A', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Layers size={18} color="#7C3AED" />
               <span>Interactive Drag-and-Drop Batch Segregation & Swapping</span>
             </h3>
             <p style={{ margin: 0, fontSize: '12.5px', color: '#475569' }}>
@@ -201,7 +201,7 @@ export default function BatchDragDropManager({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid var(--border-default)', paddingBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <strong style={{ color: '#ffffff', fontSize: '14px' }}>{bName}</strong>
+                  <strong style={{ color: '#0F172A', fontSize: '15px', fontWeight: 700 }}>{bName}</strong>
                   <span className={styles.badgePurple} style={{ fontSize: '12.5px' }}>
                     {batchCandidates.length} Interns
                   </span>
@@ -248,7 +248,7 @@ export default function BatchDragDropManager({
                         <Move size={12} color="#71717a" />
                       </div>
 
-                      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '2px' }}>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0F172A', marginBottom: '2px' }}>
                         {c.fullName}
                       </div>
 

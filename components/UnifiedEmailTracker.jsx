@@ -198,7 +198,7 @@ export default function UnifiedEmailTracker({
       {/* Logs Table */}
       <div className={styles.tableCard}>
         <div className={styles.tableHeaderRow}>
-          <strong style={{ color: '#ffffff', fontSize: '13.5px' }}>
+          <strong style={{ color: '#0F172A', fontSize: '14px', fontWeight: 700 }}>
             Showing {filteredEmails.length} Sent Email Records
           </strong>
         </div>
@@ -232,7 +232,7 @@ export default function UnifiedEmailTracker({
                         {new Date(log.sentAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600, color: '#ffffff' }}>{log.recipientName || 'Candidate'}</div>
+                        <div style={{ fontWeight: 700, color: '#0F172A', fontSize: '14px' }}>{log.recipientName || 'Candidate'}</div>
                         <div style={{ fontSize: '13px', color: '#475569' }}>{log.recipientEmail}</div>
                       </td>
                       <td>
@@ -281,7 +281,7 @@ export default function UnifiedEmailTracker({
         <div className={styles.modalOverlay} onClick={() => setInspectingEmail(null)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h3 style={{ margin: 0, fontSize: '15px', color: '#ffffff' }}>
+              <h3 style={{ margin: 0, fontSize: '16px', color: '#0F172A', fontWeight: 800 }}>
                 Email Dispatch Details
               </h3>
               <button type="button" onClick={() => setInspectingEmail(null)} style={{ color: '#475569', cursor: 'pointer' }}>

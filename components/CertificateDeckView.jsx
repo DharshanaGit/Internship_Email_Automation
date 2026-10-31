@@ -190,7 +190,7 @@ export default function CertificateDeckView({
               onChange={handleToggleSelectAll}
               style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
             />
-            <span style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
               {selectedCandidateIds.length} of {filteredCandidates.length} Selected for CEO Approval
             </span>
           </div>
@@ -233,9 +233,9 @@ export default function CertificateDeckView({
                         />
                       </td>
                       <td style={{ fontFamily: 'monospace', color: '#6D28D9', fontWeight: 700 }}>{c.internId}</td>
-                      <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
+                      <td style={{ fontWeight: 700, color: '#0F172A', fontSize: '14px' }}>{c.fullName}</td>
                       <td>
-                        <div>{c.role}</div>
+                        <div style={{ color: '#0F172A', fontWeight: 600 }}>{c.role}</div>
                         <div style={{ fontSize: '12.5px', color: '#475569' }}>{c.collegeName}</div>
                       </td>
                       <td><span className={styles.badgePurple}>{c.batch}</span></td>

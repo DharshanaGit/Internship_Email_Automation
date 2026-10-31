@@ -271,8 +271,8 @@ Shortfundly`,
           <div className={styles.editorBox}>
             <div className={styles.editorHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FileText size={18} color="#a855f7" />
-                <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff' }}>
+                <FileText size={18} color="#7C3AED" />
+                <h3 style={{ margin: 0, fontSize: '17px', color: '#0F172A', fontWeight: 800 }}>
                   {isNew ? 'Create New Offer Template' : `Customize: ${editingTemplate.name}`}
                 </h3>
               </div>

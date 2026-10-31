@@ -262,27 +262,45 @@ export default function LoginPage() {
       <div className={styles.leftBrandPanel}>
         <div className={styles.gridOverlay} />
 
-        {/* Floating Digital Workflow Visual Artwork */}
+        {/* Top brand header */}
+        <div className={styles.brandLogoHeader}>
+          <div className={styles.brandLogoBox}>
+            <Shield size={22} />
+          </div>
+          <span className={styles.brandLogoText}>Shortfundly</span>
+        </div>
+
+        {/* Central typographic narrative (Unobstructed & Cleanly Aligned) */}
+        <div className={styles.brandNarrative}>
+          <h1 className={styles.brandHeading}>
+            Streamlining Internship Operations &amp; Automation
+          </h1>
+          <p className={styles.brandParagraph}>
+            Manage applicants, automate offer letters, and handle approvals in one secure dashboard.
+          </p>
+        </div>
+
+        {/* Floating Digital Workflow Visual Artwork (Positioned in bottom-right quadrant away from text) */}
         <div className={styles.workflowArtLayer}>
           <svg className={styles.pipelineSvg} viewBox="0 0 700 800" fill="none">
-            {/* Connecting pipeline lines */}
+            {/* Connecting pipeline lines positioned in lower area */}
             <path
-              d="M 60 550 L 120 550 L 120 420 L 280 420 L 280 300 L 460 300"
-              stroke="rgba(255, 255, 255, 0.22)"
+              d="M 120 720 L 260 720 L 260 660 L 440 660 L 440 600 L 580 600"
+              stroke="rgba(255, 255, 255, 0.25)"
               strokeWidth="2.5"
               strokeDasharray="6 6"
             />
             <path
-              d="M 120 420 L 120 620 L 320 620"
+              d="M 260 720 L 260 770 L 480 770"
               stroke="rgba(255, 255, 255, 0.18)"
               strokeWidth="2"
             />
             {/* Pipeline circular nodes */}
-            <circle cx="60" cy="550" r="14" fill="#4338CA" stroke="rgba(255,255,255,0.7)" strokeWidth="2.5" />
-            <circle cx="120" cy="420" r="11" fill="#6D28D9" stroke="rgba(255,255,255,0.8)" strokeWidth="2" />
-            <circle cx="280" cy="420" r="8" fill="#7C3AED" stroke="rgba(255,255,255,0.9)" strokeWidth="2" />
-            <circle cx="280" cy="300" r="9" fill="#9333EA" stroke="rgba(255,255,255,0.7)" strokeWidth="2" />
-            <circle cx="320" cy="620" r="12" fill="#5B21B6" stroke="rgba(255,255,255,0.8)" strokeWidth="2" />
+            <circle cx="120" cy="720" r="14" fill="#4338CA" stroke="rgba(255,255,255,0.8)" strokeWidth="2.5" />
+            <circle cx="260" cy="660" r="11" fill="#6D28D9" stroke="rgba(255,255,255,0.9)" strokeWidth="2" />
+            <circle cx="440" cy="660" r="9" fill="#7C3AED" stroke="rgba(255,255,255,0.9)" strokeWidth="2" />
+            <circle cx="440" cy="600" r="10" fill="#9333EA" stroke="rgba(255,255,255,0.8)" strokeWidth="2" />
+            <circle cx="480" cy="770" r="13" fill="#5B21B6" stroke="rgba(255,255,255,0.8)" strokeWidth="2" />
           </svg>
 
           {/* Top floating glassmorphic node card */}
@@ -304,24 +322,6 @@ export default function LoginPage() {
           <div className={styles.glassCheckBadgeSmall}>
             <Check size={14} strokeWidth={3} />
           </div>
-        </div>
-
-        {/* Top brand header */}
-        <div className={styles.brandLogoHeader}>
-          <div className={styles.brandLogoBox}>
-            <Shield size={20} />
-          </div>
-          <span className={styles.brandLogoText}>Shortfundly</span>
-        </div>
-
-        {/* Central typographic narrative */}
-        <div className={styles.brandNarrative}>
-          <h1 className={styles.brandHeading}>
-            Streamlining Internship Operations &amp; Automation
-          </h1>
-          <p className={styles.brandParagraph}>
-            Manage applicants, automate offer letters, and handle approvals in one secure dashboard.
-          </p>
         </div>
 
         {/* Bottom meta */}

@@ -430,8 +430,8 @@ export default function GoogleFormsBatchManager({
       {/* 3. GOOGLE FORM CONNECT & VALIDATE */}
       <div className={styles.configCard}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <LinkIcon size={16} color="#a855f7" />
-          <strong style={{ color: '#ffffff', fontSize: '14px' }}>Connect Google Form / Linked Responses</strong>
+          <LinkIcon size={16} color="#7C3AED" />
+          <strong style={{ color: '#0F172A', fontSize: '15px', fontWeight: 700 }}>Connect Google Form / Linked Responses</strong>
         </div>
 
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -497,9 +497,9 @@ export default function GoogleFormsBatchManager({
       {/* 4. SPREADSHEET CANDIDATE REVIEW & IMPORT */}
       {fetchedData && (
         <div className={styles.spreadsheetCard}>
-          <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1f1b2e' }}>
+          <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E2E8F0' }}>
             <div>
-              <strong style={{ color: '#ffffff', fontSize: '15px' }}>
+              <strong style={{ color: '#0F172A', fontSize: '15px', fontWeight: 700 }}>
                 Review Candidates & Duplicate Prevention ({fetchedData.totalFetched} responses)
               </strong>
               <div style={{ fontSize: '13px', color: '#475569', marginTop: '2px' }}>

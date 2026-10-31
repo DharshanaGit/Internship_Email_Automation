@@ -620,8 +620,8 @@ www.shortfundly.com`;
 
           <div className={styles.modeToggleRow}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Users size={16} color="#a855f7" />
-              <strong style={{ color: '#ffffff', fontSize: '14px' }}>Candidate Source:</strong>
+              <Users size={16} color="#7C3AED" />
+              <strong style={{ color: '#0F172A', fontSize: '14px', fontWeight: 700 }}>Candidate Source:</strong>
             </div>
 
             <div className={styles.modeToggleButtons}>
@@ -990,7 +990,7 @@ www.shortfundly.com`;
             <div className={styles.fieldGroup} style={{ gridColumn: 'span 2', background: 'var(--bg-surface)', padding: '14px 16px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <label className={styles.fieldLabel} style={{ margin: 0 }}>
-                  <span style={{ color: '#ffffff', fontWeight: 700 }}>Candidate Offer Acceptance Link</span>
+                  <span style={{ color: '#0F172A', fontWeight: 700 }}>Candidate Offer Acceptance Link</span>
                   <span style={{ fontSize: '12.5px', color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                     <Sparkles size={11} /> Active Response Link
                   </span>
@@ -1112,8 +1112,8 @@ www.shortfundly.com`;
       {currentStep === 2 && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FileText size={18} color="#a855f7" />
+            <h3 style={{ margin: 0, fontSize: '17px', color: '#0F172A', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FileText size={18} color="#7C3AED" />
               <span>Select Text Template & Add cc</span>
             </h3>
           </div>
@@ -1191,8 +1191,8 @@ www.shortfundly.com`;
           <div className={styles.attachmentsContainer} style={{ marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
               <label className={styles.fieldLabel} style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Paperclip size={15} color="#a855f7" />
-                <span style={{ color: '#ffffff', fontWeight: 600 }}>Attach Images &amp; Documents to Email (Optional)</span>
+                <Paperclip size={15} color="#7C3AED" />
+                <span style={{ color: '#0F172A', fontWeight: 700 }}>Attach Images &amp; Documents to Email (Optional)</span>
               </label>
               <label style={{ cursor: 'pointer', background: 'rgba(168, 85, 247, 0.15)', border: '1px solid #a855f7', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: '#6D28D9', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
                 <Upload size={13} />
@@ -1266,8 +1266,8 @@ www.shortfundly.com`;
       {currentStep === 3 && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Eye size={18} color="#a855f7" />
+            <h3 style={{ margin: 0, fontSize: '17px', color: '#0F172A', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Eye size={18} color="#7C3AED" />
               <span>Preview Personalized Offer & Confirm Send</span>
             </h3>
 
@@ -1305,7 +1305,7 @@ www.shortfundly.com`;
                       <div><strong>To:</strong> {formData.email} ({formData.fullName})</div>
                       {formData.cc && <div><strong>CC:</strong> {formData.cc}</div>}
                       <div><strong>Subject:</strong> {renderJinja(formData.customSubject || activeTemplate?.subject || 'Official Internship Offer from Shortfundly - {{candidateName}}', previewContext)}</div>
-                      <div><strong>Intern ID:</strong> <code style={{ color: '#ffffff', fontWeight: 700 }}>{formData.internId}</code></div>
+                      <div><strong>Intern ID:</strong> <code style={{ color: '#6D28D9', fontWeight: 700 }}>{formData.internId}</code></div>
                       <div><strong>Expiration Deadline:</strong> {formData.deadline ? new Date(formData.deadline).toLocaleString() : '3 Days'}</div>
                       {attachedFiles.length > 0 && (
                         <div><strong>Attached Files:</strong> <span style={{ color: '#6D28D9' }}>{attachedFiles.length} file(s) ({attachedFiles.map(f => f.name).join(', ')})</span></div>
@@ -1385,8 +1385,8 @@ www.shortfundly.com`;
                   </div>
                 ) : (
                   <div style={{ textAlign: 'center', color: '#475569', padding: '36px' }}>
-                    <FileText size={36} color="#a855f7" style={{ margin: '0 auto 10px auto' }} />
-                    <p style={{ color: '#ffffff', margin: '0 0 6px 0' }}>Offer Letter PDF ready to render</p>
+                    <FileText size={36} color="#7C3AED" style={{ margin: '0 auto 10px auto' }} />
+                    <p style={{ color: '#0F172A', fontWeight: 700, margin: '0 0 6px 0' }}>Offer Letter PDF ready to render</p>
                     <button
                       type="button"
                       onClick={loadPdfPreview}
