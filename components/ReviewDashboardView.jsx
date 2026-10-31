@@ -528,7 +528,7 @@ export default function ReviewDashboardView({
                     setSelectedCandidateIds(submittedIds);
                     showToast?.(`Selected ${submittedIds.length} submitted candidates for review scheduling!`, 'info');
                   }}
-                  style={{ background: '#064e3b', border: '1px solid #059669', color: '#a7f3d0', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                  style={{ background: '#064e3b', border: '1px solid #059669', color: '#a7f3d0', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
                 >
                   Select All Submitted ({filteredCandidates.filter(c => c.activeTask?.submissionStatus === 'SUBMITTED' || c.taskStatus === 'Under Review').length})
                 </button>
@@ -541,7 +541,7 @@ export default function ReviewDashboardView({
                     setSelectedCandidateIds(submittedIds);
                     setSubTab('schedule-r1');
                   }}
-                  style={{ background: '#10b981', border: 'none', color: '#ffffff', padding: '6px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                  style={{ background: '#10b981', border: 'none', color: '#ffffff', padding: '6px 14px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
                 >
                   Approve & Schedule Review Mail &rarr;
                 </button>
@@ -594,7 +594,7 @@ export default function ReviewDashboardView({
               <tbody>
                 {filteredCandidates.length === 0 ? (
                   <tr>
-                    <td colSpan={10} style={{ textAlign: 'center', padding: '40px', color: '#71717a' }}>
+                    <td colSpan={10} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>
                       No candidates currently in the review queue. (Candidates appear here only after task emails are dispatched.)
                     </td>
                   </tr>
@@ -612,9 +612,9 @@ export default function ReviewDashboardView({
                             style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                           />
                         </td>
-                        <td><code style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', color: '#c084fc', border: '1px solid var(--border-hairline)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{c.internId}</code></td>
+                        <td><code style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', color: '#6D28D9', border: '1px solid var(--border-hairline)', padding: '2px 6px', borderRadius: '4px', fontSize: '13px', fontWeight: 600 }}>{c.internId}</code></td>
                         <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
-                        <td style={{ fontSize: '12px', color: '#94a3b8' }}>{c.email}</td>
+                        <td style={{ fontSize: '13px', color: '#475569' }}>{c.email}</td>
                         <td><span className={styles.badgePurple}>{c.batch}</span></td>
                         <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>#{task?.taskNumber || 1}</td>
                         <td>{task?.title || 'Milestone Task'}</td>
@@ -635,12 +635,12 @@ export default function ReviewDashboardView({
                         </td>
                         <td>
                           {task?.meetLink ? (
-                            <a href={task.meetLink} target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <a href={task.meetLink} target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                               <Video size={12} />
                               <span>Join Session</span>
                             </a>
                           ) : (
-                            <span style={{ color: '#71717a', fontSize: '11px' }}>Auto-Assigned</span>
+                            <span style={{ color: '#475569', fontSize: '12.5px' }}>Auto-Assigned</span>
                           )}
                         </td>
                       </tr>
@@ -660,13 +660,13 @@ export default function ReviewDashboardView({
             <Clock size={18} color="#a855f7" />
             <span>Schedule Review Meeting & Send Meeting Links</span>
           </h3>
-          <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>
+          <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#475569' }}>
             HR and Admin decide the review date and session time for selected interns. Dispatches official review invitations with Google Meet video links, automatically skipping non-working days or conforming to HR calendar preferences.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1fr', gap: '16px', marginBottom: '20px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Review Milestone Session <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <select
@@ -682,7 +682,7 @@ export default function ReviewDashboardView({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Review Scheduled Date (HR Decided) <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -704,13 +704,13 @@ export default function ReviewDashboardView({
                   <Calendar size={16} color="#c084fc" />
                 </button>
               </div>
-              <span style={{ fontSize: '11px', color: '#34d399', marginTop: '4px', display: 'block' }}>
+              <span style={{ fontSize: '12.5px', color: '#34d399', marginTop: '4px', display: 'block' }}>
                 Suggested Next Business Day: {suggestedReviewDate}
               </span>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Scheduled Review Time
               </label>
               <input
@@ -751,7 +751,7 @@ export default function ReviewDashboardView({
                 <Video size={16} color={r1ScheduleForm.meetMode === 'BATCH' ? '#c084fc' : '#94a3b8'} />
                 <div>
                   <div style={{ color: r1ScheduleForm.meetMode === 'BATCH' ? '#ffffff' : '#e2e8f0' }}>Batch-Wise Shared Google Meet Link</div>
-                  <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>Send same Meet link to all candidates in batch</div>
+                  <div style={{ fontSize: '12.5px', color: '#475569', fontWeight: 400 }}>Send same Meet link to all candidates in batch</div>
                 </div>
               </button>
 
@@ -777,7 +777,7 @@ export default function ReviewDashboardView({
                 <Sparkles size={16} color={r1ScheduleForm.meetMode === 'INDIVIDUAL' ? '#c084fc' : '#94a3b8'} />
                 <div>
                   <div style={{ color: r1ScheduleForm.meetMode === 'INDIVIDUAL' ? '#ffffff' : '#e2e8f0' }}>Unique Google Meet Link per Candidate</div>
-                  <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>Auto-generate dedicated 1-on-1 Meet room per student</div>
+                  <div style={{ fontSize: '12.5px', color: '#475569', fontWeight: 400 }}>Auto-generate dedicated 1-on-1 Meet room per student</div>
                 </div>
               </button>
             </div>
@@ -785,7 +785,7 @@ export default function ReviewDashboardView({
             {r1ScheduleForm.meetMode === 'BATCH' ? (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <label style={{ fontSize: '11.5px', color: '#cbd5e1', fontWeight: 600 }}>
+                  <label style={{ fontSize: '13px', color: '#334155', fontWeight: 600 }}>
                     Batch Google Meet Room URL (Sent to all {selectedCandidateIds.length} candidate(s)):
                   </label>
                   <button
@@ -795,7 +795,7 @@ export default function ReviewDashboardView({
                       setR1ScheduleForm({ ...r1ScheduleForm, batchMeetLink: newUrl });
                       showToast?.('Regenerated genuine Google Meet link!', 'info');
                     }}
-                    style={{ background: '#221f33', border: '1px solid #3d3957', color: '#c084fc', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', cursor: 'pointer' }}
+                    style={{ background: '#221f33', border: '1px solid #3d3957', color: '#6D28D9', borderRadius: '4px', padding: '2px 8px', fontSize: '12.5px', cursor: 'pointer' }}
                   >
                     Regenerate Meet Link
                   </button>
@@ -809,10 +809,10 @@ export default function ReviewDashboardView({
                 />
               </div>
             ) : (
-              <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', padding: '10px 14px', borderRadius: '6px', fontSize: '12px', color: '#38bdf8' }}>
+              <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', padding: '10px 14px', borderRadius: '6px', fontSize: '13px', color: '#38bdf8' }}>
                 <div style={{ fontWeight: 600, marginBottom: '2px' }}>Dedicated Individual Google Meet Room:</div>
-                <code style={{ color: '#c084fc' }}>https://meet.google.com/xxx-yyyy-zzz (Unique authentic Google Meet room per candidate)</code>
-                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
+                <code style={{ color: '#6D28D9' }}>https://meet.google.com/xxx-yyyy-zzz (Unique authentic Google Meet room per candidate)</code>
+                <div style={{ fontSize: '12.5px', color: '#475569', marginTop: '4px' }}>
                   A unique, authentic Google Meet video conference link will be automatically generated and dispatched to each individual candidate in their review email.
                 </div>
               </div>
@@ -820,7 +820,7 @@ export default function ReviewDashboardView({
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
               Mentorship Guidelines & Preparation Notes
             </label>
             <textarea
@@ -833,7 +833,7 @@ export default function ReviewDashboardView({
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '12.5px', color: '#94a3b8' }}>
+            <span style={{ fontSize: '12.5px', color: '#475569' }}>
               Targeting <strong>{selectedCandidateIds.length}</strong> selected candidates.
             </span>
 
@@ -856,7 +856,7 @@ export default function ReviewDashboardView({
                   <Users size={16} color="#c084fc" />
                   <span>Select Candidates for Review Scheduling ({selectedCandidateIds.length} of {filteredCandidates.length} Selected)</span>
                 </h4>
-                <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: '#475569' }}>
                   Check candidate(s) below who will receive Review #{r1ScheduleForm.reviewNumber || 1} emails on {r1ScheduleForm.reviewDate || 'the scheduled date'}.
                 </p>
               </div>
@@ -865,7 +865,7 @@ export default function ReviewDashboardView({
                 <button
                   type="button"
                   onClick={handleToggleSelectAll}
-                  style={{ background: 'var(--bg-surface-elevated)', border: '1px solid #32323c', color: '#e2e8f0', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                  style={{ background: 'var(--bg-surface-elevated)', border: '1px solid #32323c', color: '#e2e8f0', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', cursor: 'pointer' }}
                 >
                   {selectedCandidateIds.length === filteredCandidates.length && filteredCandidates.length > 0 ? 'Deselect All' : 'Select All'}
                 </button>
@@ -891,7 +891,7 @@ export default function ReviewDashboardView({
                 <tbody>
                   {filteredCandidates.length === 0 ? (
                     <tr>
-                      <td colSpan={10} style={{ textAlign: 'center', padding: '30px', color: '#71717a' }}>
+                      <td colSpan={10} style={{ textAlign: 'center', padding: '30px', color: '#475569' }}>
                         No candidates found for review scheduling.
                       </td>
                     </tr>
@@ -909,10 +909,10 @@ export default function ReviewDashboardView({
                               style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                             />
                           </td>
-                          <td><code style={{ fontFamily: 'var(--font-mono)', color: '#c084fc', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{c.internId}</code></td>
+                          <td><code style={{ fontFamily: 'var(--font-mono)', color: '#6D28D9', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '2px 6px', borderRadius: '4px', fontSize: '13px', fontWeight: 600 }}>{c.internId}</code></td>
                           <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
-                          <td style={{ fontSize: '12px', color: '#94a3b8' }}>{c.email}</td>
-                          <td style={{ fontSize: '12px', color: '#cbd5e1' }}>{c.role}</td>
+                          <td style={{ fontSize: '13px', color: '#475569' }}>{c.email}</td>
+                          <td style={{ fontSize: '13px', color: '#334155' }}>{c.role}</td>
                           <td><span className={styles.badgePurple}>{c.batch}</span></td>
                           <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>#{task?.taskNumber || 1}</td>
                           <td>
@@ -928,9 +928,9 @@ export default function ReviewDashboardView({
                           </td>
                           <td>
                             {r1ScheduleForm.meetMode === 'BATCH' ? (
-                              <span style={{ fontSize: '11.5px', color: '#c084fc' }}>Batch Shared Link</span>
+                              <span style={{ fontSize: '13px', color: '#6D28D9' }}>Batch Shared Link</span>
                             ) : (
-                              <span style={{ fontSize: '11.5px', color: '#38bdf8' }}>Individual Auto-Link</span>
+                              <span style={{ fontSize: '13px', color: '#38bdf8' }}>Individual Auto-Link</span>
                             )}
                           </td>
                         </tr>
@@ -959,7 +959,7 @@ export default function ReviewDashboardView({
                 type="button"
                 onClick={() => handleDownloadFeedbackTemplate('xlsx')}
                 className={styles.btnSecondary}
-                style={{ padding: '5px 12px', fontSize: '12px' }}
+                style={{ padding: '5px 12px', fontSize: '13px' }}
                 title="Download ready-to-fill Excel template with prefilled intern records"
               >
                 <FileSpreadsheet size={13} color="#10b981" />
@@ -969,7 +969,7 @@ export default function ReviewDashboardView({
                 type="button"
                 onClick={() => handleDownloadFeedbackTemplate('csv')}
                 className={styles.btnSecondary}
-                style={{ padding: '5px 12px', fontSize: '12px' }}
+                style={{ padding: '5px 12px', fontSize: '13px' }}
                 title="Download CSV format template"
               >
                 <Download size={13} color="#38bdf8" />
@@ -978,13 +978,13 @@ export default function ReviewDashboardView({
             </div>
           </div>
 
-          <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#94a3b8', lineHeight: '1.6' }}>
+          <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#475569', lineHeight: '1.6' }}>
             Upload evaluation feedback for Review 2, Review 3, etc. Expected CSV / Excel columns: Intern ID, Name, Email ID, Task ID, Task Number, Task Title, batch, role, Review Number, Feedback, Performance Score. Sends personalized feedback emails with Google Meet links.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '18px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Review Date
               </label>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -1008,7 +1008,7 @@ export default function ReviewDashboardView({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Review Time
               </label>
               <input
@@ -1021,7 +1021,7 @@ export default function ReviewDashboardView({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Add CC Recipients (Optional)
               </label>
               <input
@@ -1066,7 +1066,7 @@ export default function ReviewDashboardView({
                     <CheckCircle2 size={16} color="#10b981" />
                     <span>Uploaded Interns List ({feedbackRows.length} Records Loaded from File)</span>
                   </h4>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
+                  <p style={{ margin: 0, fontSize: '13px', color: '#475569' }}>
                     Review each intern\'s feedback and scores below before confirming dispatch.
                   </p>
                 </div>
@@ -1078,7 +1078,7 @@ export default function ReviewDashboardView({
                       setFeedbackRows([]);
                       showToast?.('Cleared uploaded file records.', 'info');
                     }}
-                    style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', color: '#f87171', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                    style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', color: '#f87171', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', cursor: 'pointer' }}
                   >
                     Clear / Re-upload
                   </button>
@@ -1087,7 +1087,7 @@ export default function ReviewDashboardView({
                     onClick={handleSendFeedbackMails}
                     disabled={uploadingFeedback}
                     className={styles.btnPrimary}
-                    style={{ padding: '6px 14px', fontSize: '12px' }}
+                    style={{ padding: '6px 14px', fontSize: '13px' }}
                   >
                     <Send size={13} />
                     <span>{uploadingFeedback ? 'Dispatching...' : `Dispatch Feedback Mails (${feedbackRows.length})`}</span>
@@ -1129,17 +1129,17 @@ export default function ReviewDashboardView({
 
                       return (
                         <tr key={idx}>
-                          <td style={{ color: '#71717a', fontSize: '11px' }}>{idx + 1}</td>
-                          <td><code style={{ fontFamily: 'var(--font-mono)', color: '#c084fc', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{internId}</code></td>
+                          <td style={{ color: '#475569', fontSize: '12.5px' }}>{idx + 1}</td>
+                          <td><code style={{ fontFamily: 'var(--font-mono)', color: '#6D28D9', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '2px 6px', borderRadius: '4px', fontSize: '13px', fontWeight: 600 }}>{internId}</code></td>
                           <td style={{ fontWeight: 600, color: '#ffffff' }}>{name}</td>
-                          <td style={{ fontSize: '12px', color: '#94a3b8' }}>{email}</td>
+                          <td style={{ fontSize: '13px', color: '#475569' }}>{email}</td>
                           <td><span className={styles.badgePurple}>{batch}</span></td>
-                          <td style={{ fontSize: '12px', color: '#cbd5e1' }}>{role}</td>
+                          <td style={{ fontSize: '13px', color: '#334155' }}>{role}</td>
                           <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>{taskId} (#{taskNum})</td>
                           <td style={{ maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{taskTitle}</td>
                           <td><span className={styles.badgeAmber}>Review #{reviewNum}</span></td>
                           <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>{score}%</td>
-                          <td style={{ maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '12px', color: '#e2e8f0' }} title={feedback}>
+                          <td style={{ maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '13px', color: '#e2e8f0' }} title={feedback}>
                             {feedback}
                           </td>
                           <td>
@@ -1166,7 +1166,7 @@ export default function ReviewDashboardView({
                     <Users size={16} color="#c084fc" />
                     <span>Eligible Interns in System ({filteredCandidates.length} Candidates Available)</span>
                   </h4>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
+                  <p style={{ margin: 0, fontSize: '13px', color: '#475569' }}>
                     Upload an Excel or CSV file above to submit bulk evaluation feedback, or download a template pre-filled with these candidates.
                   </p>
                 </div>
@@ -1190,7 +1190,7 @@ export default function ReviewDashboardView({
                   <tbody>
                     {filteredCandidates.length === 0 ? (
                       <tr>
-                        <td colSpan={9} style={{ textAlign: 'center', padding: '30px', color: '#71717a' }}>
+                        <td colSpan={9} style={{ textAlign: 'center', padding: '30px', color: '#475569' }}>
                           No candidates found matching criteria.
                         </td>
                       </tr>
@@ -1199,14 +1199,14 @@ export default function ReviewDashboardView({
                         const task = c.activeTask;
                         return (
                           <tr key={c.id}>
-                            <td><code style={{ fontFamily: 'var(--font-mono)', color: '#c084fc', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '2px 6px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 600 }}>{c.internId}</code></td>
+                            <td><code style={{ fontFamily: 'var(--font-mono)', color: '#6D28D9', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '2px 6px', borderRadius: '4px', fontSize: '13px', fontWeight: 600 }}>{c.internId}</code></td>
                             <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
-                            <td style={{ fontSize: '12px', color: '#94a3b8' }}>{c.email}</td>
-                            <td style={{ fontSize: '12px', color: '#cbd5e1' }}>{c.role}</td>
+                            <td style={{ fontSize: '13px', color: '#475569' }}>{c.email}</td>
+                            <td style={{ fontSize: '13px', color: '#334155' }}>{c.role}</td>
                             <td><span className={styles.badgePurple}>{c.batch}</span></td>
                             <td>
                               <span style={{ fontWeight: 600 }}>{task?.taskId || 'TSK-DEV-001'}</span>
-                              <div style={{ fontSize: '11px', color: '#94a3b8' }}>{task?.title || 'Technical Milestone'}</div>
+                              <div style={{ fontSize: '12.5px', color: '#475569' }}>{task?.title || 'Technical Milestone'}</div>
                             </td>
                             <td>
                               <span className={
@@ -1221,12 +1221,12 @@ export default function ReviewDashboardView({
                             </td>
                             <td>
                               {task?.meetLink ? (
-                                <a href={task.meetLink} target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                <a href={task.meetLink} target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                   <Video size={12} />
                                   <span>View Meet</span>
                                 </a>
                               ) : (
-                                <span style={{ color: '#71717a', fontSize: '11px' }}>Auto-Generates</span>
+                                <span style={{ color: '#475569', fontSize: '12.5px' }}>Auto-Generates</span>
                               )}
                             </td>
                           </tr>
@@ -1248,7 +1248,7 @@ export default function ReviewDashboardView({
             <Award size={18} color="#10b981" />
             <span>Mark Tasks Completed</span>
           </h3>
-          <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#94a3b8' }}>
+          <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#475569' }}>
             Once reviews are completed across sessions, HR marks candidates as <strong>Task Completed</strong>. The platform calculates the individual task percentage score, sends automated milestone approval emails, and approves students to proceed to their next sprint task.
           </p>
 
@@ -1260,7 +1260,7 @@ export default function ReviewDashboardView({
 
               if (checkpointCandidates.length === 0) {
                 return (
-                  <div style={{ textAlign: 'center', padding: '36px', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px dashed var(--border-medium)', color: '#94a3b8' }}>
+                  <div style={{ textAlign: 'center', padding: '36px', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px dashed var(--border-medium)', color: '#475569' }}>
                     <Award size={36} color="#a855f7" style={{ margin: '0 auto 10px auto' }} />
                     <h4 style={{ color: '#ffffff', margin: '0 0 6px 0' }}>No Candidates Ready for Final Checkpoint</h4>
                     <p style={{ margin: 0, fontSize: '13px', maxWidth: '480px', marginInline: 'auto' }}>
@@ -1295,7 +1295,7 @@ export default function ReviewDashboardView({
                               style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                             />
                           </td>
-                          <td style={{ fontFamily: 'monospace', color: '#c084fc' }}>{c.internId}</td>
+                          <td style={{ fontFamily: 'monospace', color: '#6D28D9' }}>{c.internId}</td>
                           <td style={{ fontWeight: 600 }}>{c.fullName}</td>
                           <td><span className={styles.badgePurple}>{c.batch}</span></td>
                           <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
@@ -1341,13 +1341,13 @@ export default function ReviewDashboardView({
             <AlertTriangle size={18} color="#ef4444" />
             <span>Formal Performance Warning & Score Reduction Dispatcher</span>
           </h3>
-          <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#94a3b8' }}>
+          <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#475569' }}>
             For candidates who fail multiple review evaluations or leave tasks incomplete. Deducts a performance penalty (e.g. -10%) and dispatches official warning documentation.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '18px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Penalty Deduction Percentage
               </label>
               <input
@@ -1362,7 +1362,7 @@ export default function ReviewDashboardView({
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
               Warning Directive / Reason for Penalty
             </label>
             <textarea

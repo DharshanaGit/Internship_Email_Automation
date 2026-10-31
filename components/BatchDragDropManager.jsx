@@ -151,7 +151,7 @@ export default function BatchDragDropManager({
               <Layers size={18} color="#a855f7" />
               <span>Interactive Drag-and-Drop Batch Segregation & Swapping</span>
             </h3>
-            <p style={{ margin: 0, fontSize: '12.5px', color: '#94a3b8' }}>
+            <p style={{ margin: 0, fontSize: '12.5px', color: '#475569' }}>
               Drag any intern card from one batch column and drop into another batch to reassign cohorts based on college, role, or customized joining dates.
             </p>
           </div>
@@ -202,7 +202,7 @@ export default function BatchDragDropManager({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid var(--border-default)', paddingBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <strong style={{ color: '#ffffff', fontSize: '14px' }}>{bName}</strong>
-                  <span className={styles.badgePurple} style={{ fontSize: '11px' }}>
+                  <span className={styles.badgePurple} style={{ fontSize: '12.5px' }}>
                     {batchCandidates.length} Interns
                   </span>
                 </div>
@@ -211,7 +211,7 @@ export default function BatchDragDropManager({
                   <button
                     type="button"
                     onClick={() => handleDeleteBatch(bName)}
-                    style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', padding: '4px' }}
+                    style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '4px' }}
                     title="Delete Empty Batch"
                   >
                     <Trash2 size={13} />
@@ -222,7 +222,7 @@ export default function BatchDragDropManager({
               {/* Candidates in this batch */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
                 {batchCandidates.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '30px 10px', color: '#71717a', fontSize: '12px', border: '1px dashed var(--border-medium)', borderRadius: '8px' }}>
+                  <div style={{ textAlign: 'center', padding: '30px 10px', color: '#475569', fontSize: '13px', border: '1px dashed var(--border-medium)', borderRadius: '8px' }}>
                     Drop interns here to assign to {bName}
                   </div>
                 ) : (
@@ -242,7 +242,7 @@ export default function BatchDragDropManager({
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={{ fontFamily: 'monospace', fontSize: '11px', color: '#c084fc', fontWeight: 700 }}>
+                        <span style={{ fontFamily: 'monospace', fontSize: '12.5px', color: '#6D28D9', fontWeight: 700 }}>
                           {c.internId || c.candidateId}
                         </span>
                         <Move size={12} color="#71717a" />
@@ -252,11 +252,11 @@ export default function BatchDragDropManager({
                         {c.fullName}
                       </div>
 
-                      <div style={{ fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                      <div style={{ fontSize: '13px', color: '#475569', marginBottom: '4px' }}>
                         {c.role}
                       </div>
 
-                      <div style={{ fontSize: '10.5px', color: '#71717a', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <div style={{ fontSize: '12.5px', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <Building size={10} />
                         <span>{c.collegeName || 'University'}</span>
                       </div>

@@ -6,64 +6,64 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  /* 1. Surfaces & Canvas */
-  --bg-app: #F8FAFC;                     /* Slate-50 root */
-  --bg-surface: #FFFFFF;                 /* Pure white cards, surfaces, modals */
-  --bg-surface-elevated: #F1F5F9;        /* Slate-100 secondary surface / chips */
-  --bg-surface-hover: #E2E8F0;           /* Slate-200 interactive hover */
-  --bg-input: #FFFFFF;                   /* Crisp white inputs */
+  /* 1. Surfaces & Canvas (Comfortable SaaS Layering - Never Blinding Pure White) */
+  --bg-app: #F1F5F9;                     /* Slate-100 comfortable canvas */
+  --bg-surface: #FFFFFF;                 /* Distinct white card surfaces */
+  --bg-surface-elevated: #E2E8F0;        /* Slate-200 secondary panels / chips / headers */
+  --bg-surface-hover: #CBD5E1;           /* Slate-300 interactive hover */
+  --bg-input: #FFFFFF;                   /* Input fields */
   --bg-input-focus: #FFFFFF;
-  --bg-overlay: rgba(15, 23, 42, 0.45);  /* Accessible modal overlay */
+  --bg-overlay: rgba(15, 23, 42, 0.55);  /* Modal backdrop blur */
 
-  /* 2. Typography & Text Contrast (WCAG AA Compliant) */
-  --text-primary: #0F172A;               /* Slate-900 (15.8:1 contrast on white) */
-  --text-heading: #1E1B4B;               /* Deep Indigo / Purple-950 */
-  --text-secondary: #334155;             /* Slate-700 (9.5:1 contrast on white) */
-  --text-muted: #64748B;                 /* Slate-500 (4.8:1 contrast on white) */
-  --text-label: #1E293B;                 /* Slate-800 form labels */
-  --text-accent: #6D28D9;                /* Purple-700 primary accent text */
+  /* 2. Typography & High-Contrast Readability (WCAG AAA/AA Compliant) */
+  --text-primary: #0F172A;               /* Slate-900 bold high contrast */
+  --text-heading: #0F172A;               /* Slate-900 headings */
+  --text-secondary: #334155;             /* Slate-700 body text */
+  --text-muted: #475569;                 /* Slate-600 legible secondary text */
+  --text-label: #0F172A;                 /* Slate-900 form labels */
+  --text-accent: #6D28D9;                /* Purple-700 brand text */
 
-  /* 3. Primary Brand Palette (Purple & Slate) */
+  /* 3. Primary Brand Palette (Purple & Indigo Accent) */
   --accent-primary: #6D28D9;             /* Purple-700 */
   --accent-primary-hover: #5B21B6;       /* Purple-800 */
   --accent-primary-active: #4C1D95;      /* Purple-900 */
   --accent-violet: #7C3AED;              /* Violet-600 */
   --accent-purple-light: #EDE9FE;        /* Violet-100 badges & highlights */
-  --accent-purple-text: #5B21B6;         /* Violet-800 text inside badges */
-  --border-focus-ring: rgba(109, 40, 217, 0.25);
+  --accent-purple-text: #581C87;         /* Violet-900 text inside badges */
+  --border-focus-ring: rgba(109, 40, 217, 0.28);
 
-  /* 4. Semantic Status Indicators (High-contrast deep tones on light surfaces) */
+  /* 4. Semantic Status Indicators (High-contrast deep tones on tinted surfaces) */
   --accent-emerald: #059669;             /* Emerald-600 */
-  --accent-emerald-bg: #ECFDF5;          /* Emerald-50 */
-  --accent-emerald-border: #A7F3D0;      /* Emerald-200 */
-  --accent-emerald-text: #065F46;        /* Emerald-800 */
+  --accent-emerald-bg: #D1FAE5;          /* Emerald-100 */
+  --accent-emerald-border: #6EE7B7;      /* Emerald-300 */
+  --accent-emerald-text: #064E3B;        /* Emerald-900 */
 
   --accent-amber: #D97706;               /* Amber-600 */
-  --accent-amber-bg: #FFFBEB;            /* Amber-50 */
-  --accent-amber-border: #FDE68A;        /* Amber-200 */
-  --accent-amber-text: #92400E;          /* Amber-800 */
+  --accent-amber-bg: #FEF3C7;            /* Amber-100 */
+  --accent-amber-border: #FCD34D;        /* Amber-300 */
+  --accent-amber-text: #78350F;          /* Amber-900 */
 
   --accent-rose: #DC2626;                /* Rose-600 */
-  --accent-rose-bg: #FEF2F2;             /* Rose-50 */
-  --accent-rose-border: #FECACA;         /* Rose-200 */
-  --accent-rose-text: #991B1B;           /* Rose-800 */
+  --accent-rose-bg: #FEE2E2;             /* Rose-100 */
+  --accent-rose-border: #FCA5A5;         /* Rose-300 */
+  --accent-rose-text: #7F1D1D;           /* Rose-900 */
 
   --accent-blue: #2563EB;                /* Blue-600 */
-  --accent-blue-bg: #EFF6FF;             /* Blue-50 */
-  --accent-blue-border: #BFDBFE;         /* Blue-200 */
-  --accent-blue-text: #1E40AF;           /* Blue-800 */
+  --accent-blue-bg: #DBEAFE;             /* Blue-100 */
+  --accent-blue-border: #93C5FD;         /* Blue-300 */
+  --accent-blue-text: #1E3A8A;           /* Blue-900 */
 
-  /* 5. Systematic Borders & Dividers */
-  --border-default: #E2E8F0;             /* Slate-200 */
-  --border-subtle: #F1F5F9;              /* Slate-100 */
-  --border-medium: #CBD5E1;              /* Slate-300 interactive / input */
+  /* 5. Systematic Borders & Dividers (Distinct Structural Definition) */
+  --border-default: #CBD5E1;             /* Slate-300 defined card borders */
+  --border-subtle: #E2E8F0;              /* Slate-200 dividers */
+  --border-medium: #94A3B8;              /* Slate-400 interactive / input */
   --border-focus: #6D28D9;               /* Purple-700 */
 
-  /* 6. Restrained SaaS Card Shadows (No fuzzy neon glow) */
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(109, 40, 217, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  /* 6. Physical Depth Shadows */
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.10), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(109, 40, 217, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.06);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
 
   /* 7. Radii Scale */
   --radius-xs: 4px;
@@ -91,8 +91,8 @@ body {
   background-color: var(--bg-app);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 13.5px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

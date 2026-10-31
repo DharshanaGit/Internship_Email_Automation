@@ -330,10 +330,10 @@ export default function GoogleFormsBatchManager({
       {editingBatch && (
         <div className={styles.configCard}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#c084fc' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#6D28D9' }}>
               Authoritative Configuration for {editingBatch.batchName} (Protects Sent/Accepted Offers)
             </span>
-            <button type="button" onClick={handleSaveBatchConfig} className={styles.btnAction} style={{ padding: '6px 14px', fontSize: '12px' }}>
+            <button type="button" onClick={handleSaveBatchConfig} className={styles.btnAction} style={{ padding: '6px 14px', fontSize: '13px' }}>
               Save Batch Config
             </button>
           </div>
@@ -472,7 +472,7 @@ export default function GoogleFormsBatchManager({
                 <CheckCircle2 size={18} />
                 <div>
                   <strong>Google Form Connected Successfully</strong>
-                  <div style={{ fontSize: '12px', marginTop: '2px' }}>
+                  <div style={{ fontSize: '13px', marginTop: '2px' }}>
                     Title: {validationResult.formTitle} &bull; All required fields and approved role mapping verified.
                   </div>
                 </div>
@@ -482,7 +482,7 @@ export default function GoogleFormsBatchManager({
                 <AlertCircle size={18} />
                 <div>
                   <strong>Form Schema Validation Errors:</strong>
-                  <ul style={{ margin: '4px 0 0 0', paddingLeft: '18px', fontSize: '12px' }}>
+                  <ul style={{ margin: '4px 0 0 0', paddingLeft: '18px', fontSize: '13px' }}>
                     {validationResult.errors.map((err, i) => (
                       <li key={i}>{err}</li>
                     ))}
@@ -502,7 +502,7 @@ export default function GoogleFormsBatchManager({
               <strong style={{ color: '#ffffff', fontSize: '15px' }}>
                 Review Candidates & Duplicate Prevention ({fetchedData.totalFetched} responses)
               </strong>
-              <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>
+              <div style={{ fontSize: '13px', color: '#475569', marginTop: '2px' }}>
                 {fetchedData.validCount} valid &bull; {fetchedData.duplicateCount} duplicates &bull; {fetchedData.errorCount} errors detected. Authoritative HR configuration will apply.
               </div>
             </div>
@@ -564,7 +564,7 @@ export default function GoogleFormsBatchManager({
                         style={{ accentColor: '#a855f7' }}
                       />
                     </td>
-                    <td><code style={{ color: '#c084fc' }}>{cand.internId}</code></td>
+                    <td><code style={{ color: '#6D28D9' }}>{cand.internId}</code></td>
                     <td style={{ fontWeight: 600, color: '#f8fafc' }}>{cand.fullName}</td>
                     <td>{cand.email}</td>
                     <td>{cand.phone}</td>

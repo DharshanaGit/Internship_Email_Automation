@@ -176,7 +176,7 @@ export default function UnifiedEmailTracker({
               type="button"
               onClick={() => setSelectedCategory(cat.id)}
               className={`${styles.subTabBtn} ${selectedCategory === cat.id ? styles.subTabBtnActive : ''}`}
-              style={{ padding: '6px 12px', fontSize: '11.5px' }}
+              style={{ padding: '6px 12px', fontSize: '13px' }}
             >
               {cat.label}
             </button>
@@ -219,7 +219,7 @@ export default function UnifiedEmailTracker({
             <tbody>
               {filteredEmails.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#71717a' }}>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>
                     No email logs found matching the selected stream criteria.
                   </td>
                 </tr>
@@ -228,12 +228,12 @@ export default function UnifiedEmailTracker({
                   const isSent = log.status === 'Sent' || log.status === 'Delivered';
                   return (
                     <tr key={log.id}>
-                      <td style={{ fontSize: '12px', color: '#94a3b8', whiteSpace: 'nowrap' }}>
+                      <td style={{ fontSize: '13px', color: '#475569', whiteSpace: 'nowrap' }}>
                         {new Date(log.sentAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </td>
                       <td>
                         <div style={{ fontWeight: 600, color: '#ffffff' }}>{log.recipientName || 'Candidate'}</div>
-                        <div style={{ fontSize: '11.5px', color: '#94a3b8' }}>{log.recipientEmail}</div>
+                        <div style={{ fontSize: '13px', color: '#475569' }}>{log.recipientEmail}</div>
                       </td>
                       <td>
                         <span className={
@@ -261,7 +261,7 @@ export default function UnifiedEmailTracker({
                           type="button"
                           onClick={() => setInspectingEmail(log)}
                           className={styles.btnSecondary}
-                          style={{ fontSize: '11px', padding: '4px 8px' }}
+                          style={{ fontSize: '12.5px', padding: '4px 8px' }}
                         >
                           <Eye size={12} />
                           <span>View Body</span>
@@ -284,7 +284,7 @@ export default function UnifiedEmailTracker({
               <h3 style={{ margin: 0, fontSize: '15px', color: '#ffffff' }}>
                 Email Dispatch Details
               </h3>
-              <button type="button" onClick={() => setInspectingEmail(null)} style={{ color: '#94a3b8', cursor: 'pointer' }}>
+              <button type="button" onClick={() => setInspectingEmail(null)} style={{ color: '#475569', cursor: 'pointer' }}>
                 <X size={18} />
               </button>
             </div>
@@ -302,7 +302,7 @@ export default function UnifiedEmailTracker({
               </div>
 
               <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '16px', maxHeight: '350px', overflowY: 'auto' }}>
-                <pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '12px', whiteSpace: 'pre-wrap', color: '#cbd5e1' }}>
+                <pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '13px', whiteSpace: 'pre-wrap', color: '#334155' }}>
                   {inspectingEmail.body}
                 </pre>
               </div>

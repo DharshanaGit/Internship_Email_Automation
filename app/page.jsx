@@ -455,7 +455,7 @@ export default function LandingPage() {
             {/* Module 6 */}
             <div className={styles.moduleCard}>
               <div className={styles.moduleCardHeader}>
-                <div className={styles.moduleIcon} style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}>
+                <div className={styles.moduleIcon} style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#6D28D9' }}>
                   <Activity size={20} />
                 </div>
                 <span className={styles.moduleNumber}>06</span>

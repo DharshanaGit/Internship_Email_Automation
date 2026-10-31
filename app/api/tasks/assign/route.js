@@ -64,33 +64,21 @@ export async function POST(request) {
       if (cand) candidates = [cand];
     }
 
-    // Auto-create fallback candidate if name and email provided but record doesn't exist
-    if (candidates.length === 0 && candidateName && email) {
-      const candId = `SF-INT-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
-      const newCand = await prisma.candidate.create({
-        data: {
-          candidateId: candId,
-          internId: candId,
-          fullName: candidateName,
-          email,
-          role: role || 'Web Developer Intern',
-          department: 'Engineering',
-          joiningDate: new Date().toISOString().split('T')[0],
-          endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          duration: '3 Months',
-          reportingManager: 'Priyanka Nair',
-          assignedMentor: 'Rahul Kapoor',
-          offerLetterStatus: 'Accepted',
-          taskStatus: 'Not Assigned',
-        },
-      });
-      candidates = [newCand];
+    // If preview mode, allow rendering sample without inserting dummy records into DB
+    if (candidates.length === 0 && previewOnly) {
+      candidates = [{
+        id: candidateId || 'preview-id',
+        fullName: candidateName || 'Preview Candidate',
+        email: email || 'intern@shortfundly.com',
+        role: role || 'Web Developer Intern',
+        tasksCompleted: 0,
+      }];
     }
 
     if (candidates.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'No valid candidate found. Please select candidates or provide candidate details.' },
-        { status: 400 }
+        { success: false, error: 'No matching candidate found in database. Please select a valid candidate from the directory.' },
+        { status: 404 }
       );
     }
 

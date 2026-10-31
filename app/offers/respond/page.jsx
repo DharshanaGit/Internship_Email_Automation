@@ -377,7 +377,7 @@ export default function OfferRespondPage() {
                 <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: 700 }}>
                   Official Internship Offer Letter (PDF)
                 </h3>
-                <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#64748b' }}>
+                <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#64748b' }}>
                   Document: Shortfundly_Offer_{(candidate.fullName || 'Candidate').replace(/\s+/g, '_')}.pdf &bull; A4 Corporate Standard
                 </p>
               </div>
@@ -512,7 +512,7 @@ export default function OfferRespondPage() {
                       />
                       {typedName && (
                         <div className={styles.sigFontPreview}>
-                          <span style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Digital Signature Preview:</span>
+                          <span style={{ fontSize: '12.5px', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Digital Signature Preview:</span>
                           <div className={styles.signatureStyledText}>{typedName}</div>
                         </div>
                       )}
@@ -535,7 +535,7 @@ export default function OfferRespondPage() {
                         />
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                        <span style={{ fontSize: '12px', color: '#64748b' }}>Draw your signature using mouse or finger touch.</span>
+                        <span style={{ fontSize: '13px', color: '#64748b' }}>Draw your signature using mouse or finger touch.</span>
                         <button type="button" onClick={clearCanvas} className={styles.btnClearCanvas}>Clear Canvas</button>
                       </div>
                     </div>
@@ -549,14 +549,14 @@ export default function OfferRespondPage() {
                         <span style={{ marginTop: '8px', fontSize: '13px', color: '#0f172a', fontWeight: 600 }}>
                           Click to upload signature image or photo (PNG / JPG / WEBP)
                         </span>
-                        <span style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
+                        <span style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
                           Image will be cryptographically verified and securely stored in Cloudinary
                         </span>
                         <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
                       </label>
                       {signatureData && signatureData.startsWith('data:image/') && (
                         <div style={{ marginTop: '12px', textAlign: 'center', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                          <div style={{ fontSize: '12px', color: '#059669', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                          <div style={{ fontSize: '13px', color: '#059669', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                             <Check size={14} color="#059669" />
                             <span>Signature Image Ready for Cloudinary Upload</span>
                           </div>

@@ -198,7 +198,7 @@ export default function TaskSubmitPage() {
         {/* Submission Form */}
         {task?.alreadySubmitted ? (
           <div style={{ marginTop: '20px', padding: '18px', background: 'var(--bg-input)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '10px' }}>SUBMITTED DELIVERABLE RECORDS:</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px' }}>SUBMITTED DELIVERABLE RECORDS:</div>
             {task.projectUrl && (
               <div style={{ marginBottom: '8px', fontSize: '13px' }}>
                 <Globe size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />

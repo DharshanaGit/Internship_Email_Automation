@@ -1620,12 +1620,12 @@ export default function DashboardPage() {
                 border: '1px solid rgba(168, 85, 247, 0.45)',
                 padding: '5px 14px',
                 borderRadius: '9999px',
-                fontSize: '12px',
+                fontSize: '13px',
                 fontWeight: 700,
-                color: '#c084fc',
+                color: '#6D28D9',
               }}
             >
-              <RefreshCw size={12} className={styles.spin} style={{ color: '#c084fc' }} />
+              <RefreshCw size={12} className={styles.spin} style={{ color: '#6D28D9' }} />
               <span>Queue Active: {queueStats.completed} sent &bull; {queueStats.pending} pending (1 every 2.5s)</span>
             </div>
           )}
@@ -1636,7 +1636,7 @@ export default function DashboardPage() {
           <div className={styles.roleSelectWrapper} style={{ cursor: 'default' }} title="Role switching requires signing out">
             <Shield size={14} style={{ color: '#a855f7' }} />
             <span className={styles.roleLabel}>Role:</span>
-            <span style={{ color: '#0F172A', fontWeight: 700, fontSize: '12px' }}>{adminUser.role}</span>
+            <span style={{ color: '#0F172A', fontWeight: 700, fontSize: '13px' }}>{adminUser.role}</span>
           </div>
 
           <div className={styles.userPill}>
@@ -1783,7 +1783,7 @@ export default function DashboardPage() {
             
             {/* Filter Bar for Automated Offer Letter */}
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', background: 'var(--bg-surface)', padding: '12px 18px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#c084fc', fontSize: '13px', fontWeight: 700 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6D28D9', fontSize: '13px', fontWeight: 700 }}>
                 <Filter size={15} />
                 <span>Filter Interns:</span>
               </div>
@@ -1791,7 +1791,7 @@ export default function DashboardPage() {
               <select
                 value={offerBatchFilter}
                 onChange={(e) => setOfferBatchFilter(e.target.value)}
-                style={{ height: '36px', background: 'var(--bg-surface)', color: '#cbd5e1', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
+                style={{ height: '36px', background: 'var(--bg-surface)', color: '#334155', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
               >
                 <option value="ALL">All Batches</option>
                 {batches.map((b) => (
@@ -1802,7 +1802,7 @@ export default function DashboardPage() {
               <select
                 value={offerRoleFilter}
                 onChange={(e) => setOfferRoleFilter(e.target.value)}
-                style={{ height: '36px', background: 'var(--bg-surface)', color: '#cbd5e1', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
+                style={{ height: '36px', background: 'var(--bg-surface)', color: '#334155', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
               >
                 <option value="ALL">All Roles</option>
                 {Array.from(new Set(candidates.map((c) => c.role).filter(Boolean))).map((r) => (
@@ -1811,7 +1811,7 @@ export default function DashboardPage() {
               </select>
 
               <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
-                <Search size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: '#71717a' }} />
+                <Search size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: '#475569' }} />
                 <input
                   type="text"
                   placeholder="Search by intern ID, candidate name, or email..."
@@ -1829,7 +1829,7 @@ export default function DashboardPage() {
                 <div className={styles.metricValue} style={{ fontSize: '21px', color: '#ffffff', fontWeight: 700 }}>
                   {stats.offerLetters?.sent || 0}
                 </div>
-                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Delivered to Inboxes</div>
+                <div className={styles.metricSubtitle} style={{ color: '#475569' }}>Delivered to Inboxes</div>
               </div>
 
               <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #f43f5e', background: 'rgba(14, 20, 34, 0.85)' }}>
@@ -1837,7 +1837,7 @@ export default function DashboardPage() {
                 <div className={styles.metricValue} style={{ fontSize: '21px', color: '#ffffff', fontWeight: 700 }}>
                   {stats.offerLetters?.failed || 0}
                 </div>
-                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Need Attention</div>
+                <div className={styles.metricSubtitle} style={{ color: '#475569' }}>Need Attention</div>
               </div>
 
               <div className={styles.metricCard} style={{ padding: '18px 20px', borderLeft: '4px solid #f59e0b', background: 'rgba(14, 20, 34, 0.85)' }}>
@@ -1845,7 +1845,7 @@ export default function DashboardPage() {
                 <div className={styles.metricValue} style={{ fontSize: '21px', color: '#ffffff', fontWeight: 700 }}>
                   {stats.offerLetters?.waiting || stats.offerLetters?.readyToSend || 0}
                 </div>
-                <div className={styles.metricSubtitle} style={{ color: '#94a3b8' }}>Waiting for Review</div>
+                <div className={styles.metricSubtitle} style={{ color: '#475569' }}>Waiting for Review</div>
               </div>
             </div>
 
@@ -1856,7 +1856,7 @@ export default function DashboardPage() {
                   <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '14.5px' }}>
                     Offer Letter Dispatched to {recentOfferCandidate.fullName} ({recentOfferCandidate.role})
                   </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '2px' }}>
                     Candidate is now fully qualified to receive role sprint deliverables and a Google Meet briefing.
                   </div>
                 </div>
@@ -1912,13 +1912,13 @@ export default function DashboardPage() {
                         href="/api/candidates/download-template"
                         download="Shortfundly_Bulk_Offer_Template.xlsx"
                         className={styles.btnAction}
-                        style={{ fontSize: '12px', padding: '6px 12px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                        style={{ fontSize: '13px', padding: '6px 12px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                       >
                         <FileSpreadsheet size={13} />
                         <span>Download Bulk Offer Template (.xlsx)</span>
                       </a>
 
-                      <label className={styles.btnPrimaryAction} style={{ fontSize: '12px', padding: '6px 12px', cursor: 'pointer' }}>
+                      <label className={styles.btnPrimaryAction} style={{ fontSize: '13px', padding: '6px 12px', cursor: 'pointer' }}>
                         <Upload size={13} />
                         <span>Upload Dataset (Validate Excel/CSV)</span>
                         <input
@@ -1935,7 +1935,7 @@ export default function DashboardPage() {
                           onClick={handleClearBulkDataset}
                           className={styles.btnAction}
                           style={{
-                            fontSize: '12px',
+                            fontSize: '13px',
                             padding: '6px 12px',
                             color: '#f87171',
                             borderColor: 'rgba(239, 68, 68, 0.4)',
@@ -1954,8 +1954,8 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: '#cbd5e1', lineHeight: 1.6 }}>
-                    <strong style={{ color: '#c084fc' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#e9d5ff' }}>Name, Email ID, Phone Number, Role, Degree, College, JoiningDate, EndingDate, Monthly Stipend (INR)</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Intern IDs & Expiring URLs</strong>.
+                  <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: '#334155', lineHeight: 1.6 }}>
+                    <strong style={{ color: '#6D28D9' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#e9d5ff' }}>Name, Email ID, Phone Number, Role, Degree, College, JoiningDate, EndingDate, Monthly Stipend (INR)</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Intern IDs & Expiring URLs</strong>.
                   </div>
 
                   {bulkValidationReport ? (
@@ -2018,7 +2018,7 @@ export default function DashboardPage() {
                           type="button"
                           onClick={handleSelectAllFiltered}
                           className={styles.btnAction}
-                          style={{ fontSize: '12px', padding: '6px 12px' }}
+                          style={{ fontSize: '13px', padding: '6px 12px' }}
                         >
                           <CheckSquare size={13} />
                           <span>Select All ({filteredBulkRows.length})</span>
@@ -2027,7 +2027,7 @@ export default function DashboardPage() {
                           type="button"
                           onClick={handleDeselectAll}
                           className={styles.btnAction}
-                          style={{ fontSize: '12px', padding: '6px 12px' }}
+                          style={{ fontSize: '13px', padding: '6px 12px' }}
                         >
                           <Square size={13} />
                           <span>Deselect All</span>
@@ -2050,10 +2050,10 @@ export default function DashboardPage() {
                       background: 'var(--bg-surface)',
                       borderTop: '1px solid var(--border-default)',
                       borderBottom: '1px solid var(--border-default)',
-                      fontSize: '12px',
+                      fontSize: '13px',
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                        <span style={{ color: '#c084fc', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <span style={{ color: '#6D28D9', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px' }}>
                           <Users size={14} /> Batch Assignment:
                         </span>
                         <select
@@ -2065,7 +2065,7 @@ export default function DashboardPage() {
                             borderRadius: '6px',
                             color: '#ffffff',
                             padding: '5px 10px',
-                            fontSize: '12px',
+                            fontSize: '13px',
                             outline: 'none',
                           }}
                         >
@@ -2077,7 +2077,7 @@ export default function DashboardPage() {
                           type="button"
                           onClick={() => handleApplyBatchToSelected(selectedBulkBatchTarget)}
                           className={styles.btnAction}
-                          style={{ fontSize: '11.5px', padding: '5px 12px', borderColor: '#7c3aed', color: '#c084fc' }}
+                          style={{ fontSize: '13px', padding: '5px 12px', borderColor: '#7c3aed', color: '#6D28D9' }}
                           disabled={selectedCandidateKeys.size === 0}
                           title="Assign selected batch to all checked candidates"
                         >
@@ -2097,7 +2097,7 @@ export default function DashboardPage() {
                             borderRadius: '6px',
                             color: '#ffffff',
                             padding: '5px 10px',
-                            fontSize: '12px',
+                            fontSize: '13px',
                             outline: 'none',
                             width: '180px',
                           }}
@@ -2112,7 +2112,7 @@ export default function DashboardPage() {
                           type="button"
                           onClick={handleAddNewBatch}
                           className={styles.btnAction}
-                          style={{ fontSize: '11.5px', padding: '5px 10px' }}
+                          style={{ fontSize: '13px', padding: '5px 10px' }}
                         >
                           + Create Batch
                         </button>
@@ -2158,7 +2158,7 @@ export default function DashboardPage() {
                                   />
                                 </td>
                                 <td>
-                                  <code style={{ color: '#c084fc', fontWeight: 700, fontSize: '11.5px', background: 'var(--bg-surface-elevated)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border-default)' }}>
+                                  <code style={{ color: '#6D28D9', fontWeight: 700, fontSize: '13px', background: 'var(--bg-surface-elevated)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border-default)' }}>
                                     {internId}
                                   </code>
                                 </td>
@@ -2175,7 +2175,7 @@ export default function DashboardPage() {
                                       borderRadius: 'var(--radius-sm)',
                                       color: 'var(--text-primary)',
                                       padding: '3px 8px',
-                                      fontSize: '11px',
+                                      fontSize: '12.5px',
                                       fontWeight: 600,
                                       cursor: 'pointer',
                                       outline: 'none',
@@ -2191,14 +2191,14 @@ export default function DashboardPage() {
                                         {row.batch}
                                       </option>
                                     )}
-                                    <option value="__NEW_CUSTOM_BATCH__" style={{ background: '#2e1065', color: '#c084fc', fontWeight: 'bold' }}>
+                                    <option value="__NEW_CUSTOM_BATCH__" style={{ background: '#2e1065', color: '#6D28D9', fontWeight: 'bold' }}>
                                       + Create / Custom Batch...
                                     </option>
                                   </select>
                                 </td>
                                 <td>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                    <span style={{ fontFamily: 'monospace', fontSize: '11px', color: '#94a3b8' }}>
+                                    <span style={{ fontFamily: 'monospace', fontSize: '12.5px', color: '#475569' }}>
                                       {portalUrl.length > 28 ? `${portalUrl.slice(0, 26)}...` : portalUrl}
                                     </span>
                                     <button
@@ -2207,7 +2207,7 @@ export default function DashboardPage() {
                                         navigator.clipboard?.writeText(portalUrl);
                                         showToast('Copied candidate portal link!', 'success');
                                       }}
-                                      style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '4px', padding: '2px 6px', fontSize: '10px', color: '#c084fc', cursor: 'pointer' }}
+                                      style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '4px', padding: '2px 6px', fontSize: '12.5px', color: '#6D28D9', cursor: 'pointer' }}
                                       title="Copy URL"
                                     >
                                       Copy
@@ -2224,7 +2224,7 @@ export default function DashboardPage() {
                                     type="button"
                                     onClick={() => triggerOfferPreview({ ...row.raw, ...row }, bulkCustomSubject, bulkCustomBody, bulkCustomPdfTemplate)}
                                     className={styles.btnAction}
-                                    style={{ fontSize: '11px', padding: '3px 8px' }}
+                                    style={{ fontSize: '12.5px', padding: '3px 8px' }}
                                   >
                                     <Eye size={12} />
                                     <span>Preview</span>
@@ -2241,16 +2241,16 @@ export default function DashboardPage() {
                     <div style={{ padding: '18px 24px', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-surface-elevated)' }}>
                       <div style={{ background: 'var(--bg-surface)', padding: '14px 18px', borderRadius: '8px', border: '1px solid var(--border-default)', marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
                         <div>
-                          <div style={{ color: '#c084fc', fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                          <div style={{ color: '#6D28D9', fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                             <Clock size={15} />
                             <span>Candidate Portal URL Expiration Deadline (Fixed by HR for all candidates)</span>
                           </div>
-                          <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                          <div style={{ fontSize: '13px', color: '#475569' }}>
                             Populated into <code>{'{{deadline}}'}</code> in the offer email. Candidates must submit their digital signature via their unique portal link before this timestamp.
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <label style={{ fontSize: '12px', color: '#cbd5e1', fontWeight: 600 }}>Set Expiry Deadline:</label>
+                          <label style={{ fontSize: '13px', color: '#334155', fontWeight: 600 }}>Set Expiry Deadline:</label>
                           <input
                             type="datetime-local"
                             value={bulkOfferDeadline}
@@ -2286,7 +2286,7 @@ export default function DashboardPage() {
                         <div className={styles.formFull}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                             <label className={styles.label}>Insert Template Dynamic Variables</label>
-                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Click to append to subject line</span>
+                            <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Click to append to subject line</span>
                           </div>
                           <div className={styles.tagPillsBar}>
                             {[
@@ -2332,7 +2332,7 @@ export default function DashboardPage() {
                               color: '#60a5fa',
                               padding: '5px 12px',
                               borderRadius: '6px',
-                              fontSize: '12px',
+                              fontSize: '13px',
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
@@ -2354,7 +2354,7 @@ export default function DashboardPage() {
                               color: '#34d399',
                               padding: '5px 12px',
                               borderRadius: '6px',
-                              fontSize: '12px',
+                              fontSize: '13px',
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
@@ -2376,7 +2376,7 @@ export default function DashboardPage() {
                         {(bulkAttachments.length > 0 || bulkBannerImage) && (
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', paddingTop: '8px', borderTop: '1px dashed var(--border-medium)' }}>
                             {bulkBannerImage && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '4px 10px', borderRadius: '6px', fontSize: '11.5px', color: '#065f46' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', color: '#065f46' }}>
                                 <ImageIcon size={13} />
                                 <span>Company Banner Attached</span>
                                 <button
@@ -2391,7 +2391,7 @@ export default function DashboardPage() {
                             )}
 
                             {bulkAttachments.map((att, idx) => (
-                              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#eff6ff', border: '1px solid #bfdbfe', padding: '4px 10px', borderRadius: '6px', fontSize: '11.5px', color: '#1e40af' }}>
+                              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#eff6ff', border: '1px solid #bfdbfe', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', color: '#1e40af' }}>
                                 <FileText size={13} />
                                 <span>{att.filename} ({att.size})</span>
                                 <button
@@ -2437,10 +2437,10 @@ export default function DashboardPage() {
                               setPdfEditorModalOpen(true);
                             }}
                             className={styles.btnAction}
-                            style={{ borderColor: '#7c3aed', color: '#c084fc' }}
+                            style={{ borderColor: '#7c3aed', color: '#6D28D9' }}
                             title="Customize formal PDF offer letter clauses and text content"
                           >
-                            <FileText size={14} style={{ color: '#c084fc' }} />
+                            <FileText size={14} style={{ color: '#6D28D9' }} />
                             <span>Customize PDF Content</span>
                           </button>
 
@@ -2561,7 +2561,7 @@ export default function DashboardPage() {
                         setBulkTaskSelectedKeys(new Set(targetList.map(c => c.id)));
                       }}
                       className={styles.btnAction}
-                      style={{ fontSize: '12px', padding: '5px 12px' }}
+                      style={{ fontSize: '13px', padding: '5px 12px' }}
                     >
                       Select Filtered ({filteredTaskCandidates.length})
                     </button>
@@ -2569,7 +2569,7 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setBulkTaskSelectedKeys(new Set())}
                       className={styles.btnAction}
-                      style={{ fontSize: '12px', padding: '5px 12px' }}
+                      style={{ fontSize: '13px', padding: '5px 12px' }}
                     >
                       Deselect All
                     </button>
@@ -2679,9 +2679,9 @@ export default function DashboardPage() {
                                 }}
                               />
                             </td>
-                            <td><code style={{ color: 'var(--accent-cyan)', fontSize: '12px' }}>{c.internId || c.candidateId}</code></td>
+                            <td><code style={{ color: 'var(--accent-cyan)', fontSize: '13px' }}>{c.internId || c.candidateId}</code></td>
                             <td><strong>{c.fullName}</strong></td>
-                            <td><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{c.batch || 'Batch A'}</span></td>
+                            <td><span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{c.batch || 'Batch A'}</span></td>
                             <td>{c.email}</td>
                             <td>{c.role}</td>
                             <td>
@@ -2792,7 +2792,7 @@ export default function DashboardPage() {
                   <div className={styles.formFull}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                       <label className={styles.label}>Template Dynamic Variables</label>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Click to append to subject line</span>
+                      <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Click to append to subject line</span>
                     </div>
                     <div className={styles.tagPillsBar}>
                       {[
@@ -3090,7 +3090,7 @@ export default function DashboardPage() {
                             }
                           }}
                           className={styles.btnAction}
-                          style={{ fontSize: '10.5px', padding: '2px 8px', color: 'var(--accent-cyan)' }}
+                          style={{ fontSize: '12.5px', padding: '2px 8px', color: 'var(--accent-cyan)' }}
                           title="Generate a genuine, non-expired Google Meet room via Google Calendar API"
                         >
                           <Video size={11} />
@@ -3100,7 +3100,7 @@ export default function DashboardPage() {
                           type="button"
                           onClick={() => setSingleTaskForm({ ...singleTaskForm, meetLink: generateGoogleMeetLink() })}
                           className={styles.btnAction}
-                          style={{ fontSize: '10.5px', padding: '2px 6px' }}
+                          style={{ fontSize: '12.5px', padding: '2px 6px' }}
                         >
                           Regenerate
                         </button>
@@ -3138,7 +3138,7 @@ export default function DashboardPage() {
                   <div className={styles.formFull}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                       <label className={styles.label}>Template Tag Support</label>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Click to append to task description</span>
+                      <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Click to append to task description</span>
                     </div>
                     <div className={styles.tagPillsBar}>
                       {[
@@ -3246,7 +3246,7 @@ export default function DashboardPage() {
                     <RefreshCw size={14} className={cronLoading ? styles.spin : ''} />
                     <span>{cronLoading ? 'Running Review Cron...' : 'Run Review Cron Pipeline'}</span>
                   </button>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                  <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
                     Auto-evaluates schedule dates &amp; advances pending Review 1 / 2 cycles
                   </span>
                 </div>
@@ -3308,25 +3308,25 @@ export default function DashboardPage() {
                           <tr key={task.id}>
                             <td>
                               <strong>{c.fullName}</strong>
-                              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{c.role}</div>
+                              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{c.role}</div>
                             </td>
                             <td>
                               <div>{task.title}</div>
-                              <span className={styles.tabBadge} style={{ fontSize: '10.5px' }}>{task.status}</span>
+                              <span className={styles.tabBadge} style={{ fontSize: '12.5px' }}>{task.status}</span>
                             </td>
                             <td>
                               <div>{task.explanationDate || 'Pending'}</div>
-                              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{task.explanationTime}</div>
+                              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{task.explanationTime}</div>
                             </td>
                             <td>
                               <div style={{ color: 'var(--accent-amber)', fontWeight: 600 }}>
                                 {task.firstReviewDate || task.reviewDate || 'Pending'}
                               </div>
-                              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{task.firstReviewStatus || 'Pending'}</div>
+                              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{task.firstReviewStatus || 'Pending'}</div>
                             </td>
                             <td>
                               <div>{task.secondReviewDate || 'Pending'}</div>
-                              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{task.secondReviewStatus || 'Pending'}</div>
+                              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{task.secondReviewStatus || 'Pending'}</div>
                             </td>
                             <td>
                               <a
@@ -3363,7 +3363,7 @@ export default function DashboardPage() {
                                         });
                                       }}
                                       className={styles.btnAction}
-                                      style={{ fontSize: '11px', padding: '3px 7px' }}
+                                      style={{ fontSize: '12.5px', padding: '3px 7px' }}
                                     >
                                       <Eye size={11} />
                                       <span>Preview</span>
@@ -3390,7 +3390,7 @@ export default function DashboardPage() {
                                         }
                                       }}
                                       className={styles.btnPrimaryAction}
-                                      style={{ fontSize: '11px', padding: '4px 8px' }}
+                                      style={{ fontSize: '12.5px', padding: '4px 8px' }}
                                     >
                                       <span>Send Review 1</span>
                                     </button>
@@ -3410,7 +3410,7 @@ export default function DashboardPage() {
                                       });
                                     }}
                                     className={styles.btnAction}
-                                    style={{ fontSize: '11px', padding: '4px 8px', color: 'var(--accent-amber)' }}
+                                    style={{ fontSize: '12.5px', padding: '4px 8px', color: 'var(--accent-amber)' }}
                                     title="Open manual review 2 dialog to type personalized mentor feedback before dispatch"
                                   >
                                     <Sparkles size={11} />
@@ -3430,7 +3430,7 @@ export default function DashboardPage() {
                                     });
                                   }}
                                   className={styles.btnAction}
-                                  style={{ fontSize: '11px', padding: '4px 8px' }}
+                                  style={{ fontSize: '12.5px', padding: '4px 8px' }}
                                 >
                                   <span>Inspect</span>
                                 </button>
@@ -3460,7 +3460,7 @@ export default function DashboardPage() {
                                     }
                                   }}
                                   className={styles.btnPrimaryAction}
-                                  style={{ fontSize: '11px', padding: '4px 8px', background: 'var(--accent-emerald)' }}
+                                  style={{ fontSize: '12.5px', padding: '4px 8px', background: 'var(--accent-emerald)' }}
                                 >
                                   <span>Complete Task</span>
                                 </button>
@@ -3490,7 +3490,7 @@ export default function DashboardPage() {
                         setBulkReview2SelectedKeys(new Set(allIds));
                       }}
                       className={styles.btnAction}
-                      style={{ fontSize: '12px', padding: '5px 12px' }}
+                      style={{ fontSize: '13px', padding: '5px 12px' }}
                     >
                       Select All
                     </button>
@@ -3498,7 +3498,7 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setBulkReview2SelectedKeys(new Set())}
                       className={styles.btnAction}
-                      style={{ fontSize: '12px', padding: '5px 12px' }}
+                      style={{ fontSize: '13px', padding: '5px 12px' }}
                     >
                       Deselect All
                     </button>
@@ -3546,12 +3546,12 @@ export default function DashboardPage() {
                               </td>
                               <td style={{ verticalAlign: 'top', paddingTop: '14px' }}>
                                 <strong>{c.fullName}</strong>
-                                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{c.email}</div>
-                                <span className={styles.tabBadge} style={{ fontSize: '10.5px', marginTop: '4px' }}>{c.role}</span>
+                                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{c.email}</div>
+                                <span className={styles.tabBadge} style={{ fontSize: '12.5px', marginTop: '4px' }}>{c.role}</span>
                               </td>
                               <td style={{ verticalAlign: 'top', paddingTop: '14px' }}>
                                 <div><strong>{task.title}</strong></div>
-                                <div style={{ fontSize: '11px', color: 'var(--accent-cyan)', marginTop: '4px' }}>
+                                <div style={{ fontSize: '12.5px', color: 'var(--accent-cyan)', marginTop: '4px' }}>
                                   <a href={task.meetLink} target="_blank" rel="noreferrer">{task.meetLink}</a>
                                 </div>
                               </td>
@@ -3559,7 +3559,7 @@ export default function DashboardPage() {
                                 <input
                                   type="text"
                                   className={styles.inputField}
-                                  style={{ fontSize: '12px', padding: '6px 8px' }}
+                                  style={{ fontSize: '13px', padding: '6px 8px' }}
                                   value={reviewDate}
                                   onChange={(e) => setBulkReview2Dates({ ...bulkReview2Dates, [task.id]: e.target.value })}
                                 />
@@ -3592,7 +3592,7 @@ export default function DashboardPage() {
                                     });
                                   }}
                                   className={styles.btnAction}
-                                  style={{ fontSize: '11px', padding: '4px 8px' }}
+                                  style={{ fontSize: '12.5px', padding: '4px 8px' }}
                                 >
                                   <Eye size={12} />
                                   <span>Preview</span>
@@ -3878,7 +3878,7 @@ export default function DashboardPage() {
                           }
                         }}
                         className={styles.btnAction}
-                        style={{ fontSize: '10.5px', padding: '2px 8px', color: 'var(--accent-cyan)' }}
+                        style={{ fontSize: '12.5px', padding: '2px 8px', color: 'var(--accent-cyan)' }}
                         title="Generate an active, non-expired Google Meet room via Google Calendar API"
                       >
                         <Video size={11} />
@@ -3913,7 +3913,7 @@ export default function DashboardPage() {
                     <div className={styles.formFull}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                         <label className={styles.label} style={{ marginBottom: 0 }}>Manual Mentor Feedback & Review Agenda Notes *</label>
-                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
                           Expanded editor for comprehensive mentor feedback, code review, and deliverables
                         </span>
                       </div>
@@ -3931,7 +3931,7 @@ export default function DashboardPage() {
                   <div className={styles.formFull}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                       <label className={styles.label}>Template Tag Support</label>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Click to append to subject line</span>
+                      <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Click to append to subject line</span>
                     </div>
                     <div className={styles.tagPillsBar}>
                       {[
@@ -4059,7 +4059,7 @@ export default function DashboardPage() {
                         setBulkCertSelectedKeys(new Set(eligibleIds));
                       }}
                       className={styles.btnAction}
-                      style={{ fontSize: '12px', padding: '5px 12px' }}
+                      style={{ fontSize: '13px', padding: '5px 12px' }}
                     >
                       Select All Eligible
                     </button>
@@ -4067,7 +4067,7 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setBulkCertSelectedKeys(new Set())}
                       className={styles.btnAction}
-                      style={{ fontSize: '12px', padding: '5px 12px' }}
+                      style={{ fontSize: '13px', padding: '5px 12px' }}
                     >
                       Deselect All
                     </button>
@@ -4129,11 +4129,11 @@ export default function DashboardPage() {
                             </td>
                             <td>
                               {c.certificates && c.certificates.length > 0 ? (
-                                <span style={{ color: 'var(--accent-cyan)', fontSize: '12px' }}>
+                                <span style={{ color: 'var(--accent-cyan)', fontSize: '13px' }}>
                                   Issued: {c.certificates[0].certificateNumber}
                                 </span>
                               ) : (
-                                <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Not Issued</span>
+                                <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Not Issued</span>
                               )}
                             </td>
                           </tr>
@@ -4181,7 +4181,7 @@ export default function DashboardPage() {
                     <div className={styles.formFull}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                         <label className={styles.label}>Template Tag Support</label>
-                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Click to append to subject line</span>
+                        <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Click to append to subject line</span>
                       </div>
                       <div className={styles.tagPillsBar}>
                         {[
@@ -4565,7 +4565,7 @@ export default function DashboardPage() {
                     type="button"
                     onClick={handleClearAllEmailLogs}
                     className={styles.btnAction}
-                    style={{ color: '#ef4444', borderColor: '#ef444444', fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                    style={{ color: '#ef4444', borderColor: '#ef444444', fontSize: '13px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                     title="Clear all email tracking records"
                   >
                     <Trash2 size={13} />
@@ -4614,7 +4614,7 @@ export default function DashboardPage() {
                           <td>
                             <div>{log.recipientEmail}</div>
                             {log.cc && (
-                              <div style={{ fontSize: '11px', color: 'var(--accent-indigo)', marginTop: '2px' }}>
+                              <div style={{ fontSize: '12.5px', color: 'var(--accent-indigo)', marginTop: '2px' }}>
                                 Cc: {log.cc}
                               </div>
                             )}
@@ -4625,7 +4625,7 @@ export default function DashboardPage() {
                           </td>
                           <td>
                             {log.attachments && log.attachments !== '[]' ? (
-                              <span style={{ fontSize: '11px', color: 'var(--text-accent)' }}>
+                              <span style={{ fontSize: '12.5px', color: 'var(--text-accent)' }}>
                                 <Paperclip size={11} style={{ marginRight: '4px' }} />
                                 {JSON.parse(log.attachments).length} File(s)
                               </span>
@@ -4651,7 +4651,7 @@ export default function DashboardPage() {
                                 color: '#ef4444',
                                 borderColor: '#ef444444',
                                 padding: '4px 8px',
-                                fontSize: '11px',
+                                fontSize: '12.5px',
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 gap: '4px',
@@ -4721,7 +4721,7 @@ export default function DashboardPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <label className={styles.label} style={{ margin: 0 }}>Google App Password</label>
                     {sysSettings.hasPassword && (
-                      <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
+                      <span style={{ fontSize: '12.5px', color: '#10b981', fontWeight: 600 }}>
                         <CheckCircle2 size={12} style={{ display: "inline", verticalAlign: "middle", marginRight: "3px" }} /> Saved &amp; Encrypted
                       </span>
                     )}
@@ -4733,7 +4733,7 @@ export default function DashboardPage() {
                     value={sysSettings.smtpPassword || ''}
                     onChange={(e) => setSysSettings({ ...sysSettings, smtpPassword: e.target.value })}
                   />
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '3px', display: 'block' }}>
+                  <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '3px', display: 'block' }}>
                     Your password is permanently saved &amp; secured. Never exposed in plain text.
                   </span>
                 </div>
@@ -4769,7 +4769,7 @@ export default function DashboardPage() {
                   />
                   <span>Simulation Mode (Test without sending real emails)</span>
                 </label>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px', marginLeft: '24px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px', marginLeft: '24px' }}>
                   When unchecked, real emails will be sent directly to candidate inboxes using your Google account.
                 </div>
               </div>
@@ -4856,7 +4856,7 @@ export default function DashboardPage() {
                     <h3 className={styles.modalTitle} style={{ margin: 0, fontSize: '17px' }}>
                       {templateEditorModal.title || 'Customize Entire Email Template'}
                     </h3>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: 'var(--text-muted)' }}>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>
                       Customize the whole HTML email structure, branding, styling, and subject line.
                     </p>
                   </div>
@@ -4868,7 +4868,7 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setTemplateEditorModal(prev => ({ ...prev, activeTab: 'editor' }))}
                       className={templateEditorModal.activeTab === 'editor' ? styles.btnPrimaryAction : styles.btnAction}
-                      style={{ fontSize: '12px', padding: '4px 12px', height: '28px' }}
+                      style={{ fontSize: '13px', padding: '4px 12px', height: '28px' }}
                     >
                       Template Editor
                     </button>
@@ -4876,7 +4876,7 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setTemplateEditorModal(prev => ({ ...prev, activeTab: 'preview' }))}
                       className={templateEditorModal.activeTab === 'preview' ? styles.btnPrimaryAction : styles.btnAction}
-                      style={{ fontSize: '12px', padding: '4px 12px', height: '28px' }}
+                      style={{ fontSize: '13px', padding: '4px 12px', height: '28px' }}
                     >
                       Live Output Preview
                     </button>
@@ -4913,7 +4913,7 @@ export default function DashboardPage() {
                         <label className={styles.label} style={{ margin: 0, fontSize: '13px' }}>
                           Insert Dynamic Variables (Click to insert into template)
                         </label>
-                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
                           Automatically populated per candidate
                         </span>
                       </div>
@@ -4929,7 +4929,7 @@ export default function DashboardPage() {
                             }))}
                             title={`Insert ${tag.label}`}
                           >
-                            + {tag.label} <code style={{ fontSize: '10.5px', opacity: 0.75 }}>({tag.val})</code>
+                            + {tag.label} <code style={{ fontSize: '12.5px', opacity: 0.75 }}>({tag.val})</code>
                           </button>
                         ))}
                       </div>
@@ -4937,10 +4937,10 @@ export default function DashboardPage() {
 
                     <div className={styles.formGroup} style={{ marginBottom: '4px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <label className={styles.label} style={{ margin: 0, fontSize: '13px', color: '#c084fc', fontWeight: 600 }}>
+                        <label className={styles.label} style={{ margin: 0, fontSize: '13px', color: '#6D28D9', fontWeight: 600 }}>
                           Email Body (Plain Text & Jinja Format)
                         </label>
-                        <span style={{ fontSize: '11px', color: '#a855f7' }}>
+                        <span style={{ fontSize: '12.5px', color: '#a855f7' }}>
                           Jinja Variables Supported &bull; No HTML Required
                         </span>
                       </div>
@@ -4963,7 +4963,7 @@ export default function DashboardPage() {
                         onChange={(e) => setTemplateEditorModal(prev => ({ ...prev, body: e.target.value }))}
                         placeholder="Write your email body in clean plain text with {{tags}}..."
                       />
-                      <p style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '6px' }}>
+                      <p style={{ fontSize: '13px', color: '#475569', marginTop: '6px' }}>
                         &bull; Write your email in human-readable plain text using Jinja tags. The automation engine automatically converts it into a responsive, inbox-optimized Shortfundly email layout.
                       </p>
                     </div>
@@ -4972,7 +4972,7 @@ export default function DashboardPage() {
                   <div>
                     <div style={{ marginBottom: '14px', padding: '12px 16px', background: 'var(--bg-surface-elevated)', borderRadius: '8px', border: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>SUBJECT LINE:</div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>SUBJECT LINE:</div>
                         <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)', marginTop: '2px' }}>
                           {templateEditorModal.subject || '(No Subject Line)'}
                         </div>
@@ -5075,7 +5075,7 @@ export default function DashboardPage() {
 
                 {previewModal.attachments && previewModal.attachments.length > 0 && (
                   <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-                    <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700 }}>
+                    <span style={{ fontSize: '12.5px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700 }}>
                       Attachments ({previewModal.attachments.length}):
                     </span>
                     {previewModal.attachments.map((att, i) => (
@@ -5086,7 +5086,7 @@ export default function DashboardPage() {
                           <Calendar size={13} style={{ color: '#3b82f6' }} />
                         )}
                         <span>{att.name}</span>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>({att.size || 'Attached'})</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '12.5px' }}>({att.size || 'Attached'})</span>
                       </div>
                     ))}
                   </div>
@@ -5135,14 +5135,14 @@ export default function DashboardPage() {
           <div className={styles.modalCard} style={{ maxWidth: '850px', maxHeight: '92vh' }}>
             <div className={styles.modalHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'rgba(124, 58, 237, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c084fc' }}>
+                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'rgba(124, 58, 237, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6D28D9' }}>
                   <FileText size={18} />
                 </div>
                 <div>
                   <h3 className={styles.modalTitle} style={{ margin: 0, fontSize: '17px' }}>
                     Customize Formal Offer Letter PDF Content
                   </h3>
-                  <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: 'var(--text-muted)' }}>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>
                     Edit the clauses, paragraphs, and terms that appear in the candidate's downloadable A4 PDF.
                   </p>
                 </div>
@@ -5205,7 +5205,7 @@ export default function DashboardPage() {
                   onChange={(e) => setTempPdfEditorContent(e.target.value)}
                   placeholder="Enter customized paragraphs for the formal Offer Letter PDF..."
                 />
-                <p style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '6px' }}>
+                <p style={{ fontSize: '13px', color: '#475569', marginTop: '6px' }}>
                   &bull; Separate paragraphs with blank lines. Standard Shortfundly letterhead, Ref ID, Date, and Signature blocks are automatically integrated.
                 </p>
               </div>
@@ -5268,10 +5268,10 @@ export default function DashboardPage() {
             <div className={styles.modalBody}>
               <div style={{ background: 'var(--bg-app)', padding: '14px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', marginBottom: '16px' }}>
                 <div><strong>Milestone Task:</strong> {reviewModal.task?.title}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
                   Role: {reviewModal.task?.role} &bull; Explanation Call: {reviewModal.task?.explanationDate} at {reviewModal.task?.explanationTime}
                 </div>
-                <div style={{ fontSize: '12px', color: 'var(--accent-cyan)', marginTop: '4px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--accent-cyan)', marginTop: '4px' }}>
                   Google Meet: <a href={reviewModal.task?.meetLink} target="_blank" rel="noreferrer">{reviewModal.task?.meetLink}</a>
                 </div>
               </div>
@@ -5282,7 +5282,7 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     className={styles.btnAction}
-                    style={{ fontSize: '11px', padding: '3px 8px' }}
+                    style={{ fontSize: '12.5px', padding: '3px 8px' }}
                     onClick={() => {
                       const auto = generateGemmaFeedback(reviewModal.task?.role || 'Web Developer', reviewModal.task?.taskNumber || 1, 2);
                       setReviewModal(prev => ({ ...prev, feedback: auto.feedback }));
@@ -5310,7 +5310,7 @@ export default function DashboardPage() {
                   />
                   <span>Complete Task & Stop Review Loops (Updates Excel & Qualifies for Certificate)</span>
                 </label>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', marginLeft: '24px' }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px', marginLeft: '24px' }}>
                   When checked, marks milestone task as completed, writes updated count to Shortfundly_Internship_Candidates_Dummy.xlsx on disk, and qualifies candidate for Internship Certificate.
                 </div>
               </div>

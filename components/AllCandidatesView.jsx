@@ -381,7 +381,7 @@ export default function AllCandidatesView({
               onClick={() => handleExportCandidates('xlsx')}
               disabled={exporting || filteredCandidates.length === 0}
               className={styles.btnSecondary}
-              style={{ fontSize: '12px', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              style={{ fontSize: '13px', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               title="Export filtered candidates to Excel with all intern details"
             >
               <FileSpreadsheet size={14} color="#34d399" />
@@ -393,7 +393,7 @@ export default function AllCandidatesView({
               onClick={() => handleExportCandidates('csv')}
               disabled={exporting || filteredCandidates.length === 0}
               className={styles.btnSecondary}
-              style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              style={{ fontSize: '13px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               title="Export filtered candidates to CSV with all intern details"
             >
               <Download size={14} color="#38bdf8" />
@@ -420,27 +420,27 @@ export default function AllCandidatesView({
             <tbody>
               {filteredCandidates.length === 0 ? (
                 <tr>
-                  <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: '#71717a' }}>
+                  <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>
                     No candidates found matching the selected criteria.
                   </td>
                 </tr>
               ) : (
                 filteredCandidates.map((c) => (
                   <tr key={c.id}>
-                    <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 700 }}>
+                    <td style={{ fontFamily: 'monospace', color: '#6D28D9', fontWeight: 700 }}>
                       {c.internId || c.candidateId}
                     </td>
                     <td>
                       <div style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</div>
-                      <div style={{ fontSize: '11px', color: '#94a3b8' }}>{c.degree || 'B.Tech'}</div>
+                      <div style={{ fontSize: '12.5px', color: '#475569' }}>{c.degree || 'B.Tech'}</div>
                     </td>
                     <td>
                       <div>{c.role}</div>
-                      <div style={{ fontSize: '11px', color: '#71717a' }}>{c.collegeName}</div>
+                      <div style={{ fontSize: '12.5px', color: '#475569' }}>{c.collegeName}</div>
                     </td>
                     <td>
-                      <div style={{ fontSize: '12px' }}>{c.email}</div>
-                      <div style={{ fontSize: '11px', color: '#71717a' }}>{c.phone || '-'}</div>
+                      <div style={{ fontSize: '13px' }}>{c.email}</div>
+                      <div style={{ fontSize: '12.5px', color: '#475569' }}>{c.phone || '-'}</div>
                     </td>
                     <td>
                       <select
@@ -449,10 +449,10 @@ export default function AllCandidatesView({
                         style={{
                           background: 'var(--bg-surface)',
                           border: '1px solid #3b335c',
-                          color: '#c084fc',
+                          color: '#6D28D9',
                           borderRadius: '6px',
                           padding: '3px 8px',
-                          fontSize: '11.5px',
+                          fontSize: '13px',
                           fontWeight: 600,
                           cursor: 'pointer',
                         }}
@@ -464,7 +464,7 @@ export default function AllCandidatesView({
                         <option value="__NEW__">+ Custom Batch...</option>
                       </select>
                     </td>
-                    <td style={{ fontSize: '11.5px', color: '#94a3b8' }}>
+                    <td style={{ fontSize: '13px', color: '#475569' }}>
                       <div>{c.joiningDate}</div>
                       <div>to {c.endDate}</div>
                     </td>
@@ -485,7 +485,7 @@ export default function AllCandidatesView({
                             type="button"
                             onClick={() => handleReinstate(c)}
                             className={styles.btnSecondary}
-                            style={{ fontSize: '11px', padding: '4px 8px' }}
+                            style={{ fontSize: '12.5px', padding: '4px 8px' }}
                             title="Reinstate to Active Internship"
                           >
                             <RotateCcw size={11} />
@@ -496,7 +496,7 @@ export default function AllCandidatesView({
                             type="button"
                             onClick={() => handleOpenLeaveModal(c)}
                             className={styles.btnDanger}
-                            style={{ fontSize: '11px', padding: '4px 8px' }}
+                            style={{ fontSize: '12.5px', padding: '4px 8px' }}
                             title="Record Candidate Departure"
                           >
                             <UserX size={11} />
@@ -508,7 +508,7 @@ export default function AllCandidatesView({
                           onClick={() => handleRequestDelete(c)}
                           className={styles.btnDanger}
                           style={{
-                            fontSize: '11px',
+                            fontSize: '12.5px',
                             padding: '4px 8px',
                             background: 'rgba(239, 68, 68, 0.12)',
                             borderColor: 'rgba(239, 68, 68, 0.35)',
@@ -554,7 +554,7 @@ export default function AllCandidatesView({
             <div style={{ fontSize: '13px', fontWeight: 700, color: '#f8fafc' }}>
               Candidate &quot;{undoState.candidate.fullName}&quot; deleting in {undoState.countdown}s...
             </div>
-            <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+            <div style={{ fontSize: '12.5px', color: '#475569' }}>
               Record will be permanently purged from database when timer finishes.
             </div>
           </div>
@@ -567,7 +567,7 @@ export default function AllCandidatesView({
               borderRadius: '6px',
               color: '#ffffff',
               padding: '8px 14px',
-              fontSize: '12px',
+              fontSize: '13px',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
@@ -591,7 +591,7 @@ export default function AllCandidatesView({
                 <UserX size={18} color="#ef4444" />
                 <span>Remove Intern &bull; Mark as Left Internship</span>
               </h3>
-              <button type="button" onClick={() => setLeavingCandidate(null)} style={{ color: '#94a3b8', cursor: 'pointer' }}>
+              <button type="button" onClick={() => setLeavingCandidate(null)} style={{ color: '#475569', cursor: 'pointer' }}>
                 <X size={18} />
               </button>
             </div>
@@ -599,12 +599,12 @@ export default function AllCandidatesView({
             <div className={styles.modalBody}>
               <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '14px 18px', fontSize: '13px' }}>
                 <div><strong>Candidate Name:</strong> {leavingCandidate.fullName}</div>
-                <div><strong>Intern ID:</strong> <code style={{ color: '#c084fc' }}>{leavingCandidate.internId || leavingCandidate.candidateId}</code></div>
+                <div><strong>Intern ID:</strong> <code style={{ color: '#6D28D9' }}>{leavingCandidate.internId || leavingCandidate.candidateId}</code></div>
                 <div><strong>Role & Batch:</strong> {leavingCandidate.role} &bull; {leavingCandidate.batch}</div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                   Departure Reason / Notes (Captured from Candidate&apos;s Resignation Email)
                 </label>
                 <textarea
@@ -617,7 +617,7 @@ export default function AllCandidatesView({
                 />
               </div>
 
-              <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.5 }}>
+              <div style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>
                 Note: Marking this candidate as <strong>Leaved Internship</strong> will immediately halt automated task reminders, omit them from certificate qualification, and archive their status in the audit ledger.
               </div>
             </div>

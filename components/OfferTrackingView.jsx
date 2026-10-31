@@ -168,7 +168,7 @@ export default function OfferTrackingView({
         </div>
 
         <div className={styles.metricCard} style={{ borderLeft: '4px solid #a855f7' }}>
-          <div className={styles.metricTitle} style={{ color: '#c084fc' }}>AWAITING RESPONSE</div>
+          <div className={styles.metricTitle} style={{ color: '#6D28D9' }}>AWAITING RESPONSE</div>
           <div className={styles.metricValue}>{pendingCount}</div>
           <div className={styles.metricSubtitle}>Pending Link Decisions</div>
         </div>
@@ -277,10 +277,10 @@ export default function OfferTrackingView({
 
                       <td>
                         <div className={styles.dateBlock}>
-                          <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                          <div style={{ fontSize: '12.5px', color: '#475569' }}>
                             Sent: {formatFlexibleDate(cand.offerLetterSentAt)}
                           </div>
-                          <div style={{ fontSize: '11px', color: '#c084fc' }}>
+                          <div style={{ fontSize: '12.5px', color: '#6D28D9' }}>
                             Deadline: {formatFlexibleDate(cand.offerDeadline)}
                           </div>
                         </div>
@@ -297,7 +297,7 @@ export default function OfferTrackingView({
                             <span>View Signature</span>
                           </button>
                         ) : (
-                          <span style={{ fontSize: '12px', color: '#71717a' }}>No signature</span>
+                          <span style={{ fontSize: '13px', color: '#475569' }}>No signature</span>
                         )}
                       </td>
 
@@ -358,7 +358,7 @@ export default function OfferTrackingView({
               </div>
 
               <div className={styles.signaturePreviewBox}>
-                <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>
+                <div style={{ fontSize: '12.5px', color: '#475569', textTransform: 'uppercase', marginBottom: '8px' }}>
                   Recorded Signature Data:
                 </div>
                 {activeSigModal.signatureUrl && activeSigModal.signatureUrl.startsWith('data:image/') ? (

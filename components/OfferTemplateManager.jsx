@@ -246,8 +246,8 @@ Shortfundly`,
               <div className={styles.templateSubject}>
                 <strong>Subject:</strong> {tmpl.subject}
               </div>
-              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
-                Format: <span style={{ color: '#c084fc' }}>Plain-Text Jinja Template</span>
+              <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '4px' }}>
+                Format: <span style={{ color: '#6D28D9' }}>Plain-Text Jinja Template</span>
               </div>
             </div>
 
@@ -285,7 +285,7 @@ Shortfundly`,
                   style={{
                     padding: '6px 14px',
                     borderRadius: '6px',
-                    fontSize: '12px',
+                    fontSize: '13px',
                     fontWeight: 600,
                     background: activeTab === 'editor' ? 'rgba(168, 85, 247, 0.25)' : '#141417',
                     border: `1px solid ${activeTab === 'editor' ? 'var(--accent-primary)' : 'var(--border-default)'}`,
@@ -301,7 +301,7 @@ Shortfundly`,
                   style={{
                     padding: '6px 14px',
                     borderRadius: '6px',
-                    fontSize: '12px',
+                    fontSize: '13px',
                     fontWeight: 600,
                     background: activeTab === 'preview' ? 'rgba(168, 85, 247, 0.25)' : '#141417',
                     border: `1px solid ${activeTab === 'preview' ? 'var(--accent-primary)' : 'var(--border-default)'}`,
@@ -318,7 +318,7 @@ Shortfundly`,
                 <button
                   type="button"
                   onClick={() => setEditingTemplate(null)}
-                  style={{ color: '#94a3b8', cursor: 'pointer', marginLeft: '8px', background: 'transparent', border: 'none' }}
+                  style={{ color: '#475569', cursor: 'pointer', marginLeft: '8px', background: 'transparent', border: 'none' }}
                 >
                   <X size={18} />
                 </button>
@@ -371,7 +371,7 @@ Shortfundly`,
                   <div className={styles.fieldGroup}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <label className={styles.label}>Email Body (Clean Plain Text Jinja Format - No raw HTML tags)</label>
-                      <span style={{ fontSize: '11px', color: '#a855f7' }}>Supports paragraphs, bullets, bolding, and links</span>
+                      <span style={{ fontSize: '12.5px', color: '#a855f7' }}>Supports paragraphs, bullets, bolding, and links</span>
                     </div>
                     <textarea
                       rows={12}
@@ -391,12 +391,12 @@ Shortfundly`,
                           Offer Letter PDF Terms & Body (User-Friendly Plain Text Format - No HTML)
                         </span>
                       </div>
-                      <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
+                      <span style={{ fontSize: '12.5px', color: '#10b981', fontWeight: 600 }}>
                         &bull; Auto-Formatted into Official A4 Letterhead
                       </span>
                     </div>
 
-                    <p style={{ margin: '0 0 10px 0', fontSize: '11.5px', color: '#94a3b8' }}>
+                    <p style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#475569' }}>
                       Customize the text content of the formal A4 PDF attachment. No coding or HTML required. Uses variables like <code>&#123;&#123;candidateName&#125;&#125;</code>, <code>&#123;&#123;role&#125;&#125;</code>, <code>&#123;&#123;stipend&#125;&#125;</code>.
                     </p>
 
@@ -406,7 +406,7 @@ Shortfundly`,
                           key={`pdf-${t}`}
                           onClick={() => handleInsertTag(t, 'pdfTemplate')}
                           className={styles.tagPill}
-                          style={{ fontSize: '10.5px' }}
+                          style={{ fontSize: '12.5px' }}
                           title={`Click to insert ${t}`}
                         >
                           + {t}
@@ -432,7 +432,7 @@ Shortfundly`,
                       onChange={(e) => setEditingTemplate({ ...editingTemplate, isDefault: e.target.checked })}
                       style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
                     />
-                    <label htmlFor="isDefaultCheckbox" style={{ fontSize: '13px', color: '#cbd5e1', cursor: 'pointer' }}>
+                    <label htmlFor="isDefaultCheckbox" style={{ fontSize: '13px', color: '#334155', cursor: 'pointer' }}>
                       Set as default offer letter template for single and bulk dispatches
                     </label>
                   </div>
@@ -448,7 +448,7 @@ Shortfundly`,
                       style={{
                         padding: '6px 14px',
                         borderRadius: '6px',
-                        fontSize: '12px',
+                        fontSize: '13px',
                         fontWeight: 600,
                         background: previewSubTab === 'email' ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
                         border: `1px solid ${previewSubTab === 'email' ? 'var(--accent-primary)' : 'var(--border-default)'}`,
@@ -469,7 +469,7 @@ Shortfundly`,
                       style={{
                         padding: '6px 14px',
                         borderRadius: '6px',
-                        fontSize: '12px',
+                        fontSize: '13px',
                         fontWeight: 600,
                         background: previewSubTab === 'pdf' ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
                         border: `1px solid ${previewSubTab === 'pdf' ? 'var(--accent-primary)' : 'var(--border-default)'}`,
@@ -494,7 +494,7 @@ Shortfundly`,
                         <div><strong>To:</strong> {samplePreviewContext.candidateName} &lt;rahul.sharma@example.com&gt;</div>
                         <div><strong>Subject:</strong> {renderJinja(editingTemplate.subject, samplePreviewContext)}</div>
                         <div style={{ display: 'flex', gap: '16px', marginTop: '4px', paddingTop: '6px', borderTop: '1px solid var(--border-default)' }}>
-                          <div><strong>Intern ID:</strong> <code style={{ color: '#c084fc' }}>{samplePreviewContext.internId}</code></div>
+                          <div><strong>Intern ID:</strong> <code style={{ color: '#6D28D9' }}>{samplePreviewContext.internId}</code></div>
                           <div><strong>Expiration Deadline:</strong> <span style={{ color: '#fbbf24' }}>{samplePreviewContext.deadline}</span></div>
                         </div>
                       </div>
@@ -520,13 +520,13 @@ Shortfundly`,
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #7c3aed', paddingBottom: '16px', marginBottom: '24px' }}>
                         <div>
                           <h2 style={{ margin: 0, fontSize: '22px', color: '#1e1b4b', fontWeight: 800, letterSpacing: '1px' }}>SHORTFUNDLY</h2>
-                          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>Shortfundly Media Technologies Pvt. Ltd. &bull; Chennai, India</div>
+                          <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '2px' }}>Shortfundly Media Technologies Pvt. Ltd. &bull; Chennai, India</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <span style={{ display: 'inline-block', background: 'rgba(124, 58, 237, 0.1)', color: '#7c3aed', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '4px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: 700 }}>
+                          <span style={{ display: 'inline-block', background: 'rgba(124, 58, 237, 0.1)', color: '#7c3aed', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '4px 10px', borderRadius: '4px', fontSize: '12.5px', fontWeight: 700 }}>
                             Ref: {samplePreviewContext.internId}
                           </span>
-                          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>Date: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                          <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '4px' }}>Date: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
                         </div>
                       </div>
 
@@ -549,7 +549,7 @@ Shortfundly`,
 
                       {/* Key Details Table */}
                       <div style={{ margin: '20px 0', border: '1px solid #e2e8f0', borderRadius: '6px', overflow: 'hidden' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                           <tbody>
                             <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                               <td style={{ padding: '8px 12px', fontWeight: 600, width: '35%', color: '#475569' }}>Position / Role</td>
@@ -576,7 +576,7 @@ Shortfundly`,
                       </div>
 
                       {/* Expiration Note */}
-                      <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', padding: '10px 14px', borderRadius: '6px', fontSize: '11.5px', color: '#92400e', marginBottom: '24px' }}>
+                      <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', padding: '10px 14px', borderRadius: '6px', fontSize: '13px', color: '#92400e', marginBottom: '24px' }}>
                         <strong>Offer Validity Deadline:</strong> Please confirm and submit your signature before <strong>{samplePreviewContext.deadline}</strong>.
                       </div>
 
@@ -584,11 +584,11 @@ Shortfundly`,
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a' }}>For Shortfundly Media Technologies Pvt. Ltd.</div>
-                          <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '2px' }}>Talent Acquisition & People Operations</div>
+                          <div style={{ fontSize: '13px', color: '#64748b', marginTop: '2px' }}>Talent Acquisition & People Operations</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ borderBottom: '1px dashed #94a3b8', width: '160px', marginBottom: '6px' }} />
-                          <div style={{ fontSize: '11px', color: '#64748b' }}>Authorized Corporate Seal</div>
+                          <div style={{ fontSize: '12.5px', color: '#64748b' }}>Authorized Corporate Seal</div>
                         </div>
                       </div>
                     </div>

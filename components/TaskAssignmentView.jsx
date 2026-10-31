@@ -1039,7 +1039,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 onClick={() => handleExportTaskReviewTemplate('xlsx')}
                 disabled={filteredCandidates.length === 0}
                 className={styles.btnSecondary}
-                style={{ fontSize: '12px', padding: '7px 13px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                style={{ fontSize: '13px', padding: '7px 13px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                 title="Export tasks with columns: Intern ID, Name, Email ID, Task ID, Task Number, Task Title, batch, role, Review Number, Feedback, Score"
               >
                 <FileSpreadsheet size={13} color="#34d399" />
@@ -1056,7 +1056,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 }}
                 disabled={filteredCandidates.length === 0}
                 className={styles.btnSecondary}
-                style={{ fontSize: '12px', padding: '7px 14px', display: 'inline-flex', alignItems: 'center', gap: '5px', borderColor: '#0284c7', color: '#0284c7', background: 'rgba(2, 132, 199, 0.08)' }}
+                style={{ fontSize: '13px', padding: '7px 14px', display: 'inline-flex', alignItems: 'center', gap: '5px', borderColor: '#0284c7', color: '#0284c7', background: 'rgba(2, 132, 199, 0.08)' }}
                 title="Automatically allocate all tasks batch-wise from joining date to ending date"
               >
                 <Zap size={13} color="#0284c7" />
@@ -1109,7 +1109,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 <tbody>
                   {filteredCandidates.length === 0 ? (
                     <tr>
-                      <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#71717a' }}>
+                      <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>
                         No candidates found matching the selected filters.
                       </td>
                     </tr>
@@ -1136,7 +1136,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                 loadBatchPipeline(b, tasksPerMonthSetting);
                               }}
                               className={styles.btnSecondary}
-                              style={{ fontSize: '11px', padding: '4px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px', borderColor: 'rgba(2, 132, 199, 0.4)', color: '#0284c7' }}
+                              style={{ fontSize: '12.5px', padding: '4px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px', borderColor: 'rgba(2, 132, 199, 0.4)', color: '#0284c7' }}
                               title="Automatically allocate all tasks batch-wise from joining to end date"
                             >
                               <Zap size={12} color="#0284c7" />
@@ -1161,12 +1161,12 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           </td>
                           <td>
                             {c.googleMeetUrl ? (
-                              <a href={c.googleMeetUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              <a href={c.googleMeetUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                 <Video size={12} />
                                 <span>Join Room</span>
                               </a>
                             ) : (
-                              <span style={{ color: '#71717a', fontSize: '11px' }}>Auto-Generates on Task</span>
+                              <span style={{ color: '#475569', fontSize: '12.5px' }}>Auto-Generates on Task</span>
                             )}
                           </td>
                         </tr>
@@ -1345,49 +1345,49 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 marginTop: '4px',
               }}>
                 <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', padding: '16px 18px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '11.5px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                  <div style={{ fontSize: '13px', color: '#475569', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
                     Enrolled Interns
                   </div>
                   <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '6px' }}>
                     {autoBatchPipelineData.totalCandidates} Candidates
                   </div>
-                  <div style={{ fontSize: '11.5px', color: '#38bdf8', marginTop: '3px' }}>
+                  <div style={{ fontSize: '13px', color: '#38bdf8', marginTop: '3px' }}>
                     In {autoBatchPipelineData.batchName}
                   </div>
                 </div>
 
                 <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', padding: '16px 18px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '11.5px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                  <div style={{ fontSize: '13px', color: '#475569', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
                     Tenure Window
                   </div>
                   <div style={{ fontSize: '14.5px', fontWeight: 700, color: '#38bdf8', marginTop: '6px' }}>
                     {autoBatchPipelineData.joiningDate} &rarr; {autoBatchPipelineData.endDate}
                   </div>
-                  <div style={{ fontSize: '11.5px', color: '#71717a', marginTop: '3px' }}>
+                  <div style={{ fontSize: '13px', color: '#475569', marginTop: '3px' }}>
                     Joining to End Date
                   </div>
                 </div>
 
                 <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', padding: '16px 18px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '11.5px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                  <div style={{ fontSize: '13px', color: '#475569', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
                     Duration & Velocity
                   </div>
                   <div style={{ fontSize: '18px', fontWeight: 800, color: '#a855f7', marginTop: '6px' }}>
                     {autoBatchPipelineData.durationMonths} Months ({autoBatchPipelineData.totalDays} Days)
                   </div>
-                  <div style={{ fontSize: '11.5px', color: '#71717a', marginTop: '3px' }}>
+                  <div style={{ fontSize: '13px', color: '#475569', marginTop: '3px' }}>
                     Rate: {autoBatchPipelineData.tasksPerMonth} tasks / month
                   </div>
                 </div>
 
                 <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', padding: '16px 18px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '11.5px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                  <div style={{ fontSize: '13px', color: '#475569', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
                     Allocated Sprints
                   </div>
                   <div style={{ fontSize: '18px', fontWeight: 800, color: '#34d399', marginTop: '6px' }}>
                     {autoBatchPipelineData.totalTasks} Tasks Per Intern
                   </div>
-                  <div style={{ fontSize: '11.5px', color: '#71717a', marginTop: '3px' }}>
+                  <div style={{ fontSize: '13px', color: '#475569', marginTop: '3px' }}>
                     ~{autoBatchPipelineData.intervalDays} days per sprint
                   </div>
                 </div>
@@ -1397,7 +1397,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             {/* Role Breakdown Tabs */}
             {autoBatchPipelineData && autoBatchPipelineData.uniqueRoles && (
               <div style={{ paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Role Roadmaps in {autoBatchPipelineData.batchName} (Click to Review & Customize):
                 </div>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -1430,7 +1430,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           color: isActive ? '#020617' : '#94a3b8',
                           padding: '2px 7px',
                           borderRadius: '10px',
-                          fontSize: '11px',
+                          fontSize: '12.5px',
                           fontWeight: 700,
                         }}>
                           {count}
@@ -1445,7 +1445,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
           {/* Sprints Sequence & Mail Customization For Selected Role */}
           {isBatchAutoLoading ? (
-            <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
+            <div style={{ textAlign: 'center', padding: '60px', color: '#475569' }}>
               <RefreshCw size={26} className={styles.spin} style={{ margin: '0 auto 14px auto' }} />
               <div style={{ fontSize: '14px' }}>Calculating batch tenure intervals & generating role roadmaps...</div>
             </div>
@@ -1531,11 +1531,11 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
                         <div>
                           {isFirstTask ? (
-                            <span className={styles.badgeCyan} style={{ fontSize: '11.5px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                            <span className={styles.badgeCyan} style={{ fontSize: '13px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                               <Zap size={12} /> Auto-Dispatches After Joining Date ({task.explanationDate})
                             </span>
                           ) : (
-                            <span className={styles.badgePurple} style={{ fontSize: '11.5px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                            <span className={styles.badgePurple} style={{ fontSize: '13px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                               <Clock size={12} /> Auto-Dispatches After Task #{task.taskNumber - 1} Completion Mail
                             </span>
                           )}
@@ -1549,7 +1549,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         gap: '16px',
                       }}>
                         <div>
-                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
                             Start / Explanation Date:
                           </label>
                           <input
@@ -1562,7 +1562,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
                             Explanation Time:
                           </label>
                           <input
@@ -1575,7 +1575,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
                             Submission Deadline:
                           </label>
                           <input
@@ -1588,7 +1588,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
                             Review Milestone Date:
                           </label>
                           <input
@@ -1603,7 +1603,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
                       {/* Google Meet Link Row */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
                           Google Meet Briefing & Review Link:
                         </label>
                         <div style={{ display: 'flex', gap: '10px' }}>
@@ -1618,7 +1618,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             type="button"
                             onClick={() => handleUpdateRoleTaskField(activeRoleTab, idx, 'meetLink', generateClientMeetUrl())}
                             className={styles.btnSecondary}
-                            style={{ height: '40px', padding: '0 14px', fontSize: '11.5px', whiteSpace: 'nowrap' }}
+                            style={{ height: '40px', padding: '0 14px', fontSize: '13px', whiteSpace: 'nowrap' }}
                           >
                             Generate Link
                           </button>
@@ -1628,7 +1628,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       {/* Task Title & Deliverables */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <div>
-                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
                             Task Title:
                           </label>
                           <input
@@ -1641,7 +1641,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
                             Objective & Technical Deliverables:
                           </label>
                           <textarea
@@ -1669,13 +1669,13 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             <Mail size={14} color="#0284c7" />
                             <span>HR Customizable Task Mail Template</span>
                           </span>
-                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                          <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
                             Variables: &#123;&#123;candidate_name&#125;&#125;, &#123;&#123;internId&#125;&#125;, &#123;&#123;taskId&#125;&#125;, &#123;&#123;deadline&#125;&#125;, &#123;&#123;meetLink&#125;&#125;, &#123;&#123;submission_link&#125;&#125;
                           </span>
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px' }}>
                             Email Subject:
                           </label>
                           <input
@@ -1683,12 +1683,12 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             value={task.customSubject || ''}
                             onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'customSubject', e.target.value)}
                             className={styles.searchInput}
-                            style={{ height: '38px', fontSize: '12px' }}
+                            style={{ height: '38px', fontSize: '13px' }}
                           />
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px' }}>
                             Email Body Content:
                           </label>
                           <textarea
@@ -1696,7 +1696,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             value={task.customBody || ''}
                             onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'customBody', e.target.value)}
                             className={styles.searchInput}
-                            style={{ height: 'auto', fontFamily: 'monospace', fontSize: '11.5px', lineHeight: 1.5, padding: '10px 12px' }}
+                            style={{ height: 'auto', fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.5, padding: '10px 12px' }}
                           />
                         </div>
                       </div>
@@ -1767,7 +1767,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className={styles.filterBar}>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: '#c084fc' }}>Filter Templates:</span>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#6D28D9' }}>Filter Templates:</span>
               <select
                 value={templateFilterLevel}
                 onChange={(e) => setTemplateFilterLevel(e.target.value)}
@@ -1821,7 +1821,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 >
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ fontFamily: 'monospace', fontSize: '11px', color: '#c084fc', fontWeight: 700 }}>
+                      <span style={{ fontFamily: 'monospace', fontSize: '12.5px', color: '#6D28D9', fontWeight: 700 }}>
                         {template.taskId}
                       </span>
                       <span className={template.level === 'ENTERPRISE' ? styles.badgeRose : template.level === 'DEVELOPER' ? styles.badgePurple : styles.badgeEmerald}>
@@ -1833,11 +1833,11 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       {template.title}
                     </h4>
 
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '10px', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: '13px', color: '#475569', marginBottom: '10px', lineHeight: 1.5 }}>
                       <strong>Objective:</strong> {template.objective?.slice(0, 110)}...
                     </div>
 
-                    <div style={{ fontSize: '11.5px', color: '#71717a', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '13px', color: '#475569', marginBottom: '6px' }}>
                       <strong>Tech Stack:</strong> {template.techStack}
                     </div>
                   </div>
@@ -1850,7 +1850,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         setTemplateModalTab('preview');
                       }}
                       className={styles.btnSecondary}
-                      style={{ fontSize: '11.5px', padding: '5px 9px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                      style={{ fontSize: '13px', padding: '5px 9px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       title="Preview this template's email format"
                     >
                       <Eye size={12} />
@@ -1863,7 +1863,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         setTemplateModalTab('editor');
                       }}
                       className={styles.btnSecondary}
-                      style={{ fontSize: '11.5px', padding: '5px 10px' }}
+                      style={{ fontSize: '13px', padding: '5px 10px' }}
                     >
                       Edit Jinja Template
                     </button>
@@ -1875,7 +1875,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         showToast?.(`Selected template "${template.title}" for assignment.`, 'info');
                       }}
                       className={styles.btnPrimary}
-                      style={{ fontSize: '11.5px', padding: '5px 12px', marginLeft: 'auto' }}
+                      style={{ fontSize: '13px', padding: '5px 12px', marginLeft: 'auto' }}
                     >
                       Use Template
                     </button>
@@ -1894,24 +1894,24 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               <Clock size={18} color="#a855f7" />
               <span>Automated Task Deadline Reminder Email Dispatcher</span>
             </h3>
-            <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>
+            <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#475569' }}>
               Filter assigned candidates and dispatch automated reminder emails containing their unique Intern ID, strict deadline notice, and their secure candidate portal website URL to submit project and GitHub repository links.
             </p>
 
             {/* Unique Website Submission Portal URL banner */}
             <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '14px 18px', marginBottom: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <label style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: '#e2e8f0' }}>
+                <label style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#e2e8f0' }}>
                   Unique Candidate Submission Website URL (Auto-Generated per Candidate)
                 </label>
-                <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
+                <span style={{ fontSize: '12.5px', color: '#10b981', fontWeight: 600 }}>
                   &bull; Live Vercel Production Portal
                 </span>
               </div>
-              <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', padding: '8px 12px', borderRadius: '6px', fontFamily: 'monospace', fontSize: '12px', color: '#38bdf8', wordBreak: 'break-all' }}>
+              <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', padding: '8px 12px', borderRadius: '6px', fontFamily: 'monospace', fontSize: '13px', color: '#38bdf8', wordBreak: 'break-all' }}>
                 https://internship-email-automation.vercel.app/tasks/submit?token=&#123;&#123;candidate_submission_token&#125;&#125;
               </div>
-              <div style={{ marginTop: '8px', fontSize: '11.5px', color: '#94a3b8' }}>
+              <div style={{ marginTop: '8px', fontSize: '13px', color: '#475569' }}>
                 Candidate submits live project demo URL + GitHub repository link directly on the web app. Upon submission, the candidate is automatically transitioned to <strong>Under Review</strong>, an automated confirmation email is dispatched, and HR is notified to conduct the milestone review.
               </div>
             </div>
@@ -1925,11 +1925,11 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 <div>
                   <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span>Automated 24-Hour Pre-Deadline Reminder Dispatcher</span>
-                    <span className={due24hCount > 0 ? styles.badgeRose : styles.badgeEmerald} style={{ fontSize: '11px' }}>
+                    <span className={due24hCount > 0 ? styles.badgeRose : styles.badgeEmerald} style={{ fontSize: '12.5px' }}>
                       {due24hCount} Intern{due24hCount === 1 ? '' : 's'} Due Within 24h
                     </span>
                   </div>
-                  <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#475569' }}>
                     Automated scan detects candidates with tasks expiring within 24 hours who haven't submitted yet, and sends official submission portal reminders.
                   </p>
                 </div>
@@ -1941,7 +1941,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   onClick={check24hDeadlines}
                   disabled={checking24h}
                   className={styles.btnSecondary}
-                  style={{ fontSize: '12px', padding: '7px 12px' }}
+                  style={{ fontSize: '13px', padding: '7px 12px' }}
                   title="Scan database for tasks expiring in 24 hours"
                 >
                   <RefreshCw size={13} className={checking24h ? styles.spin : ''} />
@@ -1953,7 +1953,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   onClick={handleAutoSend24hReminders}
                   disabled={sendingReminder || due24hCount === 0}
                   className={styles.btnPrimary}
-                  style={{ fontSize: '12px', padding: '7px 16px' }}
+                  style={{ fontSize: '13px', padding: '7px 16px' }}
                 >
                   <Send size={13} />
                   <span>{sendingReminder ? 'Dispatching...' : `Auto-Send 24H Reminders (${due24hCount})`}</span>
@@ -2024,7 +2024,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                     type="button"
                     onClick={handleToggleSelectAllReminders}
                     className={styles.btnSecondary}
-                    style={{ fontSize: '11px', padding: '4px 8px' }}
+                    style={{ fontSize: '12.5px', padding: '4px 8px' }}
                   >
                     {selectedReminderIds.length === filteredReminderCandidates.length ? 'Deselect All' : 'Select All Filtered'}
                   </button>
@@ -2053,7 +2053,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   <tbody>
                     {filteredReminderCandidates.length === 0 ? (
                       <tr>
-                        <td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '24px' }}>
+                        <td colSpan={7} style={{ textAlign: 'center', color: '#475569', padding: '24px' }}>
                           No candidates found matching the selected filters.
                         </td>
                       </tr>
@@ -2073,23 +2073,23 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                 onChange={() => handleToggleSelectOneReminder(cand.id)}
                               />
                             </td>
-                            <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 600 }}>
+                            <td style={{ fontFamily: 'monospace', color: '#6D28D9', fontWeight: 600 }}>
                               {cand.internId || cand.candidateId}
                             </td>
                             <td>
                               <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{cand.fullName}</div>
-                              <div style={{ fontSize: '11px', color: '#94a3b8' }}>{cand.email}</div>
+                              <div style={{ fontSize: '12.5px', color: '#475569' }}>{cand.email}</div>
                             </td>
                             <td>
-                              <div style={{ color: '#cbd5e1' }}>{cand.batch || 'Batch A'}</div>
-                              <div style={{ fontSize: '11px', color: '#71717a' }}>{cand.role}</div>
+                              <div style={{ color: '#334155' }}>{cand.batch || 'Batch A'}</div>
+                              <div style={{ fontSize: '12.5px', color: '#475569' }}>{cand.role}</div>
                             </td>
                             <td>
                               <span className={styles.badgePurple}>
                                 Task #{activeTask?.taskNumber || 1}: {activeTask?.taskId || 'TSK-ACTIVE'}
                               </span>
                             </td>
-                            <td style={{ fontSize: '11.5px', color: '#94a3b8' }}>
+                            <td style={{ fontSize: '13px', color: '#475569' }}>
                               {activeTask?.deadline ? new Date(activeTask.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '7 Days Default'}
                             </td>
                             <td>
@@ -2111,7 +2111,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             {/* Submission Configuration Inputs */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '18px', marginBottom: '20px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                   Strict Submission Deadline (Calendar Selection) <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -2121,13 +2121,13 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   onChange={(e) => setReminderForm({ ...reminderForm, submissionDeadline: e.target.value })}
                   className={styles.searchInput}
                 />
-                <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px', display: 'block' }}>
+                <span style={{ fontSize: '12.5px', color: '#475569', marginTop: '4px', display: 'block' }}>
                   Past dates are disabled. Candidates must submit deliverables before this timestamp.
                 </span>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                   Target Recipients Summary
                 </label>
                 <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', padding: '10px 14px', borderRadius: '6px', fontSize: '12.5px', color: '#e2e8f0' }}>
@@ -2141,7 +2141,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Custom Mentorship Notes (Appended to reminder email)
               </label>
               <textarea
@@ -2184,7 +2184,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   onClick={loadOverdueTasks}
                   disabled={loadingOverdue}
                   className={styles.btnSecondary}
-                  style={{ fontSize: '12px', padding: '7px 12px' }}
+                  style={{ fontSize: '13px', padding: '7px 12px' }}
                 >
                   <RefreshCw size={13} className={loadingOverdue ? styles.spin : ''} />
                   <span>Refresh Overdue List</span>
@@ -2195,7 +2195,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   onClick={handleScanOverdueWarnings}
                   disabled={scanningOverdue}
                   className={styles.btnPrimary}
-                  style={{ fontSize: '12px', padding: '7px 16px', background: 'linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)' }}
+                  style={{ fontSize: '13px', padding: '7px 16px', background: 'linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)' }}
                 >
                   <ShieldAlert size={13} />
                   <span>{scanningOverdue ? 'Scanning & Deducting...' : 'Run Automated Overdue Scan & Deduction (-10%)'}</span>
@@ -2220,7 +2220,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 <tbody>
                   {overdueTasksList.length === 0 ? (
                     <tr>
-                      <td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#94a3b8' }}>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#475569' }}>
                         No overdue candidate submissions detected. Click "Refresh Overdue List" to scan.
                       </td>
                     </tr>
@@ -2232,12 +2232,12 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         </td>
                         <td>
                           <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{item.fullName}</div>
-                          <div style={{ fontSize: '11px', color: '#94a3b8' }}>{item.email}</div>
+                          <div style={{ fontSize: '12.5px', color: '#475569' }}>{item.email}</div>
                         </td>
                         <td>{item.role}</td>
                         <td>
                           <div style={{ color: '#fca5a5', fontWeight: 600 }}>Task #{item.taskNumber}: {item.title}</div>
-                          <div style={{ fontSize: '11px', color: '#ef4444' }}>
+                          <div style={{ fontSize: '12.5px', color: '#ef4444' }}>
                             Expired: {item.deadline ? new Date(item.deadline).toLocaleString() : 'Past Due'}
                           </div>
                         </td>
@@ -2258,7 +2258,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             type="button"
                             onClick={() => handleOpenManualWarning(item)}
                             className={styles.btnSecondary}
-                            style={{ fontSize: '11px', padding: '4px 8px', borderColor: '#ef4444', color: '#ef4444' }}
+                            style={{ fontSize: '12.5px', padding: '4px 8px', borderColor: '#ef4444', color: '#ef4444' }}
                           >
                             <Edit3 size={11} />
                             <span>Customize & Send</span>
@@ -2299,7 +2299,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
             <div className={styles.metricCard}>
               <div className={styles.metricLabel}>Under Review / Evaluated</div>
-              <div className={styles.metricValue} style={{ color: '#c084fc' }}>{trackerMetrics.underReview}</div>
+              <div className={styles.metricValue} style={{ color: '#6D28D9' }}>{trackerMetrics.underReview}</div>
               <div className={styles.metricDesc}>Review cycle triggered or scheduled</div>
             </div>
           </div>
@@ -2391,7 +2391,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 <tbody>
                   {filteredTrackerCandidates.length === 0 ? (
                     <tr>
-                      <td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '28px' }}>
+                      <td colSpan={7} style={{ textAlign: 'center', color: '#475569', padding: '28px' }}>
                         No candidates match the selected filters.
                       </td>
                     </tr>
@@ -2405,21 +2405,21 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
                       return (
                         <tr key={cand.id}>
-                          <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 600 }}>
+                          <td style={{ fontFamily: 'monospace', color: '#6D28D9', fontWeight: 600 }}>
                             {cand.internId || cand.candidateId}
                           </td>
                           <td>
                             <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{cand.fullName}</div>
-                            <div style={{ fontSize: '11px', color: '#94a3b8' }}>{cand.role}</div>
+                            <div style={{ fontSize: '12.5px', color: '#475569' }}>{cand.role}</div>
                           </td>
                           <td>
-                            <span style={{ fontSize: '12px', color: '#cbd5e1' }}>{cand.batch || 'Batch A'}</span>
+                            <span style={{ fontSize: '13px', color: '#334155' }}>{cand.batch || 'Batch A'}</span>
                           </td>
                           <td>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
                               Task #{activeTask?.taskNumber || 1}
                             </div>
-                            <div style={{ fontSize: '11px', color: '#71717a' }}>
+                            <div style={{ fontSize: '12.5px', color: '#475569' }}>
                               {activeTask?.taskId || 'TSK-ACTIVE'}
                             </div>
                           </td>
@@ -2442,7 +2442,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                       href={activeTask.githubUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#38bdf8', fontSize: '11px', textDecoration: 'none' }}
+                                      style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#38bdf8', fontSize: '12.5px', textDecoration: 'none' }}
                                     >
                                       <span>GitHub</span>
                                       <ExternalLink size={10} />
@@ -2453,7 +2453,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                       href={activeTask.projectUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#c084fc', fontSize: '11px', textDecoration: 'none' }}
+                                      style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#6D28D9', fontSize: '12.5px', textDecoration: 'none' }}
                                     >
                                       <span>Demo</span>
                                       <ExternalLink size={10} />
@@ -2473,7 +2473,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                 type="button"
                                 onClick={() => handleOpenReviewTrigger(cand)}
                                 className={styles.btnPrimary}
-                                style={{ fontSize: '11.5px', padding: '6px 12px' }}
+                                style={{ fontSize: '13px', padding: '6px 12px' }}
                               >
                                 <Video size={13} />
                                 <span>Send Review Mail & Meet</span>
@@ -2484,7 +2484,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                 onClick={() => handleSendPenaltyWarningSingle(cand.id)}
                                 disabled={sendingWarningCandidateId === cand.id}
                                 className={styles.btnDanger}
-                                style={{ fontSize: '11px', padding: '5px 10px' }}
+                                style={{ fontSize: '12.5px', padding: '5px 10px' }}
                               >
                                 <AlertTriangle size={12} />
                                 <span>{sendingWarningCandidateId === cand.id ? 'Sending...' : 'Send Warning (-10%)'}</span>
@@ -2497,7 +2497,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                   setSubTab('reminder');
                                 }}
                                 className={styles.btnSecondary}
-                                style={{ fontSize: '11px', padding: '5px 10px' }}
+                                style={{ fontSize: '12.5px', padding: '5px 10px' }}
                               >
                                 <Mail size={12} />
                                 <span>Send Reminder</span>
@@ -2527,7 +2527,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   <button
                     type="button"
                     onClick={() => setReviewTriggerModal({ ...reviewTriggerModal, isOpen: false })}
-                    style={{ color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                    style={{ color: '#475569', background: 'transparent', border: 'none', cursor: 'pointer' }}
                   >
                     <X size={18} />
                   </button>
@@ -2538,16 +2538,16 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '12px 16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <strong style={{ color: 'var(--text-primary)', fontSize: '14px' }}>{reviewTriggerModal.candidate.fullName}</strong>
-                      <span style={{ fontFamily: 'monospace', color: '#c084fc', fontSize: '12px' }}>{reviewTriggerModal.candidate.internId || reviewTriggerModal.candidate.candidateId}</span>
+                      <span style={{ fontFamily: 'monospace', color: '#6D28D9', fontSize: '13px' }}>{reviewTriggerModal.candidate.internId || reviewTriggerModal.candidate.candidateId}</span>
                     </div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '3px' }}>
+                    <div style={{ fontSize: '13px', color: '#475569', marginTop: '3px' }}>
                       {reviewTriggerModal.candidate.role} &bull; {reviewTriggerModal.candidate.batch || 'Batch A'} &bull; {reviewTriggerModal.candidate.email}
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Review Date <span style={{ color: '#ef4444' }}>*</span>
                       </label>
                       <input
@@ -2560,7 +2560,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Review Time <span style={{ color: '#ef4444' }}>*</span>
                       </label>
                       <input
@@ -2575,7 +2575,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
                   {/* Google Meet Link Options */}
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '8px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>
                       Google Meet Video Room Configuration
                     </label>
                     <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
@@ -2589,7 +2589,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           border: reviewTriggerModal.meetMode === 'BATCH' ? '1px solid var(--accent-primary)' : '1px solid var(--border-default)',
                           background: reviewTriggerModal.meetMode === 'BATCH' ? 'var(--accent-purple-light)' : 'var(--bg-surface)',
                           color: reviewTriggerModal.meetMode === 'BATCH' ? 'var(--accent-purple-text)' : 'var(--text-muted)',
-                          fontSize: '12px',
+                          fontSize: '13px',
                           fontWeight: 600,
                           cursor: 'pointer',
                         }}
@@ -2607,7 +2607,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           border: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? '1px solid var(--accent-primary)' : '1px solid var(--border-default)',
                           background: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? 'var(--accent-purple-light)' : 'var(--bg-surface)',
                           color: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? 'var(--accent-purple-text)' : 'var(--text-muted)',
-                          fontSize: '12px',
+                          fontSize: '13px',
                           fontWeight: 600,
                           cursor: 'pointer',
                         }}
@@ -2617,7 +2617,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <label style={{ fontSize: '11.5px', color: '#94a3b8' }}>
+                      <label style={{ fontSize: '13px', color: '#475569' }}>
                         Google Meet URL (Authentic standard format):
                       </label>
                       <button
@@ -2627,7 +2627,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           setReviewTriggerModal({ ...reviewTriggerModal, batchMeetLink: newUrl });
                           showToast?.('Generated new genuine Google Meet URL!', 'info');
                         }}
-                        style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', color: '#c084fc', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', cursor: 'pointer' }}
+                        style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', color: '#6D28D9', borderRadius: '4px', padding: '2px 8px', fontSize: '12.5px', cursor: 'pointer' }}
                       >
                         Regenerate Room URL
                       </button>
@@ -2642,7 +2642,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                       Custom Mentorship Notes (Delivered in review invitation email)
                     </label>
                     <textarea
@@ -2690,11 +2690,11 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   <Briefcase size={18} color="#a855f7" />
                   <span>Assign Sprint Tasks ({selectedCandidateIds.length} Interns Selected)</span>
                 </h3>
-                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#475569' }}>
                   Select whether to assign the same task in bulk or customize individual tasks and deadlines per student.
                 </p>
               </div>
-              <button type="button" onClick={() => setIsAssignModalOpen(false)} style={{ color: '#94a3b8', cursor: 'pointer', background: 'transparent', border: 'none' }}>
+              <button type="button" onClick={() => setIsAssignModalOpen(false)} style={{ color: '#475569', cursor: 'pointer', background: 'transparent', border: 'none' }}>
                 <X size={18} />
               </button>
             </div>
@@ -2753,7 +2753,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 /* --- MODE 1: BULK ASSIGN --- */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '12px 16px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#c084fc', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#6D28D9', marginBottom: '6px' }}>
                       Selected Industrial Task Template:
                     </div>
                     <select
@@ -2784,7 +2784,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Task Milestone Number
                       </label>
                       <input
@@ -2796,7 +2796,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Task ID
                       </label>
                       <input
@@ -2809,7 +2809,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                       Task Title
                     </label>
                     <input
@@ -2822,7 +2822,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Explanation Call Date
                       </label>
                       <input
@@ -2833,7 +2833,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Explanation Time
                       </label>
                       <input
@@ -2844,7 +2844,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Shared Batch Task Deadline <span style={{ color: '#ef4444' }}>*</span>
                       </label>
                       <input
@@ -2857,7 +2857,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                       Task Email Body (Jinja Text Format)
                     </label>
                     <textarea
@@ -2865,14 +2865,14 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       value={assignForm.customJinja}
                       onChange={(e) => setAssignForm({ ...assignForm, customJinja: e.target.value })}
                       className={styles.searchInput}
-                      style={{ height: 'auto', fontFamily: 'monospace', fontSize: '12px', lineHeight: 1.6 }}
+                      style={{ height: 'auto', fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.6 }}
                     />
                   </div>
                 </div>
               ) : (
                 /* --- MODE 2: ASSIGN INDIVIDUAL TASKS --- */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '8px', padding: '12px 16px', fontSize: '12.5px', color: '#d8b4fe' }}>
+                  <div style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '8px', padding: '12px 16px', fontSize: '12.5px', color: '#581C87' }}>
                     <strong>Individual Task Customization Mode Active:</strong> You can select a distinct technical sprint task, customize the task title, and set an individual deadline for each intern below.
                   </div>
 
@@ -2924,11 +2924,11 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-default)', paddingBottom: '8px' }}>
                             <div>
                               <strong style={{ color: 'var(--text-primary)', fontSize: '13.5px' }}>{cand?.fullName || 'Intern'}</strong>
-                              <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '8px' }}>
+                              <span style={{ fontSize: '13px', color: '#475569', marginLeft: '8px' }}>
                                 &bull; {cand?.role || 'Intern'} &bull; {cand?.batch || 'Batch A'}
                               </span>
                             </div>
-                            <span style={{ fontFamily: 'monospace', fontSize: '11px', color: '#c084fc', fontWeight: 700 }}>
+                            <span style={{ fontFamily: 'monospace', fontSize: '12.5px', color: '#6D28D9', fontWeight: 700 }}>
                               {cand?.internId || cand?.candidateId}
                             </span>
                           </div>
@@ -2936,14 +2936,14 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           {/* Task Selection for this Candidate */}
                           <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.6fr', gap: '10px' }}>
                             <div>
-                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
+                              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
                                 Select Task Template
                               </label>
                               <select
                                 value={currentForm.templateId || ''}
                                 onChange={(e) => handleTemplateChange(e.target.value)}
                                 className={styles.searchInput}
-                                style={{ fontSize: '12px' }}
+                                style={{ fontSize: '13px' }}
                               >
                                 {taskTemplates.map((t) => (
                                   <option key={t.id} value={t.id}>
@@ -2954,7 +2954,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             </div>
 
                             <div>
-                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
+                              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
                                 Task Title
                               </label>
                               <input
@@ -2962,7 +2962,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                 value={currentForm.taskTitle || ''}
                                 onChange={(e) => handleUpdateIndividual('taskTitle', e.target.value)}
                                 className={styles.searchInput}
-                                style={{ fontSize: '12px' }}
+                                style={{ fontSize: '13px' }}
                               />
                             </div>
                           </div>
@@ -2970,7 +2970,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           {/* Individual Deadline & Explanation Call Details */}
                           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '10px' }}>
                             <div>
-                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#38bdf8', marginBottom: '4px' }}>
+                              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#38bdf8', marginBottom: '4px' }}>
                                 Individual Task Deadline <span style={{ color: '#ef4444' }}>*</span>
                               </label>
                               <input
@@ -2978,12 +2978,12 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                 value={currentForm.deadline || ''}
                                 onChange={(e) => handleUpdateIndividual('deadline', e.target.value)}
                                 className={styles.searchInput}
-                                style={{ fontSize: '12px' }}
+                                style={{ fontSize: '13px' }}
                               />
                             </div>
 
                             <div>
-                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
+                              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
                                 Explanation Date
                               </label>
                               <input
@@ -2991,12 +2991,12 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                 value={currentForm.explanationDate || ''}
                                 onChange={(e) => handleUpdateIndividual('explanationDate', e.target.value)}
                                 className={styles.searchInput}
-                                style={{ fontSize: '12px' }}
+                                style={{ fontSize: '13px' }}
                               />
                             </div>
 
                             <div>
-                              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
+                              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
                                 Explanation Time
                               </label>
                               <input
@@ -3004,7 +3004,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                                 value={currentForm.explanationTime || '04:00 PM'}
                                 onChange={(e) => handleUpdateIndividual('explanationTime', e.target.value)}
                                 className={styles.searchInput}
-                                style={{ fontSize: '12px' }}
+                                style={{ fontSize: '13px' }}
                               />
                             </div>
                           </div>
@@ -3061,7 +3061,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               <button
                 type="button"
                 onClick={() => setEditingTemplate(null)}
-                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                style={{ background: 'transparent', border: 'none', color: '#475569', cursor: 'pointer' }}
               >
                 <X size={18} />
               </button>
@@ -3075,7 +3075,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 style={{
                   padding: '6px 14px',
                   borderRadius: '6px',
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer',
                   border: 'none',
@@ -3095,7 +3095,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 style={{
                   padding: '6px 14px',
                   borderRadius: '6px',
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer',
                   border: 'none',
@@ -3116,7 +3116,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '12px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Task ID <span style={{ color: '#ef4444' }}>*</span>
                       </label>
                       <input
@@ -3129,7 +3129,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Task Title <span style={{ color: '#ef4444' }}>*</span>
                       </label>
                       <input
@@ -3144,7 +3144,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Industrial Level
                       </label>
                       <select
@@ -3159,7 +3159,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Target Role <span style={{ color: '#ef4444' }}>*</span>
                       </label>
                       <input
@@ -3172,7 +3172,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Tech Stack
                       </label>
                       <input
@@ -3186,7 +3186,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                       Sprint Objective <span style={{ color: '#ef4444' }}>*</span>
                     </label>
                     <textarea
@@ -3195,13 +3195,13 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       onChange={(e) => setEditingTemplate({ ...editingTemplate, objective: e.target.value })}
                       placeholder="Brief summary of sprint objective..."
                       className={styles.searchInput}
-                      style={{ height: 'auto', fontSize: '12px' }}
+                      style={{ height: 'auto', fontSize: '13px' }}
                     />
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Modules & Architecture Deliverables
                       </label>
                       <textarea
@@ -3210,11 +3210,11 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         onChange={(e) => setEditingTemplate({ ...editingTemplate, modules: e.target.value })}
                         placeholder="Architecture modules to complete..."
                         className={styles.searchInput}
-                        style={{ height: 'auto', fontSize: '12px' }}
+                        style={{ height: 'auto', fontSize: '13px' }}
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                         Expected Output / Acceptance Criteria
                       </label>
                       <textarea
@@ -3223,17 +3223,17 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         onChange={(e) => setEditingTemplate({ ...editingTemplate, expectedOutput: e.target.value })}
                         placeholder="Acceptance criteria (unit tests, demo link, clean PR)..."
                         className={styles.searchInput}
-                        style={{ height: 'auto', fontSize: '12px' }}
+                        style={{ height: 'auto', fontSize: '13px' }}
                       />
                     </div>
                   </div>
 
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                      <label style={{ fontSize: '11.5px', fontWeight: 700, color: '#cbd5e1' }}>
+                      <label style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>
                         Task Email Body (Jinja Plain Text Format)
                       </label>
-                      <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                      <span style={{ fontSize: '12.5px', color: '#475569' }}>
                         Click a variable tag below to append it:
                       </span>
                     </div>
@@ -3261,8 +3261,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             border: '1px solid var(--border-default)',
                             borderRadius: '4px',
                             padding: '3px 8px',
-                            fontSize: '11px',
-                            color: '#c084fc',
+                            fontSize: '12.5px',
+                            color: '#6D28D9',
                             cursor: 'pointer',
                           }}
                         >
@@ -3277,13 +3277,13 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       onChange={(e) => setEditingTemplate({ ...editingTemplate, jinjaBody: e.target.value })}
                       placeholder="Write your email body in clean plain text with {{variable}} tags..."
                       className={styles.searchInput}
-                      style={{ height: 'auto', fontFamily: 'monospace', fontSize: '12px', lineHeight: 1.6 }}
+                      style={{ height: 'auto', fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.6 }}
                     />
                   </div>
                 </div>
               ) : (
                 <div>
-                  <div style={{ marginBottom: '10px', fontSize: '12px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ marginBottom: '10px', fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Sparkles size={13} color="#a855f7" />
                     <span>Live rendered email preview with sample intern data:</span>
                   </div>
@@ -3342,7 +3342,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '14px' }}>
               {/* Recipient Email ID Customization */}
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                   Recipient Candidate Email ID (Customizable):
                 </label>
                 <input
@@ -3353,7 +3353,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   placeholder="candidate@example.com"
                   style={{ fontFamily: 'monospace', color: '#38bdf8' }}
                 />
-                <span style={{ fontSize: '11px', color: '#64748b', marginTop: '3px', display: 'block' }}>
+                <span style={{ fontSize: '12.5px', color: '#64748b', marginTop: '3px', display: 'block' }}>
                   HR can update or modify the candidate's recipient email ID directly before sending.
                 </span>
               </div>
@@ -3361,7 +3361,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               {/* Penalty Deduction Customization */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                     Performance Score Deduction (%):
                   </label>
                   <input
@@ -3375,7 +3375,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                     Grace Period Window:
                   </label>
                   <select
@@ -3392,7 +3392,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
               {/* Subject Customization */}
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                   Warning Email Subject:
                 </label>
                 <input
@@ -3405,7 +3405,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
               {/* Content Customization */}
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                   Custom Warning Email Content:
                 </label>
                 <textarea
@@ -3413,7 +3413,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   value={manualWarningModal.customBody}
                   onChange={(e) => setManualWarningModal(prev => ({ ...prev, customBody: e.target.value }))}
                   className={styles.searchInput}
-                  style={{ height: 'auto', fontFamily: 'monospace', fontSize: '12px', lineHeight: 1.5 }}
+                  style={{ height: 'auto', fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.5 }}
                 />
               </div>
 

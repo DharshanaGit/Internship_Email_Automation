@@ -46,70 +46,48 @@ export async function GET(request) {
       },
     });
 
-    // Fallback: if token was generated from frontend preview or demo session, resolve to latest active candidate
+    // Check if candidate exists in database with this token or tokenHash
     if (!candidate) {
-      candidate = await prisma.candidate.findFirst({
-        where: {
-          offerLetterStatus: { notIn: ['Accepted', 'Rejected'] },
-        },
-        orderBy: { createdAt: 'desc' },
-        include: {
-          batchRel: true,
-        },
-      });
-
-      if (candidate) {
-        // Auto-bind token so future calls match directly
-        await prisma.candidate.update({
-          where: { id: candidate.id },
-          data: {
-            offerAcceptanceToken: token,
-            offerAcceptanceTokenHash: tokenHash,
-          },
-        }).catch(() => {});
-      } else {
-        // Fallback to any recent candidate
-        candidate = await prisma.candidate.findFirst({
+      // Support for preview mode without writing fake mock records to the DB
+      if (token === 'preview-token-sample' || token.startsWith('preview_')) {
+        const previewCand = await prisma.candidate.findFirst({
           orderBy: { createdAt: 'desc' },
-          include: {
-            batchRel: true,
-          },
+          include: { batchRel: true },
         });
-      }
-    }
 
-    if (!candidate) {
-      // Auto-provision default candidate record with this token so public offer link is ALWAYS 100% valid and never 404s
-      try {
-        const fallbackCandId = `SF-INT-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
-        const fallbackInternId = `INT-2026-${String(Math.floor(Math.random() * 90000) + 10000)}`;
-        candidate = await prisma.candidate.create({
-          data: {
-            candidateId: fallbackCandId,
-            internId: fallbackInternId,
-            fullName: 'HARISH ROHITH S',
-            email: 'harishrohith.intern@gmail.com',
-            phone: '+91-9876543210',
-            role: 'AI Intern',
-            department: 'Artificial Intelligence & Engineering',
-            collegeName: 'Engineering & Technology Institute',
-            degree: 'B.Tech in Computer Science',
-            stipend: 'Rs. 15,000',
-            joiningDate: '2026-11-01',
-            endDate: '2027-01-31',
-            duration: '3 Months',
-            workMode: 'Online - Remote',
-            reportingManager: 'Priyanka Nair',
-            assignedMentor: 'Rahul Kapoor',
-            batch: 'Batch A',
-            offerLetterStatus: 'Sent',
-            offerAcceptanceToken: token,
-            offerAcceptanceTokenHash: tokenHash,
-            offerDeadline: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-          },
-        });
-      } catch (createErr) {
-        candidate = await prisma.candidate.findFirst({ orderBy: { createdAt: 'desc' } });
+        if (previewCand) {
+          candidate = previewCand;
+        } else {
+          return NextResponse.json({
+            success: true,
+            isExpired: false,
+            alreadyResponded: false,
+            candidate: {
+              fullName: 'Preview Intern',
+              email: 'intern@shortfundly.com',
+              role: 'Web Developer Intern',
+              department: 'Engineering',
+              collegeName: 'University / Institute',
+              degree: 'B.Tech / Degree',
+              stipend: 'Rs. 15,000',
+              duration: '3 Months',
+              joiningDate: '2026-11-01',
+              endDate: '2027-01-31',
+              workMode: 'Online - Remote',
+              reportingManager: 'Priyanka Nair',
+              assignedMentor: 'Rahul Kapoor',
+              batch: 'Batch A',
+              offerLetterStatus: 'Sent',
+              offerDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            },
+            formattedDeadline: '30 Days Remaining',
+          });
+        }
+      } else {
+        return NextResponse.json(
+          { success: false, error: 'Offer not found or invalid token. Please contact HR at hr@shortfundly.com.' },
+          { status: 404 }
+        );
       }
     }
 

@@ -214,7 +214,7 @@ export default function CertificateDeckView({
             <tbody>
               {filteredCandidates.length === 0 ? (
                 <tr>
-                  <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: '#71717a' }}>
+                  <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>
                     No candidates found for certificate evaluation.
                   </td>
                 </tr>
@@ -232,14 +232,14 @@ export default function CertificateDeckView({
                           style={{ width: '16px', height: '16px', accentColor: '#a855f7', cursor: 'pointer' }}
                         />
                       </td>
-                      <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 700 }}>{c.internId}</td>
+                      <td style={{ fontFamily: 'monospace', color: '#6D28D9', fontWeight: 700 }}>{c.internId}</td>
                       <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
                       <td>
                         <div>{c.role}</div>
-                        <div style={{ fontSize: '11px', color: '#71717a' }}>{c.collegeName}</div>
+                        <div style={{ fontSize: '12.5px', color: '#475569' }}>{c.collegeName}</div>
                       </td>
                       <td><span className={styles.badgePurple}>{c.batch}</span></td>
-                      <td style={{ fontSize: '12px' }}>{c.endDate}</td>
+                      <td style={{ fontSize: '13px' }}>{c.endDate}</td>
                       <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>
                         {c.tasksCompleted} Completed
                       </td>
@@ -248,7 +248,7 @@ export default function CertificateDeckView({
                           <span style={{ fontFamily: 'monospace', fontWeight: 800, fontSize: '14px', color: isPassed ? '#34d399' : '#fbbf24' }}>
                             {c.overallAverageScore?.toFixed(1)}%
                           </span>
-                          <span style={{ fontSize: '11px', color: '#71717a' }}>
+                          <span style={{ fontSize: '12.5px', color: '#475569' }}>
                             ({c.taskHistory?.length || 0} tasks avg)
                           </span>
                         </div>
@@ -260,7 +260,7 @@ export default function CertificateDeckView({
                               <CheckCircle2 size={11} /> Approved by CEO
                             </span>
                             {c.certificateNumber && (
-                              <span style={{ fontFamily: 'monospace', fontSize: '10.5px', color: '#a855f7' }}>
+                              <span style={{ fontFamily: 'monospace', fontSize: '12.5px', color: '#a855f7' }}>
                                 {c.certificateNumber}
                               </span>
                             )}
