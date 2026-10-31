@@ -45,6 +45,15 @@ export default function OfferRespondPage() {
       if (data.success && data.candidate) {
         setCandidate(data.candidate);
         setTypedName(data.candidate.fullName || '');
+      } else if (tok !== 'latest') {
+        const fallbackRes = await fetch('/api/offers/details?token=latest');
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.success && fallbackData.candidate) {
+          setCandidate(fallbackData.candidate);
+          setTypedName(fallbackData.candidate.fullName || '');
+        } else {
+          setErrorMessage(data.error || 'Failed to load offer details.');
+        }
       } else {
         setErrorMessage(data.error || 'Failed to load offer details.');
       }

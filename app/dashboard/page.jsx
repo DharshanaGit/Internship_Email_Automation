@@ -542,9 +542,7 @@ export default function DashboardPage() {
   const [bulkCustomSubject, setBulkCustomSubject] = useState('');
   const [bulkCustomBody, setBulkCustomBody] = useState('');
   const [bulkCustomCc, setBulkCustomCc] = useState('');
-  const [bulkOfferDeadline, setBulkOfferDeadline] = useState(
-    () => new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 16)
-  );
+  const [bulkOfferDeadline, setBulkOfferDeadline] = useState('2026-11-07T12:00');
   const [bulkSending, setBulkSending] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0, status: '' });
   const [bulkDispatchResults, setBulkDispatchResults] = useState(null);
@@ -577,9 +575,9 @@ export default function DashboardPage() {
   const [bulkTaskTier, setBulkTaskTier] = useState('Intermediate');
   const [bulkTaskAssignmentMode, setBulkTaskAssignmentMode] = useState('SAME_FOR_ALL');
   const [bulkTaskScheduledAt, setBulkTaskScheduledAt] = useState('');
-  const [bulkTaskDeadlineDate, setBulkTaskDeadlineDate] = useState(() => formatToDdMmYy(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)));
+  const [bulkTaskDeadlineDate, setBulkTaskDeadlineDate] = useState('05-11-2026');
   const [bulkTaskSelectedKeys, setBulkTaskSelectedKeys] = useState(new Set());
-  const [bulkTaskExpDate, setBulkTaskExpDate] = useState(() => formatToDdMmYy(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)));
+  const [bulkTaskExpDate, setBulkTaskExpDate] = useState('02-11-2026');
   const [bulkTaskSending, setBulkTaskSending] = useState(false);
   const [bulkTaskCc, setBulkTaskCc] = useState('');
   const [bulkTaskSubject, setBulkTaskSubject] = useState('');
@@ -4955,9 +4953,10 @@ export default function DashboardPage() {
                           lineHeight: '1.6',
                           whiteSpace: 'pre-wrap',
                           minHeight: '360px',
-                          background: 'var(--bg-surface)',
-                          color: '#FFFFFF',
-                          border: '1px solid var(--border-default)',
+                          background: '#FFFFFF',
+                          color: '#0F172A',
+                          border: '1.5px solid #CBD5E1',
+                          fontWeight: 600,
                           borderRadius: '8px',
                           padding: '14px',
                         }}
@@ -5054,8 +5053,8 @@ export default function DashboardPage() {
 
                 <div className={styles.gmailMetaRow}>
                   <div className={styles.gmailAddressRow}>
-                    <span style={{ color: 'var(--text-muted)', width: '42px', display: 'inline-block' }}>From:</span>
-                    <strong>Shortfundly Operations Team</strong> &lt;{sysSettings.senderEmail || 'hr@shortfundly.com'}&gt;
+                    <span style={{ color: '#475569', fontWeight: 700, width: '42px', display: 'inline-block' }}>From:</span>
+                    <strong style={{ color: '#0F172A' }}>Shortfundly Operations Team</strong> <span style={{ color: '#334155', fontWeight: 600 }}>&lt;{sysSettings.senderEmail || 'hr@shortfundly.com'}&gt;</span>
                   </div>
                   <div className={styles.gmailSecurityBadge}>
                     <Shield size={12} style={{ color: '#10b981' }} />
@@ -5064,13 +5063,13 @@ export default function DashboardPage() {
                 </div>
 
                 <div className={styles.gmailAddressRow} style={{ marginTop: '4px' }}>
-                  <span style={{ color: 'var(--text-muted)', width: '42px', display: 'inline-block' }}>To:</span>
-                  <span>{previewModal.to || (previewModal.candidate?.email ? `${previewModal.candidate.fullName} <${previewModal.candidate.email}>` : 'candidate@shortfundly.com')}</span>
+                  <span style={{ color: '#475569', fontWeight: 700, width: '42px', display: 'inline-block' }}>To:</span>
+                  <span style={{ color: '#0F172A', fontWeight: 700 }}>{previewModal.to || (previewModal.candidate?.email ? `${previewModal.candidate.fullName} <${previewModal.candidate.email}>` : 'candidate@shortfundly.com')}</span>
                 </div>
 
                 {previewModal.cc && (
                   <div className={styles.gmailAddressRow} style={{ marginTop: '4px' }}>
-                    <span style={{ color: 'var(--text-muted)', width: '42px', display: 'inline-block' }}>Cc:</span>
+                    <span style={{ color: '#475569', fontWeight: 700, width: '42px', display: 'inline-block' }}>Cc:</span>
                     <span className={styles.gmailCcBadge}>{previewModal.cc}</span>
                   </div>
                 )}
@@ -5197,9 +5196,10 @@ export default function DashboardPage() {
                     fontFamily: 'monospace',
                     fontSize: '13px',
                     lineHeight: '1.6',
-                    background: 'var(--bg-surface)',
-                    color: '#FFFFFF',
-                    border: '1px solid var(--border-default)',
+                    background: '#FFFFFF',
+                          color: '#0F172A',
+                          border: '1.5px solid #CBD5E1',
+                          fontWeight: 600,
                     borderRadius: '8px',
                     padding: '14px',
                   }}

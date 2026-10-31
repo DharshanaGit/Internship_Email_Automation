@@ -4,6 +4,11 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './web3Deck.module.css';
 import {
   Users,
+  Sliders,
+  ExternalLink,
+  CheckSquare,
+  Square,
+  Link2,
   UserCheck,
   CheckCircle2,
   Clock,
@@ -106,6 +111,36 @@ export default function ReviewDashboardView({
   // Checkpoint Task Completion State
   const [finalScoreMap, setFinalScoreMap] = useState({});
   const [completingTask, setCompletingTask] = useState(false);
+
+  // Modal 1: Customize Next Task Modal State
+  const [customizeNextTaskModal, setCustomizeNextTaskModal] = useState({
+    open: false,
+    candidates: [],
+    nextTaskNumber: 2,
+    title: '',
+    description: '',
+    deadline: '',
+    explanationDate: '',
+    explanationTime: '11:00 AM IST',
+    meetLink: '',
+    customNotes: '',
+    awardedScore: 100,
+  });
+
+  // Modal 2: Add New Task Modal State
+  const [addNewTaskModal, setAddNewTaskModal] = useState({
+    open: false,
+    targetBatch: 'ALL',
+    targetRole: 'ALL',
+    taskNumber: 2,
+    title: '',
+    description: '',
+    deadline: '',
+    explanationDate: '',
+    explanationTime: '11:00 AM IST',
+    meetLink: '',
+    assigning: false,
+  });
 
   // Warning Mail State
   const [warningForm, setWarningForm] = useState({
@@ -321,6 +356,168 @@ export default function ReviewDashboardView({
     }
   };
 
+  // Open Customize Next Task modal for a single intern
+  const handleOpenCustomizeModal = (candidate) => {
+    const currentNum = candidate.activeTask?.taskNumber || 1;
+    const nextNum = currentNum + 1;
+    const today = new Date();
+    const defaultExpDate = new Date(today.getTime() + 86400000).toISOString().split('T')[0];
+    const defaultDeadline = new Date(today.getTime() + 10 * 86400000).toISOString().split('T')[0];
+    const meet = candidate.activeTask?.meetLink || candidate.googleMeetUrl || generateMeetUrl();
+
+    setCustomizeNextTaskModal({
+      open: true,
+      candidates: [candidate],
+      nextTaskNumber: nextNum,
+      title: `Sprint Milestone #${nextNum}: Production Feature Implementation`,
+      description: `Develop and integrate core deliverable modules for Milestone #${nextNum}. Write comprehensive unit tests and adhere to product architecture guidelines. Discuss implementation roadmap during the briefing check-in call.`,
+      deadline: defaultDeadline,
+      explanationDate: defaultExpDate,
+      explanationTime: '11:00 AM IST',
+      meetLink: meet,
+      customNotes: `Milestone #${currentNum} verified and approved. Candidate demonstrates strong technical execution and is promoted to Sprint Task #${nextNum}.`,
+      awardedScore: finalScoreMap[candidate.id] !== undefined ? Number(finalScoreMap[candidate.id]) : (candidate.performancePercentage || 100),
+    });
+  };
+
+  // Open Customize Next Task modal for multiple selected interns
+  const handleOpenBulkCustomizeModal = () => {
+    if (selectedCandidateIds.length === 0) {
+      showToast?.('Please select at least one candidate first.', 'error');
+      return;
+    }
+    const targetCands = filteredCandidates.filter(c => selectedCandidateIds.includes(c.id));
+    const sampleCand = targetCands[0];
+    const currentNum = sampleCand?.activeTask?.taskNumber || 1;
+    const nextNum = currentNum + 1;
+    const today = new Date();
+    const defaultExpDate = new Date(today.getTime() + 86400000).toISOString().split('T')[0];
+    const defaultDeadline = new Date(today.getTime() + 10 * 86400000).toISOString().split('T')[0];
+
+    setCustomizeNextTaskModal({
+      open: true,
+      candidates: targetCands,
+      nextTaskNumber: nextNum,
+      title: `Sprint Milestone #${nextNum}: Production Deliverables & Testing`,
+      description: `Implement and deliver milestone features for Task #${nextNum}. Submit live demo application and verified GitHub repository via the candidate portal.`,
+      deadline: defaultDeadline,
+      explanationDate: defaultExpDate,
+      explanationTime: '11:00 AM IST',
+      meetLink: generateMeetUrl(),
+      customNotes: `Sprint milestone approved across cohort. Candidates promoted to Milestone #${nextNum}.`,
+      awardedScore: 100,
+    });
+  };
+
+  // Open Add New Task Modal
+  const handleOpenAddNewTaskModal = () => {
+    const today = new Date();
+    const defaultExpDate = new Date(today.getTime() + 86400000).toISOString().split('T')[0];
+    const defaultDeadline = new Date(today.getTime() + 10 * 86400000).toISOString().split('T')[0];
+
+    setAddNewTaskModal({
+      open: true,
+      targetBatch: selectedBatch !== 'ALL' ? selectedBatch : 'ALL',
+      targetRole: selectedRole !== 'ALL' ? selectedRole : 'ALL',
+      taskNumber: selectedTaskNum !== 'ALL' ? (parseInt(selectedTaskNum, 10) + 1) : 2,
+      title: 'Sprint Milestone: Core Application Engineering',
+      description: 'Design and build assigned architectural modules with clean code standards, responsive interfaces, and continuous integration workflows.',
+      deadline: defaultDeadline,
+      explanationDate: defaultExpDate,
+      explanationTime: '11:00 AM IST',
+      meetLink: generateMeetUrl(),
+      assigning: false,
+    });
+  };
+
+  // Dispatch Add New Task to Batch/Role
+  const handleDispatchAddNewTask = async () => {
+    try {
+      setAddNewTaskModal(prev => ({ ...prev, assigning: true }));
+      let targetCandidates = filteredCandidates;
+      if (addNewTaskModal.targetBatch !== 'ALL') {
+        targetCandidates = targetCandidates.filter(c => c.batch === addNewTaskModal.targetBatch);
+      }
+      if (addNewTaskModal.targetRole !== 'ALL') {
+        targetCandidates = targetCandidates.filter(c => c.role?.toLowerCase().includes(addNewTaskModal.targetRole.toLowerCase()));
+      }
+
+      if (targetCandidates.length === 0) {
+        showToast?.('No matching candidates found for this batch/role selection.', 'error');
+        setAddNewTaskModal(prev => ({ ...prev, assigning: false }));
+        return;
+      }
+
+      const res = await fetch('/api/tasks/assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateIds: targetCandidates.map(c => c.id),
+          title: addNewTaskModal.title,
+          description: addNewTaskModal.description,
+          objective: addNewTaskModal.description,
+          explanationDate: addNewTaskModal.explanationDate,
+          explanationTime: addNewTaskModal.explanationTime,
+          deadline: addNewTaskModal.deadline,
+          customMeetLink: addNewTaskModal.meetLink,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        showToast?.(`Task successfully assigned & email invites sent to ${targetCandidates.length} candidate(s)!`, 'success');
+        setAddNewTaskModal(prev => ({ ...prev, open: false, assigning: false }));
+        loadReviewData();
+        onRefresh?.();
+      } else {
+        showToast?.(data.error || 'Failed to dispatch new task.', 'error');
+        setAddNewTaskModal(prev => ({ ...prev, assigning: false }));
+      }
+    } catch (err) {
+      showToast?.(err.message, 'error');
+      setAddNewTaskModal(prev => ({ ...prev, assigning: false }));
+    }
+  };
+
+  // Submit Approval and Dispatch Next Task (Customized or Quick)
+  const executeApproveAndAdvance = async (targetCandIds, customTaskData = null) => {
+    try {
+      setCompletingTask(true);
+      const res = await fetch('/api/reviews/complete-task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateIds: targetCandIds,
+          finalScoreMap,
+          customNotes: customTaskData?.customNotes,
+          customNextTask: customTaskData ? {
+            title: customTaskData.title,
+            description: customTaskData.description,
+            deadline: customTaskData.deadline,
+            explanationDate: customTaskData.explanationDate,
+            explanationTime: customTaskData.explanationTime,
+            meetLink: customTaskData.meetLink,
+          } : null,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        showToast?.(`Task approved & completed! Automated milestone notice and Next Task dispatched to ${data.completedCount} intern(s).`, 'success');
+        setSelectedCandidateIds([]);
+        setCustomizeNextTaskModal(prev => ({ ...prev, open: false }));
+        loadReviewData();
+        onRefresh?.();
+      } else {
+        showToast?.(data.error || 'Failed to approve task completion.', 'error');
+      }
+    } catch (err) {
+      showToast?.(err.message, 'error');
+    } finally {
+      setCompletingTask(false);
+    }
+  };
+
   // Mark Task Completed Checkpoint
   const handleMarkTasksCompleted = async () => {
     if (selectedCandidateIds.length === 0) {
@@ -495,7 +692,13 @@ export default function ReviewDashboardView({
 
         <select
           value={selectedTaskNum}
-          onChange={(e) => setSelectedTaskNum(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value === '__ADD_NEW__') {
+              handleOpenAddNewTaskModal();
+            } else {
+              setSelectedTaskNum(e.target.value);
+            }
+          }}
           className={styles.selectInput}
         >
           <option value="ALL">All Task Numbers</option>
@@ -503,7 +706,19 @@ export default function ReviewDashboardView({
           <option value="2">Task #2</option>
           <option value="3">Task #3</option>
           <option value="4">Task #4</option>
+          <option value="__ADD_NEW__" style={{ fontWeight: 700, color: '#6D28D9' }}>+ Add New Task Option...</option>
         </select>
+
+        <button
+          type="button"
+          onClick={handleOpenAddNewTaskModal}
+          className={styles.btnSecondary}
+          style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#EDE9FE', borderColor: '#C4B5FD', color: '#5B21B6', fontWeight: 700, padding: '7px 14px' }}
+          title="Create and assign a new milestone task"
+        >
+          <Plus size={14} />
+          <span>+ Add New Task</span>
+        </button>
       </div>
 
       {/* --- SUBTAB 1: REVIEW QUEUE TABLE --- */}
@@ -1243,94 +1458,582 @@ export default function ReviewDashboardView({
 
       {/* --- SUBTAB 4: TASK COMPLETION CHECKPOINT --- */}
       {subTab === 'checkpoint' && (
-        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '12px', padding: '24px 28px' }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '17px', color: '#0F172A', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Award size={18} color="#10b981" />
-            <span>Mark Tasks Completed</span>
-          </h3>
-          <p style={{ margin: '0 0 18px 0', fontSize: '13px', color: '#475569' }}>
-            Once reviews are completed across sessions, HR marks candidates as <strong>Task Completed</strong>. The platform calculates the individual task percentage score, sends automated milestone approval emails, and approves students to proceed to their next sprint task.
-          </p>
+        <div style={{ background: '#FFFFFF', border: '1.5px solid #CBD5E1', borderRadius: '12px', padding: '24px 28px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          {/* Header & Description */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '20px' }}>
+            <div>
+              <h3 style={{ margin: '0 0 6px 0', fontSize: '18px', color: '#0F172A', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Award size={20} color="#059669" />
+                <span>Mark Tasks Completed & Advance Interns</span>
+              </h3>
+              <p style={{ margin: 0, fontSize: '13.5px', color: '#475569', lineHeight: 1.5, maxWidth: '820px' }}>
+                HR approves candidates based on live project submissions, review evaluations, and performance scores. Approved interns are automatically promoted to their next sprint task with automated notification emails.
+              </p>
+            </div>
 
+            {/* Bulk Action Controls */}
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleToggleSelectAll}
+                className={styles.btnSecondary}
+                style={{ fontSize: '13px', padding: '7px 14px', fontWeight: 700 }}
+              >
+                {selectedCandidateIds.length === filteredCandidates.length && filteredCandidates.length > 0 ? 'Deselect All' : `Select All (${filteredCandidates.length})`}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => executeApproveAndAdvance(selectedCandidateIds, null)}
+                disabled={completingTask || selectedCandidateIds.length === 0}
+                className={styles.btnPrimary}
+                style={{ fontSize: '13px', padding: '7px 16px', fontWeight: 700, background: '#059669', borderColor: '#047857' }}
+                title="Directly approve current task and auto-dispatch next sprint task"
+              >
+                <CheckCircle2 size={15} />
+                <span>Quick Approve Selected (${selectedCandidateIds.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleOpenBulkCustomizeModal}
+                disabled={completingTask || selectedCandidateIds.length === 0}
+                className={styles.btnPrimary}
+                style={{ fontSize: '13px', padding: '7px 16px', fontWeight: 700, background: '#6D28D9', borderColor: '#5B21B6' }}
+                title="Customize next task title, requirements, deadline, and Google Meet link before sending"
+              >
+                <Sliders size={15} />
+                <span>Customize Next Task for Selected (${selectedCandidateIds.length})</span>
+              </button>
+            </div>
+          </div>
+
+          {/* All Students List Table (Filtered, True Data Only) */}
           <div className={styles.tableResponsive} style={{ marginBottom: '20px' }}>
-            {(() => {
-              const checkpointCandidates = filteredCandidates.filter(
-                (c) => (c.reviewCount && c.reviewCount >= 1) || c.reviewStage === 'Checkpoint Ready' || c.taskStatus?.includes('Completed')
-              );
+            {filteredCandidates.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px', background: '#F8FAFC', borderRadius: '10px', border: '1.5px dashed #CBD5E1', color: '#475569' }}>
+                <Users size={36} color="#6D28D9" style={{ margin: '0 auto 10px auto' }} />
+                <h4 style={{ color: '#0F172A', margin: '0 0 6px 0', fontWeight: 700, fontSize: '15px' }}>No Interns Found</h4>
+                <p style={{ margin: 0, fontSize: '13px' }}>
+                  No interns currently match your filter criteria. Try adjusting the Batch, Role, or Task Number filters above.
+                </p>
+              </div>
+            ) : (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={{ width: '40px', textAlign: 'center' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedCandidateIds.length === filteredCandidates.length && filteredCandidates.length > 0}
+                        onChange={handleToggleSelectAll}
+                        style={{ width: '16px', height: '16px', accentColor: '#6D28D9', cursor: 'pointer' }}
+                        title="Select/Deselect All"
+                      />
+                    </th>
+                    <th>Intern ID</th>
+                    <th>Candidate & Role</th>
+                    <th>Batch</th>
+                    <th>Current Task</th>
+                    <th>Submissions</th>
+                    <th>Reviews & Feedback</th>
+                    <th>Score (%)</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: 'center' }}>HR Approval & Next Task Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCandidates.map((c) => {
+                    const isSelected = selectedCandidateIds.includes(c.id);
+                    const taskNum = c.activeTask?.taskNumber || 1;
+                    const taskTitle = c.activeTask?.title || `Task #${taskNum}`;
+                    const hasSubmissions = Boolean(c.activeTask?.projectUrl || c.activeTask?.githubUrl || c.activeTask?.submissionStatus === 'SUBMITTED');
+                    const isCompleted = c.taskStatus === 'Task Completed' || c.taskStatus === 'Completed';
 
-              if (checkpointCandidates.length === 0) {
-                return (
-                  <div style={{ textAlign: 'center', padding: '36px', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px dashed var(--border-medium)', color: '#475569' }}>
-                    <Award size={36} color="#a855f7" style={{ margin: '0 auto 10px auto' }} />
-                    <h4 style={{ color: '#0F172A', margin: '0 0 6px 0', fontWeight: 700 }}>No Candidates Ready for Final Checkpoint</h4>
-                    <p style={{ margin: 0, fontSize: '13px', maxWidth: '480px', marginInline: 'auto' }}>
-                      Step-by-step review gating active: Only candidates who have received task emails and completed Review 1 & Review 2 evaluation will move into this checkpoint list.
-                    </p>
-                  </div>
-                );
-              }
-
-              return (
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th style={{ width: '40px' }}>Select</th>
-                      <th>Intern ID</th>
-                      <th>Candidate Name</th>
-                      <th>Batch</th>
-                      <th>Calculated Score</th>
-                      <th>Override Final Task Score (%)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {checkpointCandidates.map((c) => {
-                      const isSelected = selectedCandidateIds.includes(c.id);
-                      return (
-                        <tr key={c.id}>
-                          <td>
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() => handleToggleSelectOne(c.id)}
-                              style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
-                            />
-                          </td>
-                          <td><code style={{ fontFamily: 'monospace', color: '#6D28D9', fontWeight: 700 }}>{c.internId}</code></td>
-                          <td style={{ fontWeight: 700, color: '#0F172A', fontSize: '14px' }}>{c.fullName}</td>
-                          <td><span className={styles.badgePurple}>{c.batch}</span></td>
-                          <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
-                            {c.performancePercentage?.toFixed(1)}%
-                          </td>
-                          <td>
+                    return (
+                      <tr key={c.id} style={{ background: isSelected ? '#FAF5FF' : undefined }}>
+                        <td style={{ textAlign: 'center' }}>
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => handleToggleSelectOne(c.id)}
+                            style={{ width: '16px', height: '16px', accentColor: '#6D28D9', cursor: 'pointer' }}
+                          />
+                        </td>
+                        <td>
+                          <code style={{ fontFamily: 'monospace', color: '#6D28D9', fontWeight: 800, fontSize: '13px' }}>
+                            {c.internId || c.candidateId}
+                          </code>
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 700, color: '#0F172A', fontSize: '14px' }}>{c.fullName}</div>
+                          <div style={{ fontSize: '12.5px', color: '#475569', fontWeight: 500 }}>{c.role}</div>
+                          {c.collegeName && <div style={{ fontSize: '11.5px', color: '#64748B' }}>{c.collegeName}</div>}
+                        </td>
+                        <td>
+                          <span className={styles.badgePurple} style={{ fontWeight: 700 }}>{c.batch || 'Batch A'}</span>
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 700, color: '#0F172A', fontSize: '13px' }}>Task #{taskNum}</div>
+                          <div style={{ fontSize: '12px', color: '#475569', maxWidth: '180px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={taskTitle}>
+                            {taskTitle}
+                          </div>
+                        </td>
+                        <td>
+                          {hasSubmissions ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <span className={styles.badgeEmerald} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', width: 'fit-content', fontSize: '11px', padding: '2px 8px' }}>
+                                <CheckCircle2 size={11} /> Submitted
+                              </span>
+                              {c.activeTask?.projectUrl && (
+                                <a
+                                  href={c.activeTask.projectUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  style={{ color: '#2563EB', fontSize: '12px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px', textDecoration: 'underline' }}
+                                >
+                                  <ExternalLink size={11} /> Live Demo
+                                </a>
+                              )}
+                              {c.activeTask?.githubUrl && (
+                                <a
+                                  href={c.activeTask.githubUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  style={{ color: '#475569', fontSize: '12px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px', textDecoration: 'underline' }}
+                                >
+                                  <ExternalLink size={11} /> GitHub Repo
+                                </a>
+                              )}
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 600 }}>
+                              Pending Submission
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 700, color: c.reviewCount >= 2 ? '#059669' : c.reviewCount === 1 ? '#D97706' : '#64748B', fontSize: '12.5px' }}>
+                            {c.reviewCount ? `${c.reviewCount} Review(s) Conducted` : 'Review Pending'}
+                          </div>
+                          {c.activeTask?.reviews && c.activeTask.reviews.length > 0 && (
+                            <div style={{ fontSize: '11.5px', color: '#475569', marginTop: '2px', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={c.activeTask.reviews[c.activeTask.reviews.length - 1].feedback}>
+                              &bull; {c.activeTask.reviews[c.activeTask.reviews.length - 1].feedback}
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <input
                               type="number"
                               min={0}
                               max={100}
-                              placeholder={String(c.performancePercentage || 100)}
-                              value={finalScoreMap[c.id] || ''}
+                              value={finalScoreMap[c.id] !== undefined ? finalScoreMap[c.id] : Math.round(c.performancePercentage || 100)}
                               onChange={(e) => setFinalScoreMap({ ...finalScoreMap, [c.id]: e.target.value })}
-                              className={styles.searchInput}
-                              style={{ width: '100px', height: '32px' }}
+                              style={{
+                                width: '64px',
+                                height: '32px',
+                                padding: '4px 6px',
+                                border: '1.5px solid #CBD5E1',
+                                borderRadius: '6px',
+                                fontSize: '13px',
+                                fontWeight: 700,
+                                color: '#0F172A',
+                                background: '#FFFFFF',
+                                textAlign: 'center',
+                              }}
+                              title="Override candidate performance percentage"
                             />
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              );
-            })()}
-          </div>
+                            <span style={{ fontWeight: 700, color: '#475569', fontSize: '13px' }}>%</span>
+                          </div>
+                        </td>
+                        <td>
+                          {isCompleted ? (
+                            <span className={styles.badgeEmerald} style={{ fontWeight: 700 }}>Completed</span>
+                          ) : c.activeTask?.submissionStatus === 'SUBMITTED' ? (
+                            <span style={{ background: '#EDE9FE', color: '#5B21B6', border: '1px solid #C4B5FD', padding: '3px 8px', borderRadius: '4px', fontSize: '11.5px', fontWeight: 700 }}>Under Review</span>
+                          ) : (
+                            <span className={styles.badgeIndigo} style={{ fontWeight: 700 }}>In Progress</span>
+                          )}
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'inline-flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => executeApproveAndAdvance([c.id], null)}
+                              disabled={completingTask}
+                              className={styles.btnPrimary}
+                              style={{ padding: '5px 10px', fontSize: '12px', fontWeight: 700, background: '#059669', borderColor: '#047857', whiteSpace: 'nowrap' }}
+                              title="Approve task completion and auto-dispatch next sprint task"
+                            >
+                              <CheckCircle2 size={13} />
+                              <span>Approve & Next</span>
+                            </button>
 
-          <button
-            type="button"
-            onClick={handleMarkTasksCompleted}
-            disabled={completingTask || selectedCandidateIds.length === 0}
-            className={styles.btnPrimary}
-          >
-            <CheckCircle2 size={14} />
-            <span>{completingTask ? 'Dispatching Task Completion Certificates & Mails...' : `Approve & Send Task Completion Mail (${selectedCandidateIds.length} Interns)`}</span>
-          </button>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenCustomizeModal(c)}
+                              disabled={completingTask}
+                              className={styles.btnSecondary}
+                              style={{ padding: '5px 10px', fontSize: '12px', fontWeight: 700, color: '#5B21B6', borderColor: '#C4B5FD', background: '#EDE9FE', whiteSpace: 'nowrap' }}
+                              title="Customize next task title, requirements, deadline, and Google Meet room"
+                            >
+                              <Sliders size={13} />
+                              <span>Customize Next</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* MODAL: CUSTOMIZE NEXT TASK CONTENT & DISPATCH                  */}
+      {/* ============================================================== */}
+      {customizeNextTaskModal.open && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalCard} style={{ maxWidth: '780px', maxHeight: '92vh', overflowY: 'auto' }}>
+            <div className={styles.modalHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#EDE9FE', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6D28D9' }}>
+                  <Award size={20} />
+                </div>
+                <div>
+                  <h3 className={styles.modalTitle} style={{ margin: 0, fontSize: '17px', color: '#0F172A', fontWeight: 800 }}>
+                    Approve Task Completion & Customize Next Sprint Task
+                  </h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#475569' }}>
+                    {customizeNextTaskModal.candidates.length === 1
+                      ? `Intern: ${customizeNextTaskModal.candidates[0].fullName} (${customizeNextTaskModal.candidates[0].internId || customizeNextTaskModal.candidates[0].candidateId})`
+                      : `Dispatching next task to ${customizeNextTaskModal.candidates.length} selected interns`}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCustomizeNextTaskModal(prev => ({ ...prev, open: false }))}
+                className={styles.modalClose}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className={styles.modalBody} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Approval & Score Box */}
+              <div style={{ background: '#FAF5FF', border: '1.5px solid #DDD6FE', borderRadius: '8px', padding: '14px 18px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <strong style={{ color: '#5B21B6', fontSize: '14px' }}>Approval & Completion Evaluation</strong>
+                  <span style={{ fontSize: '12.5px', color: '#6D28D9', fontWeight: 700 }}>
+                    Promoting to Task #{customizeNextTaskModal.nextTaskNumber}
+                  </span>
+                </div>
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                    Mentor Feedback & Completion Note
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={customizeNextTaskModal.customNotes}
+                    onChange={(e) => setCustomizeNextTaskModal({ ...customizeNextTaskModal, customNotes: e.target.value })}
+                    style={{ width: '100%', padding: '8px 12px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', background: '#FFFFFF', fontWeight: 600 }}
+                    placeholder="Enter approval praise and evaluation note..."
+                  />
+                </div>
+              </div>
+
+              {/* Next Task Parameters */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                    Next Task Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={customizeNextTaskModal.title}
+                    onChange={(e) => setCustomizeNextTaskModal({ ...customizeNextTaskModal, title: e.target.value })}
+                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13.5px', color: '#0F172A', fontWeight: 600 }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                    Deliverable Requirements & Technical Objectives *
+                  </label>
+                  <textarea
+                    rows={5}
+                    value={customizeNextTaskModal.description}
+                    onChange={(e) => setCustomizeNextTaskModal({ ...customizeNextTaskModal, description: e.target.value })}
+                    style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600, lineHeight: 1.5 }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                      Explanation Call Date *
+                    </label>
+                    <input
+                      type="date"
+                      value={customizeNextTaskModal.explanationDate}
+                      onChange={(e) => setCustomizeNextTaskModal({ ...customizeNextTaskModal, explanationDate: e.target.value })}
+                      style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                      Explanation Call Time *
+                    </label>
+                    <input
+                      type="text"
+                      value={customizeNextTaskModal.explanationTime}
+                      onChange={(e) => setCustomizeNextTaskModal({ ...customizeNextTaskModal, explanationTime: e.target.value })}
+                      style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                      Submission Deadline *
+                    </label>
+                    <input
+                      type="date"
+                      value={customizeNextTaskModal.deadline}
+                      onChange={(e) => setCustomizeNextTaskModal({ ...customizeNextTaskModal, deadline: e.target.value })}
+                      style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                      Google Meet Briefing Room *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setCustomizeNextTaskModal(prev => ({ ...prev, meetLink: generateMeetUrl() }))}
+                      style={{ fontSize: '12px', color: '#6D28D9', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, textDecoration: 'underline' }}
+                    >
+                      Regenerate Meeting Link
+                    </button>
+                  </div>
+                  <input
+                    type="url"
+                    value={customizeNextTaskModal.meetLink}
+                    onChange={(e) => setCustomizeNextTaskModal({ ...customizeNextTaskModal, meetLink: e.target.value })}
+                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.modalFooter} style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', padding: '16px 24px' }}>
+              <button
+                type="button"
+                onClick={() => setCustomizeNextTaskModal(prev => ({ ...prev, open: false }))}
+                className={styles.btnSecondary}
+                style={{ padding: '8px 16px', fontSize: '13px', fontWeight: 600 }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => executeApproveAndAdvance(customizeNextTaskModal.candidates.map(c => c.id), customizeNextTaskModal)}
+                disabled={completingTask}
+                className={styles.btnPrimary}
+                style={{ padding: '8px 20px', fontSize: '13.5px', fontWeight: 700, background: '#6D28D9', borderColor: '#5B21B6' }}
+              >
+                <CheckCircle2 size={15} />
+                <span>{completingTask ? 'Dispatching...' : `Approve & Dispatch Task #${customizeNextTaskModal.nextTaskNumber} Email`}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* MODAL: ADD NEW TECHNICAL TASK TO COHORT                        */}
+      {/* ============================================================== */}
+      {addNewTaskModal.open && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalCard} style={{ maxWidth: '720px', maxHeight: '92vh', overflowY: 'auto' }}>
+            <div className={styles.modalHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#EDE9FE', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6D28D9' }}>
+                  <Plus size={20} />
+                </div>
+                <div>
+                  <h3 className={styles.modalTitle} style={{ margin: 0, fontSize: '17px', color: '#0F172A', fontWeight: 800 }}>
+                    Create & Assign New Technical Sprint Task
+                  </h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#475569' }}>
+                    Assign a new sprint milestone, set deadlines, and dispatch briefing meeting emails.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAddNewTaskModal(prev => ({ ...prev, open: false }))}
+                className={styles.modalClose}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className={styles.modalBody} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                    Target Batch
+                  </label>
+                  <select
+                    value={addNewTaskModal.targetBatch}
+                    onChange={(e) => setAddNewTaskModal({ ...addNewTaskModal, targetBatch: e.target.value })}
+                    style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                  >
+                    <option value="ALL">All Batches</option>
+                    {allBatches.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                    Target Role
+                  </label>
+                  <select
+                    value={addNewTaskModal.targetRole}
+                    onChange={(e) => setAddNewTaskModal({ ...addNewTaskModal, targetRole: e.target.value })}
+                    style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                  >
+                    <option value="ALL">All Roles</option>
+                    <option value="Web Developer">Web Developer Intern</option>
+                    <option value="AI">AI/ML Engineer</option>
+                    <option value="Full Stack">Full Stack Intern</option>
+                    <option value="UI/UX">UI/UX Designer</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                    Task Number
+                  </label>
+                  <select
+                    value={addNewTaskModal.taskNumber}
+                    onChange={(e) => setAddNewTaskModal({ ...addNewTaskModal, taskNumber: parseInt(e.target.value, 10) })}
+                    style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                  >
+                    <option value={1}>Task #1</option>
+                    <option value={2}>Task #2</option>
+                    <option value={3}>Task #3</option>
+                    <option value={4}>Task #4</option>
+                    <option value={5}>Task #5</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                  Task Title *
+                </label>
+                <input
+                  type="text"
+                  value={addNewTaskModal.title}
+                  onChange={(e) => setAddNewTaskModal({ ...addNewTaskModal, title: e.target.value })}
+                  style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13.5px', color: '#0F172A', fontWeight: 600 }}
+                  placeholder="e.g. Full Stack Dashboard Implementation & API Integration"
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                  Task Description & Technical Instructions *
+                </label>
+                <textarea
+                  rows={4}
+                  value={addNewTaskModal.description}
+                  onChange={(e) => setAddNewTaskModal({ ...addNewTaskModal, description: e.target.value })}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600, lineHeight: 1.5 }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                    Explanation Call Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={addNewTaskModal.explanationDate}
+                    onChange={(e) => setAddNewTaskModal({ ...addNewTaskModal, explanationDate: e.target.value })}
+                    style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                    Submission Deadline *
+                  </label>
+                  <input
+                    type="date"
+                    value={addNewTaskModal.deadline}
+                    onChange={(e) => setAddNewTaskModal({ ...addNewTaskModal, deadline: e.target.value })}
+                    style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                    Google Meet Briefing Room *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setAddNewTaskModal(prev => ({ ...prev, meetLink: generateMeetUrl() }))}
+                    style={{ fontSize: '12px', color: '#6D28D9', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, textDecoration: 'underline' }}
+                  >
+                    Regenerate Meeting Link
+                  </button>
+                </div>
+                <input
+                  type="url"
+                  value={addNewTaskModal.meetLink}
+                  onChange={(e) => setAddNewTaskModal({ ...addNewTaskModal, meetLink: e.target.value })}
+                  style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #CBD5E1', borderRadius: '6px', fontSize: '13px', color: '#0F172A', fontWeight: 600 }}
+                />
+              </div>
+            </div>
+
+            <div className={styles.modalFooter} style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', padding: '16px 24px' }}>
+              <button
+                type="button"
+                onClick={() => setAddNewTaskModal(prev => ({ ...prev, open: false }))}
+                className={styles.btnSecondary}
+                style={{ padding: '8px 16px', fontSize: '13px', fontWeight: 600 }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDispatchAddNewTask}
+                disabled={addNewTaskModal.assigning}
+                className={styles.btnPrimary}
+                style={{ padding: '8px 20px', fontSize: '13.5px', fontWeight: 700, background: '#6D28D9', borderColor: '#5B21B6' }}
+              >
+                <Send size={14} />
+                <span>{addNewTaskModal.assigning ? 'Dispatching...' : 'Assign & Dispatch Task Email'}</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

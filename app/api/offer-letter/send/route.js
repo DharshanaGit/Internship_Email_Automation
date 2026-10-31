@@ -53,7 +53,14 @@ export async function POST(request) {
     if (candidateIds && Array.isArray(candidateIds) && candidateIds.length > 0) {
       try {
         targets = await prisma.candidate.findMany({
-          where: { id: { in: candidateIds } },
+          where: {
+            OR: [
+              { id: { in: candidateIds } },
+              { candidateId: { in: candidateIds } },
+              { internId: { in: candidateIds } },
+              { email: { in: candidateIds.map(x => String(x).toLowerCase().trim()) } },
+            ],
+          },
         });
       } catch (dbErr) {
         console.warn('Lookup candidateIds fallback:', dbErr.message);

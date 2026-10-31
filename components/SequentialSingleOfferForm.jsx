@@ -236,6 +236,11 @@ export default function SequentialSingleOfferForm({
     setSelectedCandidateId(candId);
     const cand = candidates.find((c) => c.id === candId || c.candidateId === candId || c.internId === candId);
     if (cand) {
+      if (cand.offerAcceptanceToken) {
+        setPortalToken(cand.offerAcceptanceToken);
+      } else {
+        setPortalToken(cand.internId || cand.candidateId || cand.id);
+      }
       const role = cand.role || 'Web Developer Intern';
       setFormData((prev) => ({
         ...prev,
@@ -1298,17 +1303,17 @@ www.shortfundly.com`;
 
           <div className={styles.previewBox}>
             {previewTab === 'email' ? (
-              <div style={{ color: '#334155' }}>
-                <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', padding: '12px 16px', borderRadius: '6px', marginBottom: '16px', fontSize: '13px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                      <div><strong>To:</strong> {formData.email} ({formData.fullName})</div>
-                      {formData.cc && <div><strong>CC:</strong> {formData.cc}</div>}
-                      <div><strong>Subject:</strong> {renderJinja(formData.customSubject || activeTemplate?.subject || 'Official Internship Offer from Shortfundly - {{candidateName}}', previewContext)}</div>
-                      <div><strong>Intern ID:</strong> <code style={{ color: '#6D28D9', fontWeight: 700 }}>{formData.internId}</code></div>
-                      <div><strong>Expiration Deadline:</strong> {formData.deadline ? new Date(formData.deadline).toLocaleString() : '3 Days'}</div>
+              <div style={{ color: '#0F172A' }}>
+                <div style={{ background: '#FAF5FF', border: '2px solid #DDD6FE', padding: '16px 20px', borderRadius: '12px', marginBottom: '18px', fontSize: '13.5px', boxShadow: '0 2px 8px rgba(109, 40, 217, 0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                    <div style={{ color: '#0F172A', lineHeight: '1.7' }}>
+                      <div><strong style={{ color: '#0F172A' }}>To:</strong> <span style={{ color: '#1E293B', fontWeight: 700 }}>{formData.email} ({formData.fullName})</span></div>
+                      {formData.cc && <div><strong style={{ color: '#0F172A' }}>CC:</strong> <span style={{ color: '#1E293B', fontWeight: 600 }}>{formData.cc}</span></div>}
+                      <div><strong style={{ color: '#0F172A' }}>Subject:</strong> <span style={{ color: '#1E293B', fontWeight: 700 }}>{renderJinja(formData.customSubject || activeTemplate?.subject || 'Official Internship Offer from Shortfundly - {{candidateName}}', previewContext)}</span></div>
+                      <div><strong style={{ color: '#0F172A' }}>Intern ID:</strong> <code style={{ color: '#6D28D9', fontWeight: 800, fontSize: '13.5px', background: '#EDE9FE', padding: '2px 8px', borderRadius: '4px' }}>{formData.internId}</code></div>
+                      <div><strong style={{ color: '#0F172A' }}>Expiration Deadline:</strong> <span style={{ color: '#1E293B', fontWeight: 600 }}>{formData.deadline ? new Date(formData.deadline).toLocaleString() : '3 Days'}</span></div>
                       {attachedFiles.length > 0 && (
-                        <div><strong>Attached Files:</strong> <span style={{ color: '#6D28D9' }}>{attachedFiles.length} file(s) ({attachedFiles.map(f => f.name).join(', ')})</span></div>
+                        <div><strong style={{ color: '#0F172A' }}>Attached Files:</strong> <span style={{ color: '#6D28D9', fontWeight: 700 }}>{attachedFiles.length} file(s) ({attachedFiles.map(f => f.name).join(', ')})</span></div>
                       )}
                     </div>
                     <button
@@ -1317,15 +1322,17 @@ www.shortfundly.com`;
                         setPreviewTab('pdf');
                         loadPdfPreview();
                       }}
-                      style={{ background: 'rgba(168, 85, 247, 0.15)', border: '1px solid #a855f7', color: '#6D28D9', borderRadius: '4px', padding: '5px 12px', fontSize: '12.5px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap', fontWeight: 600 }}
+                      style={{ background: '#EDE9FE', border: '1.5px solid #C4B5FD', color: '#5B21B6', borderRadius: '6px', padding: '6px 14px', fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', fontWeight: 700 }}
                     >
-                      <FileText size={12} />
+                      <FileText size={14} />
                       <span>Switch to PDF Preview &rarr;</span>
                     </button>
                   </div>
-                  <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px solid var(--border-default)', wordBreak: 'break-all', color: '#475569', fontSize: '13px' }}>
-                    <Link2 size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
-                    Generated Candidate Portal URL: <span style={{ color: '#38bdf8', fontWeight: 600 }}>{previewContext.responseUrl}</span>
+                  <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1.5px solid #E2E8F0', wordBreak: 'break-all', color: '#0F172A', fontSize: '13.5px' }}>
+                    <strong style={{ color: '#475569' }}><Link2 size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />Generated Candidate Portal URL:</strong>
+                    <div style={{ marginTop: '6px', background: '#FFFFFF', border: '1.5px solid #C4B5FD', padding: '6px 12px', borderRadius: '6px', color: '#6D28D9', fontWeight: 800 }}>
+                      {previewContext.responseUrl}
+                    </div>
                   </div>
                 </div>
 

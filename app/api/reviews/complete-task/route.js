@@ -9,7 +9,7 @@ import { getAppBaseUrl } from '@/lib/offerService.js';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { candidateIds, finalScoreMap = {}, customNotes } = body;
+    const { candidateIds, finalScoreMap = {}, customNotes, customNextTask = null } = body;
 
     if (!Array.isArray(candidateIds) || candidateIds.length === 0) {
       return NextResponse.json({ success: false, error: 'Please select candidates to complete the milestone task.' }, { status: 400 });
@@ -124,7 +124,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       let nextTaskTriggerResult = null;
       try {
         const baseUrl = getAppBaseUrl();
-        nextTaskTriggerResult = await triggerNextAutomatedTask(candidate.id, taskNumber, baseUrl);
+        nextTaskTriggerResult = await triggerNextAutomatedTask(candidate.id, taskNumber, baseUrl, customNextTask);
       } catch (triggerErr) {
         console.error(`Error triggering next task for ${candidate.fullName}:`, triggerErr);
       }
