@@ -199,7 +199,7 @@ export default function BatchDragDropManager({
                 maxHeight: '600px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid #1c1c21', paddingBottom: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid var(--border-default)', paddingBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <strong style={{ color: '#ffffff', fontSize: '14px' }}>{bName}</strong>
                   <span className={styles.badgePurple} style={{ fontSize: '11px' }}>
@@ -222,7 +222,7 @@ export default function BatchDragDropManager({
               {/* Candidates in this batch */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
                 {batchCandidates.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '30px 10px', color: '#71717a', fontSize: '12px', border: '1px dashed #232328', borderRadius: '8px' }}>
+                  <div style={{ textAlign: 'center', padding: '30px 10px', color: '#71717a', fontSize: '12px', border: '1px dashed var(--border-medium)', borderRadius: '8px' }}>
                     Drop interns here to assign to {bName}
                   </div>
                 ) : (

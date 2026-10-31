@@ -1419,8 +1419,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           alignItems: 'center',
                           gap: '8px',
                           transition: 'all 0.15s ease',
-                          background: isActive ? 'rgba(56, 189, 248, 0.15)' : '#14141c',
-                          color: isActive ? '#38bdf8' : '#cbd5e1',
+                          background: isActive ? 'var(--accent-purple-light)' : 'var(--bg-surface-elevated)',
+                          color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
                           border: isActive ? '1px solid #38bdf8' : '1px solid #262632',
                         }}
                       >
@@ -2586,9 +2586,9 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           flex: 1,
                           padding: '8px 12px',
                           borderRadius: '6px',
-                          border: reviewTriggerModal.meetMode === 'BATCH' ? '1px solid #a855f7' : '1px solid #232328',
-                          background: reviewTriggerModal.meetMode === 'BATCH' ? 'rgba(168, 85, 247, 0.15)' : '#09090b',
-                          color: reviewTriggerModal.meetMode === 'BATCH' ? '#ffffff' : '#94a3b8',
+                          border: reviewTriggerModal.meetMode === 'BATCH' ? '1px solid var(--accent-primary)' : '1px solid var(--border-default)',
+                          background: reviewTriggerModal.meetMode === 'BATCH' ? 'var(--accent-purple-light)' : 'var(--bg-surface)',
+                          color: reviewTriggerModal.meetMode === 'BATCH' ? 'var(--accent-purple-text)' : 'var(--text-muted)',
                           fontSize: '12px',
                           fontWeight: 600,
                           cursor: 'pointer',
@@ -2604,9 +2604,9 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           flex: 1,
                           padding: '8px 12px',
                           borderRadius: '6px',
-                          border: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? '1px solid #a855f7' : '1px solid #232328',
-                          background: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? 'rgba(168, 85, 247, 0.15)' : '#09090b',
-                          color: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? '#ffffff' : '#94a3b8',
+                          border: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? '1px solid var(--accent-primary)' : '1px solid var(--border-default)',
+                          background: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? 'var(--accent-purple-light)' : 'var(--bg-surface)',
+                          color: reviewTriggerModal.meetMode === 'INDIVIDUAL' ? 'var(--accent-purple-text)' : 'var(--text-muted)',
                           fontSize: '12px',
                           fontWeight: 600,
                           cursor: 'pointer',
@@ -2711,9 +2711,9 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   fontSize: '12.5px',
                   fontWeight: 700,
                   cursor: 'pointer',
-                  border: assignMode === 'BULK' ? '1px solid #a855f7' : '1px solid #27272a',
-                  background: assignMode === 'BULK' ? 'rgba(168, 85, 247, 0.18)' : '#0c0c0e',
-                  color: assignMode === 'BULK' ? '#ffffff' : '#94a3b8',
+                  border: assignMode === 'BULK' ? '1px solid var(--accent-primary)' : '1px solid var(--border-default)',
+                  background: assignMode === 'BULK' ? 'var(--accent-purple-light)' : 'var(--bg-surface)',
+                  color: assignMode === 'BULK' ? 'var(--accent-purple-text)' : 'var(--text-muted)',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -2734,9 +2734,9 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   fontSize: '12.5px',
                   fontWeight: 700,
                   cursor: 'pointer',
-                  border: assignMode === 'INDIVIDUAL' ? '1px solid #a855f7' : '1px solid #27272a',
-                  background: assignMode === 'INDIVIDUAL' ? 'rgba(168, 85, 247, 0.18)' : '#0c0c0e',
-                  color: assignMode === 'INDIVIDUAL' ? '#ffffff' : '#94a3b8',
+                  border: assignMode === 'INDIVIDUAL' ? '1px solid var(--accent-primary)' : '1px solid var(--border-default)',
+                  background: assignMode === 'INDIVIDUAL' ? 'var(--accent-purple-light)' : 'var(--bg-surface)',
+                  color: assignMode === 'INDIVIDUAL' ? 'var(--accent-purple-text)' : 'var(--text-muted)',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -2921,7 +2921,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           }}
                         >
                           {/* Candidate Identity Header */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1c1c21', paddingBottom: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-default)', paddingBottom: '8px' }}>
                             <div>
                               <strong style={{ color: 'var(--text-primary)', fontSize: '13.5px' }}>{cand?.fullName || 'Intern'}</strong>
                               <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '8px' }}>

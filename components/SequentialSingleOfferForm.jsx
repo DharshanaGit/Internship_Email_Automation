@@ -1323,7 +1323,7 @@ www.shortfundly.com`;
                       <span>Switch to PDF Preview &rarr;</span>
                     </button>
                   </div>
-                  <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px solid #27272a', wordBreak: 'break-all', color: '#94a3b8', fontSize: '11.5px' }}>
+                  <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px solid var(--border-default)', wordBreak: 'break-all', color: '#94a3b8', fontSize: '11.5px' }}>
                     <Link2 size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
                     Generated Candidate Portal URL: <span style={{ color: '#38bdf8', fontWeight: 600 }}>{previewContext.responseUrl}</span>
                   </div>

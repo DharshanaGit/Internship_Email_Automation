@@ -849,7 +849,7 @@ export default function ReviewDashboardView({
           </div>
 
           {/* Candidates Selection Table in Schedule Milestone Review */}
-          <div style={{ marginTop: '24px', borderTop: '1px solid #232328', paddingTop: '20px' }}>
+          <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-default)', paddingTop: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
               <div>
                 <h4 style={{ margin: '0 0 4px 0', fontSize: '14.5px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1059,7 +1059,7 @@ export default function ReviewDashboardView({
 
           {/* UPLOADED EXCEL/CSV INTERNS DETAILS PREVIEW TABLE */}
           {feedbackRows.length > 0 && (
-            <div style={{ marginTop: '24px', borderTop: '1px solid #232328', paddingTop: '20px' }}>
+            <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-default)', paddingTop: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
                   <h4 style={{ margin: '0 0 4px 0', fontSize: '14.5px', color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1078,7 +1078,7 @@ export default function ReviewDashboardView({
                       setFeedbackRows([]);
                       showToast?.('Cleared uploaded file records.', 'info');
                     }}
-                    style={{ background: '#27272a', border: '1px solid #3f3f46', color: '#f87171', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                    style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', color: '#f87171', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
                   >
                     Clear / Re-upload
                   </button>
@@ -1159,7 +1159,7 @@ export default function ReviewDashboardView({
 
           {/* When no file is uploaded yet: Show current platform candidates table */}
           {feedbackRows.length === 0 && (
-            <div style={{ marginTop: '24px', borderTop: '1px solid #232328', paddingTop: '20px' }}>
+            <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-default)', paddingTop: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
                   <h4 style={{ margin: '0 0 4px 0', fontSize: '14.5px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1260,7 +1260,7 @@ export default function ReviewDashboardView({
 
               if (checkpointCandidates.length === 0) {
                 return (
-                  <div style={{ textAlign: 'center', padding: '36px', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px dashed #27272a', color: '#94a3b8' }}>
+                  <div style={{ textAlign: 'center', padding: '36px', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px dashed var(--border-medium)', color: '#94a3b8' }}>
                     <Award size={36} color="#a855f7" style={{ margin: '0 auto 10px auto' }} />
                     <h4 style={{ color: '#ffffff', margin: '0 0 6px 0' }}>No Candidates Ready for Final Checkpoint</h4>
                     <p style={{ margin: 0, fontSize: '13px', maxWidth: '480px', marginInline: 'auto' }}>

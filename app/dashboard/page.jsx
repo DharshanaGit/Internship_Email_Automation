@@ -1600,13 +1600,13 @@ export default function DashboardPage() {
             }}
             title="View Operational Persona Profile"
           >
-            <UserCheck size={14} style={{ color: '#38bdf8' }} />
-            <span style={{ color: '#f8fafc', fontWeight: 600 }}>View Profile</span>
+            <UserCheck size={14} style={{ color: '#6D28D9' }} />
+            <span style={{ color: '#0F172A', fontWeight: 600 }}>View Profile</span>
           </button>
 
           <div className={styles.systemBadge}>
             <span className={styles.beaconDot} />
-            <span style={{ color: '#c084fc', fontWeight: 600 }}>Mainnet • PostgreSQL Pooled • Google SMTP Active</span>
+            <span style={{ color: '#065F46', fontWeight: 600 }}>Mainnet &bull; PostgreSQL Pooled &bull; Google SMTP Active</span>
           </div>
 
           {/* Real-time Queue Status Indicator */}
@@ -1636,7 +1636,7 @@ export default function DashboardPage() {
           <div className={styles.roleSelectWrapper} style={{ cursor: 'default' }} title="Role switching requires signing out">
             <Shield size={14} style={{ color: '#a855f7' }} />
             <span className={styles.roleLabel}>Role:</span>
-            <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '12px' }}>{adminUser.role}</span>
+            <span style={{ color: '#0F172A', fontWeight: 700, fontSize: '12px' }}>{adminUser.role}</span>
           </div>
 
           <div className={styles.userPill}>
@@ -2048,8 +2048,8 @@ export default function DashboardPage() {
                       gap: '10px',
                       padding: '10px 16px',
                       background: 'var(--bg-surface)',
-                      borderTop: '1px solid #232328',
-                      borderBottom: '1px solid #232328',
+                      borderTop: '1px solid var(--border-default)',
+                      borderBottom: '1px solid var(--border-default)',
                       fontSize: '12px',
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
@@ -2374,7 +2374,7 @@ export default function DashboardPage() {
 
                         {/* Display Attached Files & Banner */}
                         {(bulkAttachments.length > 0 || bulkBannerImage) && (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', paddingTop: '8px', borderTop: '1px dashed #27272a' }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', paddingTop: '8px', borderTop: '1px dashed var(--border-medium)' }}>
                             {bulkBannerImage && (
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '4px 10px', borderRadius: '6px', fontSize: '11.5px', color: '#065f46' }}>
                                 <ImageIcon size={13} />

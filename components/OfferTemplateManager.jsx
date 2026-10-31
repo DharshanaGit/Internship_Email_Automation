@@ -288,7 +288,7 @@ Shortfundly`,
                     fontSize: '12px',
                     fontWeight: 600,
                     background: activeTab === 'editor' ? 'rgba(168, 85, 247, 0.25)' : '#141417',
-                    border: `1px solid ${activeTab === 'editor' ? '#a855f7' : '#27272a'}`,
+                    border: `1px solid ${activeTab === 'editor' ? 'var(--accent-primary)' : 'var(--border-default)'}`,
                     color: activeTab === 'editor' ? '#ffffff' : '#94a3b8',
                     cursor: 'pointer',
                   }}
@@ -304,7 +304,7 @@ Shortfundly`,
                     fontSize: '12px',
                     fontWeight: 600,
                     background: activeTab === 'preview' ? 'rgba(168, 85, 247, 0.25)' : '#141417',
-                    border: `1px solid ${activeTab === 'preview' ? '#a855f7' : '#27272a'}`,
+                    border: `1px solid ${activeTab === 'preview' ? 'var(--accent-primary)' : 'var(--border-default)'}`,
                     color: activeTab === 'preview' ? '#ffffff' : '#94a3b8',
                     cursor: 'pointer',
                     display: 'inline-flex',
@@ -441,7 +441,7 @@ Shortfundly`,
                 /* LIVE PREVIEW TAB */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {/* Sub-tab switcher */}
-                  <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid #27272a', paddingBottom: '10px' }}>
+                  <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid var(--border-default)', paddingBottom: '10px' }}>
                     <button
                       type="button"
                       onClick={() => setPreviewSubTab('email')}
@@ -451,7 +451,7 @@ Shortfundly`,
                         fontSize: '12px',
                         fontWeight: 600,
                         background: previewSubTab === 'email' ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
-                        border: `1px solid ${previewSubTab === 'email' ? '#a855f7' : '#27272a'}`,
+                        border: `1px solid ${previewSubTab === 'email' ? 'var(--accent-primary)' : 'var(--border-default)'}`,
                         color: previewSubTab === 'email' ? '#ffffff' : '#94a3b8',
                         cursor: 'pointer',
                         display: 'inline-flex',
@@ -472,7 +472,7 @@ Shortfundly`,
                         fontSize: '12px',
                         fontWeight: 600,
                         background: previewSubTab === 'pdf' ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
-                        border: `1px solid ${previewSubTab === 'pdf' ? '#a855f7' : '#27272a'}`,
+                        border: `1px solid ${previewSubTab === 'pdf' ? 'var(--accent-primary)' : 'var(--border-default)'}`,
                         color: previewSubTab === 'pdf' ? '#ffffff' : '#94a3b8',
                         cursor: 'pointer',
                         display: 'inline-flex',
@@ -493,7 +493,7 @@ Shortfundly`,
                         <div><strong>From:</strong> Shortfundly HR Team &lt;hr@shortfundly.com&gt;</div>
                         <div><strong>To:</strong> {samplePreviewContext.candidateName} &lt;rahul.sharma@example.com&gt;</div>
                         <div><strong>Subject:</strong> {renderJinja(editingTemplate.subject, samplePreviewContext)}</div>
-                        <div style={{ display: 'flex', gap: '16px', marginTop: '4px', paddingTop: '6px', borderTop: '1px solid #232328' }}>
+                        <div style={{ display: 'flex', gap: '16px', marginTop: '4px', paddingTop: '6px', borderTop: '1px solid var(--border-default)' }}>
                           <div><strong>Intern ID:</strong> <code style={{ color: '#c084fc' }}>{samplePreviewContext.internId}</code></div>
                           <div><strong>Expiration Deadline:</strong> <span style={{ color: '#fbbf24' }}>{samplePreviewContext.deadline}</span></div>
                         </div>
