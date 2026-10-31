@@ -86,12 +86,13 @@ export default function TaskAssignmentView({
   });
   const [dispatching, setDispatching] = useState(false);
 
-  // --- SUBTAB: TASK AUTOMATION PIPELINE (JOINING TO END DATE) ---
-  const [selectedAutoCandidateId, setSelectedAutoCandidateId] = useState('');
-  const [autoPipelineData, setAutoPipelineData] = useState(null);
-  const [isAutoLoading, setIsAutoLoading] = useState(false);
-  const [isAutoSaving, setIsAutoSaving] = useState(false);
-  const [autoCustomTaskCount, setAutoCustomTaskCount] = useState(0);
+  // --- SUBTAB: BATCH-WISE ROLE-BASED TASK AUTOMATION PIPELINE ---
+  const [selectedAutoBatch, setSelectedAutoBatch] = useState('Batch A');
+  const [autoBatchPipelineData, setAutoBatchPipelineData] = useState(null);
+  const [activeRoleTab, setActiveRoleTab] = useState('');
+  const [tasksPerMonthSetting, setTasksPerMonthSetting] = useState(3);
+  const [isBatchAutoLoading, setIsBatchAutoLoading] = useState(false);
+  const [isBatchAutoSaving, setIsBatchAutoSaving] = useState(false);
   const [isTriggeringJoining, setIsTriggeringJoining] = useState(false);
 
   // --- SUBTAB: OVERDUE WARNINGS AUTOMATION & MANUAL CUSTOMIZATION ---
@@ -219,63 +220,82 @@ Shortfundly Media Technologies Pvt. Ltd.`,
     }
   };
 
-  // Load pipeline for a candidate
-  const loadCandidatePipeline = async (candId, count = null) => {
-    if (!candId) return;
+  // Load batch pipeline based on batchName and tasksPerMonth
+  const loadBatchPipeline = async (batchName, perMonth = 3) => {
+    if (!batchName) return;
     try {
-      setIsAutoLoading(true);
-      setSelectedAutoCandidateId(candId);
+      setIsBatchAutoLoading(true);
+      setSelectedAutoBatch(batchName);
       const res = await fetch('/api/tasks/pipeline/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          candidateId: candId,
-          customTaskCount: count || (autoCustomTaskCount > 0 ? autoCustomTaskCount : null),
+          batchName: batchName,
+          tasksPerMonth: parseInt(perMonth, 10) || 3,
         }),
       });
       const data = await res.json();
-      if (data.success && data.singlePipeline) {
-        setAutoPipelineData(data.singlePipeline);
-        setAutoCustomTaskCount(data.singlePipeline.taskCount);
+      if (data.success && data.batchPipeline) {
+        setAutoBatchPipelineData(data.batchPipeline);
+        if (data.batchPipeline.uniqueRoles && data.batchPipeline.uniqueRoles.length > 0) {
+          setActiveRoleTab(prev => (prev && data.batchPipeline.uniqueRoles.includes(prev)) ? prev : data.batchPipeline.uniqueRoles[0]);
+        }
       } else {
-        showToast?.(data.error || 'Failed to generate pipeline', 'error');
+        showToast?.(data.error || 'Failed to generate batch pipeline', 'error');
       }
     } catch (err) {
-      console.error('Error loading pipeline:', err);
-      showToast?.('Error generating pipeline: ' + err.message, 'error');
+      console.error('Error loading batch pipeline:', err);
+      showToast?.('Error generating batch pipeline: ' + err.message, 'error');
     } finally {
-      setIsAutoLoading(false);
+      setIsBatchAutoLoading(false);
     }
   };
 
-  const handleSaveAndActivatePipeline = async () => {
-    if (!autoPipelineData || !autoPipelineData.tasks || autoPipelineData.tasks.length === 0) {
-      showToast?.('No task pipeline generated yet.', 'error');
+  const handleUpdateRoleTaskField = (roleName, taskIndex, field, value) => {
+    if (!autoBatchPipelineData || !autoBatchPipelineData.rolePlans) return;
+    const currentRoleTasks = autoBatchPipelineData.rolePlans[roleName] || [];
+    const updated = [...currentRoleTasks];
+    updated[taskIndex] = {
+      ...updated[taskIndex],
+      [field]: value,
+    };
+    setAutoBatchPipelineData({
+      ...autoBatchPipelineData,
+      rolePlans: {
+        ...autoBatchPipelineData.rolePlans,
+        [roleName]: updated,
+      },
+    });
+  };
+
+  const handleSaveAndAllocateBatchPipeline = async () => {
+    if (!autoBatchPipelineData || !autoBatchPipelineData.rolePlans) {
+      showToast?.('No batch task roadmap generated yet.', 'error');
       return;
     }
     try {
-      setIsAutoSaving(true);
+      setIsBatchAutoSaving(true);
       const res = await fetch('/api/tasks/pipeline/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          candidateId: autoPipelineData.candidateId,
-          tasks: autoPipelineData.tasks,
+          batchName: autoBatchPipelineData.batchName,
+          rolePlans: autoBatchPipelineData.rolePlans,
           autoSendFirstTask: true,
         }),
       });
       const data = await res.json();
       if (data.success) {
-        showToast?.(data.message || 'Automated task pipeline activated!', 'success');
+        showToast?.(data.message || `Pipeline allocated to ${data.candidatesCount} interns in ${autoBatchPipelineData.batchName}!`, 'success');
         onRefresh?.();
-        loadCandidatePipeline(autoPipelineData.candidateId);
+        loadBatchPipeline(autoBatchPipelineData.batchName, tasksPerMonthSetting);
       } else {
-        showToast?.(data.error || 'Failed to save pipeline', 'error');
+        showToast?.(data.error || 'Failed to save batch pipeline', 'error');
       }
     } catch (err) {
       showToast?.(err.message, 'error');
     } finally {
-      setIsAutoSaving(false);
+      setIsBatchAutoSaving(false);
     }
   };
 
@@ -295,19 +315,6 @@ Shortfundly Media Technologies Pvt. Ltd.`,
     } finally {
       setIsTriggeringJoining(false);
     }
-  };
-
-  const handleUpdatePipelineTaskField = (taskIndex, field, value) => {
-    if (!autoPipelineData) return;
-    const updatedTasks = [...autoPipelineData.tasks];
-    updatedTasks[taskIndex] = {
-      ...updatedTasks[taskIndex],
-      [field]: value,
-    };
-    setAutoPipelineData({
-      ...autoPipelineData,
-      tasks: updatedTasks,
-    });
   };
 
 
@@ -920,16 +927,14 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             type="button"
             onClick={() => {
               setSubTab('automation');
-              const targetId = selectedCandidateIds[0] || filteredCandidates[0]?.id || candidates[0]?.id;
-              if (targetId) {
-                loadCandidatePipeline(targetId);
-              }
+              const defaultBatch = (selectedBatch !== 'ALL' ? selectedBatch : null) || allBatches[0] || 'Batch A';
+              loadBatchPipeline(defaultBatch, tasksPerMonthSetting);
             }}
             className={`${styles.subTabBtn} ${subTab === 'automation' ? styles.subTabBtnActive : ''}`}
             style={subTab === 'automation' ? { borderBottom: '2px solid #38bdf8', color: '#38bdf8' } : {}}
           >
             <Zap size={14} color="#38bdf8" />
-            <span>Task Automation (Joining &rarr; End Date)</span>
+            <span>Batch Task Automation (Role-Based)</span>
           </button>
 
           <button
@@ -1174,340 +1179,588 @@ Shortfundly Media Technologies Pvt. Ltd.`;
         </div>
       )}
 
-      {/* --- SUBTAB: TASK AUTOMATION (JOINING TO END DATE ALLOCATION) --- */}
+      {/* --- SUBTAB: BATCH-WISE ROLE-BASED TASK AUTOMATION --- */}
       {subTab === 'automation' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Main Automation Directive Banner */}
-          <div style={{ background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%)', border: '1px solid rgba(56, 189, 248, 0.35)', borderRadius: '12px', padding: '20px 24px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-              <div>
-                <h3 style={{ margin: '0 0 6px 0', fontSize: '17px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Zap size={20} color="#38bdf8" />
-                  <span>Automated Task Allocation Engine (Joining Date &rarr; Ending Date)</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '30px' }}>
+          {/* Main Directive & Automation Banner */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.14) 0%, rgba(59, 130, 246, 0.09) 100%)',
+            border: '1px solid rgba(56, 189, 248, 0.4)',
+            borderRadius: '14px',
+            padding: '24px 28px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '24px', flexWrap: 'wrap' }}>
+              <div style={{ flex: '1', minWidth: '320px' }}>
+                <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Zap size={22} color="#38bdf8" />
+                  <span>Batch-Wise Automated Task Allocation Engine</span>
                 </h3>
-                <p style={{ margin: '0', fontSize: '13px', color: '#94a3b8', maxWidth: '850px', lineHeight: 1.6 }}>
-                  Tasks are automatically calculated and distributed across the intern's tenure from their <strong>Joining Date</strong> to <strong>Ending Date</strong>.
-                  The <strong>first task is automatically dispatched</strong> on or after the candidate's joining date.
-                  HR can customize the start dates, deadlines, tasks, and Google Meet link below, but <strong>sending is fully automated</strong>.
-                  After multiple review cycles when the milestone task is completed, the <strong>next automated task email is triggered instantly</strong>!
+                <p style={{ margin: '0', fontSize: '13.5px', color: '#cbd5e1', lineHeight: 1.65 }}>
+                  Tasks are automatically calculated and assigned for <strong>every intern in the selected batch</strong> based on their assigned role, from their <strong>Joining Date to Ending Date</strong>.
+                  The <strong>first task email is automatically sent on/after the joining date</strong>.
+                  HR can customize the start dates, deadlines, Google Meet room link, and <strong>email mail content</strong> for each role below.
+                  Once completed via mentor reviews, the <strong>next milestone task is triggered and dispatched automatically</strong>!
                 </p>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexShrink: 0 }}>
                 <button
                   type="button"
                   onClick={handleTriggerDueJoiningTasks}
                   disabled={isTriggeringJoining}
                   className={styles.btnSecondary}
-                  style={{ fontSize: '12px', padding: '8px 14px', borderColor: '#38bdf8', color: '#38bdf8' }}
-                  title="Scan for candidates whose joining date is today or past and auto-dispatch Task 1"
+                  style={{
+                    fontSize: '12.5px',
+                    padding: '10px 16px',
+                    borderRadius: '8px',
+                    borderColor: 'rgba(56, 189, 248, 0.5)',
+                    color: '#38bdf8',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                  title="Check and auto-dispatch Task 1 for candidates whose joining date arrived"
                 >
-                  <RefreshCw size={13} className={isTriggeringJoining ? styles.spin : ''} />
+                  <RefreshCw size={14} className={isTriggeringJoining ? styles.spin : ''} />
                   <span>{isTriggeringJoining ? 'Checking...' : 'Dispatch Due Joining Tasks'}</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Intern Selection & Tenure Overview Bar */}
-          <div style={{ background: '#0e0e12', border: '1px solid #232328', borderRadius: '12px', padding: '20px 24px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1.2fr) repeat(4, 1fr)', gap: '16px', alignItems: 'center' }}>
+          {/* Batch Selector & Milestone Velocity Controls */}
+          <div style={{
+            background: '#0d0d12',
+            border: '1px solid #22222b',
+            borderRadius: '14px',
+            padding: '26px 30px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+          }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '22px',
+              alignItems: 'flex-end',
+            }}>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
-                  Select Intern to Configure Pipeline:
+                <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 700, color: '#e2e8f0', marginBottom: '8px' }}>
+                  Target Internship Cohort / Batch:
                 </label>
                 <select
-                  value={selectedAutoCandidateId}
-                  onChange={(e) => loadCandidatePipeline(e.target.value)}
+                  value={selectedAutoBatch}
+                  onChange={(e) => {
+                    const b = e.target.value;
+                    setSelectedAutoBatch(b);
+                    loadBatchPipeline(b, tasksPerMonthSetting);
+                  }}
                   className={styles.selectInput}
-                  style={{ width: '100%', padding: '9px 12px', fontSize: '13px' }}
+                  style={{
+                    width: '100%',
+                    height: '44px',
+                    padding: '0 14px',
+                    borderRadius: '8px',
+                    fontSize: '13.5px',
+                    fontWeight: 600,
+                    background: '#13131b',
+                    borderColor: '#2b2b38',
+                  }}
                 >
-                  <option value="">-- Choose Candidate ({candidates.length} Available) --</option>
-                  {candidates.map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.fullName} ({c.internId || c.candidateId}) &bull; {c.role} [{c.batch || 'Batch A'}]
-                    </option>
-                  ))}
+                  {allBatches.map(bName => {
+                    const count = candidates.filter(c => c.batch === bName).length;
+                    return (
+                      <option key={bName} value={bName}>
+                        {bName} &bull; {count} Interns Enrolled
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
-              {autoPipelineData && (
-                <>
-                  <div style={{ background: '#141419', border: '1px solid #26262b', padding: '10px 14px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', fontWeight: 700 }}>Joining Date</div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#38bdf8', marginTop: '2px' }}>
-                      {autoPipelineData.joiningDate || 'N/A'}
-                    </div>
-                  </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 700, color: '#e2e8f0', marginBottom: '8px' }}>
+                  Milestone Frequency (Tasks / Month):
+                </label>
+                <select
+                  value={tasksPerMonthSetting}
+                  onChange={(e) => {
+                    const perMonth = parseInt(e.target.value, 10);
+                    setTasksPerMonthSetting(perMonth);
+                    loadBatchPipeline(selectedAutoBatch, perMonth);
+                  }}
+                  className={styles.selectInput}
+                  style={{
+                    width: '100%',
+                    height: '44px',
+                    padding: '0 14px',
+                    borderRadius: '8px',
+                    fontSize: '13.5px',
+                    fontWeight: 600,
+                    color: '#38bdf8',
+                    background: '#13131b',
+                    borderColor: '#2b2b38',
+                  }}
+                >
+                  <option value={1}>1 Task / Month (Monthly Milestones)</option>
+                  <option value={2}>2 Tasks / Month (Bi-Weekly Sprints)</option>
+                  <option value={3}>3 Tasks / Month (Recommended - 10-Day Sprints)</option>
+                  <option value={4}>4 Tasks / Month (Weekly Intensive)</option>
+                </select>
+              </div>
 
-                  <div style={{ background: '#141419', border: '1px solid #26262b', padding: '10px 14px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', fontWeight: 700 }}>Ending Date</div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#f43f5e', marginTop: '2px' }}>
-                      {autoPipelineData.endDate || 'N/A'}
-                    </div>
-                  </div>
-
-                  <div style={{ background: '#141419', border: '1px solid #26262b', padding: '10px 14px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', fontWeight: 700 }}>Total Duration</div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#e2e8f0', marginTop: '2px' }}>
-                      {autoPipelineData.totalDays} Days (~{Math.round(autoPipelineData.totalDays / 30)} Mo)
-                    </div>
-                  </div>
-
-                  <div style={{ background: '#141419', border: '1px solid #26262b', padding: '10px 14px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', fontWeight: 700 }}>Pipeline Milestones</div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#34d399', marginTop: '2px' }}>
-                      {autoPipelineData.taskCount} Sprints Allocated
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Task Count Adjustment & Generation Button */}
-            {autoPipelineData && (
-              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #1f1f23', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <label style={{ fontSize: '12.5px', color: '#94a3b8' }}>Tenure Sprints Partition:</label>
-                  <select
-                    value={autoCustomTaskCount || autoPipelineData.taskCount}
-                    onChange={(e) => {
-                      const count = parseInt(e.target.value, 10);
-                      setAutoCustomTaskCount(count);
-                      loadCandidatePipeline(selectedAutoCandidateId, count);
-                    }}
-                    className={styles.selectInput}
-                    style={{ padding: '6px 12px', fontSize: '12.5px' }}
-                  >
-                    <option value={2}>2 Tasks (Bi-Weekly Sprints)</option>
-                    <option value={3}>3 Tasks (Monthly Sprints)</option>
-                    <option value={4}>4 Tasks (Standard 3-Month Pipeline)</option>
-                    <option value={5}>5 Tasks (Extended Sprint Milestones)</option>
-                    <option value={6}>6 Tasks (Intensive Sprint Schedule)</option>
-                  </select>
-                  <span style={{ fontSize: '11.5px', color: '#64748b' }}>
-                    &bull; Each task is allocated ~{autoPipelineData.intervalDays} days
-                  </span>
-                </div>
-
+              <div>
                 <button
                   type="button"
-                  onClick={handleSaveAndActivatePipeline}
-                  disabled={isAutoSaving}
-                  className={styles.btnPrimary}
-                  style={{ background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)', padding: '9px 20px', fontSize: '13px' }}
+                  onClick={() => loadBatchPipeline(selectedAutoBatch, tasksPerMonthSetting)}
+                  disabled={isBatchAutoLoading}
+                  className={styles.btnSecondary}
+                  style={{
+                    width: '100%',
+                    height: '44px',
+                    padding: '0 18px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                  }}
                 >
-                  <Zap size={14} />
-                  <span>{isAutoSaving ? 'Activating Pipeline...' : 'Save & Activate Automated Pipeline'}</span>
+                  <RefreshCw size={14} className={isBatchAutoLoading ? styles.spin : ''} />
+                  <span>Recalculate Batch Sprints</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Batch Metrics Cards Grid */}
+            {autoBatchPipelineData && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+                gap: '16px',
+                marginTop: '4px',
+              }}>
+                <div style={{ background: '#121218', border: '1px solid #23232c', padding: '16px 18px', borderRadius: '10px' }}>
+                  <div style={{ fontSize: '11.5px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                    Enrolled Interns
+                  </div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff', marginTop: '6px' }}>
+                    {autoBatchPipelineData.totalCandidates} Candidates
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: '#38bdf8', marginTop: '3px' }}>
+                    In {autoBatchPipelineData.batchName}
+                  </div>
+                </div>
+
+                <div style={{ background: '#121218', border: '1px solid #23232c', padding: '16px 18px', borderRadius: '10px' }}>
+                  <div style={{ fontSize: '11.5px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                    Tenure Window
+                  </div>
+                  <div style={{ fontSize: '14.5px', fontWeight: 700, color: '#38bdf8', marginTop: '6px' }}>
+                    {autoBatchPipelineData.joiningDate} &rarr; {autoBatchPipelineData.endDate}
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: '#71717a', marginTop: '3px' }}>
+                    Joining to End Date
+                  </div>
+                </div>
+
+                <div style={{ background: '#121218', border: '1px solid #23232c', padding: '16px 18px', borderRadius: '10px' }}>
+                  <div style={{ fontSize: '11.5px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                    Duration & Velocity
+                  </div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#a855f7', marginTop: '6px' }}>
+                    {autoBatchPipelineData.durationMonths} Months ({autoBatchPipelineData.totalDays} Days)
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: '#71717a', marginTop: '3px' }}>
+                    Rate: {autoBatchPipelineData.tasksPerMonth} tasks / month
+                  </div>
+                </div>
+
+                <div style={{ background: '#121218', border: '1px solid #23232c', padding: '16px 18px', borderRadius: '10px' }}>
+                  <div style={{ fontSize: '11.5px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                    Allocated Sprints
+                  </div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#34d399', marginTop: '6px' }}>
+                    {autoBatchPipelineData.totalTasks} Tasks Per Intern
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: '#71717a', marginTop: '3px' }}>
+                    ~{autoBatchPipelineData.intervalDays} days per sprint
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Role Breakdown Tabs */}
+            {autoBatchPipelineData && autoBatchPipelineData.uniqueRoles && (
+              <div style={{ paddingTop: '8px', borderTop: '1px solid #1c1c24' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Role Roadmaps in {autoBatchPipelineData.batchName} (Click to Review & Customize):
+                </div>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  {autoBatchPipelineData.uniqueRoles.map(rName => {
+                    const count = autoBatchPipelineData.rolesSummary?.[rName] || 0;
+                    const isActive = activeRoleTab === rName;
+                    return (
+                      <button
+                        key={rName}
+                        type="button"
+                        onClick={() => setActiveRoleTab(rName)}
+                        style={{
+                          padding: '9px 18px',
+                          borderRadius: '8px',
+                          fontSize: '12.5px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          transition: 'all 0.15s ease',
+                          background: isActive ? 'rgba(56, 189, 248, 0.15)' : '#14141c',
+                          color: isActive ? '#38bdf8' : '#cbd5e1',
+                          border: isActive ? '1px solid #38bdf8' : '1px solid #262632',
+                        }}
+                      >
+                        <span>{rName}</span>
+                        <span style={{
+                          background: isActive ? '#38bdf8' : '#272736',
+                          color: isActive ? '#020617' : '#94a3b8',
+                          padding: '2px 7px',
+                          borderRadius: '10px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                        }}>
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
 
-          {/* Timeline Cards for Each Automated Task */}
-          {isAutoLoading ? (
+          {/* Sprints Sequence & Mail Customization For Selected Role */}
+          {isBatchAutoLoading ? (
             <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
-              <RefreshCw size={24} className={styles.spin} style={{ margin: '0 auto 12px auto' }} />
-              <div>Calculating tenure intervals & generating role-based task roadmap...</div>
+              <RefreshCw size={26} className={styles.spin} style={{ margin: '0 auto 14px auto' }} />
+              <div style={{ fontSize: '14px' }}>Calculating batch tenure intervals & generating role roadmaps...</div>
             </div>
-          ) : autoPipelineData && autoPipelineData.tasks ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>
-                  Automated Sprint Sequence for {autoPipelineData.fullName} ({autoPipelineData.role})
-                </div>
-                <div style={{ fontSize: '12px', color: '#38bdf8' }}>
-                  HR only customizes values below &bull; Dispatching is 100% automated
-                </div>
-              </div>
-
-              {autoPipelineData.tasks.map((task, idx) => {
-                const isFirstTask = idx === 0;
-                return (
-                  <div
-                    key={idx}
-                    style={{
-                      background: '#0c0c0e',
-                      border: isFirstTask ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid #1f1f24',
-                      borderRadius: '10px',
-                      padding: '18px 20px',
-                      position: 'relative',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid #1a1a20', paddingBottom: '10px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{
-                          width: '26px',
-                          height: '26px',
-                          borderRadius: '50%',
-                          background: isFirstTask ? 'rgba(56, 189, 248, 0.2)' : 'rgba(168, 85, 247, 0.15)',
-                          color: isFirstTask ? '#38bdf8' : '#c084fc',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '12px',
-                          fontWeight: 700,
-                        }}>
-                          {task.taskNumber}
-                        </span>
-                        <strong style={{ fontSize: '14px', color: '#ffffff' }}>
-                          Sprint Milestone #{task.taskNumber}: {task.taskId}
-                        </strong>
-                      </div>
-
-                      <div>
-                        {isFirstTask ? (
-                          <span className={styles.badgeCyan} style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                            <Zap size={11} /> Auto-dispatches on Joining Date ({task.explanationDate})
-                          </span>
-                        ) : (
-                          <span className={styles.badgePurple} style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                            <Clock size={11} /> Auto-dispatches after Task #{task.taskNumber - 1} Completion Mail
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Customizable Inputs Grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginBottom: '12px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
-                          Explanation / Start Date:
-                        </label>
-                        <input
-                          type="date"
-                          value={task.explanationDate || ''}
-                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'explanationDate', e.target.value)}
-                          className={styles.searchInput}
-                          style={{ fontSize: '12px', padding: '6px 10px' }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
-                          Explanation Time:
-                        </label>
-                        <input
-                          type="text"
-                          value={task.explanationTime || '11:00 AM IST'}
-                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'explanationTime', e.target.value)}
-                          className={styles.searchInput}
-                          style={{ fontSize: '12px', padding: '6px 10px' }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
-                          Submission Deadline:
-                        </label>
-                        <input
-                          type="date"
-                          value={task.deadline || ''}
-                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'deadline', e.target.value)}
-                          className={styles.searchInput}
-                          style={{ fontSize: '12px', padding: '6px 10px' }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
-                          Review Milestone Date:
-                        </label>
-                        <input
-                          type="date"
-                          value={task.reviewDate || ''}
-                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'reviewDate', e.target.value)}
-                          className={styles.searchInput}
-                          style={{ fontSize: '12px', padding: '6px 10px' }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Google Meet Link with Regeneration */}
-                    <div style={{ marginBottom: '12px' }}>
-                      <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
-                        Google Meet Briefing & Review Link:
-                      </label>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <input
-                          type="text"
-                          value={task.meetLink || ''}
-                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'meetLink', e.target.value)}
-                          className={styles.searchInput}
-                          style={{ fontSize: '12px', padding: '6px 10px', fontFamily: 'monospace', color: '#38bdf8' }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleUpdatePipelineTaskField(idx, 'meetLink', generateClientMeetUrl())}
-                          className={styles.btnSecondary}
-                          style={{ fontSize: '11px', padding: '5px 10px', whiteSpace: 'nowrap' }}
-                        >
-                          Generate Link
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Task Title & Objective Customization */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
-                          Task Title:
-                        </label>
-                        <input
-                          type="text"
-                          value={task.title || ''}
-                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'title', e.target.value)}
-                          className={styles.searchInput}
-                          style={{ fontSize: '12.5px', fontWeight: 600 }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
-                          Objective & Technical Deliverables:
-                        </label>
-                        <textarea
-                          rows={3}
-                          value={task.objective || ''}
-                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'objective', e.target.value)}
-                          className={styles.searchInput}
-                          style={{ height: 'auto', fontSize: '12px', lineHeight: 1.5 }}
-                        />
-                      </div>
-                    </div>
+          ) : autoBatchPipelineData && autoBatchPipelineData.rolePlans && activeRoleTab ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 700, color: '#ffffff' }}>
+                    Customizing Sprints & Mail Templates for: <span style={{ color: '#38bdf8' }}>{activeRoleTab}</span>
+                  </h4>
+                  <div style={{ fontSize: '12.5px', color: '#94a3b8' }}>
+                    Applies to all {autoBatchPipelineData.rolesSummary?.[activeRoleTab] || 0} interns enrolled under this role in {autoBatchPipelineData.batchName}.
                   </div>
-                );
-              })}
+                </div>
 
-              <div style={{ textAlign: 'right', marginTop: '10px' }}>
                 <button
                   type="button"
-                  onClick={handleSaveAndActivatePipeline}
-                  disabled={isAutoSaving}
+                  onClick={handleSaveAndAllocateBatchPipeline}
+                  disabled={isBatchAutoSaving}
                   className={styles.btnPrimary}
-                  style={{ background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)', padding: '10px 24px', fontSize: '13.5px' }}
+                  style={{
+                    background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+                    padding: '11px 24px',
+                    fontSize: '13.5px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
                 >
                   <Zap size={15} />
-                  <span>{isAutoSaving ? 'Activating Pipeline...' : 'Save & Activate Automated Pipeline'}</span>
+                  <span>{isBatchAutoSaving ? 'Allocating to Batch...' : `Save & Allocate to Batch (${autoBatchPipelineData.totalCandidates} Interns)`}</span>
+                </button>
+              </div>
+
+              {/* Task Cards List */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {(autoBatchPipelineData.rolePlans[activeRoleTab] || []).map((task, idx) => {
+                  const isFirstTask = idx === 0;
+                  return (
+                    <div
+                      key={idx}
+                      style={{
+                        background: '#0d0d12',
+                        border: isFirstTask ? '1px solid rgba(56, 189, 248, 0.45)' : '1px solid #202028',
+                        borderRadius: '12px',
+                        padding: '24px 28px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '18px',
+                      }}
+                    >
+                      {/* Task Header & Auto Dispatch Badge */}
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderBottom: '1px solid #1c1c24',
+                        paddingBottom: '14px',
+                        flexWrap: 'wrap',
+                        gap: '10px',
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <span style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            background: isFirstTask ? 'rgba(56, 189, 248, 0.2)' : 'rgba(168, 85, 247, 0.18)',
+                            color: isFirstTask ? '#38bdf8' : '#c084fc',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '13px',
+                            fontWeight: 800,
+                          }}>
+                            {task.taskNumber}
+                          </span>
+                          <strong style={{ fontSize: '15px', color: '#ffffff' }}>
+                            Milestone Sprint #{task.taskNumber}: {task.taskId}
+                          </strong>
+                        </div>
+
+                        <div>
+                          {isFirstTask ? (
+                            <span className={styles.badgeCyan} style={{ fontSize: '11.5px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                              <Zap size={12} /> Auto-Dispatches After Joining Date ({task.explanationDate})
+                            </span>
+                          ) : (
+                            <span className={styles.badgePurple} style={{ fontSize: '11.5px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                              <Clock size={12} /> Auto-Dispatches After Task #{task.taskNumber - 1} Completion Mail
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Dates & Logistics Grid with Generous Breathing Space */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+                        gap: '16px',
+                      }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                            Start / Explanation Date:
+                          </label>
+                          <input
+                            type="date"
+                            value={task.explanationDate || ''}
+                            onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'explanationDate', e.target.value)}
+                            className={styles.searchInput}
+                            style={{ height: '40px', fontSize: '12.5px', padding: '0 12px' }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                            Explanation Time:
+                          </label>
+                          <input
+                            type="text"
+                            value={task.explanationTime || '11:00 AM IST'}
+                            onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'explanationTime', e.target.value)}
+                            className={styles.searchInput}
+                            style={{ height: '40px', fontSize: '12.5px', padding: '0 12px' }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                            Submission Deadline:
+                          </label>
+                          <input
+                            type="date"
+                            value={task.deadline || ''}
+                            onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'deadline', e.target.value)}
+                            className={styles.searchInput}
+                            style={{ height: '40px', fontSize: '12.5px', padding: '0 12px' }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                            Review Milestone Date:
+                          </label>
+                          <input
+                            type="date"
+                            value={task.reviewDate || ''}
+                            onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'reviewDate', e.target.value)}
+                            className={styles.searchInput}
+                            style={{ height: '40px', fontSize: '12.5px', padding: '0 12px' }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Google Meet Link Row */}
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                          Google Meet Briefing & Review Link:
+                        </label>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          <input
+                            type="text"
+                            value={task.meetLink || ''}
+                            onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'meetLink', e.target.value)}
+                            className={styles.searchInput}
+                            style={{ height: '40px', fontSize: '12.5px', padding: '0 12px', fontFamily: 'monospace', color: '#38bdf8' }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateRoleTaskField(activeRoleTab, idx, 'meetLink', generateClientMeetUrl())}
+                            className={styles.btnSecondary}
+                            style={{ height: '40px', padding: '0 14px', fontSize: '11.5px', whiteSpace: 'nowrap' }}
+                          >
+                            Generate Link
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Task Title & Deliverables */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                            Task Title:
+                          </label>
+                          <input
+                            type="text"
+                            value={task.title || ''}
+                            onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'title', e.target.value)}
+                            className={styles.searchInput}
+                            style={{ height: '40px', fontSize: '13px', fontWeight: 600 }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                            Objective & Technical Deliverables:
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={task.objective || ''}
+                            onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'objective', e.target.value)}
+                            className={styles.searchInput}
+                            style={{ height: 'auto', fontSize: '12.5px', lineHeight: 1.55, padding: '10px 12px' }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* HR Customizable Task Mail Content Box */}
+                      <div style={{
+                        background: '#121219',
+                        border: '1px solid #282836',
+                        borderRadius: '10px',
+                        padding: '16px 20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px',
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Mail size={14} color="#38bdf8" />
+                            <span>HR Customizable Task Mail Template</span>
+                          </span>
+                          <span style={{ fontSize: '11px', color: '#64748b' }}>
+                            Variables: &#123;&#123;candidate_name&#125;&#125;, &#123;&#123;internId&#125;&#125;, &#123;&#123;taskId&#125;&#125;, &#123;&#123;deadline&#125;&#125;, &#123;&#123;meetLink&#125;&#125;, &#123;&#123;submission_link&#125;&#125;
+                          </span>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                            Email Subject:
+                          </label>
+                          <input
+                            type="text"
+                            value={task.customSubject || ''}
+                            onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'customSubject', e.target.value)}
+                            className={styles.searchInput}
+                            style={{ height: '38px', fontSize: '12px' }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                            Email Body Content:
+                          </label>
+                          <textarea
+                            rows={5}
+                            value={task.customBody || ''}
+                            onChange={(e) => handleUpdateRoleTaskField(activeRoleTab, idx, 'customBody', e.target.value)}
+                            className={styles.searchInput}
+                            style={{ height: 'auto', fontFamily: 'monospace', fontSize: '11.5px', lineHeight: 1.5, padding: '10px 12px' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Bottom Large Allocate Action Card */}
+              <div style={{
+                background: '#0d0d12',
+                border: '1px solid #262632',
+                borderRadius: '14px',
+                padding: '24px 28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '16px',
+                marginTop: '10px',
+              }}>
+                <div>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>
+                    Ready to allocate {autoBatchPipelineData.totalTasks} tasks to all {autoBatchPipelineData.totalCandidates} interns in {autoBatchPipelineData.batchName}?
+                  </div>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#94a3b8' }}>
+                    Tasks for each role will be saved. Task 1 auto-sends after batch joining date; subsequent tasks auto-dispatch after each review approval.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSaveAndAllocateBatchPipeline}
+                  disabled={isBatchAutoSaving}
+                  className={styles.btnPrimary}
+                  style={{
+                    background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+                    padding: '12px 28px',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <Zap size={16} />
+                  <span>{isBatchAutoSaving ? 'Allocating Pipeline...' : `Save & Allocate to Batch (${autoBatchPipelineData.totalCandidates} Interns)`}</span>
                 </button>
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '50px 20px', background: '#0e0e12', borderRadius: '12px', border: '1px solid #232328' }}>
-              <Zap size={36} color="#38bdf8" style={{ margin: '0 auto 12px auto' }} />
-              <h4 style={{ margin: '0 0 6px 0', color: '#ffffff', fontSize: '15px' }}>
-                Select an intern to view and customize their automated pipeline
+            <div style={{ textAlign: 'center', padding: '60px 20px', background: '#0e0e12', borderRadius: '14px', border: '1px solid #232328' }}>
+              <Zap size={38} color="#38bdf8" style={{ margin: '0 auto 12px auto' }} />
+              <h4 style={{ margin: '0 0 8px 0', color: '#ffffff', fontSize: '16px', fontWeight: 700 }}>
+                Select a batch above to generate and allocate role-based task roadmaps
               </h4>
               <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                The engine will divide the timeline from joining to end date into balanced milestone sprints.
+                The engine will distribute tasks across the cohort tenure from joining to ending date.
               </p>
             </div>
           )}
         </div>
       )}
 
-
-      {/* --- SUBTAB 2: GEMMA 2B TASK TEMPLATES --- */}
+{/* --- SUBTAB 2: GEMMA 2B TASK TEMPLATES --- */}
       {subTab === 'templates' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className={styles.filterBar}>
