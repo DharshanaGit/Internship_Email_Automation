@@ -446,7 +446,7 @@ export default function LoginPage() {
               <ArrowRight size={16} />
             </button>
 
-            <div style={{ marginTop: '14px', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: '8px', padding: '10px 14px', fontSize: '11.5px', color: '#93c5fd', lineHeight: 1.5 }}>
+            <div style={{ marginTop: '14px', background: 'var(--accent-blue-bg)', border: '1px solid var(--accent-blue-border)', borderRadius: '8px', padding: '10px 14px', fontSize: '11.5px', color: 'var(--accent-blue-text)', lineHeight: 1.5 }}>
               <strong>Chrome Safety Tip:</strong> If Google Chrome displays <em>&ldquo;You just entered your password on a deceptive site&rdquo;</em> when signing in with a personal <code>@gmail.com</code> address, click <strong>&ldquo;Site is legitimate&rdquo;</strong> to proceed.
             </div>
           </form>

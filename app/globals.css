@@ -1,49 +1,71 @@
-/* Shortfundly Enterprise Operations Design System: Crisp White Light Theme */
-/* Standardized according to DESIGN.md (awesome-design-md: Stripe & Linear Clean Enterprise) */
+/* ==========================================================================
+   Design System: Light Mode + Purple & Slate Accent (WCAG AA Compliant)
+   SaaS Enterprise Aesthetic inspired by Stripe, Linear, and Raycast
+   ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Surfaces & Canvas: Pure Crisp White Foundations */
-  --bg-app: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #f1f5f9;
-  --bg-surface-hover: #e2e8f0;
-  --bg-input: #ffffff;
-  --bg-input-focus: #ffffff;
-  --bg-badge: rgba(79, 70, 229, 0.08);
-  --bg-overlay: rgba(15, 23, 42, 0.5);
+  /* 1. Surfaces & Canvas */
+  --bg-app: #F8FAFC;                     /* Slate-50 root */
+  --bg-surface: #FFFFFF;                 /* Pure white cards, surfaces, modals */
+  --bg-surface-elevated: #F1F5F9;        /* Slate-100 secondary surface / chips */
+  --bg-surface-hover: #E2E8F0;           /* Slate-200 interactive hover */
+  --bg-input: #FFFFFF;                   /* Crisp white inputs */
+  --bg-input-focus: #FFFFFF;
+  --bg-overlay: rgba(15, 23, 42, 0.45);  /* Accessible modal overlay */
 
-  /* Hairlines & Dividers */
-  --border-hairline: #f1f5f9;
-  --border-subtle: #e2e8f0;
-  --border-medium: #cbd5e1;
-  --border-focus: #4f46e5;
-  --border-active: #6366f1;
-  --border-focus-ring: rgba(79, 70, 229, 0.22);
+  /* 2. Typography & Text Contrast (WCAG AA Compliant) */
+  --text-primary: #0F172A;               /* Slate-900 (15.8:1 contrast on white) */
+  --text-heading: #1E1B4B;               /* Deep Indigo / Purple-950 */
+  --text-secondary: #334155;             /* Slate-700 (9.5:1 contrast on white) */
+  --text-muted: #64748B;                 /* Slate-500 (4.8:1 contrast on white) */
+  --text-label: #1E293B;                 /* Slate-800 form labels */
+  --text-accent: #6D28D9;                /* Purple-700 primary accent text */
 
-  /* Typography Hierarchy (100% High Contrast) */
-  --text-primary: #0f172a;       /* Slate 900: 15.8:1 contrast on white */
-  --text-secondary: #334155;     /* Slate 700: 9.5:1 contrast */
-  --text-muted: #64748b;         /* Slate 500: 4.8:1 contrast */
-  --text-accent: #4f46e5;        /* Indigo 600 */
+  /* 3. Primary Brand Palette (Purple & Slate) */
+  --accent-primary: #6D28D9;             /* Purple-700 */
+  --accent-primary-hover: #5B21B6;       /* Purple-800 */
+  --accent-primary-active: #4C1D95;      /* Purple-900 */
+  --accent-violet: #7C3AED;              /* Violet-600 */
+  --accent-purple-light: #EDE9FE;        /* Violet-100 badges & highlights */
+  --accent-purple-text: #5B21B6;         /* Violet-800 text inside badges */
+  --border-focus-ring: rgba(109, 40, 217, 0.25);
 
-  /* Brand Signature Indigo & Violet Accents */
-  --accent-primary: #4f46e5;
-  --accent-primary-hover: #4338ca;
-  --accent-primary-active: #3730a3;
-  --accent-purple: #6366f1;
-  --accent-purple-light: #818cf8;
-  --accent-purple-dark: #3730a3;
+  /* 4. Semantic Status Indicators (High-contrast deep tones on light surfaces) */
+  --accent-emerald: #059669;             /* Emerald-600 */
+  --accent-emerald-bg: #ECFDF5;          /* Emerald-50 */
+  --accent-emerald-border: #A7F3D0;      /* Emerald-200 */
+  --accent-emerald-text: #065F46;        /* Emerald-800 */
 
-  /* Semantic Status Indicators (High-contrast deep tones on white) */
-  --accent-emerald: #059669;
-  --accent-amber: #d97706;
-  --accent-rose: #dc2626;
-  --accent-blue: #2563eb;
-  --accent-cyan: #0284c7;
+  --accent-amber: #D97706;               /* Amber-600 */
+  --accent-amber-bg: #FFFBEB;            /* Amber-50 */
+  --accent-amber-border: #FDE68A;        /* Amber-200 */
+  --accent-amber-text: #92400E;          /* Amber-800 */
 
-  /* Radii Scale */
+  --accent-rose: #DC2626;                /* Rose-600 */
+  --accent-rose-bg: #FEF2F2;             /* Rose-50 */
+  --accent-rose-border: #FECACA;         /* Rose-200 */
+  --accent-rose-text: #991B1B;           /* Rose-800 */
+
+  --accent-blue: #2563EB;                /* Blue-600 */
+  --accent-blue-bg: #EFF6FF;             /* Blue-50 */
+  --accent-blue-border: #BFDBFE;         /* Blue-200 */
+  --accent-blue-text: #1E40AF;           /* Blue-800 */
+
+  /* 5. Systematic Borders & Dividers */
+  --border-default: #E2E8F0;             /* Slate-200 */
+  --border-subtle: #F1F5F9;              /* Slate-100 */
+  --border-medium: #CBD5E1;              /* Slate-300 interactive / input */
+  --border-focus: #6D28D9;               /* Purple-700 */
+
+  /* 6. Restrained SaaS Card Shadows (No fuzzy neon glow) */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(109, 40, 217, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+
+  /* 7. Radii Scale */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -51,14 +73,9 @@
   --radius-xl: 16px;
   --radius-full: 9999px;
 
-  /* Fonts */
+  /* 8. Fonts */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
-  /* Shadows (Refined, crisp light enterprise shadows) */
-  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px 0 rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
 }
 
 * {
@@ -80,6 +97,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -98,6 +126,23 @@ textarea {
   font-family: inherit;
   color: var(--text-primary);
   background-color: var(--bg-input);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--border-focus-ring);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 ::-webkit-scrollbar {
@@ -106,14 +151,14 @@ textarea {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--bg-surface-elevated);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--border-medium);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--text-muted);
 }

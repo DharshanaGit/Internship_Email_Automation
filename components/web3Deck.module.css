@@ -1,17 +1,19 @@
-/* Shortfundly Web3 Operations UI: Black with Purple (DESIGN.md) */
+/* ==========================================================================
+   Shortfundly SaaS Operations UI: Light Mode + Purple & Slate Accent
+   ========================================================================== */
 
 .container {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 /* 1. Header Card */
 .headerCard {
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
-  padding: 14px 18px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -27,28 +29,28 @@
 }
 
 .titleIcon {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-sm);
-  background: rgba(124, 58, 237, 0.16);
-  border: 1px solid rgba(168, 85, 247, 0.35);
+  background: var(--accent-purple-light);
+  border: 1px solid #DDD6FE;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-purple-light);
+  color: var(--accent-primary);
 }
 
 .mainTitle {
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-heading);
   letter-spacing: -0.01em;
 }
 
 .subtitle {
   margin: 2px 0 0 0;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-muted);
   font-weight: 400;
 }
@@ -57,8 +59,8 @@
 .subNavBar {
   display: flex;
   gap: 6px;
-  background: var(--bg-input);
-  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
   padding: 4px;
   border-radius: var(--radius-md);
   overflow-x: auto;
@@ -68,30 +70,31 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 5px 11px;
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
-  font-size: 11.5px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   background: transparent;
   border: 1px solid transparent;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
 }
 
 .subTabBtn:hover {
-  color: var(--text-secondary);
-  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  background: #FFFFFF;
 }
 
 .subTabBtnActive {
-  background: var(--bg-surface-elevated) !important;
-  border-color: rgba(168, 85, 247, 0.4) !important;
-  color: var(--text-primary) !important;
+  background: #FFFFFF !important;
+  border-color: var(--border-default) !important;
+  color: var(--accent-primary) !important;
+  box-shadow: var(--shadow-sm);
 }
 
-/* Metric / Telemetry Cards */
+/* Metric / Telemetry Cards with Top/Left Accent Borders */
 .metricsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -106,42 +109,48 @@
 
 .metricCard {
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
+  padding: 14px 16px;
   box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
-  transition: border-color 0.15s ease;
-}
-
-.metricCard::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, #7c3aed, #c084fc);
-  opacity: 0.6;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .metricCard:hover {
-  border-color: var(--border-medium);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.metricCardSent {
+  border-left: 3px solid var(--accent-emerald);
+}
+
+.metricCardFailed {
+  border-left: 3px solid var(--accent-rose);
+}
+
+.metricCardReady {
+  border-left: 3px solid var(--accent-primary);
+}
+
+.metricCardTotal {
+  border-left: 3px solid var(--accent-blue);
 }
 
 .metricLabel {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
   margin-bottom: 6px;
 }
 
 .metricValue {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 800;
   color: var(--text-primary);
   font-family: var(--font-mono);
   letter-spacing: -0.02em;
@@ -161,9 +170,10 @@
   gap: 12px;
   flex-wrap: wrap;
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  padding: 8px 12px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow-sm);
 }
 
 .searchBox {
@@ -182,51 +192,52 @@
 
 .searchInput {
   width: 100%;
-  height: 32px;
-  background: var(--bg-input);
-  border: 1px solid var(--border-subtle);
+  height: 36px;
+  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   padding: 0 12px 0 36px;
   color: var(--text-primary);
-  font-size: 12px;
+  font-size: 12.5px;
   outline: none;
   transition: border-color 0.15s ease;
 }
 
 .searchInput:focus {
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 0 2px var(--border-focus-ring);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--border-focus-ring);
 }
 
 .selectInput {
-  height: 32px;
-  background: var(--bg-input);
-  border: 1px solid var(--border-subtle);
+  height: 36px;
+  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   padding: 0 12px;
   color: var(--text-primary);
-  font-size: 11.5px;
+  font-size: 12px;
+  font-weight: 500;
   outline: none;
   cursor: pointer;
   transition: border-color 0.15s ease;
 }
 
 .selectInput:focus {
-  border-color: var(--accent-purple);
+  border-color: var(--accent-primary);
 }
 
 /* Data Table Card */
 .tableCard {
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
 
 .tableHeaderRow {
-  padding: 9px 14px;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-default);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -244,30 +255,30 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 
 .table th {
-  background: var(--bg-input);
+  background: var(--bg-surface-elevated);
   color: var(--text-muted);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border-subtle);
+  letter-spacing: 0.05em;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-default);
   white-space: nowrap;
 }
 
 .table td {
-  padding: 8px 12px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   vertical-align: middle;
 }
 
 .table tr:hover {
-  background: rgba(168, 85, 247, 0.04);
+  background: rgba(109, 40, 217, 0.02);
 }
 
 /* Buttons */
@@ -275,25 +286,26 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 13px;
-  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
-  color: #ffffff;
+  padding: 7px 15px;
+  background: var(--accent-primary);
+  color: #FFFFFF;
   border-radius: var(--radius-sm);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid transparent;
   transition: all 0.15s ease;
   white-space: nowrap;
+  box-shadow: var(--shadow-sm);
 }
 
 .btnPrimary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #6d28d9 0%, #7e22ce 100%);
+  background: var(--accent-primary-hover);
   transform: translateY(-1px);
 }
 
 .btnPrimary:disabled {
-  opacity: 0.45;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
@@ -302,13 +314,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 7px 14px;
   background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-size: 11.5px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
@@ -316,7 +328,6 @@
 
 .btnSecondary:hover {
   background: var(--bg-surface-hover);
-  border-color: rgba(168, 85, 247, 0.4);
   color: var(--text-primary);
 }
 
@@ -324,11 +335,11 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 11px;
-  background: var(--status-danger-bg);
-  border: 1px solid var(--status-danger-border);
+  padding: 6px 12px;
+  background: var(--accent-rose-bg);
+  border: 1px solid var(--accent-rose-border);
   border-radius: var(--radius-sm);
-  color: var(--accent-rose);
+  color: var(--accent-rose-text);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -336,16 +347,16 @@
 }
 
 .btnDanger:hover {
-  background: rgba(239, 68, 68, 0.2);
+  background: #FEE2E2;
 }
 
 /* Badges */
 .badgePurple {
-  background: var(--bg-badge);
-  border: 1px solid rgba(168, 85, 247, 0.35);
-  color: var(--accent-purple-light);
+  background: var(--accent-purple-light);
+  border: 1px solid #DDD6FE;
+  color: var(--accent-purple-text);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 3px 8px;
   border-radius: var(--radius-xs);
   display: inline-flex;
@@ -354,11 +365,11 @@
 }
 
 .badgeEmerald {
-  background: var(--status-success-bg);
-  border: 1px solid var(--status-success-border);
-  color: var(--accent-emerald);
+  background: var(--accent-emerald-bg);
+  border: 1px solid var(--accent-emerald-border);
+  color: var(--accent-emerald-text);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 3px 8px;
   border-radius: var(--radius-xs);
   display: inline-flex;
@@ -367,11 +378,11 @@
 }
 
 .badgeAmber {
-  background: var(--status-warning-bg);
-  border: 1px solid var(--status-warning-border);
-  color: var(--accent-amber);
+  background: var(--accent-amber-bg);
+  border: 1px solid var(--accent-amber-border);
+  color: var(--accent-amber-text);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 3px 8px;
   border-radius: var(--radius-xs);
   display: inline-flex;
@@ -380,11 +391,11 @@
 }
 
 .badgeRose {
-  background: var(--status-danger-bg);
-  border: 1px solid var(--status-danger-border);
-  color: var(--accent-rose);
+  background: var(--accent-rose-bg);
+  border: 1px solid var(--accent-rose-border);
+  color: var(--accent-rose-text);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 3px 8px;
   border-radius: var(--radius-xs);
   display: inline-flex;
@@ -397,7 +408,7 @@
   position: fixed;
   inset: 0;
   background: var(--bg-overlay);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -409,18 +420,18 @@
   width: 100%;
   max-width: 680px;
   max-height: 90vh;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: #FFFFFF;
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
 }
 
 .modalHeader {
   padding: 16px 22px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-default);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -436,7 +447,7 @@
 
 .modalFooter {
   padding: 14px 22px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-default);
   display: flex;
   justify-content: flex-end;
   gap: 10px;

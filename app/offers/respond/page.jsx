@@ -227,8 +227,8 @@ export default function OfferRespondPage() {
     return (
       <div className={styles.container}>
         <div className={styles.loadingBox}>
-          <Shield size={36} color="#a855f7" className={styles.spinner} />
-          <p style={{ marginTop: '16px', color: '#cbd5e1' }}>Authenticating secure candidate offer portal...</p>
+          <Shield size={36} color="#6d28d9" className={styles.spinner} />
+          <p style={{ marginTop: '16px', color: '#475569', fontWeight: 500 }}>Authenticating secure candidate offer portal...</p>
         </div>
       </div>
     );
@@ -238,11 +238,11 @@ export default function OfferRespondPage() {
     return (
       <div className={styles.container}>
         <div className={styles.errorCard}>
-          <AlertCircle size={44} color="#ef4444" />
-          <h2 style={{ marginTop: '14px', color: '#f8fafc' }}>Invalid or Expired Link</h2>
-          <p style={{ color: '#94a3b8', marginTop: '8px' }}>{errorMessage}</p>
+          <AlertCircle size={44} color="#dc2626" />
+          <h2 style={{ marginTop: '14px', color: '#0f172a' }}>Offer Portal Verification</h2>
+          <p style={{ color: '#475569', marginTop: '8px' }}>{errorMessage}</p>
           <div className={styles.contactHrBox}>
-            <p>If you believe this is an error or need your offer link renewed, please contact the talent team:</p>
+            <p>If you need your offer link renewed or have questions, please reach out to the talent acquisition team:</p>
             <a href="mailto:hr@shortfundly.com" className={styles.contactBtn}>Contact HR: hr@shortfundly.com</a>
           </div>
         </div>
@@ -302,12 +302,12 @@ export default function OfferRespondPage() {
 
         {isAlreadyResponded && (
           <div className={styles.completedBanner}>
-            <CheckCircle2 size={22} color={candidate.offerLetterStatus === 'Accepted' ? '#10b981' : '#f43f5e'} />
+            <CheckCircle2 size={22} color={candidate.offerLetterStatus === 'Accepted' ? '#16a34a' : '#e11d48'} />
             <div>
-              <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff' }}>
+              <h3 style={{ margin: 0, fontSize: '16px', color: '#0f172a' }}>
                 Offer Decision Recorded: {candidate.offerLetterStatus}
               </h3>
-              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#cbd5e1' }}>
+              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#475569' }}>
                 {candidate.offerLetterStatus === 'Accepted'
                   ? `Your acceptance with verified digital signature was recorded on ${new Date(candidate.offerAcceptedAt).toUTCString()}. Welcome to the team!`
                   : `Your decision to decline this offer was recorded on ${new Date(candidate.offerRejectedAt || Date.now()).toUTCString()}. Reason: ${candidate.rejectionReason || 'None specified'}.`}
@@ -319,7 +319,7 @@ export default function OfferRespondPage() {
         {/* Candidate & Internship Details Card */}
         <div className={styles.sectionCard}>
           <h2 className={styles.sectionTitle}>
-            <Shield size={18} color="#a855f7" />
+            <Shield size={18} color="#6d28d9" />
             <span>Internship Details & Candidate Record</span>
           </h2>
 
@@ -331,7 +331,7 @@ export default function OfferRespondPage() {
 
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Permanent Intern ID</span>
-              <strong className={styles.infoValue} style={{ color: '#c084fc' }}>{candidate.internId || candidate.candidateId}</strong>
+              <strong className={styles.infoValue} style={{ color: '#6d28d9' }}>{candidate.internId || candidate.candidateId}</strong>
             </div>
 
             <div className={styles.infoItem}>
@@ -346,7 +346,7 @@ export default function OfferRespondPage() {
 
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Stipend / Compensation</span>
-              <strong className={styles.infoValue} style={{ color: '#34d399' }}>{candidate.stipend}</strong>
+              <strong className={styles.infoValue} style={{ color: '#059669' }}>{candidate.stipend}</strong>
             </div>
 
             <div className={styles.infoItem}>
@@ -370,14 +370,14 @@ export default function OfferRespondPage() {
         <div className={styles.sectionCard}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ background: 'rgba(168, 85, 247, 0.15)', border: '1px solid rgba(168, 85, 247, 0.3)', padding: '10px', borderRadius: '8px', color: '#c084fc' }}>
+              <div style={{ background: '#ede9fe', border: '1px solid #ddd6fe', padding: '10px', borderRadius: '8px', color: '#6d28d9' }}>
                 <FileText size={22} />
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: '15px', color: '#ffffff', fontWeight: 700 }}>
+                <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: 700 }}>
                   Official Internship Offer Letter (PDF)
                 </h3>
-                <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#64748b' }}>
                   Document: Shortfundly_Offer_{(candidate.fullName || 'Candidate').replace(/\s+/g, '_')}.pdf &bull; A4 Corporate Standard
                 </p>
               </div>
@@ -418,7 +418,7 @@ export default function OfferRespondPage() {
         {!isAlreadyResponded && !isExpired && (
           <div className={styles.sectionCard}>
             <h2 className={styles.sectionTitle}>
-              <PenTool size={18} color="#a855f7" />
+              <PenTool size={18} color="#6d28d9" />
               <span>Record Your Decision & Digital Signature</span>
             </h2>
 
@@ -448,8 +448,8 @@ export default function OfferRespondPage() {
               <div className={styles.acceptFlowBox}>
                 {/* Terms and Conditions Consent */}
                 <div className={styles.termsBox}>
-                  <h4 style={{ margin: '0 0 8px 0', color: '#e2e8f0', fontSize: '14px' }}>Terms & Conditions of Acceptance:</h4>
-                  <ul style={{ paddingLeft: '18px', color: '#94a3b8', fontSize: '13px', lineHeight: 1.6 }}>
+                  <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '14px', fontWeight: 700 }}>Terms & Conditions of Acceptance:</h4>
+                  <ul style={{ paddingLeft: '18px', color: '#475569', fontSize: '13px', lineHeight: 1.6 }}>
                     <li>I confirm that all personal and educational details provided are true and accurate.</li>
                     <li>I agree to adhere to Shortfundly confidentiality policies and intellectual property assignment.</li>
                     <li>I commit to the scheduled working hours, sprint deliverables, and final review cycles.</li>
@@ -460,10 +460,10 @@ export default function OfferRespondPage() {
                       type="checkbox"
                       checked={termsAccepted}
                       onChange={(e) => setTermsAccepted(e.target.checked)}
-                      style={{ width: '18px', height: '18px', accentColor: '#a855f7', cursor: 'pointer' }}
+                      style={{ width: '18px', height: '18px', accentColor: '#6d28d9', cursor: 'pointer' }}
                     />
                     <span>
-                      I have read, understood, and explicitly agree to the terms outlined in this offer letter. <strong style={{ color: '#ec4899' }}>*</strong>
+                      I have read, understood, and explicitly agree to the terms outlined in this offer letter. <strong style={{ color: '#e11d48' }}>*</strong>
                     </span>
                   </label>
                 </div>
@@ -471,7 +471,7 @@ export default function OfferRespondPage() {
                 {/* Signature Mode Selector */}
                 <div style={{ marginTop: '22px' }}>
                   <label className={styles.fieldLabel}>
-                    Select Digital Signature Method <strong style={{ color: '#ec4899' }}>*</strong>
+                    Select Digital Signature Method <strong style={{ color: '#e11d48' }}>*</strong>
                   </label>
                   <div className={styles.sigModeTabs}>
                     <button
@@ -512,7 +512,7 @@ export default function OfferRespondPage() {
                       />
                       {typedName && (
                         <div className={styles.sigFontPreview}>
-                          <span style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase' }}>Digital Signature Preview:</span>
+                          <span style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Digital Signature Preview:</span>
                           <div className={styles.signatureStyledText}>{typedName}</div>
                         </div>
                       )}
@@ -535,7 +535,7 @@ export default function OfferRespondPage() {
                         />
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>Draw your signature using mouse or finger touch.</span>
+                        <span style={{ fontSize: '12px', color: '#64748b' }}>Draw your signature using mouse or finger touch.</span>
                         <button type="button" onClick={clearCanvas} className={styles.btnClearCanvas}>Clear Canvas</button>
                       </div>
                     </div>
@@ -545,22 +545,22 @@ export default function OfferRespondPage() {
                   {signatureMode === 'upload' && (
                     <div style={{ marginTop: '14px' }}>
                       <label className={styles.uploadArea}>
-                        <Upload size={24} color="#a855f7" />
-                        <span style={{ marginTop: '8px', fontSize: '13px', color: '#cbd5e1', fontWeight: 600 }}>
+                        <Upload size={24} color="#6d28d9" />
+                        <span style={{ marginTop: '8px', fontSize: '13px', color: '#0f172a', fontWeight: 600 }}>
                           Click to upload signature image or photo (PNG / JPG / WEBP)
                         </span>
-                        <span style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '4px' }}>
+                        <span style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
                           Image will be cryptographically verified and securely stored in Cloudinary
                         </span>
                         <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
                       </label>
                       {signatureData && signatureData.startsWith('data:image/') && (
-                        <div style={{ marginTop: '12px', textAlign: 'center', background: '#09090b', padding: '12px', borderRadius: '8px', border: '1px solid #27272a' }}>
-                          <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                            <Check size={14} color="#10b981" />
+                        <div style={{ marginTop: '12px', textAlign: 'center', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                          <div style={{ fontSize: '12px', color: '#059669', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                            <Check size={14} color="#059669" />
                             <span>Signature Image Ready for Cloudinary Upload</span>
                           </div>
-                          <img src={signatureData} alt="Uploaded signature" style={{ maxHeight: '90px', border: '1px solid #a855f7', borderRadius: '6px', background: '#ffffff', padding: '6px' }} />
+                          <img src={signatureData} alt="Uploaded signature" style={{ maxHeight: '90px', border: '1px solid #6d28d9', borderRadius: '6px', background: '#ffffff', padding: '6px' }} />
                         </div>
                       )}
                     </div>
@@ -586,10 +586,10 @@ export default function OfferRespondPage() {
             {decision === 'REJECT' && (
               <div className={styles.rejectFlowBox}>
                 <div className={styles.rejectNotice}>
-                  <AlertCircle size={20} color="#f43f5e" />
+                  <AlertCircle size={20} color="#e11d48" />
                   <div>
                     <strong>Are you sure you wish to decline this internship offer?</strong>
-                    <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#cbd5e1' }}>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#475569' }}>
                       Declining is final and will release your internship placement. No digital signature is required.
                     </p>
                   </div>

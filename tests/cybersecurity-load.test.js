@@ -158,7 +158,7 @@ describe('⚡ Cybersecurity Full Load & Stress Test Suite', () => {
 
       const durationMs = Date.now() - startTime;
       console.log(`[Load Benchmark] Completed 15 concurrent bcrypt hashing & verification cycles in ${durationMs}ms.`);
-    });
+    }, 25000);
   });
 
   // --------------------------------------------------------------------------

@@ -1782,7 +1782,7 @@ export default function DashboardPage() {
 
             
             {/* Filter Bar for Automated Offer Letter */}
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', background: '#0c0c0e', padding: '12px 18px', borderRadius: '8px', border: '1px solid #232328' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', background: 'var(--bg-surface)', padding: '12px 18px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#c084fc', fontSize: '13px', fontWeight: 700 }}>
                 <Filter size={15} />
                 <span>Filter Interns:</span>
@@ -1791,7 +1791,7 @@ export default function DashboardPage() {
               <select
                 value={offerBatchFilter}
                 onChange={(e) => setOfferBatchFilter(e.target.value)}
-                style={{ height: '36px', background: '#09090b', color: '#cbd5e1', border: '1px solid #27272a', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
+                style={{ height: '36px', background: 'var(--bg-surface)', color: '#cbd5e1', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
               >
                 <option value="ALL">All Batches</option>
                 {batches.map((b) => (
@@ -1802,7 +1802,7 @@ export default function DashboardPage() {
               <select
                 value={offerRoleFilter}
                 onChange={(e) => setOfferRoleFilter(e.target.value)}
-                style={{ height: '36px', background: '#09090b', color: '#cbd5e1', border: '1px solid #27272a', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
+                style={{ height: '36px', background: 'var(--bg-surface)', color: '#cbd5e1', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '0 10px', fontSize: '12.5px', outline: 'none' }}
               >
                 <option value="ALL">All Roles</option>
                 {Array.from(new Set(candidates.map((c) => c.role).filter(Boolean))).map((r) => (
@@ -1817,7 +1817,7 @@ export default function DashboardPage() {
                   placeholder="Search by intern ID, candidate name, or email..."
                   value={offerSearchFilter}
                   onChange={(e) => setOfferSearchFilter(e.target.value)}
-                  style={{ width: '100%', height: '36px', background: '#09090b', color: '#ffffff', border: '1px solid #27272a', borderRadius: '6px', padding: '0 12px 0 32px', fontSize: '12.5px', outline: 'none' }}
+                  style={{ width: '100%', height: '36px', background: 'var(--bg-surface)', color: '#ffffff', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '0 12px 0 32px', fontSize: '12.5px', outline: 'none' }}
                 />
               </div>
             </div>
@@ -1954,7 +1954,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div style={{ background: '#09090b', border: '1px solid #232328', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: '#cbd5e1', lineHeight: 1.6 }}>
+                  <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: '#cbd5e1', lineHeight: 1.6 }}>
                     <strong style={{ color: '#c084fc' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#e9d5ff' }}>Name, Email ID, Phone Number, Role, Degree, College, JoiningDate, EndingDate, Monthly Stipend (INR)</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Intern IDs & Expiring URLs</strong>.
                   </div>
 
@@ -2047,7 +2047,7 @@ export default function DashboardPage() {
                       flexWrap: 'wrap',
                       gap: '10px',
                       padding: '10px 16px',
-                      background: '#121217',
+                      background: 'var(--bg-surface)',
                       borderTop: '1px solid #232328',
                       borderBottom: '1px solid #232328',
                       fontSize: '12px',
@@ -2060,7 +2060,7 @@ export default function DashboardPage() {
                           value={selectedBulkBatchTarget}
                           onChange={(e) => setSelectedBulkBatchTarget(e.target.value)}
                           style={{
-                            background: '#18181b',
+                            background: 'var(--bg-surface-elevated)',
                             border: '1px solid #7c3aed',
                             borderRadius: '6px',
                             color: '#ffffff',
@@ -2092,7 +2092,7 @@ export default function DashboardPage() {
                           value={newBatchNameInput}
                           onChange={(e) => setNewBatchNameInput(e.target.value)}
                           style={{
-                            background: '#18181b',
+                            background: 'var(--bg-surface-elevated)',
                             border: '1px solid #3f3f46',
                             borderRadius: '6px',
                             color: '#ffffff',
@@ -2158,7 +2158,7 @@ export default function DashboardPage() {
                                   />
                                 </td>
                                 <td>
-                                  <code style={{ color: '#c084fc', fontWeight: 700, fontSize: '11.5px', background: '#141417', padding: '2px 6px', borderRadius: '4px', border: '1px solid #27272a' }}>
+                                  <code style={{ color: '#c084fc', fontWeight: 700, fontSize: '11.5px', background: 'var(--bg-surface-elevated)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border-default)' }}>
                                     {internId}
                                   </code>
                                 </td>
@@ -2182,12 +2182,12 @@ export default function DashboardPage() {
                                     }}
                                   >
                                     {availableBatches.map(b => (
-                                      <option key={b} value={b} style={{ background: '#1c1c21', color: '#ffffff' }}>
+                                      <option key={b} value={b} style={{ background: 'var(--bg-surface-elevated)', color: '#ffffff' }}>
                                         {b}
                                       </option>
                                     ))}
                                     {row.batch && !availableBatches.includes(row.batch) && (
-                                      <option value={row.batch} style={{ background: '#1c1c21', color: '#ffffff' }}>
+                                      <option value={row.batch} style={{ background: 'var(--bg-surface-elevated)', color: '#ffffff' }}>
                                         {row.batch}
                                       </option>
                                     )}
@@ -2207,7 +2207,7 @@ export default function DashboardPage() {
                                         navigator.clipboard?.writeText(portalUrl);
                                         showToast('Copied candidate portal link!', 'success');
                                       }}
-                                      style={{ background: '#1c1c21', border: '1px solid #27272a', borderRadius: '4px', padding: '2px 6px', fontSize: '10px', color: '#c084fc', cursor: 'pointer' }}
+                                      style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '4px', padding: '2px 6px', fontSize: '10px', color: '#c084fc', cursor: 'pointer' }}
                                       title="Copy URL"
                                     >
                                       Copy
@@ -2239,7 +2239,7 @@ export default function DashboardPage() {
 
                     {/* Template Customizer & Dispatch Trigger */}
                     <div style={{ padding: '18px 24px', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-surface-elevated)' }}>
-                      <div style={{ background: '#09090b', padding: '14px 18px', borderRadius: '8px', border: '1px solid #232328', marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+                      <div style={{ background: 'var(--bg-surface)', padding: '14px 18px', borderRadius: '8px', border: '1px solid var(--border-default)', marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
                         <div>
                           <div style={{ color: '#c084fc', fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                             <Clock size={15} />
@@ -2255,7 +2255,7 @@ export default function DashboardPage() {
                             type="datetime-local"
                             value={bulkOfferDeadline}
                             onChange={(e) => setBulkOfferDeadline(e.target.value)}
-                            style={{ background: '#141417', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', colorScheme: 'dark', padding: '6px 12px', fontSize: '12.5px', outline: 'none' }}
+                            style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', colorScheme: 'light', padding: '6px 12px', fontSize: '12.5px', outline: 'none' }}
                           />
                         </div>
                       </div>
@@ -2311,10 +2311,10 @@ export default function DashboardPage() {
 
                       {/* Additional Attachments & Company Welcome Banner Upload Area */}
                       <div style={{
-                        background: '#0d0d11',
+                        background: 'var(--bg-surface)',
                         padding: '14px 18px',
                         borderRadius: '8px',
-                        border: '1px solid #27272a',
+                        border: '1px solid var(--border-default)',
                         marginBottom: '16px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -2327,7 +2327,7 @@ export default function DashboardPage() {
                           </div>
                           <div style={{ display: 'flex', gap: '10px' }}>
                             <label style={{
-                              background: '#1c1c24',
+                              background: 'var(--bg-surface-elevated)',
                               border: '1px solid #3b82f6',
                               color: '#60a5fa',
                               padding: '5px 12px',
@@ -2349,7 +2349,7 @@ export default function DashboardPage() {
                             </label>
 
                             <label style={{
-                              background: '#1c1c24',
+                              background: 'var(--bg-surface-elevated)',
                               border: '1px solid #10b981',
                               color: '#34d399',
                               padding: '5px 12px',
@@ -2376,7 +2376,7 @@ export default function DashboardPage() {
                         {(bulkAttachments.length > 0 || bulkBannerImage) && (
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', paddingTop: '8px', borderTop: '1px dashed #27272a' }}>
                             {bulkBannerImage && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#18271e', border: '1px solid #059669', padding: '4px 10px', borderRadius: '6px', fontSize: '11.5px', color: '#6ee7b7' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '4px 10px', borderRadius: '6px', fontSize: '11.5px', color: '#065f46' }}>
                                 <ImageIcon size={13} />
                                 <span>Company Banner Attached</span>
                                 <button
@@ -2391,7 +2391,7 @@ export default function DashboardPage() {
                             )}
 
                             {bulkAttachments.map((att, idx) => (
-                              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#1e2430', border: '1px solid #2563eb', padding: '4px 10px', borderRadius: '6px', fontSize: '11.5px', color: '#93c5fd' }}>
+                              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#eff6ff', border: '1px solid #bfdbfe', padding: '4px 10px', borderRadius: '6px', fontSize: '11.5px', color: '#1e40af' }}>
                                 <FileText size={13} />
                                 <span>{att.filename} ({att.size})</span>
                                 <button
@@ -4953,9 +4953,9 @@ export default function DashboardPage() {
                           lineHeight: '1.6',
                           whiteSpace: 'pre-wrap',
                           minHeight: '360px',
-                          background: '#09090b',
+                          background: 'var(--bg-surface)',
                           color: '#f8fafc',
-                          border: '1px solid #27272a',
+                          border: '1px solid var(--border-default)',
                           borderRadius: '8px',
                           padding: '14px',
                         }}
@@ -5195,9 +5195,9 @@ export default function DashboardPage() {
                     fontFamily: 'monospace',
                     fontSize: '13px',
                     lineHeight: '1.6',
-                    background: '#09090b',
+                    background: 'var(--bg-surface)',
                     color: '#f8fafc',
-                    border: '1px solid #27272a',
+                    border: '1px solid var(--border-default)',
                     borderRadius: '8px',
                     padding: '14px',
                   }}

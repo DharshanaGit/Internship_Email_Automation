@@ -383,7 +383,7 @@ Shortfundly`,
                   </div>
 
                   {/* User-Friendly Plain Text PDF Content Customizer */}
-                  <div style={{ background: '#111115', border: '1px solid #232328', borderRadius: '8px', padding: '16px' }}>
+                  <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <FileCheck size={16} color="#a855f7" />
@@ -489,7 +489,7 @@ Shortfundly`,
                     /* RENDERED EMAIL PREVIEW */
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {/* Email Header Info */}
-                      <div style={{ background: '#141417', border: '1px solid #27272a', padding: '12px 16px', borderRadius: '8px', fontSize: '12.5px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', padding: '12px 16px', borderRadius: '8px', fontSize: '12.5px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <div><strong>From:</strong> Shortfundly HR Team &lt;hr@shortfundly.com&gt;</div>
                         <div><strong>To:</strong> {samplePreviewContext.candidateName} &lt;rahul.sharma@example.com&gt;</div>
                         <div><strong>Subject:</strong> {renderJinja(editingTemplate.subject, samplePreviewContext)}</div>

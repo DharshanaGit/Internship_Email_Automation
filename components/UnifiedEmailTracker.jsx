@@ -290,7 +290,7 @@ export default function UnifiedEmailTracker({
             </div>
 
             <div className={styles.modalBody}>
-              <div style={{ background: '#141417', border: '1px solid #27272a', borderRadius: '8px', padding: '14px', fontSize: '13px' }}>
+              <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '14px', fontSize: '13px' }}>
                 <div><strong>To:</strong> {inspectingEmail.recipientName} &bull; {inspectingEmail.recipientEmail}</div>
                 {inspectingEmail.cc && <div><strong>CC:</strong> {inspectingEmail.cc}</div>}
                 <div><strong>Subject:</strong> {inspectingEmail.subject}</div>
@@ -301,7 +301,7 @@ export default function UnifiedEmailTracker({
                 )}
               </div>
 
-              <div style={{ background: '#09090b', border: '1px solid #232328', borderRadius: '8px', padding: '16px', maxHeight: '350px', overflowY: 'auto' }}>
+              <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '16px', maxHeight: '350px', overflowY: 'auto' }}>
                 <pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '12px', whiteSpace: 'pre-wrap', color: '#cbd5e1' }}>
                   {inspectingEmail.body}
                 </pre>

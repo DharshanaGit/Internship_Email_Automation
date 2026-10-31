@@ -447,7 +447,7 @@ export default function AllCandidatesView({
                         value={c.batch || 'Batch A'}
                         onChange={(e) => handleChangeCandidateBatch(c.id, e.target.value)}
                         style={{
-                          background: '#12111a',
+                          background: 'var(--bg-surface)',
                           border: '1px solid #3b335c',
                           color: '#c084fc',
                           borderRadius: '6px',
@@ -536,7 +536,7 @@ export default function AllCandidatesView({
             position: 'fixed',
             bottom: '28px',
             right: '28px',
-            background: '#121118',
+            background: 'var(--bg-surface)',
             border: '1px solid #a855f7',
             borderRadius: '10px',
             padding: '14px 20px',
@@ -597,7 +597,7 @@ export default function AllCandidatesView({
             </div>
 
             <div className={styles.modalBody}>
-              <div style={{ background: '#141417', border: '1px solid #27272a', borderRadius: '8px', padding: '14px 18px', fontSize: '13px' }}>
+              <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '14px 18px', fontSize: '13px' }}>
                 <div><strong>Candidate Name:</strong> {leavingCandidate.fullName}</div>
                 <div><strong>Intern ID:</strong> <code style={{ color: '#c084fc' }}>{leavingCandidate.internId || leavingCandidate.candidateId}</code></div>
                 <div><strong>Role & Batch:</strong> {leavingCandidate.role} &bull; {leavingCandidate.batch}</div>

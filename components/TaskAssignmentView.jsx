@@ -1050,18 +1050,17 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 type="button"
                 onClick={() => {
                   setSubTab('automation');
-                  const targetId = selectedCandidateIds[0] || filteredCandidates[0]?.id;
-                  if (targetId) {
-                    loadCandidatePipeline(targetId);
-                  }
+                  const b = (selectedCandidateIds[0] ? candidates.find(c => c.id === selectedCandidateIds[0])?.batch : null) || filteredCandidates[0]?.batch || selectedAutoBatch || 'Batch A';
+                  setSelectedAutoBatch(b);
+                  loadBatchPipeline(b, tasksPerMonthSetting);
                 }}
                 disabled={filteredCandidates.length === 0}
                 className={styles.btnSecondary}
-                style={{ fontSize: '12px', padding: '7px 14px', display: 'inline-flex', alignItems: 'center', gap: '5px', borderColor: '#0284c7', color: '#38bdf8', background: 'rgba(2, 132, 199, 0.1)' }}
-                title="Automatically allocate all tasks from joining date to ending date"
+                style={{ fontSize: '12px', padding: '7px 14px', display: 'inline-flex', alignItems: 'center', gap: '5px', borderColor: '#0284c7', color: '#0284c7', background: 'rgba(2, 132, 199, 0.08)' }}
+                title="Automatically allocate all tasks batch-wise from joining date to ending date"
               >
-                <Zap size={13} color="#38bdf8" />
-                <span>Auto-Allocate Pipeline</span>
+                <Zap size={13} color="#0284c7" />
+                <span>Batch Task Allocation</span>
               </button>
 
               <button
@@ -1086,7 +1085,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   onChange={handleToggleSelectAll}
                   style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                 />
-                <span style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
                   {selectedCandidateIds.length} of {filteredCandidates.length} Selected
                 </span>
               </div>
@@ -1132,20 +1131,22 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                               type="button"
                               onClick={() => {
                                 setSubTab('automation');
-                                loadCandidatePipeline(c.id);
+                                const b = c.batch || 'Batch A';
+                                setSelectedAutoBatch(b);
+                                loadBatchPipeline(b, tasksPerMonthSetting);
                               }}
                               className={styles.btnSecondary}
-                              style={{ fontSize: '11px', padding: '4px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px', borderColor: 'rgba(56, 189, 248, 0.4)', color: '#38bdf8' }}
-                              title="Automatically allocate all tasks from joining to end date"
+                              style={{ fontSize: '11px', padding: '4px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px', borderColor: 'rgba(2, 132, 199, 0.4)', color: '#0284c7' }}
+                              title="Automatically allocate all tasks batch-wise from joining to end date"
                             >
-                              <Zap size={12} color="#38bdf8" />
-                              <span>Auto-Pipeline</span>
+                              <Zap size={12} color="#0284c7" />
+                              <span>Batch Pipeline</span>
                             </button>
                           </td>
-                          <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 600 }}>
+                          <td style={{ fontFamily: 'monospace', color: 'var(--accent-primary)', fontWeight: 600 }}>
                             {c.internId || c.candidateId}
                           </td>
-                          <td style={{ fontWeight: 600, color: '#ffffff' }}>{c.fullName}</td>
+                          <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{c.fullName}</td>
                           <td>{c.role}</td>
                           <td>
                             <span className={styles.badgePurple}>{c.batch || 'Batch A'}</span>
@@ -1184,18 +1185,18 @@ Shortfundly Media Technologies Pvt. Ltd.`;
         <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '30px' }}>
           {/* Main Directive & Automation Banner */}
           <div style={{
-            background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.14) 0%, rgba(59, 130, 246, 0.09) 100%)',
-            border: '1px solid rgba(56, 189, 248, 0.4)',
-            borderRadius: '14px',
+            background: '#f0f9ff',
+            border: '1px solid #bae6fd',
+            borderRadius: '12px',
             padding: '24px 28px',
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '24px', flexWrap: 'wrap' }}>
               <div style={{ flex: '1', minWidth: '320px' }}>
-                <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Zap size={22} color="#38bdf8" />
+                <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', fontWeight: 700, color: '#0369a1', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Zap size={22} color="#0284c7" />
                   <span>Batch-Wise Automated Task Allocation Engine</span>
                 </h3>
-                <p style={{ margin: '0', fontSize: '13.5px', color: '#cbd5e1', lineHeight: 1.65 }}>
+                <p style={{ margin: '0', fontSize: '13.5px', color: '#334155', lineHeight: 1.65 }}>
                   Tasks are automatically calculated and assigned for <strong>every intern in the selected batch</strong> based on their assigned role, from their <strong>Joining Date to Ending Date</strong>.
                   The <strong>first task email is automatically sent on/after the joining date</strong>.
                   HR can customize the start dates, deadlines, Google Meet room link, and <strong>email mail content</strong> for each role below.
@@ -1213,8 +1214,9 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                     fontSize: '12.5px',
                     padding: '10px 16px',
                     borderRadius: '8px',
-                    borderColor: 'rgba(56, 189, 248, 0.5)',
-                    color: '#38bdf8',
+                    borderColor: '#0284c7',
+                    color: '#0284c7',
+                    background: '#ffffff',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
@@ -1451,10 +1453,10 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                  <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 700, color: '#ffffff' }}>
-                    Customizing Sprints & Mail Templates for: <span style={{ color: '#38bdf8' }}>{activeRoleTab}</span>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    Customizing Sprints & Mail Templates for: <span style={{ color: '#0284c7' }}>{activeRoleTab}</span>
                   </h4>
-                  <div style={{ fontSize: '12.5px', color: '#94a3b8' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
                     Applies to all {autoBatchPipelineData.rolesSummary?.[activeRoleTab] || 0} interns enrolled under this role in {autoBatchPipelineData.batchName}.
                   </div>
                 </div>
@@ -1489,7 +1491,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       key={idx}
                       style={{
                         background: 'var(--bg-surface)', boxShadow: 'var(--shadow-sm)',
-                        border: isFirstTask ? '1px solid rgba(56, 189, 248, 0.45)' : '1px solid #202028',
+                        border: isFirstTask ? '1px solid #bae6fd' : '1px solid var(--border-default)',
                         borderRadius: '12px',
                         padding: '24px 28px',
                         display: 'flex',
@@ -1512,8 +1514,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             width: '28px',
                             height: '28px',
                             borderRadius: '50%',
-                            background: isFirstTask ? 'rgba(56, 189, 248, 0.2)' : 'rgba(168, 85, 247, 0.18)',
-                            color: isFirstTask ? '#38bdf8' : '#c084fc',
+                            background: isFirstTask ? '#e0f2fe' : '#ede9fe',
+                            color: isFirstTask ? '#0284c7' : '#6d28d9',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -1522,7 +1524,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           }}>
                             {task.taskNumber}
                           </span>
-                          <strong style={{ fontSize: '15px', color: '#ffffff' }}>
+                          <strong style={{ fontSize: '15px', color: 'var(--text-primary)' }}>
                             Milestone Sprint #{task.taskNumber}: {task.taskId}
                           </strong>
                         </div>
@@ -1663,17 +1665,17 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         gap: '12px',
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Mail size={14} color="#38bdf8" />
+                          <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Mail size={14} color="#0284c7" />
                             <span>HR Customizable Task Mail Template</span>
                           </span>
-                          <span style={{ fontSize: '11px', color: '#64748b' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                             Variables: &#123;&#123;candidate_name&#125;&#125;, &#123;&#123;internId&#125;&#125;, &#123;&#123;taskId&#125;&#125;, &#123;&#123;deadline&#125;&#125;, &#123;&#123;meetLink&#125;&#125;, &#123;&#123;submission_link&#125;&#125;
                           </span>
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                          <label style={{ display: 'block', fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '4px' }}>
                             Email Subject:
                           </label>
                           <input
@@ -1686,7 +1688,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                          <label style={{ display: 'block', fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '4px' }}>
                             Email Body Content:
                           </label>
                           <textarea
@@ -1717,10 +1719,10 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 marginTop: '10px',
               }}>
                 <div>
-                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>
                     Ready to allocate {autoBatchPipelineData.totalTasks} tasks to all {autoBatchPipelineData.totalCandidates} interns in {autoBatchPipelineData.batchName}?
                   </div>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#94a3b8' }}>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
                     Tasks for each role will be saved. Task 1 auto-sends after batch joining date; subsequent tasks auto-dispatch after each review approval.
                   </p>
                 </div>
@@ -1748,11 +1750,11 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--bg-surface)', boxShadow: 'var(--shadow-sm)', borderRadius: '14px', border: '1px solid var(--border-subtle)' }}>
-              <Zap size={38} color="#38bdf8" style={{ margin: '0 auto 12px auto' }} />
-              <h4 style={{ margin: '0 0 8px 0', color: '#ffffff', fontSize: '16px', fontWeight: 700 }}>
+              <Zap size={38} color="#0284c7" style={{ margin: '0 auto 12px auto' }} />
+              <h4 style={{ margin: '0 0 8px 0', color: 'var(--text-primary)', fontSize: '16px', fontWeight: 700 }}>
                 Select a batch above to generate and allocate role-based task roadmaps
               </h4>
-              <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
+              <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)' }}>
                 The engine will distribute tasks across the cohort tenure from joining to ending date.
               </p>
             </div>
@@ -1827,7 +1829,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       </span>
                     </div>
 
-                    <h4 style={{ margin: '0 0 8px 0', fontSize: '14.5px', color: '#ffffff', lineHeight: 1.4 }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '14.5px', color: 'var(--text-primary)', lineHeight: 1.4 }}>
                       {template.title}
                     </h4>
 
@@ -1840,7 +1842,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                     </div>
                   </div>
 
-                  <div style={{ borderTop: '1px solid #1c1c21', paddingTop: '12px', marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <div style={{ borderTop: '1px solid var(--border-default)', paddingTop: '12px', marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <button
                       type="button"
                       onClick={() => {
@@ -1888,7 +1890,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
       {subTab === 'reminder' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           <div style={{ background: 'var(--bg-surface)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border-subtle)', borderRadius: '12px', padding: '24px 28px' }}>
-            <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Clock size={18} color="#a855f7" />
               <span>Automated Task Deadline Reminder Email Dispatcher</span>
             </h3>
@@ -1906,7 +1908,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   &bull; Live Vercel Production Portal
                 </span>
               </div>
-              <div style={{ background: '#08070d', border: '1px solid #1f1d2e', padding: '8px 12px', borderRadius: '6px', fontFamily: 'monospace', fontSize: '12px', color: '#38bdf8', wordBreak: 'break-all' }}>
+              <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', padding: '8px 12px', borderRadius: '6px', fontFamily: 'monospace', fontSize: '12px', color: '#38bdf8', wordBreak: 'break-all' }}>
                 https://internship-email-automation.vercel.app/tasks/submit?token=&#123;&#123;candidate_submission_token&#125;&#125;
               </div>
               <div style={{ marginTop: '8px', fontSize: '11.5px', color: '#94a3b8' }}>
@@ -1921,7 +1923,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   <Clock size={20} color="#c084fc" />
                 </div>
                 <div>
-                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span>Automated 24-Hour Pre-Deadline Reminder Dispatcher</span>
                     <span className={due24hCount > 0 ? styles.badgeRose : styles.badgeEmerald} style={{ fontSize: '11px' }}>
                       {due24hCount} Intern{due24hCount === 1 ? '' : 's'} Due Within 24h
@@ -2015,7 +2017,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               <div className={styles.tableHeaderRow}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Users size={16} color="#c084fc" />
-                  <strong style={{ color: '#ffffff' }}>Select Candidates for Reminder ({selectedReminderIds.length} of {filteredReminderCandidates.length} Selected)</strong>
+                  <strong style={{ color: 'var(--text-primary)' }}>Select Candidates for Reminder ({selectedReminderIds.length} of {filteredReminderCandidates.length} Selected)</strong>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button
@@ -2075,7 +2077,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                               {cand.internId || cand.candidateId}
                             </td>
                             <td>
-                              <div style={{ fontWeight: 600, color: '#ffffff' }}>{cand.fullName}</div>
+                              <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{cand.fullName}</div>
                               <div style={{ fontSize: '11px', color: '#94a3b8' }}>{cand.email}</div>
                             </td>
                             <td>
@@ -2229,7 +2231,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           {item.internId}
                         </td>
                         <td>
-                          <div style={{ fontWeight: 600, color: '#ffffff' }}>{item.fullName}</div>
+                          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{item.fullName}</div>
                           <div style={{ fontSize: '11px', color: '#94a3b8' }}>{item.email}</div>
                         </td>
                         <td>{item.role}</td>
@@ -2369,7 +2371,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             <div className={styles.tableHeaderRow}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Activity size={16} color="#c084fc" />
-                <strong style={{ color: '#ffffff' }}>Task Submission & Review Trigger Pipeline ({filteredTrackerCandidates.length} Interns)</strong>
+                <strong style={{ color: 'var(--text-primary)' }}>Task Submission & Review Trigger Pipeline ({filteredTrackerCandidates.length} Interns)</strong>
               </div>
             </div>
 
@@ -2407,14 +2409,14 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             {cand.internId || cand.candidateId}
                           </td>
                           <td>
-                            <div style={{ fontWeight: 600, color: '#ffffff' }}>{cand.fullName}</div>
+                            <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{cand.fullName}</div>
                             <div style={{ fontSize: '11px', color: '#94a3b8' }}>{cand.role}</div>
                           </td>
                           <td>
                             <span style={{ fontSize: '12px', color: '#cbd5e1' }}>{cand.batch || 'Batch A'}</span>
                           </td>
                           <td>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#ffffff' }}>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
                               Task #{activeTask?.taskNumber || 1}
                             </div>
                             <div style={{ fontSize: '11px', color: '#71717a' }}>
@@ -2518,7 +2520,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 <div className={styles.modalHeader}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Video size={18} color="#a855f7" />
-                    <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff' }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--text-primary)' }}>
                       Schedule Milestone Review & Google Meet Call
                     </h3>
                   </div>
@@ -2535,7 +2537,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                   {/* Candidate summary card */}
                   <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '12px 16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <strong style={{ color: '#ffffff', fontSize: '14px' }}>{reviewTriggerModal.candidate.fullName}</strong>
+                      <strong style={{ color: 'var(--text-primary)', fontSize: '14px' }}>{reviewTriggerModal.candidate.fullName}</strong>
                       <span style={{ fontFamily: 'monospace', color: '#c084fc', fontSize: '12px' }}>{reviewTriggerModal.candidate.internId || reviewTriggerModal.candidate.candidateId}</span>
                     </div>
                     <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '3px' }}>
@@ -2625,7 +2627,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           setReviewTriggerModal({ ...reviewTriggerModal, batchMeetLink: newUrl });
                           showToast?.('Generated new genuine Google Meet URL!', 'info');
                         }}
-                        style={{ background: '#1c1b26', border: '1px solid #332f4a', color: '#c084fc', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', cursor: 'pointer' }}
+                        style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', color: '#c084fc', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', cursor: 'pointer' }}
                       >
                         Regenerate Room URL
                       </button>
@@ -2684,7 +2686,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} style={{ maxWidth: assignMode === 'INDIVIDUAL' ? '820px' : '650px', maxHeight: '90vh', overflowY: 'auto' }}>
             <div className={styles.modalHeader}>
               <div>
-                <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Briefcase size={18} color="#a855f7" />
                   <span>Assign Sprint Tasks ({selectedCandidateIds.length} Interns Selected)</span>
                 </h3>
@@ -2921,7 +2923,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           {/* Candidate Identity Header */}
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1c1c21', paddingBottom: '8px' }}>
                             <div>
-                              <strong style={{ color: '#ffffff', fontSize: '13.5px' }}>{cand?.fullName || 'Intern'}</strong>
+                              <strong style={{ color: 'var(--text-primary)', fontSize: '13.5px' }}>{cand?.fullName || 'Intern'}</strong>
                               <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '8px' }}>
                                 &bull; {cand?.role || 'Intern'} &bull; {cand?.batch || 'Batch A'}
                               </span>
@@ -3255,8 +3257,8 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                             jinjaBody: (editingTemplate.jinjaBody || '') + ` ${chip.val}`,
                           })}
                           style={{
-                            background: '#141417',
-                            border: '1px solid #27272a',
+                            background: 'var(--bg-surface-elevated)',
+                            border: '1px solid var(--border-default)',
                             borderRadius: '4px',
                             padding: '3px 8px',
                             fontSize: '11px',

@@ -705,7 +705,7 @@ www.shortfundly.com`;
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, internId: generateReadableInternId(formData.role) })}
-                  style={{ padding: '0 12px', background: '#141417', border: '1px solid #7c3aed', borderRadius: '6px', color: '#c084fc', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  style={{ padding: '0 12px', background: 'var(--bg-surface-elevated)', border: '1px solid #7c3aed', borderRadius: '6px', color: '#c084fc', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}
                   title="Generate New Readable Intern ID"
                 >
                   Regenerate
@@ -836,7 +836,7 @@ www.shortfundly.com`;
                   </select>
                 </div>
               ) : (
-                <div style={{ background: '#12111d', border: '1px solid #7c3aed44', borderRadius: '8px', padding: '10px' }}>
+                <div style={{ background: 'var(--bg-surface)', border: '1px solid #7c3aed44', borderRadius: '8px', padding: '10px' }}>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <input
                       type="text"
@@ -987,7 +987,7 @@ www.shortfundly.com`;
             </div>
 
             {/* Field 11: Unique Candidate Offer Response Portal Link with Deadline Fixer (Moved here near Expiry Deadline) */}
-            <div className={styles.fieldGroup} style={{ gridColumn: 'span 2', background: '#09090b', padding: '14px 16px', borderRadius: '8px', border: '1px solid #232328' }}>
+            <div className={styles.fieldGroup} style={{ gridColumn: 'span 2', background: 'var(--bg-surface)', padding: '14px 16px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <label className={styles.fieldLabel} style={{ margin: 0 }}>
                   <span style={{ color: '#ffffff', fontWeight: 700 }}>Candidate Offer Acceptance Link</span>
@@ -1002,7 +1002,7 @@ www.shortfundly.com`;
                       navigator.clipboard?.writeText(candidatePortalUrl);
                       showToast?.('Copied Vercel Candidate Portal URL to clipboard!', 'success');
                     }}
-                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#cbd5e1', cursor: 'pointer' }}
+                    style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#cbd5e1', cursor: 'pointer' }}
                   >
                     Copy URL
                   </button>
@@ -1013,7 +1013,7 @@ www.shortfundly.com`;
                       setPortalToken(nextTok);
                       showToast?.('Regenerated candidate portal URL token!', 'info');
                     }}
-                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#c084fc', cursor: 'pointer' }}
+                    style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', color: '#c084fc', cursor: 'pointer' }}
                   >
                     Regenerate URL
                   </button>
@@ -1299,7 +1299,7 @@ www.shortfundly.com`;
           <div className={styles.previewBox}>
             {previewTab === 'email' ? (
               <div style={{ color: '#cbd5e1' }}>
-                <div style={{ background: '#141417', border: '1px solid #27272a', padding: '12px 16px', borderRadius: '6px', marginBottom: '16px', fontSize: '13px' }}>
+                <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', padding: '12px 16px', borderRadius: '6px', marginBottom: '16px', fontSize: '13px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
                     <div>
                       <div><strong>To:</strong> {formData.email} ({formData.fullName})</div>
@@ -1348,7 +1348,7 @@ www.shortfundly.com`;
                       type="button"
                       onClick={loadPdfPreview}
                       disabled={pdfLoading}
-                      style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', color: '#c084fc', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                      style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', color: '#c084fc', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                     >
                       <RefreshCw size={12} className={pdfLoading ? 'animate-spin' : ''} />
                       <span>{pdfLoading ? 'Rendering...' : 'Refresh PDF'}</span>
@@ -1361,7 +1361,7 @@ www.shortfundly.com`;
                           w?.document.write(pdfPreviewHtml);
                           w?.document.close();
                         }}
-                        style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', color: '#38bdf8', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                        style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', color: '#38bdf8', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                       >
                         <Printer size={12} />
                         <span>Open / Print PDF</span>

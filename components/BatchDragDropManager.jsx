@@ -144,7 +144,7 @@ export default function BatchDragDropManager({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '22px 28px' }}>
+      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '12px', padding: '22px 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -189,8 +189,8 @@ export default function BatchDragDropManager({
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, bName)}
               style={{
-                background: '#09090b',
-                border: '1px solid #232328',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border-default)',
                 borderRadius: '10px',
                 padding: '16px',
                 display: 'flex',
@@ -232,8 +232,8 @@ export default function BatchDragDropManager({
                       draggable
                       onDragStart={(e) => handleDragStart(e, c.id)}
                       style={{
-                        background: '#141417',
-                        border: '1px solid #27272a',
+                        background: 'var(--bg-surface-elevated)',
+                        border: '1px solid var(--border-default)',
                         borderRadius: '8px',
                         padding: '12px 14px',
                         cursor: 'grab',

@@ -10,68 +10,242 @@ const DEFAULT_OFFER_PDF_TEMPLATE = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <title>Internship Offer Letter - Shortfundly</title>
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2c3e50; margin: 0; padding: 0; background-color: #f4f6f8; }
-        .wrapper { max-width: 680px; margin: 40px auto; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .header { border-bottom: 2px solid #004aad; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .company-name { font-size: 24px; font-weight: bold; color: #004aad; letter-spacing: 0.5px; }
-        .date { color: #7f8c8d; font-size: 14px; text-align: right; }
-        .content { font-size: 15px; color: #34495e; }
-        .salutation { font-size: 16px; font-weight: bold; margin-bottom: 20px; }
-        .details-box { background: #f8fafc; border-left: 4px solid #004aad; padding: 15px 20px; margin: 25px 0; border-radius: 4px; }
-        .details-box ul { margin: 0; padding-left: 20px; }
-        .details-box li { margin-bottom: 8px; }
-        .section-title { font-size: 16px; font-weight: bold; color: #2c3e50; margin-top: 25px; margin-bottom: 10px; }
-        .signature-block { margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 20px; }
-        .footer-note { font-size: 12px; color: #95a5a6; margin-top: 30px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: #0f172a;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            font-size: 12px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .header-table {
+            width: 100%;
+            border-bottom: 2px solid #6d28d9;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+        .company-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e1b4b;
+            letter-spacing: 1px;
+        }
+        .company-subtitle {
+            font-size: 10px;
+            font-weight: 600;
+            color: #6d28d9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .header-meta {
+            text-align: right;
+            font-size: 10px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        .ref-banner {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #6d28d9;
+            padding: 8px 12px;
+            margin-bottom: 14px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ref-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .ref-date {
+            font-size: 11px;
+            color: #475569;
+        }
+        .salutation {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        .lead-text {
+            font-size: 11.5px;
+            color: #334155;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .terms-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 3px solid #6d28d9;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+        }
+        .terms-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .terms-table td {
+            padding: 4px 8px;
+            vertical-align: top;
+            width: 50%;
+        }
+        .term-label {
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .term-value {
+            color: #0f172a;
+            font-size: 11.5px;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .section-title {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+        .section-desc {
+            font-size: 11px;
+            color: #334155;
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+        .signature-table {
+            width: 100%;
+            margin-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 12px;
+        }
+        .signature-table td {
+            width: 50%;
+            vertical-align: top;
+            padding: 0 8px;
+        }
+        .footer-note {
+            font-size: 9.5px;
+            color: #94a3b8;
+            margin-top: 14px;
+            text-align: center;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 8px;
+        }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <div class="header">
-            <div class="company-name">SHORTFUNDLY</div>
-            <div class="date">Date: {{issueDate}}</div>
-        </div>
-        
-        <div class="content">
-            <div class="salutation">Dear {{candidateName}},</div>
-            
-            <p>We are delighted to offer you the position of <strong>{{role}}</strong> at <strong>Shortfundly</strong>. Your skills, background, and performance throughout our evaluation process stood out, and we are confident that you will make a valuable contribution to our engineering and product teams.</p>
-            
-            <div class="details-box">
-                <strong>Internship Terms & Structure:</strong>
-                <ul>
-                    <li><strong>Position / Role:</strong> {{role}}</li>
-                    <li><strong>Anticipated Start Date:</strong> {{startDate}}</li>
-                    <li><strong>Duration:</strong> {{duration}}</li>
-                    <li><strong>Stipend / Compensation:</strong> {{stipend}}</li>
-                    <li><strong>Work Location / Mode:</strong> {{workMode}} (e.g., Remote / Hybrid / Chennai Office)</li>
-                    <li><strong>Reporting To:</strong> {{reportingManager}}</li>
-                </ul>
-            </div>
+    <table class="header-table">
+        <tr>
+            <td style="vertical-align: middle;">
+                <div class="company-name">SHORTFUNDLY</div>
+                <div class="company-subtitle">Shortfundly Media Technologies Pvt. Ltd.</div>
+            </td>
+            <td class="header-meta" style="vertical-align: middle;">
+                CIN: U72900TN2015PTC099876<br>
+                Chennai, Tamil Nadu, India &bull; PIN 600001<br>
+                Web: www.shortfundly.com &bull; Email: hr@shortfundly.com
+            </td>
+        </tr>
+    </table>
 
-            <div class="section-title">1. Roles and Responsibilities</div>
-            <p>During your internship, you will be involved in core development tasks, collaborating closely with cross-functional teams to build scalable features, optimize workflows, and deliver impactful solutions aligned with company objectives. Specific project milestones will be outlined during your onboarding orientation.</p>
+    <div class="ref-banner">
+        <div class="ref-title">Formal Internship Appointment Offer</div>
+        <div class="ref-date"><strong>Date:</strong> {{issueDate}} &nbsp;|&nbsp; <strong>Ref:</strong> {{candidateId}}</div>
+    </div>
+    
+    <div class="salutation">Dear {{candidateName}},</div>
+    
+    <p class="lead-text">We are delighted to offer you an internship position as <strong>{{role}}</strong> at <strong>Shortfundly Media Technologies Pvt. Ltd.</strong> Your skills, background, and performance throughout our evaluation process stood out, and we are confident that you will make a valuable contribution to our engineering and product teams.</p>
+    
+    <div class="terms-box">
+        <table class="terms-table">
+            <tr>
+                <td>
+                    <div class="term-label">Position / Role</div>
+                    <div class="term-value">{{role}}</div>
+                </td>
+                <td>
+                    <div class="term-label">Anticipated Start Date</div>
+                    <div class="term-value">{{startDate}}</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="term-label">Tenure Duration</div>
+                    <div class="term-value">{{duration}}</div>
+                </td>
+                <td>
+                    <div class="term-label">Monthly Stipend</div>
+                    <div class="term-value">{{stipend}}</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="term-label">Work Location / Mode</div>
+                    <div class="term-value">{{workMode}}</div>
+                </td>
+                <td>
+                    <div class="term-label">Reporting Manager</div>
+                    <div class="term-value">{{reportingManager}}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
 
-            <div class="section-title">2. Confidentiality & Intellectual Property</div>
-            <p>As a team member at Shortfundly, you will have access to proprietary information, trade secrets, and internal codebases. You agree to maintain strict confidentiality regarding all company matters and assign all intellectual property rights developed during your tenure exclusively to Shortfundly.</p>
+    <div class="section-title">1. Roles and Responsibilities</div>
+    <p class="section-desc">During your internship, you will be involved in core development tasks, collaborating closely with cross-functional teams to build scalable features, optimize workflows, and deliver impactful solutions aligned with company objectives.</p>
 
-            <div class="section-title">3. Acceptance of Offer</div>
-            <p>Please review this offer carefully. To confirm your acceptance, kindly sign and return a copy of this letter along with your required onboarding documents by <strong>{{deadline}}</strong>. If you have any questions or require clarification, please feel free to reach out to us.</p>
-            
-            <p>We are excited about the prospect of having you join the Shortfundly family and look forward to achieving great milestones together.</p>
-            
-            <div class="signature-block">
-                <p>Sincerely,</p>
-                <br>
-                <strong>Hiring & Talent Acquisition Team</strong><br>
-                <span>Shortfundly</span><br>
-                <a href="https://www.shortfundly.com" target="_blank" style="color: #004aad; text-decoration: none;">www.shortfundly.com</a>
-            </div>
-        </div>
+    <div class="section-title">2. Confidentiality & Intellectual Property</div>
+    <p class="section-desc">As a team member at Shortfundly, you will have access to proprietary information, trade secrets, and internal codebases. You agree to maintain strict confidentiality regarding all company matters and assign all intellectual property rights developed during your tenure exclusively to Shortfundly.</p>
 
-        <div class="footer-note">
-            This is a computer-generated document from Shortfundly Automated Onboarding System. No physical signature is required.
-        </div>
+    <div class="section-title">3. Acceptance of Offer</div>
+    <p class="section-desc">Please review this offer carefully. To confirm your acceptance, kindly sign and submit your acceptance through our secure candidate verification portal by <strong>{{deadline}}</strong>.</p>
+    
+    <table class="signature-table">
+        <tr>
+            <td>
+                <div style="font-size: 10.5px; color: #475569; margin-bottom: 4px;">For <strong>Shortfundly Media Technologies Pvt. Ltd.</strong></div>
+                <div style="height: 30px; font-family: cursive; font-size: 16px; color: #6d28d9; border-bottom: 1px dashed #cbd5e1; width: 170px; display: table-cell; vertical-align: bottom;">
+                    Authorized Signatory
+                </div>
+                <div style="font-size: 11px; font-weight: 700; color: #0f172a; margin-top: 6px;">Priyanka Nair</div>
+                <div style="font-size: 9.5px; color: #64748b;">Director of Talent Acquisition</div>
+            </td>
+            <td>
+                <div style="font-size: 10.5px; color: #475569; margin-bottom: 4px;">Candidate Confirmation</div>
+                <div style="background: #f1f5f9; border: 1px dashed #6d28d9; border-radius: 4px; padding: 6px 10px;">
+                    <div style="font-size: 9px; font-weight: 700; color: #5b21b6; text-transform: uppercase;">Verified Candidate Portal Acceptance</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #0f172a; margin-top: 2px;">{{candidateName}}</div>
+                    <div style="font-size: 9px; color: #64748b; margin-top: 2px;">Digital Acceptance Record &bull; Ref: {{candidateId}}</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="footer-note">
+        Official Offer of Internship &bull; Shortfundly Media Technologies Pvt. Ltd. &bull; CIN: U72900TN2015PTC099876 &bull; www.shortfundly.com
     </div>
 </body>
 </html>`;

@@ -655,7 +655,7 @@ export default function ReviewDashboardView({
 
       {/* --- SUBTAB 2: SCHEDULE REVIEW 1 (AUTOMATED / SKIP SUNDAY) --- */}
       {subTab === 'schedule-r1' && (
-        <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '12px', padding: '24px 28px' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Clock size={18} color="#a855f7" />
             <span>Schedule Review Meeting & Send Meeting Links</span>
@@ -693,7 +693,7 @@ export default function ReviewDashboardView({
                   value={r1ScheduleForm.reviewDate}
                   onChange={(e) => setR1ScheduleForm({ ...r1ScheduleForm, reviewDate: e.target.value })}
                   className={styles.searchInput}
-                  style={{ colorScheme: 'dark', paddingRight: '36px' }}
+                  style={{ colorScheme: 'light', paddingRight: '36px' }}
                 />
                 <button
                   type="button"
@@ -809,7 +809,7 @@ export default function ReviewDashboardView({
                 />
               </div>
             ) : (
-              <div style={{ background: '#08070d', border: '1px solid #1f1d2e', padding: '10px 14px', borderRadius: '6px', fontSize: '12px', color: '#38bdf8' }}>
+              <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', padding: '10px 14px', borderRadius: '6px', fontSize: '12px', color: '#38bdf8' }}>
                 <div style={{ fontWeight: 600, marginBottom: '2px' }}>Dedicated Individual Google Meet Room:</div>
                 <code style={{ color: '#c084fc' }}>https://meet.google.com/xxx-yyyy-zzz (Unique authentic Google Meet room per candidate)</code>
                 <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
@@ -865,7 +865,7 @@ export default function ReviewDashboardView({
                 <button
                   type="button"
                   onClick={handleToggleSelectAll}
-                  style={{ background: '#1c1c24', border: '1px solid #32323c', color: '#e2e8f0', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                  style={{ background: 'var(--bg-surface-elevated)', border: '1px solid #32323c', color: '#e2e8f0', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
                 >
                   {selectedCandidateIds.length === filteredCandidates.length && filteredCandidates.length > 0 ? 'Deselect All' : 'Select All'}
                 </button>
@@ -946,7 +946,7 @@ export default function ReviewDashboardView({
 
       {/* --- SUBTAB 3: UPLOAD FEEDBACK CSV / EXCEL (SUBSEQUENT REVIEWS) --- */}
       {subTab === 'feedback-upload' && (
-        <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '12px', padding: '24px 28px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '8px' }}>
             <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Upload size={18} color="#a855f7" />
@@ -994,7 +994,7 @@ export default function ReviewDashboardView({
                   value={feedbackMeta.reviewDate}
                   onChange={(e) => setFeedbackMeta({ ...feedbackMeta, reviewDate: e.target.value })}
                   className={styles.searchInput}
-                  style={{ colorScheme: 'dark', paddingRight: '36px' }}
+                  style={{ colorScheme: 'light', paddingRight: '36px' }}
                 />
                 <button
                   type="button"
@@ -1243,7 +1243,7 @@ export default function ReviewDashboardView({
 
       {/* --- SUBTAB 4: TASK COMPLETION CHECKPOINT --- */}
       {subTab === 'checkpoint' && (
-        <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '12px', padding: '24px 28px' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Award size={18} color="#10b981" />
             <span>Mark Tasks Completed</span>
@@ -1260,7 +1260,7 @@ export default function ReviewDashboardView({
 
               if (checkpointCandidates.length === 0) {
                 return (
-                  <div style={{ textAlign: 'center', padding: '36px', background: '#09090b', borderRadius: '8px', border: '1px dashed #27272a', color: '#94a3b8' }}>
+                  <div style={{ textAlign: 'center', padding: '36px', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px dashed #27272a', color: '#94a3b8' }}>
                     <Award size={36} color="#a855f7" style={{ margin: '0 auto 10px auto' }} />
                     <h4 style={{ color: '#ffffff', margin: '0 0 6px 0' }}>No Candidates Ready for Final Checkpoint</h4>
                     <p style={{ margin: 0, fontSize: '13px', maxWidth: '480px', marginInline: 'auto' }}>
@@ -1336,7 +1336,7 @@ export default function ReviewDashboardView({
 
       {/* --- SUBTAB 5: FORMAL WARNING MAIL --- */}
       {subTab === 'warning' && (
-        <div style={{ background: '#0c0c0e', border: '1px solid #232328', borderRadius: '12px', padding: '24px 28px' }}>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '12px', padding: '24px 28px' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <AlertTriangle size={18} color="#ef4444" />
             <span>Formal Performance Warning & Score Reduction Dispatcher</span>
