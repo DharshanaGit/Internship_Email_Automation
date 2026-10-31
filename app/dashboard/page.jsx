@@ -1594,14 +1594,14 @@ export default function DashboardPage() {
             className={styles.userPill}
             style={{
               cursor: 'pointer',
-              background: 'rgba(30, 41, 59, 0.85)',
-              border: '1px solid rgba(56, 189, 248, 0.4)',
-              color: '#f8fafc',
+              background: '#6D28D9',
+              border: '1.5px solid #5B21B6',
+              color: '#FFFFFF',
             }}
             title="View Operational Persona Profile"
           >
-            <UserCheck size={14} style={{ color: '#6D28D9' }} />
-            <span style={{ color: '#0F172A', fontWeight: 600 }}>View Profile</span>
+            <UserCheck size={14} style={{ color: '#FFFFFF' }} />
+            <span style={{ color: '#FFFFFF', fontWeight: 700 }}>View Profile</span>
           </button>
 
           <div className={styles.systemBadge}>
@@ -1824,28 +1824,28 @@ export default function DashboardPage() {
 
             {/* LIVE TELEMETRY COUNTER BANNER: Sent, Failed, Waiting */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '22px' }}>
-              <div className={styles.metricCard} style={{ padding: '16px 18px', borderLeft: '4px solid #7c3aed', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '10px' }}>
-                <div className={styles.metricTitle} style={{ color: '#34d399', fontWeight: 700 }}>OFFER LETTERS SENT</div>
+              <div className={styles.metricCard} style={{ padding: '18px 20px', border: '2px solid #10B981', borderLeft: '6px solid #059669', background: '#F0FDF4', borderRadius: '12px', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.1)' }}>
+                <div className={styles.metricTitle} style={{ color: '#166534', fontWeight: 800, fontSize: '13px', textTransform: 'uppercase' }}>OFFER LETTERS SENT</div>
                 <div className={styles.metricValue} style={{ fontSize: '24px', color: '#0F172A', fontWeight: 800 }}>
                   {stats.offerLetters?.sent || 0}
                 </div>
-                <div className={styles.metricSubtitle} style={{ color: '#475569' }}>Delivered to Inboxes</div>
+                <div className={styles.metricSubtitle} style={{ color: '#14532D', fontWeight: 600 }}>Delivered to Inboxes</div>
               </div>
 
-              <div className={styles.metricCard} style={{ padding: '16px 18px', borderLeft: '4px solid #f43f5e', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '10px' }}>
-                <div className={styles.metricTitle} style={{ color: '#fb7185', fontWeight: 700 }}>FAILED EMAILS</div>
+              <div className={styles.metricCard} style={{ padding: '18px 20px', border: '2px solid #F87171', borderLeft: '6px solid #DC2626', background: '#FEF2F2', borderRadius: '12px', boxShadow: '0 4px 12px rgba(220, 38, 38, 0.1)' }}>
+                <div className={styles.metricTitle} style={{ color: '#991B1B', fontWeight: 800, fontSize: '13px', textTransform: 'uppercase' }}>FAILED EMAILS</div>
                 <div className={styles.metricValue} style={{ fontSize: '24px', color: '#0F172A', fontWeight: 800 }}>
                   {stats.offerLetters?.failed || 0}
                 </div>
-                <div className={styles.metricSubtitle} style={{ color: '#475569' }}>Need Attention</div>
+                <div className={styles.metricSubtitle} style={{ color: '#7F1D1D', fontWeight: 600 }}>Need Attention</div>
               </div>
 
-              <div className={styles.metricCard} style={{ padding: '16px 18px', borderLeft: '4px solid #f59e0b', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '10px' }}>
-                <div className={styles.metricTitle} style={{ color: '#fbbf24', fontWeight: 700 }}>READY TO SEND</div>
+              <div className={styles.metricCard} style={{ padding: '18px 20px', border: '2px solid #FBBF24', borderLeft: '6px solid #D97706', background: '#FFFBEB', borderRadius: '12px', boxShadow: '0 4px 12px rgba(217, 119, 6, 0.1)' }}>
+                <div className={styles.metricTitle} style={{ color: '#92400E', fontWeight: 800, fontSize: '13px', textTransform: 'uppercase' }}>READY TO SEND</div>
                 <div className={styles.metricValue} style={{ fontSize: '24px', color: '#0F172A', fontWeight: 800 }}>
                   {stats.offerLetters?.waiting || stats.offerLetters?.readyToSend || 0}
                 </div>
-                <div className={styles.metricSubtitle} style={{ color: '#475569' }}>Waiting for Review</div>
+                <div className={styles.metricSubtitle} style={{ color: '#78350F', fontWeight: 600 }}>Waiting for Review</div>
               </div>
             </div>
 
@@ -1954,27 +1954,27 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '12px 16px', margin: '14px 0', fontSize: '12.5px', color: '#334155', lineHeight: 1.6 }}>
-                    <strong style={{ color: '#6D28D9' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#e9d5ff' }}>Name, Email ID, Phone Number, Role, Degree, College, JoiningDate, EndingDate, Monthly Stipend (INR)</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Intern IDs & Expiring URLs</strong>.
+                  <div style={{ background: '#FAF5FF', border: '1.5px solid #DDD6FE', borderRadius: '8px', padding: '14px 18px', margin: '14px 0', fontSize: '13px', color: '#1E293B', fontWeight: 500, lineHeight: 1.6 }}>
+                    <strong style={{ color: '#6D28D9' }}>External Google Form Ingestion Workflow:</strong> Export candidate responses from your external Google Form as an Excel or CSV file. The columns match the bulk offer schema (<code style={{ color: '#581C87', background: '#EDE9FE', border: '1px solid #C4B5FD', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Name, Email ID, Phone Number, Role, Degree, College, JoiningDate, EndingDate, Monthly Stipend (INR)</code>). Ingestion validates data, removes invalid rows, auto-groups common joining dates into <strong>Batches (Batch A, Batch B)</strong>, and generates unique <strong>Intern IDs & Expiring URLs</strong>.
                   </div>
 
                   {bulkValidationReport ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
                       <div className={styles.metricCard} style={{ padding: '14px 18px' }}>
-                        <div className={styles.metricTitle}>Total Ingested</div>
-                        <div className={styles.metricValue} style={{ fontSize: '22px' }}>{bulkValidationReport.totalRows}</div>
+                        <div className={styles.metricTitle} style={{ color: '#6D28D9', fontWeight: 800, fontSize: '13px', textTransform: 'uppercase' }}>Total Ingested</div>
+                        <div className={styles.metricValue} style={{ fontSize: '26px', color: '#0F172A', fontWeight: 800 }}>{bulkValidationReport.totalRows}</div>
                       </div>
                       <div className={styles.metricCard} style={{ padding: '14px 18px' }}>
-                        <div className={styles.metricTitle} style={{ color: '#34d399' }}>Valid Records</div>
-                        <div className={styles.metricValue} style={{ fontSize: '22px', color: '#34d399' }}>{bulkValidationReport.validCount}</div>
+                        <div className={styles.metricTitle} style={{ color: '#047857', fontWeight: 800, fontSize: '13px', textTransform: 'uppercase' }}>Valid Records</div>
+                        <div className={styles.metricValue} style={{ fontSize: '26px', color: '#064E3B', fontWeight: 800 }}>{bulkValidationReport.validCount}</div>
                       </div>
                       <div className={styles.metricCard} style={{ padding: '14px 18px' }}>
-                        <div className={styles.metricTitle} style={{ color: '#fbbf24' }}>Duplicate Flags</div>
-                        <div className={styles.metricValue} style={{ fontSize: '22px', color: '#fbbf24' }}>{bulkValidationReport.duplicateCount}</div>
+                        <div className={styles.metricTitle} style={{ color: '#B45309', fontWeight: 800, fontSize: '13px', textTransform: 'uppercase' }}>Duplicate Flags</div>
+                        <div className={styles.metricValue} style={{ fontSize: '26px', color: '#78350F', fontWeight: 800 }}>{bulkValidationReport.duplicateCount}</div>
                       </div>
                       <div className={styles.metricCard} style={{ padding: '14px 18px' }}>
-                        <div className={styles.metricTitle} style={{ color: '#fb7185' }}>Invalid Rows</div>
-                        <div className={styles.metricValue} style={{ fontSize: '22px', color: '#fb7185' }}>{bulkValidationReport.invalidCount}</div>
+                        <div className={styles.metricTitle} style={{ color: '#B91C1C', fontWeight: 800, fontSize: '13px', textTransform: 'uppercase' }}>Invalid Rows</div>
+                        <div className={styles.metricValue} style={{ fontSize: '26px', color: '#7F1D1D', fontWeight: 800 }}>{bulkValidationReport.invalidCount}</div>
                       </div>
                     </div>
                   ) : (
@@ -4956,7 +4956,7 @@ export default function DashboardPage() {
                           whiteSpace: 'pre-wrap',
                           minHeight: '360px',
                           background: 'var(--bg-surface)',
-                          color: '#f8fafc',
+                          color: '#FFFFFF',
                           border: '1px solid var(--border-default)',
                           borderRadius: '8px',
                           padding: '14px',
@@ -5198,7 +5198,7 @@ export default function DashboardPage() {
                     fontSize: '13px',
                     lineHeight: '1.6',
                     background: 'var(--bg-surface)',
-                    color: '#f8fafc',
+                    color: '#FFFFFF',
                     border: '1px solid var(--border-default)',
                     borderRadius: '8px',
                     padding: '14px',

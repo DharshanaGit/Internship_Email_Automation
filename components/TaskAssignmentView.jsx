@@ -1344,50 +1344,50 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 gap: '16px',
                 marginTop: '4px',
               }}>
-                <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', padding: '16px 18px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '13px', color: '#475569', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                <div style={{ background: '#FFFFFF', border: '2px solid #7C3AED', padding: '18px 20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(109, 40, 217, 0.08)' }}>
+                  <div style={{ fontSize: '13px', color: '#6D28D9', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.5px' }}>
                     Enrolled Interns
                   </div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '6px' }}>
+                  <div style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', marginTop: '6px' }}>
                     {autoBatchPipelineData.totalCandidates} Candidates
                   </div>
-                  <div style={{ fontSize: '13px', color: '#38bdf8', marginTop: '3px' }}>
+                  <div style={{ fontSize: '13.5px', color: '#5B21B6', fontWeight: 700, marginTop: '3px' }}>
                     In {autoBatchPipelineData.batchName}
                   </div>
                 </div>
 
-                <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', padding: '16px 18px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '13px', color: '#475569', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                <div style={{ background: '#FFFFFF', border: '2px solid #3B82F6', padding: '18px 20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.08)' }}>
+                  <div style={{ fontSize: '13px', color: '#1D4ED8', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.5px' }}>
                     Tenure Window
                   </div>
-                  <div style={{ fontSize: '14.5px', fontWeight: 700, color: '#38bdf8', marginTop: '6px' }}>
+                  <div style={{ fontSize: '15.5px', fontWeight: 800, color: '#0F172A', marginTop: '6px' }}>
                     {autoBatchPipelineData.joiningDate} &rarr; {autoBatchPipelineData.endDate}
                   </div>
-                  <div style={{ fontSize: '13px', color: '#475569', marginTop: '3px' }}>
+                  <div style={{ fontSize: '13.5px', color: '#1E40AF', fontWeight: 700, marginTop: '3px' }}>
                     Joining to End Date
                   </div>
                 </div>
 
-                <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', padding: '16px 18px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '13px', color: '#475569', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                <div style={{ background: '#FFFFFF', border: '2px solid #9333EA', padding: '18px 20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(147, 51, 234, 0.08)' }}>
+                  <div style={{ fontSize: '13px', color: '#7E22CE', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.5px' }}>
                     Duration & Velocity
                   </div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#a855f7', marginTop: '6px' }}>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#6B21A8', marginTop: '6px' }}>
                     {autoBatchPipelineData.durationMonths} Months ({autoBatchPipelineData.totalDays} Days)
                   </div>
-                  <div style={{ fontSize: '13px', color: '#475569', marginTop: '3px' }}>
+                  <div style={{ fontSize: '13.5px', color: '#581C87', fontWeight: 700, marginTop: '3px' }}>
                     Rate: {autoBatchPipelineData.tasksPerMonth} tasks / month
                   </div>
                 </div>
 
-                <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', padding: '16px 18px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '13px', color: '#475569', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+                <div style={{ background: '#FFFFFF', border: '2px solid #059669', padding: '18px 20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(5, 150, 105, 0.08)' }}>
+                  <div style={{ fontSize: '13px', color: '#047857', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.5px' }}>
                     Allocated Sprints
                   </div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#34d399', marginTop: '6px' }}>
+                  <div style={{ fontSize: '22px', fontWeight: 800, color: '#065F46', marginTop: '6px' }}>
                     {autoBatchPipelineData.totalTasks} Tasks Per Intern
                   </div>
-                  <div style={{ fontSize: '13px', color: '#475569', marginTop: '3px' }}>
+                  <div style={{ fontSize: '13.5px', color: '#064E3B', fontWeight: 700, marginTop: '3px' }}>
                     ~{autoBatchPipelineData.intervalDays} days per sprint
                   </div>
                 </div>
@@ -1899,25 +1899,25 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             </p>
 
             {/* Unique Website Submission Portal URL banner */}
-            <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '14px 18px', marginBottom: '20px' }}>
+            <div style={{ background: '#FAF5FF', border: '2px solid #DDD6FE', borderRadius: '12px', padding: '18px 22px', marginBottom: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <label style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#e2e8f0' }}>
+                <label style={{ margin: 0, fontSize: '13px', fontWeight: 800, color: '#0F172A' }}>
                   Unique Candidate Submission Website URL (Auto-Generated per Candidate)
                 </label>
                 <span style={{ fontSize: '12.5px', color: '#10b981', fontWeight: 600 }}>
                   &bull; Live Vercel Production Portal
                 </span>
               </div>
-              <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', padding: '8px 12px', borderRadius: '6px', fontFamily: 'monospace', fontSize: '13px', color: '#38bdf8', wordBreak: 'break-all' }}>
+              <div style={{ background: '#FFFFFF', border: '1.5px solid #C4B5FD', padding: '10px 14px', borderRadius: '8px', fontFamily: 'monospace', fontSize: '13.5px', color: '#6D28D9', fontWeight: 700, wordBreak: 'break-all' }}>
                 https://internship-email-automation.vercel.app/tasks/submit?token=&#123;&#123;candidate_submission_token&#125;&#125;
               </div>
-              <div style={{ marginTop: '8px', fontSize: '13px', color: '#475569' }}>
+              <div style={{ marginTop: '8px', fontSize: '13px', color: '#1E293B', fontWeight: 500 }}>
                 Candidate submits live project demo URL + GitHub repository link directly on the web app. Upon submission, the candidate is automatically transitioned to <strong>Under Review</strong>, an automated confirmation email is dispatched, and HR is notified to conduct the milestone review.
               </div>
             </div>
 
             {/* Automated 24-Hour Pre-Deadline Reminders Card */}
-            <div style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%)', border: '1px solid rgba(168, 85, 247, 0.35)', borderRadius: '10px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ background: '#FAF5FF', border: '2px solid #DDD6FE', borderRadius: '12px', padding: '18px 22px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ width: '38px', height: '38px', borderRadius: '8px', background: 'rgba(168, 85, 247, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Clock size={20} color="#c084fc" />
@@ -1929,7 +1929,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                       {due24hCount} Intern{due24hCount === 1 ? '' : 's'} Due Within 24h
                     </span>
                   </div>
-                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#475569' }}>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#334155', fontWeight: 500 }}>
                     Automated scan detects candidates with tasks expiring within 24 hours who haven't submitted yet, and sends official submission portal reminders.
                   </p>
                 </div>
@@ -2166,14 +2166,14 @@ Shortfundly Media Technologies Pvt. Ltd.`;
           </div>
 
           {/* --- AUTOMATED OVERDUE WARNING & MANUAL CUSTOMIZATION CARD --- */}
-          <div style={{ background: 'var(--bg-surface)', boxShadow: 'var(--shadow-sm)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', padding: '24px 28px' }}>
+          <div style={{ background: '#FFF5F5', boxShadow: '0 4px 12px rgba(220, 38, 38, 0.08)', border: '2px solid #FCA5A5', borderRadius: '12px', padding: '24px 28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', color: '#fee2e2', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 style={{ margin: '0 0 6px 0', fontSize: '18px', color: '#991B1B', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <ShieldAlert size={18} color="#ef4444" />
                   <span>Overdue Task Warning & Performance Deduction Management</span>
                 </h3>
-                <p style={{ margin: 0, fontSize: '13px', color: '#fca5a5' }}>
+                <p style={{ margin: 0, fontSize: '13.5px', color: '#7F1D1D', fontWeight: 600 }}>
                   If a task is not submitted by the deadline, automatically dispatch warning notices with reduced performance percentage, or manually customize email content & recipient mail ID.
                 </p>
               </div>
@@ -2231,13 +2231,13 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                           {item.internId}
                         </td>
                         <td>
-                          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{item.fullName}</div>
-                          <div style={{ fontSize: '12.5px', color: '#475569' }}>{item.email}</div>
+                          <div style={{ fontWeight: 700, color: '#0F172A', fontSize: '14px' }}>{item.fullName}</div>
+                          <div style={{ fontSize: '13px', color: '#1E293B', fontWeight: 500 }}>{item.email}</div>
                         </td>
-                        <td>{item.role}</td>
+                        <td style={{ color: '#0F172A', fontWeight: 600 }}>{item.role}</td>
                         <td>
-                          <div style={{ color: '#fca5a5', fontWeight: 600 }}>Task #{item.taskNumber}: {item.title}</div>
-                          <div style={{ fontSize: '12.5px', color: '#ef4444' }}>
+                          <div style={{ color: '#B91C1C', fontWeight: 700 }}>Task #{item.taskNumber}: {item.title}</div>
+                          <div style={{ fontSize: '12.5px', color: '#DC2626', fontWeight: 600 }}>
                             Expired: {item.deadline ? new Date(item.deadline).toLocaleString() : 'Past Due'}
                           </div>
                         </td>
