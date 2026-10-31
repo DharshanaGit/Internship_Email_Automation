@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { recordTaskCompletion } from '@/lib/excelTaskUpdater';
 import { sendEmail } from '@/lib/mailer';
+import { triggerNextAutomatedTask } from '@/lib/taskPipelineService';
+import { getAppBaseUrl } from '@/lib/offerService';
 
 export async function POST(request) {
   try {
@@ -23,7 +25,7 @@ export async function POST(request) {
       );
     }
 
-    // 1. Record completion in SQLite and auto-update Excel file on disk
+    // 1. Record completion in SQLite/Postgres and auto-update Excel file on disk
     const result = await recordTaskCompletion(targetCandidateId, feedbackNotes);
 
     // 2. Dispatch Task Completion Notification email
@@ -60,6 +62,14 @@ export async function POST(request) {
         text: `Dear ${candidate.fullName}, your milestone task has been completed and approved. Total tasks completed: ${result.tasksCompleted}.`,
         emailType: 'TASK_COMPLETED',
       });
+
+      // 3. Automated trigger for candidate's next scheduled task mail
+      try {
+        const baseUrl = getAppBaseUrl();
+        await triggerNextAutomatedTask(candidate.id, result.tasksCompleted, baseUrl);
+      } catch (triggerErr) {
+        console.error('Error triggering next automated task:', triggerErr);
+      }
     }
 
     return NextResponse.json({

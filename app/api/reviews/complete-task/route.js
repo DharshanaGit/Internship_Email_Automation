@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
 import { sendEmail } from '@/lib/mailer.js';
 import { jinjaTextToEmailHtml } from '@/lib/jinjaEngine.js';
+import { triggerNextAutomatedTask } from '@/lib/taskPipelineService.js';
+import { getAppBaseUrl } from '@/lib/offerService.js';
 
 export async function POST(request) {
   try {
@@ -118,6 +120,15 @@ Shortfundly Media Technologies Pvt. Ltd.`;
         },
       });
 
+      // Automatically trigger next automated task in sequence after task completion email
+      let nextTaskTriggerResult = null;
+      try {
+        const baseUrl = getAppBaseUrl();
+        nextTaskTriggerResult = await triggerNextAutomatedTask(candidate.id, taskNumber, baseUrl);
+      } catch (triggerErr) {
+        console.error(`Error triggering next task for ${candidate.fullName}:`, triggerErr);
+      }
+
       results.push({
         candidateId: candidate.id,
         internId: candidate.internId || candidate.candidateId,
@@ -125,6 +136,9 @@ Shortfundly Media Technologies Pvt. Ltd.`;
         awardedScore,
         overallAvg,
         success: dispatch.success,
+        nextTaskTriggered: nextTaskTriggerResult?.triggered || false,
+        nextTaskNumber: nextTaskTriggerResult?.nextTaskNumber || null,
+        allMilestonesCompleted: nextTaskTriggerResult?.allCompleted || false,
       });
     }
 

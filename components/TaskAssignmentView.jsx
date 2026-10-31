@@ -24,6 +24,10 @@ import {
   Calendar,
   FileSpreadsheet,
   Download,
+  Zap,
+  ShieldAlert,
+  CheckSquare,
+  Edit3,
 } from 'lucide-react';
 import * as xlsx from 'xlsx';
 import { renderJinja, jinjaTextToEmailHtml } from '../lib/jinjaEngine.js';
@@ -81,6 +85,231 @@ export default function TaskAssignmentView({
     customJinja: '',
   });
   const [dispatching, setDispatching] = useState(false);
+
+  // --- SUBTAB: TASK AUTOMATION PIPELINE (JOINING TO END DATE) ---
+  const [selectedAutoCandidateId, setSelectedAutoCandidateId] = useState('');
+  const [autoPipelineData, setAutoPipelineData] = useState(null);
+  const [isAutoLoading, setIsAutoLoading] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [autoCustomTaskCount, setAutoCustomTaskCount] = useState(0);
+  const [isTriggeringJoining, setIsTriggeringJoining] = useState(false);
+
+  // --- SUBTAB: OVERDUE WARNINGS AUTOMATION & MANUAL CUSTOMIZATION ---
+  const [overdueTasksList, setOverdueTasksList] = useState([]);
+  const [loadingOverdue, setLoadingOverdue] = useState(false);
+  const [scanningOverdue, setScanningOverdue] = useState(false);
+  const [manualWarningModal, setManualWarningModal] = useState({
+    isOpen: false,
+    candidate: null,
+    recipientEmail: '',
+    customSubject: '',
+    customBody: '',
+    penaltyAmount: 10,
+    graceHours: 48,
+    customNote: '',
+  });
+  const [sendingManualWarning, setSendingManualWarning] = useState(false);
+
+  // Load Overdue Tasks
+  const loadOverdueTasks = async () => {
+    try {
+      setLoadingOverdue(true);
+      const res = await fetch('/api/tasks/check-deadlines-and-warn');
+      const data = await res.json();
+      if (data.success) {
+        setOverdueTasksList(data.overdueTasks || []);
+      }
+    } catch (err) {
+      console.warn('Error loading overdue tasks:', err);
+    } finally {
+      setLoadingOverdue(false);
+    }
+  };
+
+  // Automated scan for overdue tasks and warning dispatch
+  const handleScanOverdueWarnings = async () => {
+    try {
+      setScanningOverdue(true);
+      const res = await fetch('/api/tasks/check-deadlines-and-warn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ penaltyAmount: 10, graceHours: 48 }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast?.(data.message || 'Overdue scan completed!', 'success');
+        loadOverdueTasks();
+        onRefresh?.();
+      } else {
+        showToast?.(data.error || 'Failed to scan overdue tasks', 'error');
+      }
+    } catch (err) {
+      showToast?.(err.message, 'error');
+    } finally {
+      setScanningOverdue(false);
+    }
+  };
+
+  // Open manual warning modal with prefilled customizable values
+  const handleOpenManualWarning = (candidateOrOverdue) => {
+    const cand = candidateOrOverdue.candidate || candidateOrOverdue;
+    const taskTitle = candidateOrOverdue.title || 'Assigned Milestone';
+    const taskNum = candidateOrOverdue.taskNumber || 1;
+
+    setManualWarningModal({
+      isOpen: true,
+      candidate: cand,
+      recipientEmail: candidateOrOverdue.email || cand.email || '',
+      customSubject: `Official Warning: Performance Deduction (-10%) Applied for Task Non-Submission - ${cand.fullName}`,
+      customBody: `Dear ${cand.fullName},
+
+This is an **Official Formal Warning Notice** regarding your non-submission of internship milestone deliverables by the designated deadline.
+
+**Audit & Infraction Findings:**
+- **Intern ID:** ${cand.internId || cand.candidateId}
+- **Assigned Role:** ${cand.role}
+- **Milestone:** Task #${taskNum} - ${taskTitle}
+- **Infraction:** Deliverables were not submitted prior to the official deadline.
+- **Performance Score Reduction:** **-10%** (Score reduced from ${cand.performancePercentage || 100}% to ${Math.max(0, (cand.performancePercentage || 100) - 10)}%)
+- **Grace Period Granted:** 48 Hours to complete and upload repository link.
+
+Please submit your project repository URL immediately via your unique portal.
+
+Sincerely,
+Talent Evaluation Operations
+Shortfundly Media Technologies Pvt. Ltd.`,
+      penaltyAmount: 10,
+      graceHours: 48,
+      customNote: '',
+    });
+  };
+
+  const handleSendManualWarning = async () => {
+    if (!manualWarningModal.recipientEmail) {
+      showToast?.('Recipient email ID is required.', 'error');
+      return;
+    }
+    try {
+      setSendingManualWarning(true);
+      const res = await fetch('/api/tasks/send-warning', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateId: manualWarningModal.candidate.id,
+          customRecipientEmail: manualWarningModal.recipientEmail,
+          customSubject: manualWarningModal.customSubject,
+          customBody: manualWarningModal.customBody,
+          penaltyAmount: manualWarningModal.penaltyAmount,
+          customNote: manualWarningModal.customNote,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast?.('Formal warning notice dispatched to ' + manualWarningModal.recipientEmail + ' with penalty applied!', 'success');
+        setManualWarningModal(prev => ({ ...prev, isOpen: false }));
+        loadOverdueTasks();
+        onRefresh?.();
+      } else {
+        showToast?.(data.error || 'Failed to dispatch warning', 'error');
+      }
+    } catch (err) {
+      showToast?.(err.message, 'error');
+    } finally {
+      setSendingManualWarning(false);
+    }
+  };
+
+  // Load pipeline for a candidate
+  const loadCandidatePipeline = async (candId, count = null) => {
+    if (!candId) return;
+    try {
+      setIsAutoLoading(true);
+      setSelectedAutoCandidateId(candId);
+      const res = await fetch('/api/tasks/pipeline/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateId: candId,
+          customTaskCount: count || (autoCustomTaskCount > 0 ? autoCustomTaskCount : null),
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.singlePipeline) {
+        setAutoPipelineData(data.singlePipeline);
+        setAutoCustomTaskCount(data.singlePipeline.taskCount);
+      } else {
+        showToast?.(data.error || 'Failed to generate pipeline', 'error');
+      }
+    } catch (err) {
+      console.error('Error loading pipeline:', err);
+      showToast?.('Error generating pipeline: ' + err.message, 'error');
+    } finally {
+      setIsAutoLoading(false);
+    }
+  };
+
+  const handleSaveAndActivatePipeline = async () => {
+    if (!autoPipelineData || !autoPipelineData.tasks || autoPipelineData.tasks.length === 0) {
+      showToast?.('No task pipeline generated yet.', 'error');
+      return;
+    }
+    try {
+      setIsAutoSaving(true);
+      const res = await fetch('/api/tasks/pipeline/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateId: autoPipelineData.candidateId,
+          tasks: autoPipelineData.tasks,
+          autoSendFirstTask: true,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast?.(data.message || 'Automated task pipeline activated!', 'success');
+        onRefresh?.();
+        loadCandidatePipeline(autoPipelineData.candidateId);
+      } else {
+        showToast?.(data.error || 'Failed to save pipeline', 'error');
+      }
+    } catch (err) {
+      showToast?.(err.message, 'error');
+    } finally {
+      setIsAutoSaving(false);
+    }
+  };
+
+  const handleTriggerDueJoiningTasks = async () => {
+    try {
+      setIsTriggeringJoining(true);
+      const res = await fetch('/api/tasks/pipeline/trigger-due', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        showToast?.(data.message || `${data.dispatchedCount} first tasks dispatched!`, 'success');
+        onRefresh?.();
+      } else {
+        showToast?.(data.error || 'Failed to check joining dates', 'error');
+      }
+    } catch (err) {
+      showToast?.(err.message, 'error');
+    } finally {
+      setIsTriggeringJoining(false);
+    }
+  };
+
+  const handleUpdatePipelineTaskField = (taskIndex, field, value) => {
+    if (!autoPipelineData) return;
+    const updatedTasks = [...autoPipelineData.tasks];
+    updatedTasks[taskIndex] = {
+      ...updatedTasks[taskIndex],
+      [field]: value,
+    };
+    setAutoPipelineData({
+      ...autoPipelineData,
+      tasks: updatedTasks,
+    });
+  };
+
 
   // Template Management Modal
   const [editingTemplate, setEditingTemplate] = useState(null);
@@ -689,6 +918,22 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
           <button
             type="button"
+            onClick={() => {
+              setSubTab('automation');
+              const targetId = selectedCandidateIds[0] || filteredCandidates[0]?.id || candidates[0]?.id;
+              if (targetId) {
+                loadCandidatePipeline(targetId);
+              }
+            }}
+            className={`${styles.subTabBtn} ${subTab === 'automation' ? styles.subTabBtnActive : ''}`}
+            style={subTab === 'automation' ? { borderBottom: '2px solid #38bdf8', color: '#38bdf8' } : {}}
+          >
+            <Zap size={14} color="#38bdf8" />
+            <span>Task Automation (Joining &rarr; End Date)</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setSubTab('templates')}
             className={`${styles.subTabBtn} ${subTab === 'templates' ? styles.subTabBtnActive : ''}`}
           >
@@ -798,6 +1043,24 @@ Shortfundly Media Technologies Pvt. Ltd.`;
 
               <button
                 type="button"
+                onClick={() => {
+                  setSubTab('automation');
+                  const targetId = selectedCandidateIds[0] || filteredCandidates[0]?.id;
+                  if (targetId) {
+                    loadCandidatePipeline(targetId);
+                  }
+                }}
+                disabled={filteredCandidates.length === 0}
+                className={styles.btnSecondary}
+                style={{ fontSize: '12px', padding: '7px 14px', display: 'inline-flex', alignItems: 'center', gap: '5px', borderColor: '#0284c7', color: '#38bdf8', background: 'rgba(2, 132, 199, 0.1)' }}
+                title="Automatically allocate all tasks from joining date to ending date"
+              >
+                <Zap size={13} color="#38bdf8" />
+                <span>Auto-Allocate Pipeline</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleOpenAssignModal}
                 disabled={selectedCandidateIds.length === 0}
                 className={styles.btnPrimary}
@@ -829,6 +1092,7 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                 <thead>
                   <tr>
                     <th style={{ width: '40px' }}>Select</th>
+                    <th>Action</th>
                     <th>Intern ID</th>
                     <th>Candidate Name</th>
                     <th>Role</th>
@@ -857,6 +1121,21 @@ Shortfundly Media Technologies Pvt. Ltd.`;
                               onChange={() => handleToggleSelectOne(c.id)}
                               style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                             />
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSubTab('automation');
+                                loadCandidatePipeline(c.id);
+                              }}
+                              className={styles.btnSecondary}
+                              style={{ fontSize: '11px', padding: '4px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px', borderColor: 'rgba(56, 189, 248, 0.4)', color: '#38bdf8' }}
+                              title="Automatically allocate all tasks from joining to end date"
+                            >
+                              <Zap size={12} color="#38bdf8" />
+                              <span>Auto-Pipeline</span>
+                            </button>
                           </td>
                           <td style={{ fontFamily: 'monospace', color: '#c084fc', fontWeight: 600 }}>
                             {c.internId || c.candidateId}
@@ -894,6 +1173,339 @@ Shortfundly Media Technologies Pvt. Ltd.`;
           </div>
         </div>
       )}
+
+      {/* --- SUBTAB: TASK AUTOMATION (JOINING TO END DATE ALLOCATION) --- */}
+      {subTab === 'automation' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Main Automation Directive Banner */}
+          <div style={{ background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%)', border: '1px solid rgba(56, 189, 248, 0.35)', borderRadius: '12px', padding: '20px 24px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+              <div>
+                <h3 style={{ margin: '0 0 6px 0', fontSize: '17px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Zap size={20} color="#38bdf8" />
+                  <span>Automated Task Allocation Engine (Joining Date &rarr; Ending Date)</span>
+                </h3>
+                <p style={{ margin: '0', fontSize: '13px', color: '#94a3b8', maxWidth: '850px', lineHeight: 1.6 }}>
+                  Tasks are automatically calculated and distributed across the intern's tenure from their <strong>Joining Date</strong> to <strong>Ending Date</strong>.
+                  The <strong>first task is automatically dispatched</strong> on or after the candidate's joining date.
+                  HR can customize the start dates, deadlines, tasks, and Google Meet link below, but <strong>sending is fully automated</strong>.
+                  After multiple review cycles when the milestone task is completed, the <strong>next automated task email is triggered instantly</strong>!
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={handleTriggerDueJoiningTasks}
+                  disabled={isTriggeringJoining}
+                  className={styles.btnSecondary}
+                  style={{ fontSize: '12px', padding: '8px 14px', borderColor: '#38bdf8', color: '#38bdf8' }}
+                  title="Scan for candidates whose joining date is today or past and auto-dispatch Task 1"
+                >
+                  <RefreshCw size={13} className={isTriggeringJoining ? styles.spin : ''} />
+                  <span>{isTriggeringJoining ? 'Checking...' : 'Dispatch Due Joining Tasks'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Intern Selection & Tenure Overview Bar */}
+          <div style={{ background: '#0e0e12', border: '1px solid #232328', borderRadius: '12px', padding: '20px 24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1.2fr) repeat(4, 1fr)', gap: '16px', alignItems: 'center' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+                  Select Intern to Configure Pipeline:
+                </label>
+                <select
+                  value={selectedAutoCandidateId}
+                  onChange={(e) => loadCandidatePipeline(e.target.value)}
+                  className={styles.selectInput}
+                  style={{ width: '100%', padding: '9px 12px', fontSize: '13px' }}
+                >
+                  <option value="">-- Choose Candidate ({candidates.length} Available) --</option>
+                  {candidates.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.fullName} ({c.internId || c.candidateId}) &bull; {c.role} [{c.batch || 'Batch A'}]
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {autoPipelineData && (
+                <>
+                  <div style={{ background: '#141419', border: '1px solid #26262b', padding: '10px 14px', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', fontWeight: 700 }}>Joining Date</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#38bdf8', marginTop: '2px' }}>
+                      {autoPipelineData.joiningDate || 'N/A'}
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#141419', border: '1px solid #26262b', padding: '10px 14px', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', fontWeight: 700 }}>Ending Date</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#f43f5e', marginTop: '2px' }}>
+                      {autoPipelineData.endDate || 'N/A'}
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#141419', border: '1px solid #26262b', padding: '10px 14px', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', fontWeight: 700 }}>Total Duration</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#e2e8f0', marginTop: '2px' }}>
+                      {autoPipelineData.totalDays} Days (~{Math.round(autoPipelineData.totalDays / 30)} Mo)
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#141419', border: '1px solid #26262b', padding: '10px 14px', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', fontWeight: 700 }}>Pipeline Milestones</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#34d399', marginTop: '2px' }}>
+                      {autoPipelineData.taskCount} Sprints Allocated
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Task Count Adjustment & Generation Button */}
+            {autoPipelineData && (
+              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #1f1f23', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <label style={{ fontSize: '12.5px', color: '#94a3b8' }}>Tenure Sprints Partition:</label>
+                  <select
+                    value={autoCustomTaskCount || autoPipelineData.taskCount}
+                    onChange={(e) => {
+                      const count = parseInt(e.target.value, 10);
+                      setAutoCustomTaskCount(count);
+                      loadCandidatePipeline(selectedAutoCandidateId, count);
+                    }}
+                    className={styles.selectInput}
+                    style={{ padding: '6px 12px', fontSize: '12.5px' }}
+                  >
+                    <option value={2}>2 Tasks (Bi-Weekly Sprints)</option>
+                    <option value={3}>3 Tasks (Monthly Sprints)</option>
+                    <option value={4}>4 Tasks (Standard 3-Month Pipeline)</option>
+                    <option value={5}>5 Tasks (Extended Sprint Milestones)</option>
+                    <option value={6}>6 Tasks (Intensive Sprint Schedule)</option>
+                  </select>
+                  <span style={{ fontSize: '11.5px', color: '#64748b' }}>
+                    &bull; Each task is allocated ~{autoPipelineData.intervalDays} days
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSaveAndActivatePipeline}
+                  disabled={isAutoSaving}
+                  className={styles.btnPrimary}
+                  style={{ background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)', padding: '9px 20px', fontSize: '13px' }}
+                >
+                  <Zap size={14} />
+                  <span>{isAutoSaving ? 'Activating Pipeline...' : 'Save & Activate Automated Pipeline'}</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Timeline Cards for Each Automated Task */}
+          {isAutoLoading ? (
+            <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
+              <RefreshCw size={24} className={styles.spin} style={{ margin: '0 auto 12px auto' }} />
+              <div>Calculating tenure intervals & generating role-based task roadmap...</div>
+            </div>
+          ) : autoPipelineData && autoPipelineData.tasks ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>
+                  Automated Sprint Sequence for {autoPipelineData.fullName} ({autoPipelineData.role})
+                </div>
+                <div style={{ fontSize: '12px', color: '#38bdf8' }}>
+                  HR only customizes values below &bull; Dispatching is 100% automated
+                </div>
+              </div>
+
+              {autoPipelineData.tasks.map((task, idx) => {
+                const isFirstTask = idx === 0;
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      background: '#0c0c0e',
+                      border: isFirstTask ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid #1f1f24',
+                      borderRadius: '10px',
+                      padding: '18px 20px',
+                      position: 'relative',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid #1a1a20', paddingBottom: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{
+                          width: '26px',
+                          height: '26px',
+                          borderRadius: '50%',
+                          background: isFirstTask ? 'rgba(56, 189, 248, 0.2)' : 'rgba(168, 85, 247, 0.15)',
+                          color: isFirstTask ? '#38bdf8' : '#c084fc',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                        }}>
+                          {task.taskNumber}
+                        </span>
+                        <strong style={{ fontSize: '14px', color: '#ffffff' }}>
+                          Sprint Milestone #{task.taskNumber}: {task.taskId}
+                        </strong>
+                      </div>
+
+                      <div>
+                        {isFirstTask ? (
+                          <span className={styles.badgeCyan} style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <Zap size={11} /> Auto-dispatches on Joining Date ({task.explanationDate})
+                          </span>
+                        ) : (
+                          <span className={styles.badgePurple} style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <Clock size={11} /> Auto-dispatches after Task #{task.taskNumber - 1} Completion Mail
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Customizable Inputs Grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginBottom: '12px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                          Explanation / Start Date:
+                        </label>
+                        <input
+                          type="date"
+                          value={task.explanationDate || ''}
+                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'explanationDate', e.target.value)}
+                          className={styles.searchInput}
+                          style={{ fontSize: '12px', padding: '6px 10px' }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                          Explanation Time:
+                        </label>
+                        <input
+                          type="text"
+                          value={task.explanationTime || '11:00 AM IST'}
+                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'explanationTime', e.target.value)}
+                          className={styles.searchInput}
+                          style={{ fontSize: '12px', padding: '6px 10px' }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                          Submission Deadline:
+                        </label>
+                        <input
+                          type="date"
+                          value={task.deadline || ''}
+                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'deadline', e.target.value)}
+                          className={styles.searchInput}
+                          style={{ fontSize: '12px', padding: '6px 10px' }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                          Review Milestone Date:
+                        </label>
+                        <input
+                          type="date"
+                          value={task.reviewDate || ''}
+                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'reviewDate', e.target.value)}
+                          className={styles.searchInput}
+                          style={{ fontSize: '12px', padding: '6px 10px' }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Google Meet Link with Regeneration */}
+                    <div style={{ marginBottom: '12px' }}>
+                      <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                        Google Meet Briefing & Review Link:
+                      </label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <input
+                          type="text"
+                          value={task.meetLink || ''}
+                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'meetLink', e.target.value)}
+                          className={styles.searchInput}
+                          style={{ fontSize: '12px', padding: '6px 10px', fontFamily: 'monospace', color: '#38bdf8' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleUpdatePipelineTaskField(idx, 'meetLink', generateClientMeetUrl())}
+                          className={styles.btnSecondary}
+                          style={{ fontSize: '11px', padding: '5px 10px', whiteSpace: 'nowrap' }}
+                        >
+                          Generate Link
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Task Title & Objective Customization */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                          Task Title:
+                        </label>
+                        <input
+                          type="text"
+                          value={task.title || ''}
+                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'title', e.target.value)}
+                          className={styles.searchInput}
+                          style={{ fontSize: '12.5px', fontWeight: 600 }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11.5px', color: '#94a3b8', marginBottom: '4px' }}>
+                          Objective & Technical Deliverables:
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={task.objective || ''}
+                          onChange={(e) => handleUpdatePipelineTaskField(idx, 'objective', e.target.value)}
+                          className={styles.searchInput}
+                          style={{ height: 'auto', fontSize: '12px', lineHeight: 1.5 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div style={{ textAlign: 'right', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={handleSaveAndActivatePipeline}
+                  disabled={isAutoSaving}
+                  className={styles.btnPrimary}
+                  style={{ background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)', padding: '10px 24px', fontSize: '13.5px' }}
+                >
+                  <Zap size={15} />
+                  <span>{isAutoSaving ? 'Activating Pipeline...' : 'Save & Activate Automated Pipeline'}</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '50px 20px', background: '#0e0e12', borderRadius: '12px', border: '1px solid #232328' }}>
+              <Zap size={36} color="#38bdf8" style={{ margin: '0 auto 12px auto' }} />
+              <h4 style={{ margin: '0 0 6px 0', color: '#ffffff', fontSize: '15px' }}>
+                Select an intern to view and customize their automated pipeline
+              </h4>
+              <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
+                The engine will divide the timeline from joining to end date into balanced milestone sprints.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
 
       {/* --- SUBTAB 2: GEMMA 2B TASK TEMPLATES --- */}
       {subTab === 'templates' && (
@@ -1296,6 +1908,113 @@ Shortfundly Media Technologies Pvt. Ltd.`;
               <Send size={14} />
               <span>{sendingReminder ? 'Dispatching Reminders via SMTP...' : `Send Deadline Reminder Emails (${selectedReminderIds.length > 0 ? selectedReminderIds.length : filteredReminderCandidates.length} Interns)`}</span>
             </button>
+          </div>
+
+          {/* --- AUTOMATED OVERDUE WARNING & MANUAL CUSTOMIZATION CARD --- */}
+          <div style={{ background: '#0c0c0e', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', padding: '24px 28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', color: '#fee2e2', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldAlert size={18} color="#ef4444" />
+                  <span>Overdue Task Warning & Performance Deduction Management</span>
+                </h3>
+                <p style={{ margin: 0, fontSize: '13px', color: '#fca5a5' }}>
+                  If a task is not submitted by the deadline, automatically dispatch warning notices with reduced performance percentage, or manually customize email content & recipient mail ID.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={loadOverdueTasks}
+                  disabled={loadingOverdue}
+                  className={styles.btnSecondary}
+                  style={{ fontSize: '12px', padding: '7px 12px' }}
+                >
+                  <RefreshCw size={13} className={loadingOverdue ? styles.spin : ''} />
+                  <span>Refresh Overdue List</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleScanOverdueWarnings}
+                  disabled={scanningOverdue}
+                  className={styles.btnPrimary}
+                  style={{ fontSize: '12px', padding: '7px 16px', background: 'linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)' }}
+                >
+                  <ShieldAlert size={13} />
+                  <span>{scanningOverdue ? 'Scanning & Deducting...' : 'Run Automated Overdue Scan & Deduction (-10%)'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Overdue Candidates Table */}
+            <div className={styles.tableResponsive} style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '16px' }}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Intern ID</th>
+                    <th>Name & Email</th>
+                    <th>Role</th>
+                    <th>Task & Deadline</th>
+                    <th>Current Performance</th>
+                    <th>Warning Status</th>
+                    <th>Manual Customization</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {overdueTasksList.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#94a3b8' }}>
+                        No overdue candidate submissions detected. Click "Refresh Overdue List" to scan.
+                      </td>
+                    </tr>
+                  ) : (
+                    overdueTasksList.map((item) => (
+                      <tr key={item.taskId} style={{ background: 'rgba(239, 68, 68, 0.05)' }}>
+                        <td style={{ fontFamily: 'monospace', color: '#f87171', fontWeight: 600 }}>
+                          {item.internId}
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 600, color: '#ffffff' }}>{item.fullName}</div>
+                          <div style={{ fontSize: '11px', color: '#94a3b8' }}>{item.email}</div>
+                        </td>
+                        <td>{item.role}</td>
+                        <td>
+                          <div style={{ color: '#fca5a5', fontWeight: 600 }}>Task #{item.taskNumber}: {item.title}</div>
+                          <div style={{ fontSize: '11px', color: '#ef4444' }}>
+                            Expired: {item.deadline ? new Date(item.deadline).toLocaleString() : 'Past Due'}
+                          </div>
+                        </td>
+                        <td>
+                          <span style={{ fontFamily: 'monospace', fontWeight: 700, color: item.performancePercentage < 90 ? '#ef4444' : '#fbbf24' }}>
+                            {item.performancePercentage.toFixed(1)}%
+                          </span>
+                        </td>
+                        <td>
+                          {item.warningSentAt ? (
+                            <span className={styles.badgeRose}>Warning Sent ({new Date(item.warningSentAt).toLocaleDateString()})</span>
+                          ) : (
+                            <span className={styles.badgeAmber}>Pending Warning</span>
+                          )}
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenManualWarning(item)}
+                            className={styles.btnSecondary}
+                            style={{ fontSize: '11px', padding: '4px 8px', borderColor: '#ef4444', color: '#ef4444' }}
+                          >
+                            <Edit3 size={11} />
+                            <span>Customize & Send</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
@@ -2345,6 +3064,128 @@ Shortfundly Media Technologies Pvt. Ltd.`;
           </div>
         </div>
       )}
+      {/* --- MODAL: MANUAL WARNING & CUSTOM EMAIL ID CUSTOMIZATION --- */}
+      {manualWarningModal.isOpen && manualWarningModal.candidate && (
+        <div className={styles.modalOverlay} onClick={() => setManualWarningModal(prev => ({ ...prev, isOpen: false }))}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className={styles.modalHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShieldAlert size={18} color="#ef4444" />
+                <h3 className={styles.modalTitle} style={{ color: '#fee2e2' }}>
+                  Manual Warning Mail Customization
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setManualWarningModal(prev => ({ ...prev, isOpen: false }))}
+                className={styles.closeBtn}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '14px' }}>
+              {/* Recipient Email ID Customization */}
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                  Recipient Candidate Email ID (Customizable):
+                </label>
+                <input
+                  type="email"
+                  value={manualWarningModal.recipientEmail}
+                  onChange={(e) => setManualWarningModal(prev => ({ ...prev, recipientEmail: e.target.value }))}
+                  className={styles.searchInput}
+                  placeholder="candidate@example.com"
+                  style={{ fontFamily: 'monospace', color: '#38bdf8' }}
+                />
+                <span style={{ fontSize: '11px', color: '#64748b', marginTop: '3px', display: 'block' }}>
+                  HR can update or modify the candidate's recipient email ID directly before sending.
+                </span>
+              </div>
+
+              {/* Penalty Deduction Customization */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                    Performance Score Deduction (%):
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="50"
+                    value={manualWarningModal.penaltyAmount}
+                    onChange={(e) => setManualWarningModal(prev => ({ ...prev, penaltyAmount: parseFloat(e.target.value) || 10 }))}
+                    className={styles.searchInput}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                    Grace Period Window:
+                  </label>
+                  <select
+                    value={manualWarningModal.graceHours}
+                    onChange={(e) => setManualWarningModal(prev => ({ ...prev, graceHours: parseInt(e.target.value, 10) }))}
+                    className={styles.selectInput}
+                  >
+                    <option value={24}>24 Hours</option>
+                    <option value={48}>48 Hours (Recommended)</option>
+                    <option value={72}>72 Hours</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Subject Customization */}
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                  Warning Email Subject:
+                </label>
+                <input
+                  type="text"
+                  value={manualWarningModal.customSubject}
+                  onChange={(e) => setManualWarningModal(prev => ({ ...prev, customSubject: e.target.value }))}
+                  className={styles.searchInput}
+                />
+              </div>
+
+              {/* Content Customization */}
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+                  Custom Warning Email Content:
+                </label>
+                <textarea
+                  rows={8}
+                  value={manualWarningModal.customBody}
+                  onChange={(e) => setManualWarningModal(prev => ({ ...prev, customBody: e.target.value }))}
+                  className={styles.searchInput}
+                  style={{ height: 'auto', fontFamily: 'monospace', fontSize: '12px', lineHeight: 1.5 }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setManualWarningModal(prev => ({ ...prev, isOpen: false }))}
+                  className={styles.btnSecondary}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSendManualWarning}
+                  disabled={sendingManualWarning}
+                  className={styles.btnPrimary}
+                  style={{ background: 'linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)' }}
+                >
+                  <Send size={13} />
+                  <span>{sendingManualWarning ? 'Dispatching Warning...' : 'Dispatch Customized Warning Mail'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
