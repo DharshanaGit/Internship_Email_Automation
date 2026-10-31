@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { generateOfferLetterPdf } from '@/lib/pdfEngine';
 import { sendEmail } from '@/lib/mailer';
@@ -134,8 +135,18 @@ export async function POST(request) {
       selectedTemplate = await prisma.offerTemplate.findFirst({ where: { isDefault: true } });
     }
 
-    // Generate secure unpredictable cryptographic token and SHA-256 hash
-    const { rawToken, tokenHash } = generateSecureResponseToken();
+    // Use passed portalToken if provided, otherwise generate secure unpredictable cryptographic token and SHA-256 hash
+    const passedToken = formData.get('token') || formData.get('portalToken');
+    let rawToken = passedToken ? String(passedToken).trim() : null;
+    let tokenHash = null;
+
+    if (rawToken) {
+      tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    } else {
+      const generated = generateSecureResponseToken();
+      rawToken = generated.rawToken;
+      tokenHash = generated.tokenHash;
+    }
 
     await prisma.candidate.update({
       where: { id: candidate.id },

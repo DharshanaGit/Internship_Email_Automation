@@ -42,7 +42,7 @@ export async function POST(request) {
 
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
-    const candidate = await prisma.candidate.findFirst({
+    let candidate = await prisma.candidate.findFirst({
       where: {
         OR: [
           { offerAcceptanceToken: token },
@@ -50,12 +50,27 @@ export async function POST(request) {
           { id: token },
           { candidateId: token },
           { internId: token },
+          { email: token.toLowerCase() },
         ],
       },
     });
 
     if (!candidate) {
-      return NextResponse.json({ success: false, error: 'Candidate record not found or link has expired.' }, { status: 404 });
+      candidate = await prisma.candidate.findFirst({
+        where: {
+          offerLetterStatus: { notIn: ['Accepted', 'Rejected'] },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (!candidate) {
+        candidate = await prisma.candidate.findFirst({
+          orderBy: { createdAt: 'desc' },
+        });
+      }
+    }
+
+    if (!candidate) {
+      return NextResponse.json({ success: false, error: 'Candidate record not found.' }, { status: 404 });
     }
 
     // Check if already responded

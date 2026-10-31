@@ -1,9 +1,9 @@
 .formContainer {
-  background: #0c0c0e;
-  border: 1px solid #232328;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 14px;
   padding: 28px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--shadow-sm);
 }
 
 .stepIndicator {
@@ -24,23 +24,23 @@
   border-radius: 9999px;
   font-size: 11.5px;
   font-weight: 700;
-  background: #09090b;
-  border: 1px solid #27272a;
-  color: #71717a;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
   transition: all 0.2s ease;
 }
 
 .stepPillActive {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(124, 58, 237, 0.35));
-  border-color: #a855f7;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.3);
+  background: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
 }
 
 .stepPillCompleted {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.12);
   border-color: rgba(16, 185, 129, 0.4);
-  color: #34d399;
+  color: var(--accent-emerald);
 }
 
 .guidanceBanner {
@@ -55,15 +55,15 @@
 }
 
 .guidanceBannerAlert {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--accent-amber);
 }
 
 .guidanceBannerSuccess {
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--accent-emerald);
 }
 
 .modeToggleRow {
@@ -72,7 +72,7 @@
   align-items: center;
   margin-bottom: 14px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #232328;
+  border-bottom: 1px solid var(--border-subtle);
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -87,16 +87,16 @@
   font-size: 11.5px;
   font-weight: 600;
   border-radius: 6px;
-  background: #09090b;
-  border: 1px solid #27272a;
-  color: #94a3b8;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btnModeActive {
-  background: rgba(168, 85, 247, 0.2);
-  border-color: #a855f7;
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
   color: #ffffff;
 }
 
@@ -122,7 +122,7 @@
 .fieldLabel {
   font-size: 11px;
   font-weight: 700;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   display: flex;
@@ -131,100 +131,95 @@
 }
 
 .requiredStar {
-  color: #f43f5e;
+  color: var(--accent-rose);
   font-weight: 800;
 }
 
 .inputField,
 .selectField {
   width: 100%;
-  height: 36px;
-  background-color: #0c0b12 !important;
-  border: 1px solid #232230;
+  height: 38px;
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border-medium);
   border-radius: 6px;
   padding: 0 11px;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  font-size: 12.5px;
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  font-size: 13px;
   outline: none;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .selectField option {
-  background-color: #12111d;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #0f172a;
 }
 
 .inputField::placeholder {
-  color: #555866 !important;
-  -webkit-text-fill-color: #555866 !important;
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
 }
 
-/* When focused or active */
 .inputField:focus,
-.inputField:active {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  border-color: #a855f7 !important;
-  background-color: #141320 !important;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.28);
+.inputField:active,
+.selectField:focus {
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  border-color: var(--accent-primary) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 3px var(--border-focus-ring);
 }
 
-/* When field is filled: ONLY make text bright white, NO green borders */
 .inputFilled,
 .inputValid {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
   font-weight: 600 !important;
-  border-color: #2e2b3e !important;
-  background-color: #0c0b12 !important;
-  box-shadow: none !important;
+  border-color: var(--border-medium) !important;
+  background-color: var(--bg-surface) !important;
 }
 
 .inputValid:focus,
 .inputFilled:focus {
-  border-color: #a855f7 !important;
-  background-color: #12101e !important;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25) !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  border-color: var(--accent-primary) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 3px var(--border-focus-ring) !important;
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
 }
 
-/* Make calendar picker icon clearly visible and viewable */
 .inputField::-webkit-calendar-picker-indicator {
-  filter: invert(0.85) sepia(0.2) saturate(3) hue-rotate(240deg) brightness(1.2);
   cursor: pointer;
-  opacity: 0.85;
-  transition: opacity 0.15s ease, filter 0.15s ease;
+  opacity: 0.75;
+  transition: opacity 0.15s ease;
 }
 
 .inputField::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
-  filter: invert(1) brightness(1.5);
 }
 
 .inputField:-webkit-autofill,
 .inputField:-webkit-autofill:hover, 
 .inputField:-webkit-autofill:focus, 
 .inputField:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #0c0b12 inset !important;
-  -webkit-text-fill-color: #ffffff !important;
-  color: #ffffff !important;
-  caret-color: #c084fc !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+  color: #0f172a !important;
+  caret-color: #4f46e5 !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
 .inputError {
-  border-color: #ef4444 !important;
-  background-color: rgba(239, 68, 68, 0.08) !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  border-color: var(--accent-rose) !important;
+  background-color: rgba(239, 68, 68, 0.04) !important;
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
 }
 
 .fieldError {
   font-size: 11.5px;
-  color: #f87171;
+  color: var(--accent-rose);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -243,35 +238,35 @@
   font-size: 11px;
   font-weight: 600;
   padding: 3px 9px;
-  background: #14131f;
-  border: 1px solid #2a273f;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: 4px;
-  color: #c084fc;
+  color: var(--accent-primary);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .stipendPill:hover {
-  background: #201d33;
-  color: #ffffff;
-  border-color: #a855f7;
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--accent-primary-hover);
+  border-color: var(--accent-primary);
 }
 
 .stepperBtn {
   font-size: 11px;
   font-weight: 700;
   padding: 3px 8px;
-  background: #181726;
-  border: 1px solid #322f4d;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: 4px;
-  color: #38bdf8;
+  color: var(--accent-blue);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .stepperBtn:hover {
-  background: #24223b;
-  color: #ffffff;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-blue);
 }
 
 .deadlinePresets {
@@ -282,32 +277,31 @@
 }
 
 .btnDeadlinePreset {
-  background: #18181b;
-  border: 1px solid #27272a;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: 4px;
   padding: 3px 8px;
   font-size: 11px;
-  color: #c084fc;
+  color: var(--accent-primary);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btnDeadlinePreset:hover {
-  background: rgba(168, 85, 247, 0.2);
-  border-color: #a855f7;
-  color: #ffffff;
+  background: rgba(79, 70, 229, 0.1);
+  border-color: var(--accent-primary);
 }
 
 .templateTextarea {
   width: 100%;
   min-height: 380px;
-  background-color: #09090b !important;
-  border: 1px solid #27272a;
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border-medium);
   border-radius: 8px;
   padding: 14px;
-  color: #f8fafc !important;
-  -webkit-text-fill-color: #f8fafc !important;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.6;
   outline: none;
@@ -315,8 +309,8 @@
 }
 
 .templateTextarea:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--border-focus-ring);
 }
 
 .actionStepRow {
@@ -325,7 +319,7 @@
   align-items: center;
   margin-top: 18px;
   padding-top: 14px;
-  border-top: 1px solid #1f1b2e;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .btnPrimary {
@@ -333,25 +327,25 @@
   align-items: center;
   gap: 7px;
   padding: 8px 18px;
-  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+  background: var(--accent-primary);
   color: #ffffff;
   border: none;
   border-radius: 6px;
   font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(147, 51, 234, 0.35);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
   transition: all 0.15s ease;
 }
 
 .btnPrimary:hover:not(:disabled) {
-  opacity: 0.95;
+  background: var(--accent-primary-hover);
   transform: translateY(-1px);
 }
 
 .btnPrimaryDisabled {
-  background: #27272a !important;
-  color: #71717a !important;
+  background: var(--border-medium) !important;
+  color: var(--text-muted) !important;
   cursor: not-allowed !important;
   box-shadow: none !important;
   transform: none !important;
@@ -362,13 +356,18 @@
   align-items: center;
   gap: 6px;
   padding: 7px 14px;
-  background: #141417;
-  border: 1px solid #27272a;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: 6px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.btnBack:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
 }
 
 .previewTabs {
@@ -382,22 +381,22 @@
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
-  background: #09090b;
-  border: 1px solid #27272a;
-  color: #94a3b8;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .previewTabActive {
-  background: rgba(168, 85, 247, 0.2);
-  border-color: #a855f7;
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
   color: #ffffff;
 }
 
 .previewBox {
-  background: #09090b;
-  border: 1px solid #232328;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
   border-radius: 6px;
   padding: 16px;
   max-height: 600px;
@@ -410,7 +409,8 @@
   background: #ffffff;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-subtle);
 }
 
 .pdfIframe {
@@ -421,8 +421,8 @@
 
 .attachmentsContainer {
   margin-top: 18px;
-  background: #09090b;
-  border: 1px dashed #3f3f46;
+  background: var(--bg-surface-elevated);
+  border: 1px dashed var(--border-medium);
   border-radius: 8px;
   padding: 16px;
 }
@@ -438,18 +438,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #141417;
-  border: 1px solid #27272a;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 12.5px;
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 .attachmentRemoveBtn {
   background: transparent;
   border: none;
-  color: #ef4444;
+  color: var(--accent-rose);
   cursor: pointer;
   padding: 2px;
   display: flex;
@@ -457,9 +457,9 @@
 }
 
 .prereqNotice {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--accent-rose);
   padding: 10px 14px;
   border-radius: 6px;
   font-size: 12.5px;
@@ -471,17 +471,19 @@
 }
 
 .brightGeneratedInput {
-  color: #ffffff !important;
+  color: var(--accent-primary) !important;
+  -webkit-text-fill-color: var(--accent-primary) !important;
   font-weight: 700 !important;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-  background-color: #0f0e17 !important;
-  border-color: #7c3aed !important;
+  font-family: var(--font-mono) !important;
+  background-color: var(--bg-surface-elevated) !important;
+  border-color: var(--accent-primary) !important;
 }
 
 .brightUrlInput {
-  color: #38bdf8 !important;
+  color: var(--accent-blue) !important;
+  -webkit-text-fill-color: var(--accent-blue) !important;
   font-weight: 600 !important;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-  background-color: #000000 !important;
-  border-color: #0284c7 !important;
+  font-family: var(--font-mono) !important;
+  background-color: var(--bg-surface-elevated) !important;
+  border-color: var(--accent-blue) !important;
 }

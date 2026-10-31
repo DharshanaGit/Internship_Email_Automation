@@ -496,6 +496,11 @@ export default function SequentialSingleOfferForm({
       if (formData.templateId) payload.append('templateId', formData.templateId);
       if (formData.customSubject) payload.append('subject', formData.customSubject);
       if (formData.customBody) payload.append('body', formData.customBody);
+      if (portalToken) {
+        payload.append('token', portalToken);
+        payload.append('portalToken', portalToken);
+      }
+      payload.append('responseUrl', candidatePortalUrl);
 
       // Append any uploaded files or images
       if (attachedFiles && attachedFiles.length > 0) {
@@ -545,9 +550,9 @@ export default function SequentialSingleOfferForm({
       duration: formData.duration || '3 Months',
       stipend: `Rs. ${Number(formData.stipend || 10000).toLocaleString('en-IN')}`,
       deadline: formData.deadline ? new Date(formData.deadline).toLocaleString() : '3 Days',
-      responseUrl: `${VERCEL_PROD_URL}/offers/respond?token=sample_token_${formData.internId}`,
+      responseUrl: candidatePortalUrl,
     };
-  }, [formData, VERCEL_PROD_URL]);
+  }, [formData, candidatePortalUrl]);
 
   const defaultJinjaBody = `Dear {{candidateName}},
 

@@ -1,47 +1,47 @@
-/* Shortfundly Web3 Enterprise Operations Design System: Black with Purple */
-/* Standardized according to DESIGN.md (awesome-design-md: Kraken & Raycast) */
+/* Shortfundly Enterprise Operations Design System: Crisp White Light Theme */
+/* Standardized according to DESIGN.md (awesome-design-md: Stripe & Linear Clean Enterprise) */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Surfaces & Canvas: Black Foundations */
-  --bg-app: #08070c;
-  --bg-surface: #0f0e17;
-  --bg-surface-elevated: #161424;
-  --bg-surface-hover: #1c192e;
-  --bg-input: #0c0b13;
-  --bg-input-focus: #141221;
-  --bg-badge: rgba(168, 85, 247, 0.14);
-  --bg-overlay: rgba(5, 4, 8, 0.88);
+  /* Surfaces & Canvas: Pure Crisp White Foundations */
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
+  --bg-input: #ffffff;
+  --bg-input-focus: #ffffff;
+  --bg-badge: rgba(79, 70, 229, 0.08);
+  --bg-overlay: rgba(15, 23, 42, 0.5);
 
   /* Hairlines & Dividers */
-  --border-hairline: rgba(255, 255, 255, 0.08);
-  --border-subtle: #232135;
-  --border-medium: #35314f;
-  --border-focus: #a855f7;
-  --border-active: #c084fc;
-  --border-focus-ring: rgba(168, 85, 247, 0.28);
+  --border-hairline: #f1f5f9;
+  --border-subtle: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --border-focus: #4f46e5;
+  --border-active: #6366f1;
+  --border-focus-ring: rgba(79, 70, 229, 0.22);
 
-  /* Typography Hierarchy */
-  --text-primary: #ffffff;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-accent: #c084fc;
+  /* Typography Hierarchy (100% High Contrast) */
+  --text-primary: #0f172a;       /* Slate 900: 15.8:1 contrast on white */
+  --text-secondary: #334155;     /* Slate 700: 9.5:1 contrast */
+  --text-muted: #64748b;         /* Slate 500: 4.8:1 contrast */
+  --text-accent: #4f46e5;        /* Indigo 600 */
 
-  /* Brand Signature Purple Accents */
-  --accent-primary: #7c3aed;
-  --accent-primary-hover: #6d28d9;
-  --accent-primary-active: #5b21b6;
-  --accent-purple: #a855f7;
-  --accent-purple-light: #c084fc;
-  --accent-purple-dark: #6b21a8;
+  /* Brand Signature Indigo & Violet Accents */
+  --accent-primary: #4f46e5;
+  --accent-primary-hover: #4338ca;
+  --accent-primary-active: #3730a3;
+  --accent-purple: #6366f1;
+  --accent-purple-light: #818cf8;
+  --accent-purple-dark: #3730a3;
 
-  /* Semantic Status Indicators */
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #ef4444;
-  --accent-blue: #3b82f6;
-  --accent-cyan: #38bdf8;
+  /* Semantic Status Indicators (High-contrast deep tones on white) */
+  --accent-emerald: #059669;
+  --accent-amber: #d97706;
+  --accent-rose: #dc2626;
+  --accent-blue: #2563eb;
+  --accent-cyan: #0284c7;
 
   /* Radii Scale */
   --radius-xs: 4px;
@@ -55,10 +55,10 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Shadows (Restrained, subtle) */
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.6);
-  --shadow-md: 0 4px 14px -1px rgba(0, 0, 0, 0.65), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 14px 32px -4px rgba(0, 0, 0, 0.8), 0 4px 12px -2px rgba(0, 0, 0, 0.5);
+  /* Shadows (Refined, crisp light enterprise shadows) */
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
 }
 
 * {
@@ -75,7 +75,7 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 13.5px;
-  line-height: 1.45;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -96,22 +96,24 @@ input,
 select,
 textarea {
   font-family: inherit;
+  color: var(--text-primary);
+  background-color: var(--bg-input);
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #08070c;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #232135;
-  border-radius: 3px;
+  background: #cbd5e1;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #35314f;
+  background: #94a3b8;
 }

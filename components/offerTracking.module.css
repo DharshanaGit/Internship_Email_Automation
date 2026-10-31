@@ -17,11 +17,23 @@
 }
 
 .metricCard {
-  background: #0c0c0e;
-  border: 1px solid #232328;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 10px;
-  padding: 12px 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.metricCard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-purple-light));
 }
 
 .metricTitle {
@@ -30,17 +42,19 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 6px;
+  color: var(--text-muted);
 }
 
 .metricValue {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
 }
 
 .metricSubtitle {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
@@ -50,10 +64,11 @@
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
-  background: #0c0c0e;
-  border: 1px solid #232328;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 10px;
-  padding: 8px 12px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow-sm);
 }
 
 .searchWrapper {
@@ -67,24 +82,24 @@
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .searchInput {
   width: 100%;
-  height: 32px;
-  background: #09090b;
-  border: 1px solid #27272a;
+  height: 36px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
   border-radius: 6px;
   padding: 0 12px 0 38px;
-  color: #f8fafc;
-  font-size: 12px;
+  color: var(--text-primary);
+  font-size: 12.5px;
   outline: none;
 }
 
 .searchInput:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--border-focus-ring);
 }
 
 .selectGroup {
@@ -103,36 +118,36 @@
 .selectIcon {
   position: absolute;
   left: 10px;
-  color: #a855f7;
+  color: var(--accent-primary);
   pointer-events: none;
 }
 
 .selectInput {
-  height: 32px;
-  background: #09090b;
-  border: 1px solid #27272a;
+  height: 36px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
   border-radius: 6px;
   padding: 0 12px 0 32px;
-  color: #cbd5e1;
+  color: var(--text-primary);
   font-size: 12.5px;
   outline: none;
   cursor: pointer;
 }
 
 .selectInput:focus {
-  border-color: #a855f7;
+  border-color: var(--accent-primary);
 }
 
 .btnAudit {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 32px;
+  height: 36px;
   padding: 0 14px;
-  background: rgba(168, 85, 247, 0.15);
-  border: 1px solid rgba(168, 85, 247, 0.35);
+  background: rgba(79, 70, 229, 0.08);
+  border: 1px solid rgba(79, 70, 229, 0.25);
   border-radius: 6px;
-  color: #c084fc;
+  color: var(--accent-primary);
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
@@ -140,28 +155,29 @@
 }
 
 .btnAudit:hover:not(:disabled) {
-  background: rgba(168, 85, 247, 0.25);
-  color: #ffffff;
+  background: rgba(79, 70, 229, 0.16);
+  color: var(--accent-primary-hover);
 }
 
 .tableCard {
-  background: #0c0c0e;
-  border: 1px solid #232328;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--shadow-sm);
 }
 
 .tableHeaderRow {
-  padding: 12px 14px;
-  border-bottom: 1px solid #232328;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
 }
 
 .tableTitle {
   margin: 0;
   font-size: 14.5px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -176,34 +192,35 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 
 .table th {
-  background: #09090b;
-  color: #94a3b8;
+  background: var(--bg-surface-elevated);
+  color: var(--text-muted);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 12px 16px;
-  border-bottom: 1px solid #232328;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .table td {
   padding: 14px 16px;
-  border-bottom: 1px solid #1c1c21;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   vertical-align: middle;
 }
 
-.table tr:hover {
-  background: rgba(168, 85, 247, 0.03);
+.table tr:hover td {
+  background: rgba(79, 70, 229, 0.03);
 }
 
 .emptyCell {
   text-align: center;
   padding: 40px !important;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .candidatePrimary {
@@ -215,19 +232,19 @@
 .candInternId {
   font-size: 11px;
   font-weight: 700;
-  color: #c084fc;
-  font-family: monospace;
+  color: var(--accent-primary);
+  font-family: var(--font-mono);
 }
 
 .candName {
   font-size: 13.5px;
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--text-primary);
 }
 
 .candEmail {
   font-size: 11.5px;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .rolePrimary {
@@ -237,14 +254,15 @@
 }
 
 .candRole {
-  font-size: 12px;
-  color: #e2e8f0;
+  font-size: 12.5px;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .candBatch {
   font-size: 11px;
-  color: #a855f7;
+  color: var(--accent-primary);
+  font-weight: 600;
 }
 
 .statusPill {
@@ -258,27 +276,27 @@
 }
 
 .pillGreen {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .pillPurple {
-  background: rgba(168, 85, 247, 0.15);
-  color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.35);
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--accent-primary);
+  border: 1px solid rgba(79, 70, 229, 0.25);
 }
 
 .pillYellow {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .pillRed {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent-rose);
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .dateBlock {
@@ -292,10 +310,10 @@
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 6px;
-  color: #34d399;
+  color: var(--accent-emerald);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -303,7 +321,7 @@
 }
 
 .btnViewSignature:hover {
-  background: rgba(16, 185, 129, 0.22);
+  background: rgba(16, 185, 129, 0.2);
 }
 
 .actionRow {
@@ -313,28 +331,29 @@
 }
 
 .btnActionIcon {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #09090b;
-  border: 1px solid #27272a;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
   border-radius: 6px;
-  color: #94a3b8;
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btnActionIcon:hover {
-  border-color: #a855f7;
-  color: #c084fc;
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--bg-surface-elevated);
 }
 
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: var(--bg-overlay);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -346,46 +365,46 @@
 .modalContent {
   width: 100%;
   max-width: 520px;
-  background: #0c0c0e;
-  border: 1px solid #232328;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-lg);
 }
 
 .modalContentLarge {
   width: 100%;
   max-width: 780px;
-  background: #0c0c0e;
-  border: 1px solid #232328;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-lg);
 }
 
 .modalHeader {
-  padding: 12px 14px;
+  padding: 14px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #232328;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .modalTitle {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .modalClose {
-  color: #94a3b8;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
 }
 
 .modalClose:hover {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .modalBody {
@@ -393,21 +412,21 @@
 }
 
 .sigCandidateSummary {
-  background: #09090b;
-  border: 1px solid #1f1b2e;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   font-size: 12px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   margin-bottom: 16px;
 }
 
 .signaturePreviewBox {
-  background: #09090b;
-  border: 1px dashed rgba(168, 85, 247, 0.3);
+  background: var(--bg-surface-elevated);
+  border: 1px dashed var(--border-medium);
   border-radius: 8px;
   padding: 20px;
   text-align: center;
@@ -419,12 +438,13 @@
   background: #ffffff;
   border-radius: 6px;
   padding: 8px;
+  border: 1px solid var(--border-subtle);
 }
 
 .signatureStyledFont {
   font-family: 'Brush Script MT', cursive, 'Segoe Script', sans-serif;
   font-size: 34px;
-  color: #c084fc;
+  color: var(--accent-primary);
 }
 
 .spin {

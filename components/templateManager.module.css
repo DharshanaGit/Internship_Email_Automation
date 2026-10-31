@@ -1,24 +1,24 @@
 .managerContainer {
-  background: #0c0c0e;
-  border: 1px solid #232328;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
 }
 
 .headerRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #232328;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .title {
   font-size: 18px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -28,14 +28,20 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 13px;
-  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+  padding: 7px 15px;
+  background: var(--accent-primary);
   color: #ffffff;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.btnNew:hover {
+  background: var(--accent-primary-hover);
 }
 
 .templatesGrid {
@@ -52,25 +58,31 @@
 }
 
 .templateCard {
-  background: #09090b;
-  border: 1px solid #27272a;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: all 0.15s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.templateCard:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-md);
 }
 
 .templateCardActive {
-  border-color: #a855f7;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--border-focus-ring);
 }
 
 .templateName {
   font-size: 14px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 6px;
   display: flex;
   align-items: center;
@@ -79,16 +91,17 @@
 
 .defaultBadge {
   font-size: 10px;
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
   padding: 2px 6px;
   border-radius: 4px;
+  font-weight: 700;
 }
 
 .templateSubject {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-muted);
   margin-bottom: 12px;
   line-height: 1.4;
 }
@@ -98,16 +111,16 @@
   gap: 8px;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #232328;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .btnEdit {
   flex: 1;
   padding: 6px;
-  background: #141417;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: 6px;
-  color: #c084fc;
+  color: var(--accent-primary);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -115,13 +128,13 @@
 }
 
 .btnEdit:hover {
-  background: rgba(168, 85, 247, 0.2);
+  background: rgba(79, 70, 229, 0.08);
 }
 
 .editorModal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: var(--bg-overlay);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -134,13 +147,13 @@
   width: 100%;
   max-width: 960px;
   max-height: 90vh;
-  background: #0c0c0e;
-  border: 1px solid #232328;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-lg);
 }
 
 .editorHeader {
@@ -148,7 +161,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #232328;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .editorBody {
@@ -168,39 +181,41 @@
 .label {
   font-size: 12px;
   font-weight: 700;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   text-transform: uppercase;
 }
 
 .input {
   height: 40px;
-  background: #09090b;
-  border: 1px solid #27272a;
+  background: #ffffff;
+  border: 1px solid var(--border-medium);
   border-radius: 6px;
   padding: 0 12px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 13.5px;
   outline: none;
 }
 
 .input:focus {
-  border-color: #a855f7;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--border-focus-ring);
 }
 
 .textarea {
-  background: #09090b;
-  border: 1px solid #27272a;
+  background: #ffffff;
+  border: 1px solid var(--border-medium);
   border-radius: 6px;
   padding: 12px;
-  color: #ffffff;
-  font-family: monospace;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
   font-size: 12.5px;
   outline: none;
   resize: vertical;
 }
 
 .textarea:focus {
-  border-color: #a855f7;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--border-focus-ring);
 }
 
 .tagsHelperRow {
@@ -212,16 +227,17 @@
 
 .tagPill {
   font-size: 11px;
-  background: rgba(168, 85, 247, 0.12);
-  color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.25);
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--accent-primary);
+  border: 1px solid rgba(79, 70, 229, 0.25);
   border-radius: 4px;
   padding: 2px 8px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .tagPill:hover {
-  background: rgba(168, 85, 247, 0.25);
+  background: rgba(79, 70, 229, 0.16);
 }
 
 .editorFooter {
@@ -229,26 +245,36 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  border-top: 1px solid #232328;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .btnCancel {
-  padding: 6px 13px;
-  background: #141417;
-  border: 1px solid #27272a;
+  padding: 7px 15px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: 6px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 
+.btnCancel:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
 .btnSave {
   padding: 8px 24px;
-  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+  background: var(--accent-primary);
   color: #ffffff;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  border: none;
+}
+
+.btnSave:hover {
+  background: var(--accent-primary-hover);
 }

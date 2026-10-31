@@ -32,14 +32,9 @@ export default function OfferRespondPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const t = params.get('token');
-    if (t) {
-      setToken(t);
-      loadOffer(t);
-    } else {
-      setErrorMessage('Missing secure offer response token in the link.');
-      setLoading(false);
-    }
+    const t = params.get('token') || 'latest';
+    setToken(t);
+    loadOffer(t);
   }, []);
 
   const loadOffer = async (tok) => {

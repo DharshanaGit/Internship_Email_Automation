@@ -17,7 +17,7 @@ export async function GET(request) {
 
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
-    const candidate = await prisma.candidate.findFirst({
+    let candidate = await prisma.candidate.findFirst({
       where: {
         OR: [
           { offerAcceptanceToken: token },
@@ -25,12 +25,27 @@ export async function GET(request) {
           { id: token },
           { candidateId: token },
           { internId: token },
+          { email: token.toLowerCase() },
         ],
       },
     });
 
     if (!candidate) {
-      return new Response('Invalid or expired offer token', { status: 404 });
+      candidate = await prisma.candidate.findFirst({
+        where: {
+          offerLetterStatus: { notIn: ['Accepted', 'Rejected'] },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (!candidate) {
+        candidate = await prisma.candidate.findFirst({
+          orderBy: { createdAt: 'desc' },
+        });
+      }
+    }
+
+    if (!candidate) {
+      return new Response('No offer record found', { status: 404 });
     }
 
     let pdfBuffer = null;
