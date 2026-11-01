@@ -1917,19 +1917,19 @@ Shortfundly Media Technologies Pvt. Ltd.`;
             </div>
 
             {/* Automated 24-Hour Pre-Deadline Reminders Card */}
-            <div style={{ background: '#FAF5FF', border: '2px solid #DDD6FE', borderRadius: '12px', padding: '18px 22px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ background: '#FAF5FF', border: '2px solid #C4B5FD', borderRadius: '12px', padding: '18px 22px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', boxShadow: '0 2px 8px rgba(109, 40, 217, 0.06)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '8px', background: 'rgba(168, 85, 247, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Clock size={20} color="#c084fc" />
+                <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#EDE9FE', border: '1px solid #DDD6FE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Clock size={20} color="#7C3AED" />
                 </div>
                 <div>
-                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ fontSize: '14.5px', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span>Automated 24-Hour Pre-Deadline Reminder Dispatcher</span>
-                    <span className={due24hCount > 0 ? styles.badgeRose : styles.badgeEmerald} style={{ fontSize: '12.5px' }}>
+                    <span className={due24hCount > 0 ? styles.badgeRose : styles.badgeEmerald} style={{ fontSize: '13px', fontWeight: 700, padding: '3px 10px', borderRadius: '6px' }}>
                       {due24hCount} Intern{due24hCount === 1 ? '' : 's'} Due Within 24h
                     </span>
                   </div>
-                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#334155', fontWeight: 500 }}>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#1E293B', fontWeight: 600 }}>
                     Automated scan detects candidates with tasks expiring within 24 hours who haven't submitted yet, and sends official submission portal reminders.
                   </p>
                 </div>

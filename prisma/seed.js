@@ -262,7 +262,7 @@ const DEFAULT_OFFER_EMAIL_BODY = `<p>Dear {{candidateName}},</p>
 </div>
 <p><strong>Action Required: Review & Respond</strong></p>
 <p>To review the full formal offer letter PDF attached to this email and record your response, please access your secure candidate portal via the unique link below:</p>
-<p><a href="{{responseLink}}" style="display: inline-block; background: #9333ea; color: #ffffff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">👉 Access Your Secure Offer Portal & Sign Offer</a></p>
+<p><a href="{{responseLink}}" style="display: inline-block; background: #9333ea; color: #ffffff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">Access Your Secure Offer Portal & Sign Offer</a></p>
 <p><em>Important Note on Expiration:</em> This unique link and offer will officially expire on <strong>{{deadline}}</strong>. Please ensure you complete your response before this deadline.</p>
 <p><strong>How to Confirm Acceptance:</strong></p>
 <ol>

@@ -2138,7 +2138,7 @@ export default function DashboardPage() {
                           {filteredBulkRows.slice(0, 50).map((row, idx) => {
                             const isSelected = selectedCandidateKeys.has(row.candidateId);
                             const internId = String(row.internId || row.raw?.internId || row.candidateId || `INT-2026-${String(idx + 100).padStart(5, '0')}`);
-                            const portalUrl = String(row.responseUrl || (typeof window !== 'undefined' ? `${window.location.origin}/offers/respond?token=${row.token || row.candidateId}` : `https://internship-email-automation.vercel.app/offers/respond?token=${row.token || row.candidateId}`));
+                            const portalUrl = String(row.responseUrl || `https://internship-email-automation.vercel.app/offers/respond?token=${row.token || row.candidateId}`);
                             const fullName = typeof row.fullName === 'string' ? row.fullName : String(row.fullName || '');
                             const email = typeof row.email === 'string' ? row.email : String(row.email || '');
                             const role = typeof row.role === 'string' ? row.role : String(row.role || '');
@@ -2198,13 +2198,16 @@ export default function DashboardPage() {
                                 </td>
                                 <td>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                    <span style={{ fontFamily: 'monospace', fontSize: '12.5px', color: '#475569' }}>
+                                    <span style={{ fontFamily: 'monospace', fontSize: '12.5px', color: '#475569' }} suppressHydrationWarning>
                                       {portalUrl.length > 28 ? `${portalUrl.slice(0, 26)}...` : portalUrl}
                                     </span>
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        navigator.clipboard?.writeText(portalUrl);
+                                        const urlToCopy = typeof window !== 'undefined'
+                                          ? `${window.location.origin}/offers/respond?token=${row.token || row.candidateId}`
+                                          : portalUrl;
+                                        navigator.clipboard?.writeText(urlToCopy);
                                         showToast('Copied candidate portal link!', 'success');
                                       }}
                                       style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '4px', padding: '2px 6px', fontSize: '12.5px', color: '#6D28D9', cursor: 'pointer' }}

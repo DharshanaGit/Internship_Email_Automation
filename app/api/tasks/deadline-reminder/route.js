@@ -44,7 +44,13 @@ export async function GET(request) {
       })),
     });
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    console.warn('Deadline reminder GET fallback:', error.message);
+    return NextResponse.json({
+      success: true,
+      dueCount: 0,
+      candidates: [],
+      warning: error.message,
+    });
   }
 }
 

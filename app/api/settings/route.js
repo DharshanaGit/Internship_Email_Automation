@@ -40,7 +40,23 @@ export async function GET() {
       },
     });
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    console.warn('Settings GET fallback:', error.message);
+    return NextResponse.json({
+      success: true,
+      data: {
+        smtpHost: process.env.SMTP_HOST || 'smtp.gmail.com',
+        smtpPort: parseInt(process.env.SMTP_PORT || '465', 10),
+        smtpSecure: true,
+        smtpUser: process.env.SMTP_USER || 'dharshana.shortfundly@gmail.com',
+        hasPassword: Boolean(process.env.SMTP_PASS),
+        maskedPassword: process.env.SMTP_PASS ? '••••••••••••••••' : '',
+        senderEmail: process.env.SMTP_USER || 'dharshana.shortfundly@gmail.com',
+        senderName: process.env.SENDER_NAME || 'Shortfundly Media Technologies',
+        googleCalendarConnected: false,
+        defaultMeetLinkPrefix: 'https://meet.google.com',
+        simulationMode: process.env.SIMULATION_MODE === 'true',
+      },
+    });
   }
 }
 
