@@ -6,7 +6,7 @@ import styles from './login.module.css';
 import { Mail, Lock, Shield, RotateCw, ArrowRight, AlertCircle, CheckCircle2, UserCheck, Eye, EyeOff, UserPlus, LogIn, Check } from 'lucide-react';
 
 // Validation helpers
-const validateName = (val) => {
+export const validateName = (val) => {
   if (!val) return null;
   if (/\d/.test(val)) {
     return 'Full name cannot contain numbers (letters only).';
@@ -14,21 +14,54 @@ const validateName = (val) => {
   return null;
 };
 
-const validateEmail = (val) => {
+export const validateEmail = (val) => {
   if (!val) return null;
-  if (/[A-Z]/.test(val)) {
+  const trimmed = val.trim();
+
+  // 1. Plain numbers only validation
+  if (/^\d+$/.test(trimmed)) {
+    return 'Plain numbers only are not allowed. Please enter a valid email address with letters.';
+  }
+
+  // 2. Must contain letters
+  if (!/[a-z]/.test(trimmed)) {
+    return 'Email must contain letters and cannot be plain numbers only.';
+  }
+
+  // 3. Lowercase check
+  if (/[A-Z]/.test(trimmed)) {
     return 'Email address cannot contain capital letters (lowercase only).';
   }
-  if (!val.includes('@')) {
+
+  // 4. Must contain '@'
+  if (!trimmed.includes('@')) {
     return "Email must contain an '@' symbol.";
   }
-  if (!/\.(com|in)$/.test(val.trim())) {
+
+  // 5. Username (local part before '@') cannot be plain numbers only
+  const [localPart, ...domainParts] = trimmed.split('@');
+  const domainPart = domainParts.join('@');
+
+  if (!localPart || !/[a-z]/.test(localPart)) {
+    return 'Email username cannot be plain numbers only; it must contain letters (e.g. name@domain.com).';
+  }
+
+  // 6. Domain must contain letters
+  if (!domainPart || !/[a-z]/.test(domainPart)) {
+    return 'Email domain must contain letters (e.g. @gmail.com).';
+  }
+
+  // 7. Must end with .com or .in
+  if (!/\.(com|in)$/.test(trimmed)) {
     return "Email must end with '.com' or '.in' (e.g. name@gmail.com).";
   }
+
+  // 8. Overall email pattern
   const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in)$/;
-  if (!emailRegex.test(val.trim())) {
+  if (!emailRegex.test(trimmed)) {
     return "Please enter a valid lowercase email ending with '.com' or '.in'.";
   }
+
   return null;
 };
 

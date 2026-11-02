@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { parseFlexibleDate, isDeadlineExpired, formatFlexibleDate } from '../lib/dateUtils.js';
 import { buildCandidateResponseUrl, getAppBaseUrl } from '../lib/offerService.js';
+import { validateEmail, validateName } from '../app/login/page.jsx';
 
 describe('Phase 3 Fixes & Verifications Suite', () => {
   describe('1. Date Parsing & Expiry Bug (02/06/2026 vs 27/10/2026)', () => {
@@ -46,6 +47,41 @@ describe('Phase 3 Fixes & Verifications Suite', () => {
       expect(url).not.toContain('localhost');
       expect(url).not.toContain('127.0.0.1');
       expect(url).toContain('/offers/respond?token=test-token-phase3-verification');
+    });
+  });
+
+  describe('3. Login & Create Account Email Validation (No Plain Numbers Only)', () => {
+    it('rejects plain numbers only in email address', () => {
+      const err = validateEmail('9876543210');
+      expect(err).toBe('Plain numbers only are not allowed. Please enter a valid email address with letters.');
+    });
+
+    it('rejects email where username is plain numbers only', () => {
+      const err = validateEmail('123456@gmail.com');
+      expect(err).toBe('Email username cannot be plain numbers only; it must contain letters (e.g. name@domain.com).');
+    });
+
+    it('rejects email with no letters at all', () => {
+      const err = validateEmail('12345@67890.com');
+      expect(err).toBe('Email username cannot be plain numbers only; it must contain letters (e.g. name@domain.com).');
+    });
+
+    it('allows valid emails containing both letters and numbers', () => {
+      expect(validateEmail('dachudharshana17@gmail.com')).toBeNull();
+      expect(validateEmail('dharshanab32@gmail.com')).toBeNull();
+      expect(validateEmail('user123@shortfundly.com')).toBeNull();
+      expect(validateEmail('intern2026@shortfundly.in')).toBeNull();
+    });
+
+    it('allows valid emails with letters only', () => {
+      expect(validateEmail('admin@gmail.com')).toBeNull();
+      expect(validateEmail('hr@shortfundly.com')).toBeNull();
+    });
+
+    it('rejects full name containing numbers in create account', () => {
+      expect(validateName('Dharshana 17')).toBe('Full name cannot contain numbers (letters only).');
+      expect(validateName('Admin 123')).toBe('Full name cannot contain numbers (letters only).');
+      expect(validateName('Dharshana')).toBeNull();
     });
   });
 });

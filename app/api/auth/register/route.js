@@ -17,6 +17,16 @@ const registerSchema = z.object({
 export async function POST(request) {
   try {
     const body = await request.json().catch(() => ({}));
+    const rawEmail = String(body?.email || '').trim();
+
+    // Plain numbers only check on email
+    if (/^\d+$/.test(rawEmail)) {
+      return NextResponse.json(
+        { success: false, error: 'Plain numbers only are not allowed. Please enter a valid email address with letters.' },
+        { status: 400 }
+      );
+    }
+
     const parseResult = registerSchema.safeParse(body);
 
     if (!parseResult.success) {
@@ -40,7 +50,13 @@ export async function POST(request) {
       );
     }
 
-    // 2. Validate Email: No capital letters, must have '@', and must end with .com or .in
+    // 2. Validate Email: No plain numbers only, no capital letters, must have '@', and must end with .com or .in
+    if (!/[a-z]/.test(normalizedEmail)) {
+      return NextResponse.json(
+        { success: false, error: 'Email must contain letters and cannot be plain numbers only.' },
+        { status: 400 }
+      );
+    }
     if (/[A-Z]/.test(email)) {
       return NextResponse.json(
         { success: false, error: 'Email address cannot contain capital letters (lowercase only).' },
@@ -50,6 +66,21 @@ export async function POST(request) {
     if (!email.includes('@')) {
       return NextResponse.json(
         { success: false, error: "Email address must contain an '@' symbol." },
+        { status: 400 }
+      );
+    }
+    const [regLocalPart, ...regDomainParts] = normalizedEmail.split('@');
+    const regDomainPart = regDomainParts.join('@');
+
+    if (!regLocalPart || !/[a-z]/.test(regLocalPart)) {
+      return NextResponse.json(
+        { success: false, error: 'Email username cannot be plain numbers only; it must contain letters.' },
+        { status: 400 }
+      );
+    }
+    if (!regDomainPart || !/[a-z]/.test(regDomainPart)) {
+      return NextResponse.json(
+        { success: false, error: 'Email domain must contain letters (e.g. @gmail.com).' },
         { status: 400 }
       );
     }
