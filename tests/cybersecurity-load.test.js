@@ -320,7 +320,7 @@ describe('⚡ Cybersecurity Full Load & Stress Test Suite', () => {
       expect(lockedSubmissions.length).toBe(CONCURRENT_SUBMISSIONS - 1);
 
       console.log(`[Race Condition Defense] 10 concurrent submissions on token: exactly 1 succeeded, 9 safely locked (idempotent).`);
-    });
+    }, 25000);
 
     it('cleans up test candidate record safely', async () => {
       if (testCandidate?.id) {

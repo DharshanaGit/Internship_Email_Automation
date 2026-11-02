@@ -2138,7 +2138,10 @@ export default function DashboardPage() {
                           {filteredBulkRows.slice(0, 50).map((row, idx) => {
                             const isSelected = selectedCandidateKeys.has(row.candidateId);
                             const internId = String(row.internId || row.raw?.internId || row.candidateId || `INT-2026-${String(idx + 100).padStart(5, '0')}`);
-                            const portalUrl = String(row.responseUrl || `https://internship-email-automation.vercel.app/offers/respond?token=${row.token || row.candidateId}`);
+                            const candidateToken = row.token || row.candidateId;
+                            const portalUrl = (row.responseUrl && !row.responseUrl.includes('-projects.vercel.app') && !row.responseUrl.includes('-git-') && !row.responseUrl.includes('localhost'))
+                              ? row.responseUrl
+                              : `https://internship-email-automation.vercel.app/offers/respond?token=${encodeURIComponent(candidateToken)}`;
                             const fullName = typeof row.fullName === 'string' ? row.fullName : String(row.fullName || '');
                             const email = typeof row.email === 'string' ? row.email : String(row.email || '');
                             const role = typeof row.role === 'string' ? row.role : String(row.role || '');
@@ -2204,11 +2207,8 @@ export default function DashboardPage() {
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        const urlToCopy = typeof window !== 'undefined'
-                                          ? `${window.location.origin}/offers/respond?token=${row.token || row.candidateId}`
-                                          : portalUrl;
-                                        navigator.clipboard?.writeText(urlToCopy);
-                                        showToast('Copied candidate portal link!', 'success');
+                                        navigator.clipboard?.writeText(portalUrl);
+                                        showToast('Copied public candidate portal link!', 'success');
                                       }}
                                       style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)', borderRadius: '4px', padding: '2px 6px', fontSize: '12.5px', color: '#6D28D9', cursor: 'pointer' }}
                                       title="Copy URL"
